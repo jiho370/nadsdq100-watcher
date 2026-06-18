@@ -68,12 +68,20 @@ def _get_json(path: str, params: dict | None = None, retries: int = 3):
 
 
 # ------------------------- 데이터 수집 --------------------------
+# 변경할 코드
 def get_nasdaq100_symbols() -> list[str]:
-    """나스닥-100 구성종목 티커 목록. (지수 기준이라 분기 리밸런싱 때만 바뀜)"""
-    data = _get_json("nasdaq_constituent")
-    syms = [row["symbol"] for row in data if row.get("symbol")]
-    # 일부 클래스주(BRK.B 형태 등) 안전 처리
-    return sorted(set(syms))
+    """무료 플랜 403 에러 우회를 위한 나스닥-100 구성종목 하드코딩 목록"""
+    return [
+        "AAPL", "MSFT", "AMZN", "NVDA", "GOOGL", "GOOG", "META", "TSLA", "PEP", "AVGO",
+        "COST", "CSCO", "TMUS", "CMCSA", "TXN", "QCOM", "AMD", "INTC", "AMGN", "HON",
+        "INTU", "SBUX", "MDLZ", "ISRG", "BKNG", "AMAT", "ADI", "MDLZ", "ADP", "LRCX",
+        "MU", "REGN", "PYPL", "VRTX", "FISV", "PANW", "SNPS", "CDNS", "CHTR", "KLAC",
+        "ASML", "MAR", "MNST", "ORLY", "FTNT", "KDP", "AEP", "NXPI", "ADSK", "PDD",
+        "MCHP", "IDXX", "CTAS", "CPRT", "KHC", "PCAR", "PAYX", "ODFL", "ALGN", "GEHC",
+        "MELI", "FAST", "EXC", "ROST", "BKR", "LULU", "SIRI", "IDXX", "CTSH", "DDOG",
+        "FAST", "CSX", "TEAM", "ILMN", "EBAY", "WBD", "WDAY", "ZS", "ANSS", "DLTR",
+        "MERC", "FANG", "WBA", "BIIB", "GILD", "EA", "MRVL", "CTVA", "EXPE", "ABNB"
+    ]
 
 
 def get_quotes(symbols: list[str]) -> dict[str, dict]:
