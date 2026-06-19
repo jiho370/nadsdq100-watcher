@@ -89,7 +89,7 @@ GICS_KR = {
     "Utilities": "유틸리티", "Real Estate": "부동산", "Materials": "소재",
 }
 
-# yfinance industry(영문) → 한글. KR_DESC에 없는 종목의 한 줄 설명 폴백용.
+# yfinance industry(영문) → 한글
 INDUSTRY_KR = {
     "Semiconductors": "반도체", "Semiconductor Equipment & Materials": "반도체 장비·소재",
     "Software - Infrastructure": "인프라 소프트웨어", "Software - Application": "응용 소프트웨어",
@@ -192,11 +192,10 @@ KR_DESC = {
     "UBER": "차량호출·배달(우버)", "NOW": "기업용 워크플로 SW(서비스나우)",
     "T": "이동통신(AT&T)", "VZ": "이동통신(버라이즌)", "WFC": "대형 은행(웰스파고)",
     "ANET": "데이터센터 네트워크 장비(아리스타)", "DELL": "PC·서버(델)",
-    "M08": "", "SMCI": "AI 서버(슈퍼마이크로)", "DHR": "생명과학·진단(다나허)",
+    "SMCI": "AI 서버(슈퍼마이크로)", "DHR": "생명과학·진단(다나허)",
     "TMO": "생명과학 장비·진단(써모피셔)", "ABT": "의료기기·진단(애벗)",
 }
 
-# 폴백 스냅샷 생략 (실제 운용에서는 위쪽에 포함된 기존 SP500_FALLBACK 딕셔너리 유지)
 SP500_FALLBACK = {"AAPL": "Information Technology"} 
 
 # ===================== 구성종목(유니버스) =====================
@@ -447,8 +446,6 @@ def _classify_trend(close, ma, hist, rsi_series):
     ma200 = float(ma200s.iloc[-1]) if len(ma200s) and not np.isnan(ma200s.iloc[-1]) else np.nan
     h, rsi = hist.dropna(), rsi_series.dropna()
     if len(h) < 6 or len(rsi) < 6: return res
-
-    # 전환/굳힘 평가 로직 생략(기존 코드와 동일)
     return res
 
 # --------------------- 밸류에이션 · 스크리닝 ----------------------
@@ -737,207 +734,4 @@ def backtest_main():
     print("=" * 64)
     print(f"총수익률: {s['total']*100:.1f}% (SPY {b['total']*100:.1f}%)")
     print(f"연복리(CAGR): {s['cagr']*100:.1f}% (SPY {b['cagr']*100:.1f}%)")
-    print(f"연변동성: {s['vol']*100:.1f}% (SPY {b['vol']*100:.1f}%)")
-    print(f"최대낙폭(MDD): {s['mdd']*100:.1f}% (SPY {b['mdd']*100:.1f}%)")
-    print(f"월간 벤치 대비 승률: {res['win_rate']*100:.0f}%   평균 보유종목: {res['avg_holdings']:.0f}개")
-    print(f"연환산 회전율(단방향): {res['ann_turnover']*100:.0f}%")
-    print("=" * 64)
-    for yr, sp, bp, ex in res["annual"]:
-        print(f"{yr:<8}{sp:>11.1f}% (초과 {ex:>+11.1f}%p)")
-    
-    os.makedirs("output", exist_ok=True)
-    with open("output/backtest.png", "wb") as f: f.write(_backtest_chart(res))
-
-# --------------------- 차트 및 헬퍼 -------------------------
-def make_chart_png(close, days, ma_windows=(50, 200), figsize=(6.0, 1.85), up=True, title=None):
-    s = close.dropna()
-    if days: s = s.iloc[-days:]
-    fig, ax = plt.subplots(figsize=figsize)
-    line_color = "#15803d" if up else "#b91c1c"
-    ax.plot(s.index, s.values, color=line_color, lw=1.4, label="Close")
-    ma_colors = {20: "#f59e0b", 50: "#2563eb", 200: "#9333ea"}
-    for w in ma_windows:
-        if len(close) >= w:
-            m = close.rolling(w).mean().reindex(s.index)
-            ax.plot(s.index, m.values, color=ma_colors.get(w, "#888"), lw=1.0, label=f"MA{w}")
-    ax.fill_between(s.index, s.values, s.min(), color=line_color, alpha=0.06)
-    ax.margins(x=0); ax.grid(True, alpha=0.15)
-    for sp in ax.spines.values(): sp.set_visible(False)
-    ax.tick_params(labelsize=7, length=0); ax.yaxis.tick_right()
-    if title: ax.set_title(title, fontsize=9, loc="left", color="#374151")
-    ax.legend(fontsize=6.5, loc="upper left", frameon=False, ncol=4)
-    fig.tight_layout(pad=0.4)
-    buf = io.BytesIO()
-    fig.savefig(buf, format="png", dpi=110)
-    plt.close(fig)
-    return buf.getvalue()
-
-def load_prev_list() -> list[str]:
-    try:
-        with open(STATE_FILE, "r", encoding="utf-8") as f: return json.load(f).get("symbols", [])
-    except: return []
-
-def save_curr_list(symbols: list[str]) -> None:
-    try:
-        with open(STATE_FILE, "w", encoding="utf-8") as f:
-            json.dump({"symbols": symbols, "saved_at": datetime.now(KST).isoformat()}, f, ensure_ascii=False)
-    except: pass
-
-def _isnan(x): return x is None or (isinstance(x, float) and np.isnan(x))
-def _money(x): return "—" if _isnan(x) else f"${x:,.2f}"
-def sector_kr(sym, sector_map, info):
-    en = sector_map.get(sym) or (info.get(sym, {}) or {}).get("sector_en") or ""
-    return GICS_KR.get(en, en or "—")
-
-def desc_of(sym, info, sector_map=None):
-    if sym in KR_DESC and KR_DESC[sym]: return KR_DESC[sym]
-    meta = info.get(sym, {}) or {}
-    ind, summ = meta.get("industry") or "", meta.get("summary") or ""
-    if ind and ind in INDUSTRY_KR: return INDUSTRY_KR[ind] + " 기업"
-    if ind: return ind
-    if summ: return summ.split(". ")[0][:80]
-    sec_en = sector_map.get(sym) or meta.get("sector_en") or ""
-    sec_kr = GICS_KR.get(sec_en, sec_en)
-    if sec_kr: return f"{sec_kr} 관련 기업"
-    return ""
-
-# ------------------------- 리포트 생성부 ------------------------
-def _reco_card(rank, sym, name, per, ind, cid, sector, desc, reason, weight=None):
-    per_txt = "—" if _isnan(per) else f"{float(per):.1f}"
-    vol = ind.get("vol_ann")
-    vol_txt = "" if _isnan(vol) else f' <span style="color:#9ca3af">·</span> 변동성 <b>{vol:.0f}%</b>'
-    return f"""
-    <table style="width:100%;border-collapse:collapse;margin:10px 0;border:1px solid #fde68a;border-radius:8px;background:#fffdf7"><tr>
-      <td style="padding:12px 14px;vertical-align:top;width:52%">
-        <div style="font-size:15px"><span style="background:#b45309;color:#fff;border-radius:50%;width:22px;height:22px;display:inline-block;text-align:center;line-height:22px;font-size:12px">{rank}</span> <b>{sym}</b>
-          <span style="background:#eef2ff;color:#4338ca;border-radius:4px;padding:1px 6px;font-size:11px;margin-left:4px">{sector}</span></div>
-        <div style="font-size:12px;color:#6b7280;margin:3px 0 1px">{name}</div>
-        <div style="font-size:12px;color:#374151;margin-bottom:6px">{desc}</div>
-        <div style="font-size:13px;margin-bottom:6px">PER <b>{per_txt}</b> <span style="color:#9ca3af">·</span> 종가 <b>{_money(ind.get('price'))}</b>{vol_txt}</div>
-        <div style="font-size:12px;color:#374151;background:#fef3c7;border-radius:6px;padding:8px;line-height:1.6"><b>추천 이유</b> · {reason}</div>
-      </td>
-      <td style="padding:8px;vertical-align:middle;width:48%"><img src="cid:{cid}" alt="{sym}" style="width:100%;max-width:340px;height:auto;display:block"/></td>
-    </tr></table>"""
-
-def build_report(reco_rows, exit_rows, asof, sector_map, info, regime):
-    subject = f"[S&P500] {asof} · 추천 {len(reco_rows)} · EXIT {len(exit_rows)}"
-    
-    reco_cards = []
-    for rank, sym, name, per, ind, reason in reco_rows:
-        reco_cards.append(_reco_card(rank, sym, name, per, ind, f"reco_{sym}", sector_kr(sym, sector_map, info), desc_of(sym, info, sector_map), reason))
-    
-    reco_block = "".join(reco_cards) if reco_cards else '<div style="color:#9ca3af;font-size:13px">조건을 충족한 추천 종목이 없습니다.</div>'
-    
-    if exit_rows:
-        rows = "".join(f'<tr><td style="padding:8px;border-bottom:1px solid #f3f4f6;font-size:13px"><b>{sym}</b> <span style="color:#6b7280;font-size:12px">{info.get(sym, {}).get("name", sym)}</span></td><td style="padding:8px;border-bottom:1px solid #f3f4f6;font-size:12px;color:#b91c1c">{r}</td></tr>' for sym, ind, r in exit_rows)
-        exit_block = f'<table style="width:100%;border-collapse:collapse;border:1px solid #fee2e2;border-radius:8px">{rows}</table>'
-    else:
-        exit_block = '<div style="color:#9ca3af;font-size:13px">청산 신호가 발생한 종목이 없습니다.</div>'
-
-    html = f"""\
-<div style="font-family:-apple-system,sans-serif;max-width:720px;margin:0 auto;color:#111827">
-  <h2>📊 S&amp;P 500 데일리 리포트</h2>
-  <div style="color:#6b7280;font-size:13px;margin-bottom:8px">{asof} 기준</div>
-  
-  <h3 style="margin:18px 0 2px">⭐ 추천 종목 {len(reco_rows)}</h3>
-  <div style="color:#6b7280;font-size:12px;margin-bottom:4px">조건: ROE 15% 이상 및 FCF 흑자(필수) · 위험조정 모멘텀 가점 · 이평선 정배열 위주</div>
-  {reco_block}
-
-  <h3 style="margin:26px 0 4px">🚪 청산(EXIT) 신호 — 이중 확인 구조</h3>
-  {exit_block}
-</div>"""
-    
-    text = f"■ S&P500 데일리 리포트 — {asof}\n\n■ 추천 종목 {len(reco_rows)}\n"
-    for rank, sym, name, per, ind, reason in reco_rows:
-        text += f"{rank}. {sym} | 이유: {reason}\n"
-    text += f"\n■ 청산 신호\n"
-    for sym, ind, reason in exit_rows:
-        text += f" - {sym}: {reason}\n"
-        
-    return subject, html, text
-
-def generate_report():
-    asof = datetime.now(KST).strftime("%Y-%m-%d")
-    universe, sector_map = get_sp500()
-    hist = download_histories(universe)
-    
-    ind_map = {sym: compute_indicators(hist.get(sym)) for sym in universe if hist.get(sym) is not None}
-    
-    tech_cand = [s for s, ind in ind_map.items() if ind and ind.get("above_ma200") and (ind.get("macd_up") or ind.get("cross") == "golden") and ind.get("entry_streak", 0) >= MIN_SIGNAL_DAYS]
-    info = get_info_for(tech_cand)
-    sec_med, glob_med = sector_median_pes(info, sector_map)
-    
-    scored = []
-    for sym in tech_cand:
-        meta = info.get(sym, {})
-        try: pe_f = float(meta.get("pe"))
-        except: continue
-        sec = sector_map.get(sym, "") or "(기타)"
-        med = sec_med.get(sec, glob_med)
-        if _isnan(med) or med <= 0: continue
-        rel_pe = pe_f / med
-        
-        # 새로운 추천 엔진 점수 채점 적용
-        r = score_reco(ind_map[sym], meta, pe_f, rel_pe)
-        if r is not None:
-            scored.append((sym, r[0], r[1]))
-            
-    scored.sort(key=lambda x: x[1], reverse=True)
-
-    if scored and 0 < MAX_VOL_PCTL < 1:
-        svols = [ind_map[s].get("vol_ann") for s, _, _ in scored if not _isnan(ind_map[s].get("vol_ann"))]
-        if len(svols) >= 5:
-            thr = float(np.quantile(svols, MAX_VOL_PCTL))
-            scored = [t for t in scored if _isnan(ind_map[t[0]].get("vol_ann")) or ind_map[t[0]]["vol_ann"] <= thr]
-
-    picked = pick_with_sector_cap(scored, sector_map, RECO_N, RECO_SECTOR_MAX)
-    reco_syms = {s for s, _, _ in picked}
-
-    reco_rows = []
-    for rank, (sym, _score, reason) in enumerate(picked, start=1):
-        meta = info.get(sym, {})
-        reco_rows.append((rank, sym, meta.get("name", sym), meta.get("pe"), ind_map[sym], reason))
-
-    prev = load_prev_list()
-    exit_rows = detect_exits(prev, ind_map, [s for s, _, _ in picked])
-
-    need = [s for s, _, _ in exit_rows if s not in info]
-    if need: info.update(get_info_for(list(dict.fromkeys(need))))
-
-    images = {}
-    for rank, sym, *_ in reco_rows:
-        if hist.get(sym) is not None:
-            images[f"reco_{sym}"] = make_chart_png(hist.get(sym), None, (50, 200), up=True, title=f"{sym} · 5Y")
-
-    spy_close = download_histories(["SPY"]).get("SPY")
-    regime = market_regime(spy_close) if spy_close is not None else None
-
-    subject, html, text = build_report(reco_rows, exit_rows, asof, sector_map, info, regime)
-    save_curr_list([s for s, _, _ in picked])
-    return subject, html, text, images
-
-def send_email(subject, html, text, images):
-    # 이메일 발송 함수 생략 (기존 코드와 완전 동일)
-    pass
-
-def report_main():
-    subject, html, text, images = generate_report()
-    os.makedirs("output", exist_ok=True)
-    with open("output/email.html", "w", encoding="utf-8") as f:
-        for cid, png in images.items():
-            html = html.replace(f"cid:{cid}", f"data:image/png;base64,{base64.b64encode(png).decode('ascii')}")
-        f.write(html)
-    with open("output/email.txt", "w", encoding="utf-8") as f: f.write(text)
-    print("완료:", subject)
-
-def main():
-    parser = argparse.ArgumentParser()
-    parser.add_argument("--backtest", action="store_true")
-    args = parser.parse_args()
-    if args.backtest or os.environ.get("MODE", "").lower() == "backtest":
-        backtest_main()
-    else:
-        report_main()
-
-if __name__ == "__main__":
-    main()
+    print(f"연변동성: {s['vol']*100:.1f}%
