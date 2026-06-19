@@ -15,7 +15,9 @@ name: sp500-daily-report
 
 on:
   schedule:
-    - cron: "0 21 * * 1-5"        # UTC 21:00 ≈ 미 동부장 마감 후(평일). 조정 가능
+    # 01:00 UTC = 한국시간(KST) 10:00. 미국장(월~금) 마감분을 "다음날 아침" 받기 위해
+    # 요일은 2-6(화~토). GitHub cron은 UTC 고정이라 서머타임을 따라가지 않습니다.
+    - cron: "0 1 * * 2-6"         # KST 10:00, 화~토 (전 거래일 종가 기준)
   workflow_dispatch:
     inputs:
       run_backtest:
@@ -51,9 +53,6 @@ jobs:
           EMAIL_TO:  ${{ secrets.EMAIL_TO }}
           RECO_SECTOR_MAX: "3"
           MIN_SIGNAL_DAYS: "2"
-          REGIME_FILTER: "1"          # SPY 200일선 아래면 위험회피 배너 표시(0=끄기)
-          WEIGHTING: "invvol"         # 추천 비중: invvol(역변동성)/equal
-          MAX_VOL_PCTL: "0.90"        # 변동성 상위 10% 종목 제외
         run: python sp500_daily_report.py
 
       - name: Upload preview
@@ -75,11 +74,6 @@ jobs:
           BT_YEARS:     "5"          # 검증 기간(년)
           BT_REBALANCE: "21"         # 리밸런싱 주기(거래일) ≈ 월 1회
           BT_TOPK:      "20"         # 매 리밸런싱 보유 종목수
-          REGIME_FILTER:       "1"   # SPY가 200일선 아래면 노출 축소(추세전략 낙폭 완화)
-          REGIME_OFF_EXPOSURE: "0.3" # 위험회피 시 투자비중(0=전액현금)
-          WEIGHTING:           "invvol" # 포트 가중: invvol(역변동성)/equal
-          MAX_VOL_PCTL:        "0.90"   # 고변동 상위 10% 제외
-          HYSTERESIS_MULT:     "1.5"    # 보유 유지 순위 버퍼(회전율↓)
           BT_COST_BPS:  "5"          # 거래비용(bp)
           # BT_PER_PROXY: "1"        # (참고용·룩어헤드 편향) 펀더멘털 프록시 켜기
         run: python sp500_daily_report.py --backtest
