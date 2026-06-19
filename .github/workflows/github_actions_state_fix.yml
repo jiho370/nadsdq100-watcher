@@ -52,6 +52,8 @@ jobs:
           RECO_SECTOR_MAX: "3"
           MIN_SIGNAL_DAYS: "2"
           REGIME_FILTER: "1"          # SPY 200일선 아래면 위험회피 배너 표시(0=끄기)
+          WEIGHTING: "invvol"         # 추천 비중: invvol(역변동성)/equal
+          MAX_VOL_PCTL: "0.90"        # 변동성 상위 10% 종목 제외
         run: python sp500_daily_report.py
 
       - name: Upload preview
@@ -75,6 +77,9 @@ jobs:
           BT_TOPK:      "20"         # 매 리밸런싱 보유 종목수
           REGIME_FILTER:       "1"   # SPY가 200일선 아래면 노출 축소(추세전략 낙폭 완화)
           REGIME_OFF_EXPOSURE: "0.3" # 위험회피 시 투자비중(0=전액현금)
+          WEIGHTING:           "invvol" # 포트 가중: invvol(역변동성)/equal
+          MAX_VOL_PCTL:        "0.90"   # 고변동 상위 10% 제외
+          HYSTERESIS_MULT:     "1.5"    # 보유 유지 순위 버퍼(회전율↓)
           BT_COST_BPS:  "5"          # 거래비용(bp)
           # BT_PER_PROXY: "1"        # (참고용·룩어헤드 편향) 펀더멘털 프록시 켜기
         run: python sp500_daily_report.py --backtest
