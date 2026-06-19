@@ -68,20 +68,38 @@ def _get_json(path: str, params: dict | None = None, retries: int = 3):
 
 
 # ------------------------- 데이터 수집 --------------------------
-# 변경할 코드
+# 나스닥-100 구성종목 (지수는 3·6·9·12월 분기 리밸런싱 — 그때만 갱신하면 됩니다)
+# 출처: slickcharts.com/nasdaq100. 클래스 중복주(GOOGL/GOOG 등) 포함.
+NASDAQ100_SYMBOLS = [
+    "NVDA", "AAPL", "MSFT", "AMZN", "GOOGL", "GOOG", "AVGO", "TSLA", "META", "MU",
+    "WMT", "AMD", "ASML", "INTC", "AMAT", "LRCX", "CSCO", "ARM", "COST", "KLAC",
+    "SNDK", "NFLX", "PLTR", "TXN", "MRVL", "WDC", "STX", "QCOM", "LIN", "PANW",
+    "ADI", "TMUS", "PEP", "AMGN", "CRWD", "APP", "GILD", "HON", "ISRG", "SHOP",
+    "BKNG", "VRTX", "SBUX", "PDD", "CDNS", "FTNT", "MAR", "CEG", "MNST", "SNPS",
+    "ADP", "CSX", "ABNB", "MELI", "CMCSA", "NXPI", "DDOG", "MDLZ", "ADBE", "MPWR",
+    "DASH", "ROST", "INTU", "ORLY", "AEP", "CTAS", "LITE", "WBD", "REGN", "PCAR",
+    "BKR", "MCHP", "FAST", "FANG", "EA", "FER", "XEL", "EXC", "ODFL", "TTWO",
+    "IDXX", "CCEP", "KDP", "ADSK", "MSTR", "PYPL", "ALNY", "PAYX", "TRI", "AXON",
+    "ROP", "WDAY", "DXCM", "CPRT", "GEHC", "KHC", "VRSK", "INSM", "CTSH", "ZS", "CHTR",
+]
+
+
 def get_nasdaq100_symbols() -> list[str]:
-    """무료 플랜 403 에러 우회를 위한 나스닥-100 구성종목 하드코딩 목록"""
-    return [
-        "AAPL", "MSFT", "AMZN", "NVDA", "GOOGL", "GOOG", "META", "TSLA", "PEP", "AVGO",
-        "COST", "CSCO", "TMUS", "CMCSA", "TXN", "QCOM", "AMD", "INTC", "AMGN", "HON",
-        "INTU", "SBUX", "MDLZ", "ISRG", "BKNG", "AMAT", "ADI", "MDLZ", "ADP", "LRCX",
-        "MU", "REGN", "PYPL", "VRTX", "FISV", "PANW", "SNPS", "CDNS", "CHTR", "KLAC",
-        "ASML", "MAR", "MNST", "ORLY", "FTNT", "KDP", "AEP", "NXPI", "ADSK", "PDD",
-        "MCHP", "IDXX", "CTAS", "CPRT", "KHC", "PCAR", "PAYX", "ODFL", "ALGN", "GEHC",
-        "MELI", "FAST", "EXC", "ROST", "BKR", "LULU", "SIRI", "IDXX", "CTSH", "DDOG",
-        "FAST", "CSX", "TEAM", "ILMN", "EBAY", "WBD", "WDAY", "ZS", "ANSS", "DLTR",
-        "MERC", "FANG", "WBA", "BIIB", "GILD", "EA", "MRVL", "CTVA", "EXPE", "ABNB"
-    ]
+    """나스닥-100 구성종목 티커 목록.
+
+    FMP 무료 플랜은 지수 구성종목 엔드포인트(nasdaq_constituent)가 막혀 있어(HTTP 403)
+    위 정적 목록을 사용한다. 분기 리밸런싱(3/6/9/12월) 때만 목록을 갱신하면 된다.
+    유료 FMP 플랜이라면 환경변수 USE_FMP_CONSTITUENT=1 을 주면 API로 자동 조회한다.
+    """
+    if os.environ.get("USE_FMP_CONSTITUENT") == "1":
+        try:
+            data = _get_json("nasdaq_constituent")
+            syms = [row["symbol"] for row in data if row.get("symbol")]
+            if syms:
+                return sorted(set(syms))
+        except Exception as e:  # noqa: BLE001
+            print(f"[경고] FMP 구성종목 조회 실패 → 정적 목록 사용: {e}", file=sys.stderr)
+    return list(NASDAQ100_SYMBOLS)
 
 
 def get_quotes(symbols: list[str]) -> dict[str, dict]:
