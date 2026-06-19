@@ -10,7 +10,7 @@ v5 핵심 개선점:
   4. 이벤트 드리븐 백테스트: 정기 교체를 폐지하고 락업(21일)과 상태 기반 편출입으로 마찰 비용 최소화.
 
 데이터 : Yahoo Finance(yfinance, 키 불필요) + SPY 보유종목(State Street)
-실행   : GitHub Actions cron (매일 1회, 미국장 마감 후)
+실행   : GitHub Actions cron (미국 거래일 다음날 아침 KST 10:00, 전일 종가 기준)
 """
 
 from __future__ import annotations
