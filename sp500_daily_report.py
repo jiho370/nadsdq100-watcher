@@ -1,23 +1,20 @@
 #!/usr/bin/env python3
 """
-sp500_daily_report.py  (v3)
+sp500_daily_report.py  (v4)
 
 매일 S&P 500 구성종목을 분석해 이메일 리포트를 생성/발송한다.
-
-리포트 구성
-  1) ⭐ 추천 종목 (최대 10개) — 저PER이면서 기술적 지표가 우수한 종목
-     · 필수 조건: 200일선 위  AND  (MACD 상승  OR  최근 골든크로스)  AND  PER 적정범위
-     · 복합 점수(밸류에이션 + 추세 강도)로 정렬해 상위 N개. 조건 충족이 적으면 그만큼만.
-  2) 🔄 추세 전환(하락→상승) — 며칠 사이 하락을 멈추고 상승 신호가 나타난 종목
-  3) 📈 추세 굳힘(상승 고착) — 정배열이 며칠째 유지되는 종목
-     ※ 추천에 이미 든 종목은 2)·3)에서 제외(중복 표시 방지)
-
-구성종목은 매 실행 시 SPDR S&P500 ETF(SPY)의 공식 일일 보유종목을 받아 항상 최신으로 유지하고,
-다운로드 실패 시에만 내장 스냅샷(SP500_FALLBACK)으로 폴백한다.
+v4 개선점(요청 반영):
+  · 백테스트 모드 추가 (--backtest): 기술적 전략을 룩어헤드 없이 과거 검증, SPY 대비 성과 비교
+  · 밸류에이션을 '섹터 상대 PER'로 전환 + 퀄리티(ROE·부채·FCF·성장) 필터 결합
+  · 추천 종목 섹터 상한(RECO_SECTOR_MAX)으로 집중 위험 완화
+  · 신호 지속일(MIN_SIGNAL_DAYS) 요건으로 휘프소(잦은 뒤집힘) 완화
+  · 데이터 신선도 검증: 마지막 종가가 오래된 종목 자동 제외
+  · 보유/추천 청산 신호 섹션(🚪 EXIT) 추가
+  · 상태파일(state) CI 영속화 안내 강화
 
 데이터 : Yahoo Finance(yfinance, 키 불필요) + SPY 보유종목(State Street)
 실행   : GitHub Actions cron (매일 1회, 미국장 마감 후)
-지표·차트는 일봉 종가 기준 자동 계산값이며 투자 권유가 아니다.
+지표·차트·추천·백테스트는 일봉 종가 기준 자동 계산값이며 투자 권유가 아니다.
 """
 
 from __future__ import annotations
@@ -28,14 +25,20 @@ import sys
 import json
 import base64
 import time
+import argparse
 from datetime import datetime, timezone, timedelta
 
 import pandas as pd
 import numpy as np
 
+import warnings
 import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
+warnings.filterwarnings("ignore", message=".*tight_layout.*")
+warnings.filterwarnings("ignore", message=".*Tight layout.*")
+warnings.filterwarnings("ignore", category=UserWarning, module="matplotlib")
+warnings.filterwarnings("ignore", category=UserWarning, module=r"matplotlib\..*")
 
 try:
     import yfinance as yf
@@ -55,11 +58,21 @@ from email.mime.image import MIMEImage
 
 # ----------------------------- 설정 -----------------------------
 RECO_N         = int(os.environ.get("RECO_N", "10"))            # 추천 종목 최대 개수
-RECO_PER_MAX   = float(os.environ.get("RECO_PER_MAX", "20"))    # '저PER' 기준 상한
+RECO_PER_MAX   = float(os.environ.get("RECO_PER_MAX", "20"))    # PER 절대 상한(이상치 차단용)
+RECO_SECTOR_MAX= int(os.environ.get("RECO_SECTOR_MAX", "3"))    # 추천 섹터당 최대 종목수(집중 완화)
+MIN_SIGNAL_DAYS= int(os.environ.get("MIN_SIGNAL_DAYS", "2"))    # 기술 진입신호 최소 지속일(휘프소 완화)
+MAX_STALE_DAYS = int(os.environ.get("MAX_STALE_DAYS", "5"))     # 종가 신선도 허용 일수(달력일)
 TREND_MAX      = int(os.environ.get("TREND_MAX", "6"))          # 전환/굳힘 섹션별 최대 종목
 HISTORY_PERIOD = os.environ.get("HISTORY_PERIOD", "5y")
 STATE_FILE     = os.environ.get("STATE_FILE", "state_prev_list.json")
 KST            = timezone(timedelta(hours=9))
+
+# 백테스트 설정
+BT_REBALANCE   = int(os.environ.get("BT_REBALANCE", "21"))      # 리밸런싱 주기(거래일)
+BT_YEARS       = float(os.environ.get("BT_YEARS", "5"))         # 백테스트 기간(년)
+BT_TOPK        = int(os.environ.get("BT_TOPK", "20"))           # 매 리밸런싱 보유 종목수(0=전체)
+BT_COST_BPS    = float(os.environ.get("BT_COST_BPS", "5"))      # 편입/편출 1회 거래비용(bp)
+BT_PER_PROXY   = os.environ.get("BT_PER_PROXY", "0") == "1"     # 현재 PER을 과거에 적용(룩어헤드!) 실험용
 
 RSI_PERIOD     = 14
 MACD_FAST, MACD_SLOW, MACD_SIGNAL = 12, 26, 9
@@ -77,7 +90,50 @@ GICS_KR = {
     "Utilities": "유틸리티", "Real Estate": "부동산", "Materials": "소재",
 }
 
-# 주요 종목 한글 한 줄 설명(없으면 야후 영문 industry/summary로 폴백)
+# yfinance industry(영문) → 한글. KR_DESC에 없는 종목의 한 줄 설명 폴백용.
+INDUSTRY_KR = {
+    "Semiconductors": "반도체", "Semiconductor Equipment & Materials": "반도체 장비·소재",
+    "Software - Infrastructure": "인프라 소프트웨어", "Software - Application": "응용 소프트웨어",
+    "Information Technology Services": "IT 서비스", "Communication Equipment": "통신장비",
+    "Computer Hardware": "컴퓨터 하드웨어", "Consumer Electronics": "소비자 전자제품",
+    "Electronic Components": "전자부품", "Scientific & Technical Instruments": "정밀계측기기",
+    "Internet Content & Information": "인터넷 콘텐츠·플랫폼", "Internet Retail": "온라인 소매",
+    "Entertainment": "엔터테인먼트", "Telecom Services": "통신 서비스",
+    "Banks - Diversified": "종합 은행", "Banks - Regional": "지역 은행",
+    "Capital Markets": "자본시장·증권", "Asset Management": "자산운용",
+    "Insurance - Diversified": "종합 보험", "Insurance - Property & Casualty": "손해보험",
+    "Insurance - Life": "생명보험", "Credit Services": "여신·결제 서비스",
+    "Financial Data & Stock Exchanges": "금융데이터·거래소",
+    "Drug Manufacturers - General": "대형 제약", "Drug Manufacturers - Specialty & Generic": "전문·제네릭 제약",
+    "Biotechnology": "바이오테크", "Medical Devices": "의료기기", "Medical Instruments & Supplies": "의료기기·소모품",
+    "Diagnostics & Research": "진단·연구", "Healthcare Plans": "건강보험", "Medical Care Facilities": "의료시설",
+    "Drug Manufacturers": "제약", "Health Information Services": "헬스케어 IT",
+    "Oil & Gas Integrated": "종합 석유·가스", "Oil & Gas E&P": "석유·가스 탐사생산",
+    "Oil & Gas Midstream": "석유·가스 운송·저장", "Oil & Gas Equipment & Services": "유전 장비·서비스",
+    "Oil & Gas Refining & Marketing": "정유·판매",
+    "Aerospace & Defense": "항공우주·방산", "Specialty Industrial Machinery": "산업기계",
+    "Farm & Heavy Construction Machinery": "건설·중장비", "Building Products & Equipment": "건축자재·설비",
+    "Railroads": "철도", "Integrated Freight & Logistics": "물류·운송", "Airlines": "항공",
+    "Trucking": "화물 운송", "Engineering & Construction": "엔지니어링·건설",
+    "Industrial Distribution": "산업재 유통", "Staffing & Employment Services": "인력·고용 서비스",
+    "Discount Stores": "할인점", "Specialty Retail": "전문 소매", "Home Improvement Retail": "주택용품 소매",
+    "Restaurants": "외식·레스토랑", "Apparel Retail": "의류 소매", "Footwear & Accessories": "신발·액세서리",
+    "Auto Manufacturers": "자동차 제조", "Auto Parts": "자동차 부품", "Travel Services": "여행 서비스",
+    "Lodging": "호텔·숙박", "Resorts & Casinos": "리조트·카지노", "Packaging & Containers": "포장재",
+    "Beverages - Non-Alcoholic": "음료(비주류)", "Beverages - Brewers": "주류",
+    "Confectioners": "제과", "Packaged Foods": "가공식품", "Household & Personal Products": "생활·개인용품",
+    "Tobacco": "담배", "Grocery Stores": "식료품 소매", "Farm Products": "농산물",
+    "Utilities - Regulated Electric": "전력 유틸리티", "Utilities - Regulated Gas": "가스 유틸리티",
+    "Utilities - Diversified": "종합 유틸리티", "Utilities - Renewable": "신재생 유틸리티",
+    "Utilities - Regulated Water": "수도 유틸리티",
+    "REIT - Specialty": "특수 리츠", "REIT - Industrial": "산업용 리츠", "REIT - Retail": "리테일 리츠",
+    "REIT - Residential": "주거용 리츠", "REIT - Office": "오피스 리츠", "REIT - Healthcare Facilities": "헬스케어 리츠",
+    "Specialty Chemicals": "특수 화학", "Chemicals": "화학", "Building Materials": "건축소재",
+    "Gold": "금광", "Copper": "구리", "Steel": "철강", "Agricultural Inputs": "비료·농자재",
+    "Industrial Gases": "산업용 가스",
+}
+
+# 주요 종목 한글 한 줄 설명(없으면 INDUSTRY_KR → 야후 영문 industry/summary로 폴백)
 KR_DESC = {
     "NVDA": "AI·데이터센터용 GPU 1위", "AAPL": "아이폰·맥·서비스 생태계",
     "MSFT": "윈도우·오피스·Azure 클라우드", "AMZN": "전자상거래·AWS 클라우드",
@@ -237,7 +293,6 @@ def get_sp500() -> tuple[list[str], dict[str, str]]:
     """
     syms, sectors = _fetch_spy_holdings()
     if syms and 400 <= len(syms) <= 520:
-        # 폴백 섹터로 빈 곳 보충
         for s in syms:
             sectors.setdefault(s, SP500_FALLBACK.get(s, ""))
         print(f"[정보] SPY 보유종목 {len(syms)}개 로드(공식 일일 데이터)", file=sys.stderr)
@@ -259,7 +314,6 @@ def _fetch_spy_holdings() -> tuple[list[str], dict[str, str]]:
         print(f"[경고] SPY xlsx 다운로드/파싱 실패: {e}", file=sys.stderr)
         return [], {}
 
-    # 'Ticker'와 'Name'을 포함한 헤더 행을 찾는다
     hdr = None
     for i in range(min(15, len(raw))):
         cells = [str(c).strip().lower() for c in raw.iloc[i].tolist()]
@@ -290,7 +344,6 @@ def _fetch_spy_holdings() -> tuple[list[str], dict[str, str]]:
         tic = str(row.get(c_tic, "")).strip()
         if not tic or tic.lower() in ("nan", "-", "cash", "ssga", "uscash"):
             continue
-        # 알파벳/점 위주의 정상 티커만
         if not all(ch.isalnum() or ch in ".-" for ch in tic):
             continue
         yh = tic.replace(".", "-")
@@ -330,7 +383,7 @@ def _require_yf():
 
 
 def get_info_for(symbols: list[str]) -> dict[str, dict]:
-    """주어진 종목들의 PER/가격/이름/업종/요약을 .info로 조회(종목당 1콜)."""
+    """PER/가격/이름/업종/요약 + 퀄리티 지표(ROE·부채·FCF·성장)를 .info로 조회(종목당 1콜)."""
     _require_yf()
     out: dict[str, dict] = {}
     for sym in symbols:
@@ -360,12 +413,20 @@ def get_info_for(symbols: list[str]) -> dict[str, dict]:
             "industry": info.get("industry") or "",
             "sector_en": info.get("sector") or "",
             "summary": info.get("longBusinessSummary") or "",
+            # 퀄리티 원천(없을 수 있음)
+            "roe": info.get("returnOnEquity"),
+            "de": info.get("debtToEquity"),
+            "fcf": info.get("freeCashflow"),
+            "rev_growth": info.get("revenueGrowth"),
+            "profit_margin": info.get("profitMargins"),
         }
     return out
 
 
 def download_histories(symbols: list[str], period: str = HISTORY_PERIOD) -> dict[str, pd.Series]:
-    """모든 종목 일봉 종가를 배치로 받아 {sym: close}로 반환. 실패 시 개별 폴백."""
+    """모든 종목 일봉 종가를 배치로 받아 {sym: close}로 반환. 실패 시 개별 폴백.
+    이후 _filter_stale()로 신선도가 떨어지는 종목을 제거한다.
+    """
     _require_yf()
     out: dict[str, pd.Series] = {}
     try:
@@ -400,7 +461,30 @@ def download_histories(symbols: list[str], period: str = HISTORY_PERIOD) -> dict
                     out[sym] = close
         except Exception:  # noqa: BLE001
             continue
-    return out
+    return _filter_stale(out, MAX_STALE_DAYS)
+
+
+def _filter_stale(hist: dict[str, pd.Series], max_stale_days: int) -> dict[str, pd.Series]:
+    """유니버스 최신 거래일 기준으로 마지막 종가가 너무 오래된 종목을 제거한다.
+    (상장폐지·거래정지 등으로 데이터가 멈춘 종목이 추천에 섞이는 것을 차단)
+    """
+    if not hist:
+        return hist
+    last_dates = {s: c.index[-1] for s, c in hist.items() if len(c)}
+    if not last_dates:
+        return hist
+    ref = max(last_dates.values())
+    cutoff = ref - pd.Timedelta(days=max_stale_days)
+    fresh, dropped = {}, []
+    for s, c in hist.items():
+        if len(c) and c.index[-1] >= cutoff:
+            fresh[s] = c
+        else:
+            dropped.append(s)
+    if dropped:
+        print(f"[정보] 신선도 필터: {len(dropped)}개 종목 제외(마지막 거래일이 {max_stale_days}일 이상 과거): "
+              f"{', '.join(dropped[:12])}{'...' if len(dropped) > 12 else ''}", file=sys.stderr)
+    return fresh
 
 
 def _clean_close(close: pd.Series) -> pd.Series:
@@ -448,6 +532,28 @@ def _ret_full(close):
     return float("nan")
 
 
+def _tech_entry_series(close: pd.Series) -> pd.Series:
+    """매 시점의 '기술적 진입 조건' 불리언 시리즈(룩어헤드 없음).
+    조건: 종가 > 200일선  AND  MACD 히스토그램 > 0.
+    백테스트와 신호 지속일 계산에 공통으로 사용한다.
+    """
+    ma200 = close.rolling(200).mean()
+    _, _, hist = _macd(close)
+    cond = (close > ma200) & (hist > 0)
+    return cond.fillna(False)
+
+
+def _signal_streak(cond: pd.Series) -> int:
+    """불리언 시리즈 끝에서부터 연속 True 개수."""
+    streak = 0
+    for v in reversed(cond.values):
+        if bool(v):
+            streak += 1
+        else:
+            break
+    return streak
+
+
 def compute_indicators(close):
     if close is None or close.empty:
         return None
@@ -468,11 +574,12 @@ def compute_indicators(close):
                 cross = "golden"
             elif recent.iloc[0] > 0 and recent.iloc[-1] < 0:
                 cross = "death"
+    entry_streak = _signal_streak(_tech_entry_series(close))
     ind = {
         "price": last, "ma20": ma_last[20], "ma50": ma_last[50], "ma200": ma_last[200],
         "above_ma200": (not np.isnan(ma_last[200])) and last > ma_last[200],
         "rsi": rsi_val, "macd": macd_val, "macd_signal": sig_val, "macd_hist": hist_val,
-        "macd_up": hist_val > 0, "cross": cross,
+        "macd_up": hist_val > 0, "cross": cross, "entry_streak": entry_streak,
         "chg_1d": _ret(close, 1), "chg_1w": _ret(close, P_1W), "chg_1m": _ret(close, P_1M),
         "chg_3m": _ret(close, 63), "chg_1y": _ret(close, P_1Y), "chg_3y": _ret(close, P_3Y),
         "chg_5y": _ret_full(close),
@@ -552,10 +659,81 @@ def _classify_trend(close, ma, hist, rsi_series):
     return res
 
 
+# --------------------- 밸류에이션 · 퀄리티 ----------------------
+def sector_median_pes(info: dict[str, dict], sector_map: dict[str, str]) -> tuple[dict, float]:
+    """후보들의 PER을 섹터별로 모아 중앙값을 구한다. (섹터 median, 전체 median) 반환.
+    표본이 3개 미만인 섹터는 호출부에서 전체 median으로 폴백한다.
+    """
+    by_sec: dict[str, list[float]] = {}
+    allpe: list[float] = []
+    for sym, meta in info.items():
+        pe = meta.get("pe")
+        try:
+            pe = float(pe)
+        except (TypeError, ValueError):
+            continue
+        if not (0 < pe <= 200):       # 명백한 이상치 제외
+            continue
+        sec = sector_map.get(sym, "") or "(기타)"
+        by_sec.setdefault(sec, []).append(pe)
+        allpe.append(pe)
+    med = {sec: float(np.median(v)) for sec, v in by_sec.items()}
+    counts = {sec: len(v) for sec, v in by_sec.items()}
+    global_med = float(np.median(allpe)) if allpe else float("nan")
+    # 표본 부족 섹터는 전체 median으로
+    for sec in list(med.keys()):
+        if counts[sec] < 3 and not np.isnan(global_med):
+            med[sec] = global_med
+    return med, global_med
+
+
+def quality_score(meta: dict) -> tuple[float, list[str]]:
+    """ROE·부채·FCF·매출성장으로 0~3점 안팎의 퀄리티 점수와 사유 산출.
+    데이터가 없으면 해당 항목은 건너뛴다(불이익 없음).
+    """
+    s, reasons = 0.0, []
+    roe = meta.get("roe")
+    de = meta.get("de")
+    fcf = meta.get("fcf")
+    rg = meta.get("rev_growth")
+    pm = meta.get("profit_margin")
+    if isinstance(roe, (int, float)) and roe is not None:
+        if roe >= 0.20:
+            s += 1.2; reasons.append(f"ROE {roe*100:.0f}%(우수)")
+        elif roe >= 0.12:
+            s += 0.6; reasons.append(f"ROE {roe*100:.0f}%")
+        elif roe < 0:
+            s -= 0.8; reasons.append("ROE 적자")
+    if isinstance(de, (int, float)) and de is not None:
+        # yfinance debtToEquity는 보통 % 단위(예: 80 = 0.8배)
+        if de < 80:
+            s += 0.5; reasons.append("저부채")
+        elif de > 200:
+            s -= 0.5; reasons.append("고부채 주의")
+    if isinstance(fcf, (int, float)) and fcf is not None:
+        if fcf > 0:
+            s += 0.6; reasons.append("FCF 흑자")
+        else:
+            s -= 0.6; reasons.append("FCF 적자")
+    if isinstance(rg, (int, float)) and rg is not None:
+        if rg >= 0.10:
+            s += 0.5; reasons.append(f"매출성장 +{rg*100:.0f}%")
+        elif rg < 0:
+            s -= 0.3
+    if isinstance(pm, (int, float)) and pm is not None and pm >= 0.15:
+        s += 0.3; reasons.append("고마진")
+    return s, reasons
+
+
 # --------------------- 추천 종목 스코어링 -----------------------
-def score_reco(ind: dict, pe) -> tuple[float, str] | None:
+def score_reco(ind: dict, pe, rel_pe: float, qscore: float, qreasons: list[str]) -> tuple[float, str] | None:
     """추천 적격이면 (점수, 한글사유) 반환, 아니면 None.
-    필수: PER∈(0, RECO_PER_MAX]  AND  200일선 위  AND  (MACD 상승 OR 최근 골든크로스).
+    필수:
+      · PER ∈ (0, RECO_PER_MAX]  (이상치 차단용 절대 상한)
+      · 섹터 상대 PER ≤ 1.0  (같은 섹터 중앙값 이하 = 동종 대비 저평가)
+      · 200일선 위  AND  (MACD 상승 OR 골든크로스)
+      · 기술 진입신호 {MIN_SIGNAL_DAYS}일 이상 지속  (휘프소 방지)
+      · 퀄리티 점수 ≥ 0  (적자/고부채 트랩 제거)
     """
     try:
         pe = float(pe)
@@ -563,18 +741,30 @@ def score_reco(ind: dict, pe) -> tuple[float, str] | None:
         return None
     if not (0 < pe <= RECO_PER_MAX):
         return None
+    if not (rel_pe <= 1.0):
+        return None
     if not ind.get("above_ma200"):
         return None
     if not (ind.get("macd_up") or ind.get("cross") == "golden"):
         return None
-    # 극단적 과열(RSI>82)은 추천에서 제외(추격매수 방지)
+    if ind.get("entry_streak", 0) < MIN_SIGNAL_DAYS:
+        return None
+    if qscore < 0:                                   # 밸류 트랩 차단
+        return None
     if not _isnan(ind.get("rsi")) and ind["rsi"] > 82:
         return None
 
     score, reasons = 0.0, []
-    # 밸류에이션(저PER일수록 가점)
-    score += (RECO_PER_MAX - pe) / RECO_PER_MAX * 2.5
-    reasons.append(f"PER {pe:.1f}로 저평가 구간")
+    # 밸류에이션(섹터 대비 쌀수록 가점)
+    cheap = max(0.0, min(1.0, 1.0 - rel_pe))
+    score += cheap * 2.5
+    reasons.append(f"PER {pe:.1f}(섹터 중앙 대비 {rel_pe:.0%} 수준)")
+    # 퀄리티
+    if qscore > 0:
+        score += min(qscore, 2.5)
+        if qreasons:
+            reasons.append("퀄리티: " + ", ".join(qreasons[:3]))
+    # 추세/모멘텀
     if ind.get("cross") == "golden":
         score += 2.5
         reasons.append("최근 골든크로스(50일선이 200일선 상향 돌파)")
@@ -587,6 +777,9 @@ def score_reco(ind: dict, pe) -> tuple[float, str] | None:
         reasons.append("20·50·200일선 정배열(상승추세 견고)")
     else:
         reasons.append("주가가 200일선 위(중장기 상승 흐름)")
+    es = ind.get("entry_streak", 0)
+    if es >= MIN_SIGNAL_DAYS:
+        reasons.append(f"진입신호 {es}일 지속")
     rsi = ind.get("rsi")
     if not _isnan(rsi):
         if 50 <= rsi <= 70:
@@ -601,6 +794,252 @@ def score_reco(ind: dict, pe) -> tuple[float, str] | None:
     if not _isnan(ind.get("chg_1m")) and ind["chg_1m"] > 0:
         score += 0.5
     return score, " · ".join(reasons)
+
+
+def pick_with_sector_cap(scored: list[tuple], sector_map: dict[str, str],
+                         n: int, cap: int) -> list[tuple]:
+    """점수 내림차순으로 정렬된 [(sym, score, reason), ...]에서
+    섹터당 최대 cap개까지만 골라 상위 n개를 반환(집중 위험 완화)."""
+    out, per_sec = [], {}
+    for sym, sc, reason in scored:
+        sec = sector_map.get(sym, "") or "(기타)"
+        if per_sec.get(sec, 0) >= cap:
+            continue
+        out.append((sym, sc, reason))
+        per_sec[sec] = per_sec.get(sec, 0) + 1
+        if len(out) >= n:
+            break
+    return out
+
+
+# --------------------- 청산(EXIT) 신호 --------------------------
+def detect_exits(prev_syms: list[str], ind_map: dict[str, dict],
+                 picked_syms: list[str]) -> list[tuple]:
+    """직전 추천 종목 중 이번에 기술적 조건이 무너진 종목을 EXIT로 표시.
+    무너짐 = 200일선 이탈  OR  데드크로스  OR  MACD 하락 전환.
+    이번에도 추천에 다시 든 종목은 EXIT에서 제외.
+    """
+    exits = []
+    for sym in prev_syms:
+        if sym in picked_syms:
+            continue
+        ind = ind_map.get(sym)
+        if not ind:
+            exits.append((sym, ind, "데이터 없음(거래정지·신선도 미달 가능) — 보유 시 점검 필요"))
+            continue
+        why = []
+        if not ind.get("above_ma200"):
+            why.append("200일선 하향 이탈")
+        if ind.get("cross") == "death":
+            why.append("데드크로스(50일선이 200일선 하향 돌파)")
+        if not ind.get("macd_up"):
+            why.append("MACD 하락 전환")
+        if why:
+            exits.append((sym, ind, " · ".join(why)))
+    return exits
+
+
+# ============================ 백테스트 ===========================
+# 주의: 이 백테스트는 '기술적' 전략(200일선 위 + MACD 히스토그램>0)만 인과적으로 검증한다.
+# 롤링평균·EWM·과거수익률은 모두 과거 데이터만 쓰므로 룩어헤드가 없다.
+# 반면 PER/퀄리티는 '과거 그 시점'의 값이 필요한데 yfinance 무료 데이터로는
+# 현재값만 제공된다. 현재 PER을 과거에 적용하면 룩어헤드 편향이 생기므로 기본 비활성.
+# (BT_PER_PROXY=1로 켤 수 있으나, 결과는 실제보다 좋게 나오는 '참고용'임을 명시한다.)
+
+def _align_panel(hist: dict[str, pd.Series], dates: pd.DatetimeIndex) -> pd.DataFrame:
+    cols = {}
+    for s, c in hist.items():
+        cols[s] = c.reindex(dates).astype(float)
+    return pd.DataFrame(cols, index=dates)
+
+
+def _max_drawdown(equity: pd.Series) -> float:
+    peak = equity.cummax()
+    dd = equity / peak - 1.0
+    return float(dd.min())
+
+
+def _metrics(equity: pd.Series, periods_per_year: int = 252) -> dict:
+    eq = equity.dropna()
+    if len(eq) < 2:
+        return {"total": float("nan"), "cagr": float("nan"), "vol": float("nan"),
+                "mdd": float("nan"), "sharpe": float("nan")}
+    rets = eq.pct_change().dropna()
+    years = len(eq) / periods_per_year
+    total = float(eq.iloc[-1] / eq.iloc[0] - 1.0)
+    cagr = float((eq.iloc[-1] / eq.iloc[0]) ** (1 / years) - 1.0) if years > 0 else float("nan")
+    vol = float(rets.std() * np.sqrt(periods_per_year))
+    sharpe = float(rets.mean() / rets.std() * np.sqrt(periods_per_year)) if rets.std() > 0 else float("nan")
+    return {"total": total, "cagr": cagr, "vol": vol, "mdd": _max_drawdown(eq), "sharpe": sharpe}
+
+
+def run_backtest(hist: dict[str, pd.Series], spy_close: pd.Series,
+                 sector_map: dict[str, str], info: dict | None = None) -> dict:
+    """기술 전략 vs SPY 매수후보유 백테스트.
+    리밸런싱마다 진입조건을 만족하는 종목을 (3개월 모멘텀 상위 BT_TOPK개) 동일가중 보유.
+    """
+    if spy_close is None or spy_close.empty:
+        raise RuntimeError("백테스트에는 SPY 종가가 필요합니다.")
+    spy_close = _clean_close(spy_close)
+
+    # 공통 달력 = SPY 거래일 중 최근 BT_YEARS년
+    end = spy_close.index[-1]
+    start = end - pd.Timedelta(days=int(BT_YEARS * 365.25) + 5)
+    dates = spy_close.index[(spy_close.index >= start) & (spy_close.index <= end)]
+    if len(dates) < BT_REBALANCE * 3:
+        raise RuntimeError("백테스트 기간이 너무 짧습니다(데이터 부족).")
+
+    panel = _align_panel(hist, dates)                 # 가격
+    rets = panel.pct_change()                         # 일간 수익률
+    mom = panel.pct_change(63)                        # 3개월 모멘텀(인과적)
+
+    # 진입조건 패널(인과적): 종가>200MA AND MACD hist>0  — 전체기간에서 계산 후 윈도우 슬라이스
+    entry_full = {}
+    for s, c in hist.items():
+        entry_full[s] = _tech_entry_series(c)
+    entry = pd.DataFrame({s: e.reindex(dates) for s, e in entry_full.items()},
+                         index=dates).fillna(False)
+
+    # 선택적 PER 프록시(룩어헤드 — 참고용)
+    per_ok = None
+    if BT_PER_PROXY and info:
+        med, gmed = sector_median_pes(info, sector_map)
+        cheap_syms = set()
+        for s, meta in info.items():
+            try:
+                pe = float(meta.get("pe"))
+            except (TypeError, ValueError):
+                continue
+            sec = sector_map.get(s, "") or "(기타)"
+            m = med.get(sec, gmed)
+            if 0 < pe <= RECO_PER_MAX and not np.isnan(m) and pe <= m:
+                cheap_syms.add(s)
+        per_ok = cheap_syms
+        print("[경고] BT_PER_PROXY=1: 현재 PER을 과거에 적용 — 룩어헤드 편향(결과 과대평가) 참고용",
+              file=sys.stderr)
+
+    rebal_idx = list(range(0, len(dates), BT_REBALANCE))
+    weights = pd.DataFrame(0.0, index=dates, columns=panel.columns)
+    cur_w = pd.Series(0.0, index=panel.columns)
+    turnover_on = {}
+
+    for k, i in enumerate(rebal_idx):
+        d = dates[i]
+        elig = entry.iloc[i]
+        cand = [s for s in panel.columns if bool(elig.get(s, False)) and not pd.isna(panel.iloc[i][s])]
+        if per_ok is not None:
+            cand = [s for s in cand if s in per_ok]
+        # 3개월 모멘텀 상위 BT_TOPK
+        if cand:
+            mser = mom.iloc[i][cand].dropna()
+            ranked = list(mser.sort_values(ascending=False).index)
+            if BT_TOPK and len(ranked) > BT_TOPK:
+                ranked = ranked[:BT_TOPK]
+            w = pd.Series(0.0, index=panel.columns)
+            if ranked:
+                w[ranked] = 1.0 / len(ranked)
+        else:
+            w = pd.Series(0.0, index=panel.columns)   # 현금
+        turnover_on[d] = float((w - cur_w).abs().sum())
+        cur_w = w
+        nxt = rebal_idx[k + 1] if k + 1 < len(rebal_idx) else len(dates)
+        weights.iloc[i:nxt] = w.values
+
+    # 전일 가중치로 당일 수익 실현(룩어헤드 방지)
+    w_lag = weights.shift(1).fillna(0.0)
+    port_ret = (w_lag * rets).sum(axis=1)
+    # 리밸런싱일 거래비용 차감
+    cost = pd.Series(0.0, index=dates)
+    for d, to in turnover_on.items():
+        cost[d] = to * (BT_COST_BPS / 1e4)
+    port_ret = port_ret - cost
+    port_ret = port_ret.fillna(0.0)
+
+    strat_eq = (1.0 + port_ret).cumprod()
+    spy_eq = spy_close.reindex(dates).pct_change().fillna(0.0).add(1).cumprod()
+
+    m_s = _metrics(strat_eq)
+    m_b = _metrics(spy_eq)
+    # 기간(리밸런싱 주기) 단위 벤치 대비 승률
+    rb_dates = [dates[i] for i in rebal_idx]
+    s_lv = strat_eq.reindex(rb_dates).values
+    b_lv = spy_eq.reindex(rb_dates).values
+    wins = 0
+    for j in range(1, len(s_lv)):
+        sp = s_lv[j] / s_lv[j-1] - 1 if s_lv[j-1] else 0
+        bp = b_lv[j] / b_lv[j-1] - 1 if b_lv[j-1] else 0
+        if sp > bp:
+            wins += 1
+    win_rate = wins / max(1, len(s_lv) - 1)
+    avg_hold = float((weights > 0).sum(axis=1).reindex(rb_dates).mean())
+
+    return {"strat_eq": strat_eq, "spy_eq": spy_eq, "strat": m_s, "spy": m_b,
+            "win_rate": win_rate, "avg_holdings": avg_hold,
+            "start": dates[0], "end": dates[-1], "rebalances": len(rebal_idx)}
+
+
+def _backtest_chart(res: dict) -> bytes:
+    fig, ax = plt.subplots(figsize=(7.5, 3.2))
+    ax.plot(res["strat_eq"].index, res["strat_eq"].values, color="#15803d", lw=1.6, label="전략(기술)")
+    ax.plot(res["spy_eq"].index, res["spy_eq"].values, color="#6b7280", lw=1.4, label="SPY 매수후보유")
+    ax.set_title("백테스트 누적성과 (1.0=시작)", fontsize=10, loc="left")
+    ax.grid(True, alpha=0.2)
+    ax.legend(fontsize=8, frameon=False)
+    for sp in ax.spines.values():
+        sp.set_visible(False)
+    fig.tight_layout()
+    buf = io.BytesIO()
+    fig.savefig(buf, format="png", dpi=110)
+    plt.close(fig)
+    return buf.getvalue()
+
+
+def backtest_main():
+    _require_yf()
+    print(f"[백테스트] 기간≈{BT_YEARS}년 · 리밸런싱 {BT_REBALANCE}거래일 · "
+          f"보유 {BT_TOPK or '전체'}종목 · 비용 {BT_COST_BPS:.0f}bp · PER프록시={'ON' if BT_PER_PROXY else 'OFF'}")
+    universe, sector_map = get_sp500()
+    period = f"{int(BT_YEARS)+2}y"
+    hist = download_histories(universe, period=period)
+    spy = download_histories(["SPY"], period=period).get("SPY")
+    if spy is None:
+        raise RuntimeError("SPY 데이터 다운로드 실패")
+    info = get_info_for(universe) if BT_PER_PROXY else None
+    res = run_backtest(hist, spy, sector_map, info)
+
+    s, b = res["strat"], res["spy"]
+    lines = [
+        "=" * 64,
+        f" 백테스트 결과  {res['start'].date()} ~ {res['end'].date()}  (리밸런싱 {res['rebalances']}회)",
+        "=" * 64,
+        f"{'지표':<14}{'전략(기술)':>16}{'SPY 보유':>16}",
+        "-" * 64,
+        f"{'총수익률':<14}{s['total']*100:>14.1f}%{b['total']*100:>15.1f}%",
+        f"{'연복리(CAGR)':<14}{s['cagr']*100:>14.1f}%{b['cagr']*100:>15.1f}%",
+        f"{'연변동성':<14}{s['vol']*100:>14.1f}%{b['vol']*100:>15.1f}%",
+        f"{'최대낙폭(MDD)':<14}{s['mdd']*100:>14.1f}%{b['mdd']*100:>15.1f}%",
+        f"{'샤프(rf=0)':<14}{s['sharpe']:>15.2f}{b['sharpe']:>16.2f}",
+        "-" * 64,
+        f"리밸런싱 단위 벤치 대비 승률: {res['win_rate']*100:.0f}%   평균 보유종목: {res['avg_holdings']:.0f}개",
+        "=" * 64,
+    ]
+    excess = (s["cagr"] - b["cagr"]) * 100 if not (np.isnan(s["cagr"]) or np.isnan(b["cagr"])) else float("nan")
+    verdict = ("✅ 벤치(SPY) 대비 초과수익" if excess > 0 else "⚠️ 벤치(SPY)에 미달")
+    lines.append(f"판정: {verdict}  (CAGR 차이 {excess:+.1f}%p)")
+    if not BT_PER_PROXY:
+        lines.append("주의: PER/퀄리티는 과거 시점 데이터 부재로 미검증(기술 전략만 검증). 실제 추천엔 PER·퀄리티가 추가됨.")
+    else:
+        lines.append("주의: PER프록시는 룩어헤드 편향 — 실제보다 좋게 나오는 참고용 결과.")
+    report = "\n".join(lines)
+    print(report)
+
+    os.makedirs("output", exist_ok=True)
+    with open("output/backtest.txt", "w", encoding="utf-8") as f:
+        f.write(report + "\n")
+    with open("output/backtest.png", "wb") as f:
+        f.write(_backtest_chart(res))
+    print("\n저장: output/backtest.txt · output/backtest.png")
+    return res
 
 
 # --------------------- 차트 이미지 생성 -------------------------
@@ -634,6 +1073,9 @@ def make_chart_png(close, days, ma_windows=(50, 200), figsize=(6.0, 1.85), up=Tr
 
 
 # --------------------- 명단 편입/이탈 비교 -----------------------
+# [중요] GitHub Actions 러너는 매 실행마다 초기화된다. 이 상태파일을 영속화하지 않으면
+#        load_prev_list()가 항상 빈 리스트를 반환해 '신규/이탈/EXIT'가 무의미해진다.
+#        워크플로에 actions/cache 또는 commit-back 단계를 반드시 추가할 것(파일 하단 안내 참조).
 def load_prev_list() -> list[str]:
     try:
         with open(STATE_FILE, "r", encoding="utf-8") as f:
@@ -682,17 +1124,24 @@ def sector_kr(sym, sector_map, info):
     return GICS_KR.get(en, en or "—")
 
 
-def desc_of(sym, info):
+def desc_of(sym, info, sector_map=None):
+    """종목 한 줄 설명. KR_DESC → INDUSTRY_KR(업종 한글) → 섹터 한글 폴백 순."""
     if sym in KR_DESC and KR_DESC[sym]:
         return KR_DESC[sym]
     meta = info.get(sym, {}) or {}
     ind = meta.get("industry") or ""
     summ = meta.get("summary") or ""
+    if ind and ind in INDUSTRY_KR:
+        return INDUSTRY_KR[ind] + " 기업"
     if ind:
-        first = summ.split(". ")[0] if summ else ""
-        return f"{ind}" + (f" — {first[:60]}" if first else "")
+        return ind  # 매핑 없으면 영문 업종이라도
     if summ:
         return summ.split(". ")[0][:80]
+    if sector_map is not None:
+        sec_en = sector_map.get(sym) or meta.get("sector_en") or ""
+        sec_kr = GICS_KR.get(sec_en, sec_en)
+        if sec_kr:
+            return f"{sec_kr} 관련 기업"
     return ""
 
 
@@ -766,21 +1215,107 @@ def _trend_card(sym, name, ind, cid, sector, desc, reason):
       </td></tr></table>"""
 
 
-def build_report(reco_rows, reversal_rows, solid_rows, new_in, dropped, asof, sector_map, info):
-    subject = (f"[S&P500] {asof} · 추천 {len(reco_rows)} · 추세전환 {len(reversal_rows)} · 굳힘 {len(solid_rows)}")
+def _exit_row_html(sym, name, sector, desc, reason):
+    desc_part = f' <span style="color:#374151;font-size:12px">— {desc}</span>' if desc else ""
+    return (f'<tr><td style="padding:8px 10px;border-bottom:1px solid #f3f4f6;font-size:13px">'
+            f'<b>{sym}</b> <span style="color:#9ca3af;font-size:11px">{sector}</span> '
+            f'<span style="color:#6b7280;font-size:12px">{name}</span>{desc_part}</td>'
+            f'<td style="padding:8px 10px;border-bottom:1px solid #f3f4f6;font-size:12px;color:#b91c1c">{reason}</td></tr>')
+
+
+def build_commentary(reco_rows, reversal_rows, solid_rows, exit_rows,
+                     ind_map, sector_map, info, asof):
+    """그날 종목들을 데이터로 분석하는 2문단 총평(HTML, 텍스트) 생성."""
+    from collections import Counter
+
+    # 시장 폭(breadth): 유니버스 중 200일선 위 비중
+    n_uni = len(ind_map)
+    above = sum(1 for i in ind_map.values() if i.get("above_ma200"))
+    breadth = (above / n_uni * 100) if n_uni else float("nan")
+    if _isnan(breadth):
+        tone = "시장 폭을 계산하기 어려운 상태"
+    elif breadth >= 70:
+        tone = f"구성종목의 {breadth:.0f}%가 200일선 위에 있어 시장 전반이 강세 국면"
+    elif breadth >= 50:
+        tone = f"구성종목의 {breadth:.0f}%가 200일선 위로 중립~강세 구간"
+    elif breadth >= 30:
+        tone = f"구성종목의 {breadth:.0f}%만 200일선 위에 있어 혼조세"
+    else:
+        tone = f"구성종목의 {breadth:.0f}%만 200일선 위에 있어 약세 국면"
+
+    # ── 1문단: 오늘의 추천 요약 ──
+    if reco_rows:
+        secs = Counter(sector_kr(r[1], sector_map, info) for r in reco_rows)
+        sec_txt = ", ".join(f"{k} {v}종목" for k, v in secs.most_common(3))
+        pers = [float(r[3]) for r in reco_rows if not _isnan(r[3])]
+        rsis = [r[4].get("rsi") for r in reco_rows if not _isnan(r[4].get("rsi"))]
+        gc = sum(1 for r in reco_rows if r[4].get("cross") == "golden")
+        avg_per = sum(pers) / len(pers) if pers else float("nan")
+        avg_rsi = sum(rsis) / len(rsis) if rsis else float("nan")
+        top = reco_rows[0]
+        top_sym, top_desc = top[1], desc_of(top[1], info, sector_map)
+        top_reason = (top[5].split(" · ")[0] if top[5] else "")
+
+        p1 = f"오늘 추천 {len(reco_rows)}종목은 {sec_txt} 등에 분포합니다. "
+        if not _isnan(avg_per):
+            p1 += (f"이들은 각 섹터 중앙값 이하의 PER에서 선별돼 동종 대비 저평가 영역에 있으며"
+                   f"(평균 PER 약 {avg_per:.1f}배), ")
+        if not _isnan(avg_rsi):
+            heat = "과열 없이 " if avg_rsi < 70 else "다소 과열된 가운데 "
+            p1 += f"평균 RSI는 {avg_rsi:.0f} 수준으로 {heat}상승 모멘텀이 살아 있는 구간입니다. "
+        if gc:
+            p1 += f"이 중 {gc}종목은 최근 50일선이 200일선을 상향 돌파한 골든크로스 종목입니다. "
+        if top_desc:
+            p1 += f"점수가 가장 높은 종목은 {top_sym}({top_desc})으로, {top_reason} 점이 부각됐습니다."
+        else:
+            p1 += f"점수가 가장 높은 종목은 {top_sym}입니다."
+    else:
+        p1 = ("오늘은 섹터 상대 저평가와 기술적 강세(200일선 위·상승 모멘텀 지속)를 동시에 "
+              "만족하는 추천 종목이 없었습니다. 가치와 추세가 서로 어긋나 있거나 시장이 단기 "
+              "과열된 구간일 수 있어, 무리한 신규 진입보다 관망이 합리적일 수 있는 날입니다.")
+
+    # ── 2문단: 시장 맥락 + 추세/청산 + 주의 ──
+    p2 = tone + "입니다. "
+    if solid_rows:
+        names = ", ".join(r[0] for r in solid_rows[:3])
+        p2 += f"상승 추세가 굳어진 종목으로는 {names} 등이 정배열을 유지하고 있고, "
+    if reversal_rows:
+        names = ", ".join(r[0] for r in reversal_rows[:3])
+        p2 += f"하락을 멈추고 반등 신호가 나온 {names} 등은 추세 전환 초기 후보로 관찰할 만합니다. "
+    elif solid_rows:
+        p2 += "추세 전환 초기 후보는 오늘 두드러지지 않았습니다. "
+    if exit_rows:
+        names = ", ".join(r[0] for r in exit_rows[:3])
+        p2 += (f"반면 직전 추천 중 {names} 등 {len(exit_rows)}종목은 200일선 이탈·데드크로스 등으로 "
+               f"기술적 조건이 무너져, 보유 중이라면 비중 점검이 필요합니다. ")
+    p2 += ("모든 수치는 규칙 기반 자동 계산값이며 특정 종목 매매 권유가 아니므로, 실제 매매 전 "
+           "기업 펀더멘털과 최신 뉴스를 반드시 함께 확인하세요.")
+
+    html = (f'<div style="margin:24px 0 8px;background:#f8fafc;border:1px solid #e5e7eb;'
+            f'border-radius:10px;padding:14px 16px">'
+            f'<div style="font-size:15px;font-weight:700;margin-bottom:6px">📝 오늘의 총평</div>'
+            f'<p style="font-size:13px;line-height:1.8;color:#374151;margin:0 0 10px">{p1}</p>'
+            f'<p style="font-size:13px;line-height:1.8;color:#374151;margin:0">{p2}</p></div>')
+    text = "■ 오늘의 총평\n" + p1 + "\n\n" + p2
+    return html, text
+
+
+def build_report(reco_rows, reversal_rows, solid_rows, exit_rows, new_in, dropped, asof, sector_map, info, ind_map):
+    subject = (f"[S&P500] {asof} · 추천 {len(reco_rows)} · 전환 {len(reversal_rows)} · "
+               f"굳힘 {len(solid_rows)} · EXIT {len(exit_rows)}")
 
     reco_cards = []
     for rank, sym, name, per, ind, reason in reco_rows:
         reco_cards.append(_reco_card(rank, sym, name, per, ind, f"reco_{sym}",
-                                     sector_kr(sym, sector_map, info), desc_of(sym, info), reason))
+                                     sector_kr(sym, sector_map, info), desc_of(sym, info, sector_map), reason))
     rev_cards = []
     for sym, name, ind in reversal_rows:
         rev_cards.append(_trend_card(sym, name, ind, f"rev_{sym}",
-                                     sector_kr(sym, sector_map, info), desc_of(sym, info), ind.get("reversal_reason", "")))
+                                     sector_kr(sym, sector_map, info), desc_of(sym, info, sector_map), ind.get("reversal_reason", "")))
     sol_cards = []
     for sym, name, ind in solid_rows:
         sol_cards.append(_trend_card(sym, name, ind, f"sol_{sym}",
-                                     sector_kr(sym, sector_map, info), desc_of(sym, info), ind.get("solidified_reason", "")))
+                                     sector_kr(sym, sector_map, info), desc_of(sym, info, sector_map), ind.get("solidified_reason", "")))
 
     def chips(items, color):
         if not items:
@@ -794,13 +1329,25 @@ def build_report(reco_rows, reversal_rows, solid_rows, new_in, dropped, asof, se
     sol_block = (f'<div style="color:#6b7280;font-size:12px;margin-bottom:6px">종가가 20·50·200일선 위 정배열로 며칠째 유지되며 상승 추세가 굳어진 종목입니다.</div>{"".join(sol_cards)}'
                  if sol_cards else '<div style="color:#9ca3af;font-size:13px">오늘은 조건을 충족한 종목이 없습니다.</div>')
 
+    if exit_rows:
+        rows = "".join(_exit_row_html(sym, info.get(sym, {}).get("name", sym),
+                                      sector_kr(sym, sector_map, info), desc_of(sym, info, sector_map), reason)
+                       for sym, ind, reason in exit_rows)
+        exit_block = (f'<div style="color:#6b7280;font-size:12px;margin-bottom:6px">직전 추천 종목 중 기술적 조건이 무너진 종목입니다. 보유 중이라면 청산/비중축소를 점검하세요.</div>'
+                      f'<table style="width:100%;border-collapse:collapse;border:1px solid #fee2e2;border-radius:8px">{rows}</table>')
+    else:
+        exit_block = '<div style="color:#9ca3af;font-size:13px">청산 신호가 발생한 직전 추천 종목이 없습니다.</div>'
+
+    commentary_html, commentary_text = build_commentary(
+        reco_rows, reversal_rows, solid_rows, exit_rows, ind_map, sector_map, info, asof)
+
     html = f"""\
 <div style="font-family:-apple-system,'Segoe UI',Roboto,'Apple SD Gothic Neo',sans-serif;max-width:720px;margin:0 auto;color:#111827">
   <h2 style="margin:0 0 4px">📊 S&amp;P 500 데일리 리포트</h2>
   <div style="color:#6b7280;font-size:13px;margin-bottom:8px">{asof} 마감 기준 · 변동률 1일/1주/1달/1년/3년/5년 · 차트는 가격+이동평균</div>
 
-  <h3 style="margin:18px 0 2px">⭐ 추천 종목 {len(reco_rows)} <span style="font-size:12px;color:#9ca3af;font-weight:400">(저PER + 우수한 기술적 지표)</span></h3>
-  <div style="color:#6b7280;font-size:12px;margin-bottom:4px">조건: 200일선 위 · (MACD 상승 또는 골든크로스) · PER ≤ {RECO_PER_MAX:.0f} · 점수 상위 {RECO_N}개(미달 시 그만큼)</div>
+  <h3 style="margin:18px 0 2px">⭐ 추천 종목 {len(reco_rows)} <span style="font-size:12px;color:#9ca3af;font-weight:400">(섹터 상대 저PER + 퀄리티 + 기술 지표)</span></h3>
+  <div style="color:#6b7280;font-size:12px;margin-bottom:4px">조건: 섹터중앙 이하 PER · 퀄리티(ROE·부채·FCF) 양호 · 200일선 위 · (MACD↑ 또는 골든크로스) · 진입신호 {MIN_SIGNAL_DAYS}일+ 지속 · 섹터당 최대 {RECO_SECTOR_MAX}개 · 상위 {RECO_N}개</div>
   {reco_block}
 
   <div style="margin:12px 0;font-size:13px;line-height:1.7">
@@ -808,15 +1355,21 @@ def build_report(reco_rows, reversal_rows, solid_rows, new_in, dropped, asof, se
     <div>목록 이탈: {chips(dropped, "#6b7280")}</div>
   </div>
 
+  <h3 style="margin:26px 0 4px">🚪 청산(EXIT) 신호 — 직전 추천 중 조건 붕괴</h3>
+  {exit_block}
+
   <h3 style="margin:26px 0 4px">🔄 추세 전환 — 하락에서 상승으로</h3>
   {rev_block}
 
   <h3 style="margin:26px 0 4px">📈 추세 굳힘 — 상승 흐름 고착</h3>
   {sol_block}
 
+  {commentary_html}
+
   <div style="margin-top:22px;font-size:11px;color:#9ca3af;border-top:1px solid #eee;padding-top:8px;line-height:1.6">
     구성종목: SPDR S&amp;P500 ETF(SPY) 공식 일일 보유종목 · 지표 데이터: Yahoo Finance.<br>
-    모든 지표·차트·추천은 규칙 기반 자동 계산값이며 <b>투자 권유가 아닙니다.</b> 매매 전 반드시 추가 확인이 필요합니다.
+    모든 지표·차트·추천·청산신호는 규칙 기반 자동 계산값이며 <b>투자 권유가 아닙니다.</b> 매매 전 반드시 추가 확인이 필요합니다.<br>
+    전략 검증은 <code>python sp500_daily_report.py --backtest</code>로 확인하세요(기술 전략 기준).
   </div>
 </div>"""
 
@@ -824,13 +1377,16 @@ def build_report(reco_rows, reversal_rows, solid_rows, new_in, dropped, asof, se
     lines = [f"S&P500 데일리 리포트 — {asof} 마감", "변동률: [1일/1주/1달/1년/3년/5년]", "", f"■ 추천 종목 {len(reco_rows)}"]
     for rank, sym, name, per, ind, reason in reco_rows:
         per_t = "—" if _isnan(per) else f"{float(per):.1f}"
-        lines.append(f"{rank:>2}. {sym:<6} PER {per_t:<5} {sector_kr(sym, sector_map, info)} | {desc_of(sym, info)}")
+        lines.append(f"{rank:>2}. {sym:<6} PER {per_t:<5} {sector_kr(sym, sector_map, info)} | {desc_of(sym, info, sector_map)}")
         lines.append(f"      이유: {reason}")
+    lines += ["", "■ 청산(EXIT) 신호"]
+    lines += ([f"  · {sym}: {reason}" for sym, ind, reason in exit_rows] or ["  (해당 없음)"])
     lines += ["", "■ 추세 전환(하락→상승)"]
     lines += ([f"  · {sym}: {ind.get('reversal_reason','')}" for sym, name, ind in reversal_rows] or ["  (해당 없음)"])
     lines += ["", "■ 추세 굳힘(상승 고착)"]
     lines += ([f"  · {sym}: {ind.get('solidified_reason','')}" for sym, name, ind in solid_rows] or ["  (해당 없음)"])
     lines += ["", f"신규 진입: {', '.join(new_in) or '없음'} / 이탈: {', '.join(dropped) or '없음'}"]
+    lines += ["", commentary_text]
     text = "\n".join(lines)
     return subject, html, text
 
@@ -848,20 +1404,33 @@ def generate_report():
         if ind:
             ind_map[sym] = ind
 
-    # 기술 사전필터(.info 호출 축소): 200일선 위 AND (MACD 상승 OR 골든크로스)
+    # 기술 사전필터(.info 호출 축소): 200일선 위 AND (MACD↑ OR 골든크로스) AND 신호 지속
     tech_cand = [s for s, ind in ind_map.items()
-                 if ind.get("above_ma200") and (ind.get("macd_up") or ind.get("cross") == "golden")]
+                 if ind.get("above_ma200") and (ind.get("macd_up") or ind.get("cross") == "golden")
+                 and ind.get("entry_streak", 0) >= MIN_SIGNAL_DAYS]
     info = get_info_for(tech_cand)
 
-    # ---- 추천 종목 ----
+    # ---- 추천 종목 (섹터 상대 PER + 퀄리티) ----
+    sec_med, glob_med = sector_median_pes(info, sector_map)
     scored = []
     for sym in tech_cand:
-        pe = info.get(sym, {}).get("pe")
-        r = score_reco(ind_map[sym], pe)
+        meta = info.get(sym, {})
+        pe = meta.get("pe")
+        try:
+            pe_f = float(pe)
+        except (TypeError, ValueError):
+            continue
+        sec = sector_map.get(sym, "") or "(기타)"
+        med = sec_med.get(sec, glob_med)
+        if _isnan(med) or med <= 0:
+            continue
+        rel_pe = pe_f / med
+        qscore, qreasons = quality_score(meta)
+        r = score_reco(ind_map[sym], pe, rel_pe, qscore, qreasons)
         if r is not None:
             scored.append((sym, r[0], r[1]))
     scored.sort(key=lambda x: x[1], reverse=True)
-    picked = scored[:RECO_N]
+    picked = pick_with_sector_cap(scored, sector_map, RECO_N, RECO_SECTOR_MAX)
     reco_syms = {s for s, _, _ in picked}
 
     reco_rows = []
@@ -880,17 +1449,20 @@ def generate_report():
     sol.sort(key=lambda x: x[1].get("solidified_score", 0), reverse=True)
     sol = sol[:TREND_MAX]
 
-    # 표시될 추세 종목 info 보충
-    need = [s for s, _ in (rev + sol) if s not in info]
+    # ---- 청산(EXIT): 직전 추천 종목 중 조건 붕괴 ----
+    prev = load_prev_list()
+    picked_syms = [s for s, _, _ in picked]
+    exit_rows = detect_exits(prev, ind_map, picked_syms)
+
+    # 표시될 추세/EXIT 종목 info 보충
+    need = [s for s, _ in (rev + sol) if s not in info] + [s for s, _, _ in exit_rows if s not in info]
     if need:
-        info.update(get_info_for(need))
+        info.update(get_info_for(list(dict.fromkeys(need))))
 
     reversal_rows = [(s, info.get(s, {}).get("name", s), ind) for s, ind in rev]
     solid_rows = [(s, info.get(s, {}).get("name", s), ind) for s, ind in sol]
 
     # 편입/이탈(추천 명단 기준)
-    prev = load_prev_list()
-    picked_syms = [s for s, _, _ in picked]
     new_in = [s for s in picked_syms if s not in prev]
     dropped = [s for s in prev if s not in picked_syms]
 
@@ -909,7 +1481,8 @@ def generate_report():
         if close is not None:
             images[f"sol_{sym}"] = make_chart_png(close, 260, (20, 50, 200), up=True, title=f"{sym} · 1Y")
 
-    subject, html, text = build_report(reco_rows, reversal_rows, solid_rows, new_in, dropped, asof, sector_map, info)
+    subject, html, text = build_report(reco_rows, reversal_rows, solid_rows, exit_rows,
+                                       new_in, dropped, asof, sector_map, info, ind_map)
     save_curr_list(picked_syms)
     return subject, html, text, images
 
@@ -954,7 +1527,7 @@ def send_email(subject, html, text, images):
         s.sendmail(sender, recipients, root.as_string())
 
 
-def main():
+def report_main():
     subject, html, text, images = generate_report()
     os.makedirs("output", exist_ok=True)
     with open("output/email.html", "w", encoding="utf-8") as f:
@@ -974,6 +1547,17 @@ def main():
         print("✅ 이메일 발송 완료 →", os.environ.get("EMAIL_TO"))
     else:
         print("(SMTP 미설정: 파일만 생성. 메일 받으려면 SMTP_USER/SMTP_PASS/EMAIL_TO 설정)")
+
+
+def main():
+    parser = argparse.ArgumentParser(description="S&P500 데일리 리포트 / 백테스트")
+    parser.add_argument("--backtest", action="store_true",
+                        help="기술 전략을 과거 데이터로 검증(SPY 대비)")
+    args = parser.parse_args()
+    if args.backtest or os.environ.get("MODE", "").lower() == "backtest":
+        backtest_main()
+    else:
+        report_main()
 
 
 if __name__ == "__main__":
