@@ -1,19 +1,19 @@
-name: NASDAQ100 Low-PER Daily Report
+name: S&P500 Daily Report
 
 # 이 파일은 저장소의 .github/workflows/daily-per-report.yml 경로에 두어야 합니다.
 
 on:
   schedule:
-    # 매주 평일 22:00 UTC = 한국시간 익일 07:00 (미국장 마감 후, 데이터 확정 시점)
-    # 참고: GitHub cron은 UTC 고정이라 서머타임을 따라가지 않습니다. 시간은 자유롭게 조정하세요.
+    # 01:00 UTC = 한국시간 10:00. 요일 2-6(화~토)은 미국 월~금장 마감분을 받기 위함.
+    # GitHub cron은 UTC 고정이라 서머타임을 따라가지 않습니다.
     - cron: "0 1 * * 2-6"
-  workflow_dispatch:            # 👈 "Run workflow" 수동 실행 버튼 (지금 당장 테스트용)
+  workflow_dispatch:            # 👈 "Run workflow" 수동 실행 버튼
 
 permissions:
-  contents: write               # 편입/이탈 상태파일(state_prev_list.json) 커밋용
+  contents: write               # 추천 명단 상태파일(state_prev_list.json) 커밋용
 
-concurrency:                    # 동시 실행 방지
-  group: per-report
+concurrency:
+  group: sp500-report
   cancel-in-progress: false
 
 jobs:
@@ -36,10 +36,10 @@ jobs:
           SMTP_USER:   ${{ secrets.SMTP_USER }}
           SMTP_PASS:   ${{ secrets.SMTP_PASS }}
           EMAIL_TO:    ${{ secrets.EMAIL_TO }}
-          # 필요 시 SMTP_HOST / SMTP_PORT / EMAIL_FROM 도 secrets로 덮어쓸 수 있음
-        run: python nasdaq100_low_per_report.py
+          # 선택: RECO_N, RECO_PER_MAX, TREND_MAX 등으로 기준 조정 가능
+        run: python sp500_daily_report.py
 
-      - name: Persist 편입/이탈 state
+      - name: Persist 추천 명단 state
         run: |
           if [ -n "$(git status --porcelain state_prev_list.json)" ]; then
             git config user.name  "github-actions[bot]"
