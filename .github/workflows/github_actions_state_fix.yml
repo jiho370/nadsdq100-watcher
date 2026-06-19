@@ -51,6 +51,7 @@ jobs:
           EMAIL_TO:  ${{ secrets.EMAIL_TO }}
           RECO_SECTOR_MAX: "3"
           MIN_SIGNAL_DAYS: "2"
+          REGIME_FILTER: "1"          # SPY 200일선 아래면 위험회피 배너 표시(0=끄기)
         run: python sp500_daily_report.py
 
       - name: Upload preview
@@ -72,6 +73,8 @@ jobs:
           BT_YEARS:     "5"          # 검증 기간(년)
           BT_REBALANCE: "21"         # 리밸런싱 주기(거래일) ≈ 월 1회
           BT_TOPK:      "20"         # 매 리밸런싱 보유 종목수
+          REGIME_FILTER:       "1"   # SPY가 200일선 아래면 노출 축소(추세전략 낙폭 완화)
+          REGIME_OFF_EXPOSURE: "0.3" # 위험회피 시 투자비중(0=전액현금)
           BT_COST_BPS:  "5"          # 거래비용(bp)
           # BT_PER_PROXY: "1"        # (참고용·룩어헤드 편향) 펀더멘털 프록시 켜기
         run: python sp500_daily_report.py --backtest
