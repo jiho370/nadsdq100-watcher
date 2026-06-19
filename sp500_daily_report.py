@@ -974,10 +974,10 @@ def _metrics(equity: pd.Series, periods_per_year: int = 252) -> dict:
 
 def run_backtest(hist: dict[str, pd.Series], spy_close: pd.Series,
                  sector_map: dict[str, str], info: dict | None = None) -> dict:
-    """기술 전략 vs SPY 매수후보유 백테스트(라이브 로직에 맞춤).
-    리밸런싱마다: 진입조건(200MA 위·MACD>0) + 신호 {MIN_SIGNAL_DAYS}일 지속 종목 중
-    3개월 모멘텀 상위를 섹터당 최대 {RECO_SECTOR_MAX}개로 BT_TOPK개까지 동일가중.
-    REGIME_FILTER=1이면 SPY가 200일선 아래인 날엔 투자비중을 REGIME_OFF_EXPOSURE로 축소.
+    """이벤트 드리븐(Event-Driven) 상태 머신 백테스트 로직.
+    매 리밸런싱 주기가 아닌 '매일(Daily)' 상태를 평가하여 독립적인 매수/청산을 집행합니다.
+    - 매수: 빈 슬롯(현금)이 있고 SPY가 200일선 위(Risk-on)일 때, 모멘텀 상위 편입
+    - 청산: 락업(최소 보유 21일) 경과 후 종가 200일선 이탈 또는 MACD 데드크로스 발생 시 매도
     """
     if spy_close is None or spy_close.empty:
         raise RuntimeError("백테스트에는 SPY 종가가 필요합니다.")
@@ -986,86 +986,137 @@ def run_backtest(hist: dict[str, pd.Series], spy_close: pd.Series,
     end = spy_close.index[-1]
     start = end - pd.Timedelta(days=int(BT_YEARS * 365.25) + 5)
     dates = spy_close.index[(spy_close.index >= start) & (spy_close.index <= end)]
-    if len(dates) < BT_REBALANCE * 3:
+    if len(dates) < 60:
         raise RuntimeError("백테스트 기간이 너무 짧습니다(데이터 부족).")
 
     panel = _align_panel(hist, dates)
-    rets = panel.pct_change()
+    rets = panel.pct_change().fillna(0.0)
     mom = panel.pct_change(63)
 
-    # 진입조건/신호지속 패널(인과적)
+    # 진입조건/신호지속 패널 (스크리너 로직과 동일)
     entry_full = {s: _tech_entry_series(c) for s, c in hist.items()}
-    entry = pd.DataFrame({s: e.reindex(dates) for s, e in entry_full.items()},
-                         index=dates).fillna(False)
-    streak = pd.DataFrame({s: _streak_series(e).reindex(dates) for s, e in entry_full.items()},
-                          index=dates).fillna(0)
+    entry = pd.DataFrame({s: e.reindex(dates) for s, e in entry_full.items()}, index=dates).fillna(False)
+    streak = pd.DataFrame({s: _streak_series(e).reindex(dates) for s, e in entry_full.items()}, index=dates).fillna(0)
 
-    # 변동성 패널(인과적): 연환산 63일 변동성 — 고변동 컷·역변동성 가중에 사용
-    vol = pd.DataFrame(
-        {s: (c.pct_change().rolling(VOL_WINDOW).std() * np.sqrt(252)).reindex(dates)
-         for s, c in hist.items()}, index=dates)
+    # 청산 신호(Exit Signal) 사전 계산: 200일선 이탈 OR MACD 데드크로스
+    exit_signal = pd.DataFrame(False, index=dates, columns=panel.columns)
+    for s, c in hist.items():
+        ma200 = c.rolling(200).mean().reindex(dates)
+        _, _, m_hist = _macd(c)
+        m_hist = m_hist.reindex(dates)
+        # 데드크로스: 오늘 히스토그램 음수 & 어제 양수(또는 0)
+        macd_death = (m_hist < 0) & (m_hist.shift(1) >= 0)
+        under_ma200 = panel[s] < ma200
+        exit_signal[s] = under_ma200 | macd_death
 
-    # SPY 200MA 레짐(인과적)
+    # SPY 200MA 레짐
     spy_aligned = spy_close.reindex(dates)
     spy_ma200 = spy_close.rolling(200).mean().reindex(dates)
 
-    # 선택적 PER 프록시(룩어헤드 — 참고용)
-    per_ok = None
-    if BT_PER_PROXY and info:
-        med, gmed = sector_median_pes(info, sector_map)
-        per_ok = set()
-        for s, meta in info.items():
-            try:
-                pe = float(meta.get("pe"))
-            except (TypeError, ValueError):
-                continue
-            sec = sector_map.get(s, "") or "(기타)"
-            m = med.get(sec, gmed)
-            if 0 < pe <= RECO_PER_MAX and not np.isnan(m) and pe <= m:
-                per_ok.add(s)
-        print("[경고] BT_PER_PROXY=1: 현재 PER을 과거에 적용 — 룩어헤드 편향(결과 과대평가) 참고용",
-              file=sys.stderr)
+    # 운용 파라미터 (명시적 상태 머신 통제)
+    MAX_POSITIONS = 10 if BT_TOPK <= 0 else BT_TOPK
+    LOCK_UP_DAYS = 21
+    TARGET_WEIGHT = 1.0 / MAX_POSITIONS
 
-    rebal_idx = list(range(0, len(dates), BT_REBALANCE))
     weights = pd.DataFrame(0.0, index=dates, columns=panel.columns)
-    cur_w = pd.Series(0.0, index=panel.columns)
-    turnover_on, regime_off = {}, 0
+    turnover_on = {}
+    regime_off_days = 0
+    portfolio = {}  # {symbol: entry_index}
 
-    for k, i in enumerate(rebal_idx):
+    for i in range(len(dates)):
         d = dates[i]
-        elig = entry.iloc[i]
-        strk = streak.iloc[i]
-        vrow = vol.iloc[i]
-        cand = [s for s in panel.columns
-                if bool(elig.get(s, False)) and strk.get(s, 0) >= MIN_SIGNAL_DAYS
-                and not pd.isna(panel.iloc[i][s])]
-        if per_ok is not None:
-            cand = [s for s in cand if s in per_ok]
+        cur_spy = float(spy_aligned.iloc[i])
+        cur_spy_ma200 = float(spy_ma200.iloc[i])
+        risk_on = cur_spy > cur_spy_ma200 if not pd.isna(cur_spy_ma200) else True
 
-        # 고변동 컷: 후보 변동성 상위(1-MAX_VOL_PCTL)% 제외(모멘텀 크래시 노출 완화)
-        if cand and 0 < MAX_VOL_PCTL < 1:
-            cvols = vrow[cand].dropna()
-            if len(cvols) >= 5:
-                thr = float(cvols.quantile(MAX_VOL_PCTL))
-                cand = [s for s in cand if pd.isna(vrow.get(s)) or vrow[s] <= thr]
+        if not risk_on:
+            regime_off_days += 1
 
+        # 1. 상태 점검 및 청산(Exit)
+        to_remove = []
+        for s, entry_idx in portfolio.items():
+            days_held = i - entry_idx
+            if days_held >= LOCK_UP_DAYS and exit_signal[s].iloc[i]:
+                to_remove.append(s)
+
+        for s in to_remove:
+            del portfolio[s]
+
+        # 2. 조건부 편입(Entry)
+        empty_slots = MAX_POSITIONS - len(portfolio)
+        if risk_on and empty_slots > 0:
+            elig = entry.iloc[i]
+            strk = streak.iloc[i]
+            
+            # 매수 조건: 진입신호 충족, 신호 지속일 충족, 포트폴리오에 없는 새로운 종목
+            cand = [s for s in panel.columns
+                    if bool(elig.get(s, False)) and strk.get(s, 0) >= MIN_SIGNAL_DAYS
+                    and s not in portfolio and not pd.isna(panel.iloc[i][s])]
+
+            if cand:
+                # 모멘텀 상위 정렬 후 빈 슬롯만큼 선별
+                ranked = list(mom.iloc[i][cand].dropna().sort_values(ascending=False).index)
+                selected = ranked[:empty_slots]
+                for s in selected:
+                    portfolio[s] = i
+
+        # 3. 비중 할당 (목표 비중 균등)
         w = pd.Series(0.0, index=panel.columns)
-        if cand:
-            ranked = list(mom.iloc[i][cand].dropna().sort_values(ascending=False).index)
-            held = set(cur_w[cur_w > 0].index)
-            chosen = _select_holdings(ranked, sector_map, BT_TOPK, RECO_SECTOR_MAX,
-                                      held, HYSTERESIS_MULT)
-            w = _alloc_weights(chosen, vrow, panel.columns)
+        for s in portfolio.keys():
+            w[s] = TARGET_WEIGHT
 
-        # 레짐 필터: SPY가 200일선 아래면 노출 축소
-        if REGIME_FILTER and not pd.isna(spy_ma200.iloc[i]) and spy_aligned.iloc[i] < spy_ma200.iloc[i]:
-            w = w * REGIME_OFF_EXPOSURE
-            regime_off += 1
+        weights.iloc[i] = w
 
-        turnover_on[d] = float((w - cur_w).abs().sum())
-        cur_w = w
-        nxt = rebal_idx[k + 1] if k + 1 < len(rebal_idx) else len(dates)
-        weights.iloc[i:nxt] = w.values
+        # 회전율 계산 (일간 변동 합계의 절반 = 단방향 턴오버)
+        if i > 0:
+            w_prev = weights.iloc[i-1]
+            to = float((w - w_prev).abs().sum())
+            if to > 0:
+                turnover_on[d] = to / 2.0
+
+    # 수익률 및 수수료 계산
+    w_lag = weights.shift(1).fillna(0.0)
+    port_ret = (w_lag * rets).sum(axis=1)
+    cost = pd.Series(0.0, index=dates)
+    for d, to in turnover_on.items():
+        cost[d] = to * (BT_COST_BPS / 1e4)
+    port_ret = (port_ret - cost).fillna(0.0)
+
+    strat_eq = (1.0 + port_ret).cumprod()
+    spy_dr = spy_aligned.pct_change().fillna(0.0)
+    spy_eq = (1.0 + spy_dr).cumprod()
+
+    m_s, m_b = _metrics(strat_eq), _metrics(spy_eq)
+
+    rebalances = len(turnover_on)
+    avg_hold = float((weights > 0).sum(axis=1).mean())
+
+    total_to = sum(turnover_on.values())
+    years = len(dates) / 252
+    ann_turnover = total_to / years if years > 0 else float("nan")
+
+    annual = []
+    for yr in sorted(set(port_ret.index.year)):
+        sp = (1 + port_ret[port_ret.index.year == yr]).prod() - 1
+        bp = (1 + spy_dr[spy_dr.index.year == yr]).prod() - 1
+        annual.append((yr, sp * 100, bp * 100, (sp - bp) * 100))
+
+    strat_m = (1 + port_ret).resample("ME").prod() - 1
+    spy_m = (1 + spy_dr).resample("ME").prod() - 1
+    excess_m = (strat_m - spy_m).dropna()
+    total_ex = float(excess_m.sum())
+    top3 = float(excess_m.sort_values(ascending=False).head(3).sum())
+    conc = {"total_excess_pp": total_ex * 100,
+            "top3_share": (top3 / total_ex) if abs(total_ex) > 1e-9 else float("nan"),
+            "excl_top3_pp": (total_ex - top3) * 100,
+            "win_months": float((excess_m > 0).mean())}
+
+    return {"strat_eq": strat_eq, "spy_eq": spy_eq, "strat": m_s, "spy": m_b,
+            "win_rate": conc["win_months"], "avg_holdings": avg_hold, 
+            "start": dates[0], "end": dates[-1], "rebalances": rebalances,
+            "ann_turnover": ann_turnover, "regime_off": regime_off_days,
+            "regime_on_pct": (1 - regime_off_days / len(dates)) * 100,
+            "annual": annual, "conc": conc}
 
     w_lag = weights.shift(1).fillna(0.0)
     port_ret = (w_lag * rets).sum(axis=1)
