@@ -6,8 +6,8 @@ nasdaq100_low_per_report.py  (A단계)
 추세 지표(이동평균 20/50/200, RSI 14, MACD 12/26/9)를 계산하고,
 이메일로 보낼 본문(HTML + 텍스트)과 제목을 생성한다.
 
-- 데이터 소스 : Financial Modeling Prep (FMP)   → 환경변수 FMP_API_KEY 필요
-- 실행 환경   : Claude Code 클라우드 routine (매일 1회, 미국장 마감 후)
+- 데이터 소스 : Yahoo Finance (yfinance) — API 키 불필요
+- 실행 환경   : GitHub Actions cron (매일 1회, 미국장 마감 후)
 - 발송(B단계) : generate_report()가 돌려주는 (subject, html, text)를 받아 처리
 
 규칙
@@ -22,9 +22,14 @@ import sys
 import json
 from datetime import datetime, timezone, timedelta
 
-import requests
+import time
 import pandas as pd
 import numpy as np
+
+try:
+    import yfinance as yf
+except ImportError:  # 런타임 환경에 설치 필요 (requirements.txt 참고)
+    yf = None
 
 import smtplib
 import ssl
@@ -32,12 +37,10 @@ from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 
 # ----------------------------- 설정 -----------------------------
-FMP_API_KEY   = os.environ.get("FMP_API_KEY", "").strip()
-FMP_BASE      = os.environ.get("FMP_BASE", "https://financialmodelingprep.com/stable")
 TOP_N         = int(os.environ.get("TOP_N", "10"))          # PER 하위 N개
-HISTORY_DAYS  = int(os.environ.get("HISTORY_DAYS", "400"))  # MA200(영업일 200) + 여유
+HISTORY_PERIOD = os.environ.get("HISTORY_PERIOD", "2y")     # MA200 계산용 (영업일 200+ 확보)
 STATE_FILE    = os.environ.get("STATE_FILE", "state_prev_list.json")  # 전일 명단 저장
-TIMEOUT       = 30
+REQUEST_SLEEP = float(os.environ.get("REQUEST_SLEEP", "0.2"))  # yfinance 호출 간 간격(rate-limit 완화)
 KST           = timezone(timedelta(hours=9))
 
 RSI_PERIOD    = 14
@@ -45,26 +48,10 @@ MACD_FAST, MACD_SLOW, MACD_SIGNAL = 12, 26, 9
 MA_WINDOWS    = (20, 50, 200)
 
 
-# ------------------------- HTTP 유틸 ----------------------------
-def _get_json(path: str, params: dict | None = None, retries: int = 3):
-    """FMP GET 호출. 간단한 재시도/백오프 포함."""
-    if not FMP_API_KEY:
-        raise RuntimeError("환경변수 FMP_API_KEY가 비어 있습니다.")
-    params = dict(params or {})
-    params["apikey"] = FMP_API_KEY
-    url = f"{FMP_BASE}/{path.lstrip('/')}"
-    last_err = None
-    for attempt in range(retries):
-        try:
-            r = requests.get(url, params=params, timeout=TIMEOUT)
-            r.raise_for_status()
-            return r.json()
-        except Exception as e:  # noqa: BLE001
-            last_err = e
-            if attempt < retries - 1:
-                import time
-                time.sleep(1.5 * (attempt + 1))
-    raise RuntimeError(f"FMP 호출 실패: {url} :: {last_err}")
+# ------------------------- yfinance 유틸 ------------------------
+def _require_yf():
+    if yf is None:
+        raise RuntimeError("yfinance가 설치되어 있지 않습니다. `pip install yfinance` 후 실행하세요.")
 
 
 # ------------------------- 데이터 수집 --------------------------
@@ -85,75 +72,74 @@ NASDAQ100_SYMBOLS = [
 
 
 def get_nasdaq100_symbols() -> list[str]:
-    """나스닥-100 구성종목 티커 목록.
-
-    FMP 무료 플랜은 지수 구성종목 엔드포인트(nasdaq_constituent)가 막혀 있어(HTTP 403)
-    위 정적 목록을 사용한다. 분기 리밸런싱(3/6/9/12월) 때만 목록을 갱신하면 된다.
-    유료 FMP 플랜이라면 환경변수 USE_FMP_CONSTITUENT=1 을 주면 API로 자동 조회한다.
-    """
-    if os.environ.get("USE_FMP_CONSTITUENT") == "1":
-        try:
-            data = _get_json("nasdaq_constituent")
-            syms = [row["symbol"] for row in data if row.get("symbol")]
-            if syms:
-                return sorted(set(syms))
-        except Exception as e:  # noqa: BLE001
-            print(f"[경고] FMP 구성종목 조회 실패 → 정적 목록 사용: {e}", file=sys.stderr)
+    """나스닥-100 구성종목 티커 목록 (정적). 분기 리밸런싱(3/6/9/12월) 때만 갱신하면 된다."""
     return list(NASDAQ100_SYMBOLS)
 
 
 def get_quotes(symbols: list[str]) -> dict[str, dict]:
-    """각 종목의 시세/PER. stable quote는 종목당 1콜(symbol= 쿼리). 실패 종목은 건너뜀.
+    """yfinance에서 각 종목의 trailingPE/가격/이름. 종목당 1콜(.info), 실패는 건너뜀.
 
-    PER(pe)이 없으면 price/eps로 보정한다. 100종목이면 ~100콜(무료 250/일 한도 내).
+    PER이 없으면 price/EPS로 보정한다. 100종목 .info 조회는 1~3분 걸릴 수 있다.
     """
+    _require_yf()
     out: dict[str, dict] = {}
+    fail = 0
     for sym in symbols:
-        try:
-            data = _get_json("quote", {"symbol": sym})
-        except Exception as e:  # noqa: BLE001
-            print(f"[경고] {sym} 시세 조회 실패: {e}", file=sys.stderr)
+        info = None
+        for attempt in range(2):
+            try:
+                info = yf.Ticker(sym).info or {}
+                break
+            except Exception:  # noqa: BLE001
+                if attempt == 0:
+                    time.sleep(1.0)
+        if info is None:
+            fail += 1
+            print(f"[경고] {sym} info 조회 실패 → 제외", file=sys.stderr)
             continue
-        row = (data[0] if isinstance(data, list) and data
-               else data if isinstance(data, dict) else None)
-        if not row:
-            continue
-        pe = row.get("pe")
+
+        pe = info.get("trailingPE")
+        price = info.get("currentPrice") or info.get("regularMarketPrice") or info.get("previousClose")
         if pe is None:
-            eps, price = row.get("eps"), row.get("price")
+            eps = info.get("trailingEps")
             try:
                 if eps and price:
                     pe = float(price) / float(eps)
             except (TypeError, ValueError, ZeroDivisionError):
                 pe = None
-        row["pe"] = pe
-        out[sym] = row
+        out[sym] = {
+            "pe": pe,
+            "price": price,
+            "name": info.get("shortName") or info.get("longName") or sym,
+        }
+        if REQUEST_SLEEP:
+            time.sleep(REQUEST_SLEEP)
+
+    if fail:
+        print(f"[정보] info 조회 실패 {fail}건 (나머지로 진행)", file=sys.stderr)
     return out
 
 
-def get_history(symbol: str, days: int = HISTORY_DAYS) -> pd.DataFrame:
-    """일봉 종가 시계열(과거→현재 오름차순). 컬럼: date(index), close.
-
-    stable: historical-price-eod/full?symbol=&from=&to=  → 보통 배열을 직접 반환.
-    (v3 호환 위해 {"historical":[...]} 형태도 처리)
-    """
-    end = datetime.now(timezone.utc).date()
-    start = end - timedelta(days=int(days * 1.6) + 10)  # 주말/휴장 감안 여유
-    data = _get_json(
-        "historical-price-eod/full",
-        {"symbol": symbol, "from": start.isoformat(), "to": end.isoformat()},
-    )
-    hist = data.get("historical", []) if isinstance(data, dict) else (data or [])
-    if not hist:
+def get_history(symbol: str, period: str = HISTORY_PERIOD) -> pd.DataFrame:
+    """일봉 종가 시계열(과거→현재 오름차순). 컬럼: date(index), close."""
+    _require_yf()
+    try:
+        raw = yf.Ticker(symbol).history(period=period, interval="1d", auto_adjust=True)
+    except Exception as e:  # noqa: BLE001
+        print(f"[경고] {symbol} 히스토리 조회 실패: {e}", file=sys.stderr)
         return pd.DataFrame(columns=["close"])
-    df = pd.DataFrame(hist)
-    if "date" not in df.columns or "close" not in df.columns:
+    if raw is None or raw.empty or "Close" not in raw.columns:
         return pd.DataFrame(columns=["close"])
-    df = df[["date", "close"]].copy()
-    df["date"] = pd.to_datetime(df["date"])
-    df = df.sort_values("date").set_index("date")
+    df = raw[["Close"]].rename(columns={"Close": "close"})
+    idx = pd.to_datetime(df.index)
+    try:
+        idx = idx.tz_localize(None)          # tz-aware → naive
+    except (TypeError, AttributeError):
+        pass
+    df.index = idx
+    df.index.name = "date"
     df["close"] = pd.to_numeric(df["close"], errors="coerce")
-    return df.dropna(subset=["close"])
+    return df.dropna(subset=["close"]).sort_index()
 
 
 # ------------------------- 지표 계산 ----------------------------
@@ -405,7 +391,7 @@ def build_email(rows: list[dict], new_in: list[str], dropped: list[str], asof: s
   {cross_note}
 
   <div style="margin-top:18px;font-size:11px;color:#9ca3af;border-top:1px solid #eee;padding-top:8px">
-    데이터: Financial Modeling Prep · 지표는 일봉 종가 기준 자동 계산값이며 투자 권유가 아닙니다.
+    데이터: Yahoo Finance (yfinance) · 지표는 일봉 종가 기준 자동 계산값이며 투자 권유가 아닙니다.
   </div>
 </div>"""
 
