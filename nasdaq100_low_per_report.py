@@ -33,7 +33,7 @@ from email.mime.text import MIMEText
 
 # ----------------------------- 설정 -----------------------------
 FMP_API_KEY   = os.environ.get("FMP_API_KEY", "").strip()
-FMP_BASE      = os.environ.get("FMP_BASE", "https://financialmodelingprep.com/api/v3")
+FMP_BASE      = os.environ.get("FMP_BASE", "https://financialmodelingprep.com/stable")
 TOP_N         = int(os.environ.get("TOP_N", "10"))          # PER 하위 N개
 HISTORY_DAYS  = int(os.environ.get("HISTORY_DAYS", "400"))  # MA200(영업일 200) + 여유
 STATE_FILE    = os.environ.get("STATE_FILE", "state_prev_list.json")  # 전일 명단 저장
@@ -103,31 +103,53 @@ def get_nasdaq100_symbols() -> list[str]:
 
 
 def get_quotes(symbols: list[str]) -> dict[str, dict]:
-    """여러 종목의 시세/PER을 한 번에. /quote 는 콤마 구분 다종목 조회 지원."""
+    """각 종목의 시세/PER. stable quote는 종목당 1콜(symbol= 쿼리). 실패 종목은 건너뜀.
+
+    PER(pe)이 없으면 price/eps로 보정한다. 100종목이면 ~100콜(무료 250/일 한도 내).
+    """
     out: dict[str, dict] = {}
-    # URL 길이 보호를 위해 50개씩 나눠 호출
-    for i in range(0, len(symbols), 50):
-        chunk = symbols[i : i + 50]
-        data = _get_json("quote/" + ",".join(chunk))
-        for row in data:
-            sym = row.get("symbol")
-            if sym:
-                out[sym] = row
+    for sym in symbols:
+        try:
+            data = _get_json("quote", {"symbol": sym})
+        except Exception as e:  # noqa: BLE001
+            print(f"[경고] {sym} 시세 조회 실패: {e}", file=sys.stderr)
+            continue
+        row = (data[0] if isinstance(data, list) and data
+               else data if isinstance(data, dict) else None)
+        if not row:
+            continue
+        pe = row.get("pe")
+        if pe is None:
+            eps, price = row.get("eps"), row.get("price")
+            try:
+                if eps and price:
+                    pe = float(price) / float(eps)
+            except (TypeError, ValueError, ZeroDivisionError):
+                pe = None
+        row["pe"] = pe
+        out[sym] = row
     return out
 
 
 def get_history(symbol: str, days: int = HISTORY_DAYS) -> pd.DataFrame:
-    """일봉 종가 시계열(과거→현재 오름차순). 컬럼: date(index), close."""
+    """일봉 종가 시계열(과거→현재 오름차순). 컬럼: date(index), close.
+
+    stable: historical-price-eod/full?symbol=&from=&to=  → 보통 배열을 직접 반환.
+    (v3 호환 위해 {"historical":[...]} 형태도 처리)
+    """
     end = datetime.now(timezone.utc).date()
     start = end - timedelta(days=int(days * 1.6) + 10)  # 주말/휴장 감안 여유
     data = _get_json(
-        f"historical-price-full/{symbol}",
-        {"from": start.isoformat(), "to": end.isoformat()},
+        "historical-price-eod/full",
+        {"symbol": symbol, "from": start.isoformat(), "to": end.isoformat()},
     )
-    hist = (data or {}).get("historical", [])
+    hist = data.get("historical", []) if isinstance(data, dict) else (data or [])
     if not hist:
         return pd.DataFrame(columns=["close"])
-    df = pd.DataFrame(hist)[["date", "close"]].copy()
+    df = pd.DataFrame(hist)
+    if "date" not in df.columns or "close" not in df.columns:
+        return pd.DataFrame(columns=["close"])
+    df = df[["date", "close"]].copy()
     df["date"] = pd.to_datetime(df["date"])
     df = df.sort_values("date").set_index("date")
     df["close"] = pd.to_numeric(df["close"], errors="coerce")
