@@ -80,6 +80,12 @@ BT_PER_PROXY   = os.environ.get("BT_PER_PROXY", "0") == "1"     # 현재 PER을 
 REGIME_FILTER  = os.environ.get("REGIME_FILTER", "1") == "1"
 REGIME_OFF_EXPOSURE = float(os.environ.get("REGIME_OFF_EXPOSURE", "0.3"))  # 위험회피 시 투자비중(0=전액현금)
 
+# 백테스트가 드러낸 약점에 대응하는 구조적 개선(커브 피팅이 아닌, 근거 있는 기법)
+WEIGHTING      = os.environ.get("WEIGHTING", "invvol")          # invvol=역변동성, equal=동일가중
+VOL_WINDOW     = int(os.environ.get("VOL_WINDOW", "63"))        # 변동성 계산 창(거래일, ≈3개월)
+MAX_VOL_PCTL   = float(os.environ.get("MAX_VOL_PCTL", "0.90"))  # 후보 변동성 상위(1-이값)% 제외(0.90=상위10% 컷)
+HYSTERESIS_MULT= float(os.environ.get("HYSTERESIS_MULT", "1.5"))# 보유 종목 유지 순위 버퍼(1.5×TOPK 안이면 유지)
+
 RSI_PERIOD     = 14
 MACD_FAST, MACD_SLOW, MACD_SIGNAL = 12, 26, 9
 MA_WINDOWS     = (20, 50, 200)
@@ -581,6 +587,14 @@ def market_regime(spy_close: pd.Series) -> dict:
             "gap_pct": (last / ma200 - 1) * 100 if ma200 else float("nan")}
 
 
+def _ann_vol(close: pd.Series, window: int = VOL_WINDOW) -> float:
+    """최근 window 거래일 일간수익률의 연환산 변동성(%). 인과적."""
+    r = close.pct_change().dropna()
+    if len(r) < max(20, window // 2):
+        return float("nan")
+    return float(r.iloc[-window:].std() * np.sqrt(252) * 100)
+
+
 def compute_indicators(close):
     if close is None or close.empty:
         return None
@@ -607,6 +621,7 @@ def compute_indicators(close):
         "above_ma200": (not np.isnan(ma_last[200])) and last > ma_last[200],
         "rsi": rsi_val, "macd": macd_val, "macd_signal": sig_val, "macd_hist": hist_val,
         "macd_up": hist_val > 0, "cross": cross, "entry_streak": entry_streak,
+        "vol_ann": _ann_vol(close),
         "chg_1d": _ret(close, 1), "chg_1w": _ret(close, P_1W), "chg_1m": _ret(close, P_1M),
         "chg_3m": _ret(close, 63), "chg_1y": _ret(close, P_1Y), "chg_3y": _ret(close, P_3Y),
         "chg_5y": _ret_full(close),
@@ -839,6 +854,63 @@ def pick_with_sector_cap(scored: list[tuple], sector_map: dict[str, str],
     return out
 
 
+def _select_holdings(ranked: list[str], sector_map: dict[str, str], topk: int,
+                     cap: int, held: set, buffer_mult: float) -> list[str]:
+    """순위 리스트에서 섹터 상한 + 히스테리시스(보유 종목 우선 유지)로 보유군 선택.
+    회전율을 줄이기 위해, 이미 보유 중이고 buffer_mult×topk 순위 안에 있으면 유지한 뒤
+    나머지를 상위에서 채운다.
+    """
+    rank_of = {s: i for i, s in enumerate(ranked)}
+    chosen, per_sec = [], {}
+
+    def try_add(s):
+        sec = sector_map.get(s, "") or "(기타)"
+        if per_sec.get(sec, 0) >= cap:
+            return False
+        chosen.append(s)
+        per_sec[sec] = per_sec.get(sec, 0) + 1
+        return True
+
+    buf = int(topk * buffer_mult) if topk else len(ranked)
+    # 1) 보유 종목 중 여전히 적격이고 버퍼 안인 것 우선 유지
+    for s in ranked:
+        if topk and len(chosen) >= topk:
+            break
+        if s in held and rank_of.get(s, 10**9) < buf:
+            try_add(s)
+    # 2) 나머지를 상위에서 채움
+    for s in ranked:
+        if topk and len(chosen) >= topk:
+            break
+        if s in chosen:
+            continue
+        try_add(s)
+    return chosen
+
+
+def _alloc_weights(chosen: list[str], vol_row, columns) -> pd.Series:
+    """선택 종목에 가중치 부여. WEIGHTING='invvol'이면 역변동성, 아니면 동일가중."""
+    w = pd.Series(0.0, index=columns)
+    if not chosen:
+        return w
+    if WEIGHTING == "invvol":
+        inv = {}
+        for s in chosen:
+            v = vol_row.get(s, np.nan)
+            inv[s] = (1.0 / v) if (v is not None and not pd.isna(v) and v > 0) else np.nan
+        vals = [x for x in inv.values() if not pd.isna(x)]
+        if vals:
+            med = float(np.median(vals))
+            tot = sum((x if not pd.isna(x) else med) for x in inv.values())
+            for s in chosen:
+                w[s] = (inv[s] if not pd.isna(inv[s]) else med) / tot
+            return w
+    # 폴백: 동일가중
+    for s in chosen:
+        w[s] = 1.0 / len(chosen)
+    return w
+
+
 # --------------------- 청산(EXIT) 신호 --------------------------
 def detect_exits(prev_syms: list[str], ind_map: dict[str, dict],
                  picked_syms: list[str]) -> list[tuple]:
@@ -928,6 +1000,11 @@ def run_backtest(hist: dict[str, pd.Series], spy_close: pd.Series,
     streak = pd.DataFrame({s: _streak_series(e).reindex(dates) for s, e in entry_full.items()},
                           index=dates).fillna(0)
 
+    # 변동성 패널(인과적): 연환산 63일 변동성 — 고변동 컷·역변동성 가중에 사용
+    vol = pd.DataFrame(
+        {s: (c.pct_change().rolling(VOL_WINDOW).std() * np.sqrt(252)).reindex(dates)
+         for s, c in hist.items()}, index=dates)
+
     # SPY 200MA 레짐(인과적)
     spy_aligned = spy_close.reindex(dates)
     spy_ma200 = spy_close.rolling(200).mean().reindex(dates)
@@ -958,27 +1035,27 @@ def run_backtest(hist: dict[str, pd.Series], spy_close: pd.Series,
         d = dates[i]
         elig = entry.iloc[i]
         strk = streak.iloc[i]
+        vrow = vol.iloc[i]
         cand = [s for s in panel.columns
                 if bool(elig.get(s, False)) and strk.get(s, 0) >= MIN_SIGNAL_DAYS
                 and not pd.isna(panel.iloc[i][s])]
         if per_ok is not None:
             cand = [s for s in cand if s in per_ok]
 
+        # 고변동 컷: 후보 변동성 상위(1-MAX_VOL_PCTL)% 제외(모멘텀 크래시 노출 완화)
+        if cand and 0 < MAX_VOL_PCTL < 1:
+            cvols = vrow[cand].dropna()
+            if len(cvols) >= 5:
+                thr = float(cvols.quantile(MAX_VOL_PCTL))
+                cand = [s for s in cand if pd.isna(vrow.get(s)) or vrow[s] <= thr]
+
         w = pd.Series(0.0, index=panel.columns)
         if cand:
             ranked = list(mom.iloc[i][cand].dropna().sort_values(ascending=False).index)
-            # 섹터 상한 적용하며 TOPK개 선택
-            chosen, per_sec = [], {}
-            for s in ranked:
-                sec = sector_map.get(s, "") or "(기타)"
-                if per_sec.get(sec, 0) >= RECO_SECTOR_MAX:
-                    continue
-                chosen.append(s)
-                per_sec[sec] = per_sec.get(sec, 0) + 1
-                if BT_TOPK and len(chosen) >= BT_TOPK:
-                    break
-            if chosen:
-                w[chosen] = 1.0 / len(chosen)
+            held = set(cur_w[cur_w > 0].index)
+            chosen = _select_holdings(ranked, sector_map, BT_TOPK, RECO_SECTOR_MAX,
+                                      held, HYSTERESIS_MULT)
+            w = _alloc_weights(chosen, vrow, panel.columns)
 
         # 레짐 필터: SPY가 200일선 아래면 노출 축소
         if REGIME_FILTER and not pd.isna(spy_ma200.iloc[i]) and spy_aligned.iloc[i] < spy_ma200.iloc[i]:
@@ -1062,6 +1139,8 @@ def backtest_main():
     _require_yf()
     print(f"[백테스트] 기간≈{BT_YEARS}년 · 리밸런싱 {BT_REBALANCE}거래일 · "
           f"보유 {BT_TOPK or '전체'}종목 · 비용 {BT_COST_BPS:.0f}bp · PER프록시={'ON' if BT_PER_PROXY else 'OFF'}")
+    print(f"           가중={WEIGHTING} · 고변동컷=상위{(1-MAX_VOL_PCTL)*100:.0f}% · "
+          f"히스테리시스={HYSTERESIS_MULT}× · 레짐필터={'ON' if REGIME_FILTER else 'OFF'}")
     universe, sector_map = get_sp500()
     period = f"{int(BT_YEARS)+2}y"
     hist = download_histories(universe, period=period)
@@ -1272,21 +1351,26 @@ def _badges(ind):
     return " ".join(out)
 
 
-def _reco_card(rank, sym, name, per, ind, cid, sector, desc, reason):
+def _reco_card(rank, sym, name, per, ind, cid, sector, desc, reason, weight=None):
     per_txt = "—" if _isnan(per) else f"{float(per):.1f}"
     rank_html = (f'<span style="background:#b45309;color:#fff;border-radius:50%;width:22px;height:22px;'
                  f'display:inline-block;text-align:center;line-height:22px;font-size:12px">{rank}</span> ')
     rets = (_ret_chip("1일", ind.get("chg_1d")) + _ret_chip("1주", ind.get("chg_1w"))
             + _ret_chip("1달", ind.get("chg_1m")) + _ret_chip("1년", ind.get("chg_1y"))
             + _ret_chip("3년", ind.get("chg_3y")) + _ret_chip("5년", ind.get("chg_5y")))
+    vol = ind.get("vol_ann")
+    vol_txt = "" if _isnan(vol) else f' <span style="color:#9ca3af">·</span> 변동성 <b>{vol:.0f}%</b>'
+    wt_txt = ("" if weight is None else
+              f'<span style="background:#dbeafe;color:#1d4ed8;border-radius:4px;padding:1px 7px;'
+              f'font-size:12px;margin-left:6px">추천 비중 {weight*100:.1f}%</span>')
     return f"""
     <table style="width:100%;border-collapse:collapse;margin:10px 0;border:1px solid #fde68a;border-radius:8px;background:#fffdf7"><tr>
       <td style="padding:12px 14px;vertical-align:top;width:52%">
         <div style="font-size:15px">{rank_html}<b>{sym}</b>
-          <span style="background:#eef2ff;color:#4338ca;border-radius:4px;padding:1px 6px;font-size:11px;margin-left:4px">{sector}</span></div>
+          <span style="background:#eef2ff;color:#4338ca;border-radius:4px;padding:1px 6px;font-size:11px;margin-left:4px">{sector}</span>{wt_txt}</div>
         <div style="font-size:12px;color:#6b7280;margin:3px 0 1px">{name}</div>
         <div style="font-size:12px;color:#374151;margin-bottom:6px">{desc}</div>
-        <div style="font-size:13px;margin-bottom:6px">PER <b>{per_txt}</b> <span style="color:#9ca3af">·</span> 종가 <b>{_money(ind.get('price'))}</b></div>
+        <div style="font-size:13px;margin-bottom:6px">PER <b>{per_txt}</b> <span style="color:#9ca3af">·</span> 종가 <b>{_money(ind.get('price'))}</b>{vol_txt}</div>
         <div style="margin-bottom:6px">{rets}</div>
         <div style="margin-bottom:6px">{_badges(ind)}</div>
         <div style="font-size:12px;color:#374151;background:#fef3c7;border-radius:6px;padding:8px;line-height:1.6"><b>추천 이유</b> · {reason}</div>
@@ -1403,14 +1487,16 @@ def build_commentary(reco_rows, reversal_rows, solid_rows, exit_rows,
     return html, text
 
 
-def build_report(reco_rows, reversal_rows, solid_rows, exit_rows, new_in, dropped, asof, sector_map, info, ind_map, regime=None):
+def build_report(reco_rows, reversal_rows, solid_rows, exit_rows, new_in, dropped, asof, sector_map, info, ind_map, regime=None, reco_weights=None):
+    reco_weights = reco_weights or {}
     subject = (f"[S&P500] {asof} · 추천 {len(reco_rows)} · 전환 {len(reversal_rows)} · "
                f"굳힘 {len(solid_rows)} · EXIT {len(exit_rows)}")
 
     reco_cards = []
     for rank, sym, name, per, ind, reason in reco_rows:
         reco_cards.append(_reco_card(rank, sym, name, per, ind, f"reco_{sym}",
-                                     sector_kr(sym, sector_map, info), desc_of(sym, info, sector_map), reason))
+                                     sector_kr(sym, sector_map, info), desc_of(sym, info, sector_map),
+                                     reason, reco_weights.get(sym)))
     rev_cards = []
     for sym, name, ind in reversal_rows:
         rev_cards.append(_trend_card(sym, name, ind, f"rev_{sym}",
@@ -1469,7 +1555,7 @@ def build_report(reco_rows, reversal_rows, solid_rows, exit_rows, new_in, droppe
   {regime_banner}
 
   <h3 style="margin:18px 0 2px">⭐ 추천 종목 {len(reco_rows)} <span style="font-size:12px;color:#9ca3af;font-weight:400">(섹터 상대 저PER + 퀄리티 + 기술 지표)</span></h3>
-  <div style="color:#6b7280;font-size:12px;margin-bottom:4px">조건: 섹터중앙 이하 PER · 퀄리티(ROE·부채·FCF) 양호 · 200일선 위 · (MACD↑ 또는 골든크로스) · 진입신호 {MIN_SIGNAL_DAYS}일+ 지속 · 섹터당 최대 {RECO_SECTOR_MAX}개 · 상위 {RECO_N}개</div>
+  <div style="color:#6b7280;font-size:12px;margin-bottom:4px">조건: 섹터중앙 이하 PER · 퀄리티(ROE·부채·FCF) 양호 · 200일선 위 · (MACD↑ 또는 골든크로스) · 진입신호 {MIN_SIGNAL_DAYS}일+ 지속 · 고변동 상위{(1-MAX_VOL_PCTL)*100:.0f}% 제외 · 섹터당 최대 {RECO_SECTOR_MAX}개 · 상위 {RECO_N}개 · 추천 비중은 역변동성 기준(참고용)</div>
   {reco_block}
 
   <div style="margin:12px 0;font-size:13px;line-height:1.7">
@@ -1502,7 +1588,9 @@ def build_report(reco_rows, reversal_rows, solid_rows, exit_rows, new_in, droppe
     lines += ["", f"■ 추천 종목 {len(reco_rows)}"]
     for rank, sym, name, per, ind, reason in reco_rows:
         per_t = "—" if _isnan(per) else f"{float(per):.1f}"
-        lines.append(f"{rank:>2}. {sym:<6} PER {per_t:<5} {sector_kr(sym, sector_map, info)} | {desc_of(sym, info, sector_map)}")
+        w = reco_weights.get(sym)
+        wt = "" if w is None else f" 비중 {w*100:.0f}%"
+        lines.append(f"{rank:>2}. {sym:<6} PER {per_t:<5}{wt} {sector_kr(sym, sector_map, info)} | {desc_of(sym, info, sector_map)}")
         lines.append(f"      이유: {reason}")
     lines += ["", "■ 청산(EXIT) 신호"]
     lines += ([f"  · {sym}: {reason}" for sym, ind, reason in exit_rows] or ["  (해당 없음)"])
@@ -1555,8 +1643,26 @@ def generate_report():
         if r is not None:
             scored.append((sym, r[0], r[1]))
     scored.sort(key=lambda x: x[1], reverse=True)
+
+    # 고변동 컷: 적격 후보 중 변동성 상위(1-MAX_VOL_PCTL)% 제외
+    if scored and 0 < MAX_VOL_PCTL < 1:
+        svols = [ind_map[s].get("vol_ann") for s, _, _ in scored
+                 if not _isnan(ind_map[s].get("vol_ann"))]
+        if len(svols) >= 5:
+            thr = float(np.quantile(svols, MAX_VOL_PCTL))
+            scored = [t for t in scored
+                      if _isnan(ind_map[t[0]].get("vol_ann")) or ind_map[t[0]]["vol_ann"] <= thr]
+
     picked = pick_with_sector_cap(scored, sector_map, RECO_N, RECO_SECTOR_MAX)
     reco_syms = {s for s, _, _ in picked}
+
+    # 역변동성 추천 비중(참고용 포지션 사이징)
+    reco_weights = {}
+    if picked:
+        wser = _alloc_weights([s for s, _, _ in picked],
+                              {s: ind_map[s].get("vol_ann") for s, _, _ in picked},
+                              [s for s, _, _ in picked])
+        reco_weights = {s: float(wser.get(s, 0.0)) for s, _, _ in picked}
 
     reco_rows = []
     for rank, (sym, _score, reason) in enumerate(picked, start=1):
@@ -1611,7 +1717,8 @@ def generate_report():
     regime = market_regime(spy_close) if spy_close is not None else None
 
     subject, html, text = build_report(reco_rows, reversal_rows, solid_rows, exit_rows,
-                                       new_in, dropped, asof, sector_map, info, ind_map, regime)
+                                       new_in, dropped, asof, sector_map, info, ind_map, regime,
+                                       reco_weights)
     save_curr_list(picked_syms)
     return subject, html, text, images
 
