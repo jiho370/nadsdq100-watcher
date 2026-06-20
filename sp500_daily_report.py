@@ -363,6 +363,80 @@ def _norm_sector(sec: str) -> str:
     }
     return table.get(s, sec.strip())
 
+# yfinance 자체 섹터 분류(11개) → GICS 표준명. yfinance info["sector"]는 GICS와 이름이 달라 매핑 필수.
+YF_SECTOR_TO_GICS = {
+    "Technology": "Information Technology",
+    "Healthcare": "Health Care",
+    "Financial Services": "Financials",
+    "Consumer Cyclical": "Consumer Discretionary",
+    "Consumer Defensive": "Consumer Staples",
+    "Communication Services": "Communication Services",
+    "Industrials": "Industrials",
+    "Energy": "Energy",
+    "Utilities": "Utilities",
+    "Real Estate": "Real Estate",
+    "Basic Materials": "Materials",
+}
+
+WIKI_SP500_URL = "https://en.wikipedia.org/wiki/List_of_S%26P_500_companies"
+_WIKI_SECTOR_CACHE = {}   # {ticker(야후형, .→-): GICS 섹터}
+
+def _norm_yf_sector(sec: str) -> str:
+    """yfinance/임의 섹터 문자열을 GICS 표준명으로. 못 맞추면 빈 문자열."""
+    if not sec:
+        return ""
+    s = sec.strip()
+    g = _norm_sector(s)
+    if g in GICS_KR:
+        return g
+    return YF_SECTOR_TO_GICS.get(s, "")
+
+def fetch_wikipedia_sectors() -> dict:
+    """위키피디아 S&P500 표에서 ticker→GICS 섹터를 긁어온다(가장 권위 있는 1차 소스).
+    pandas.read_html 우선, 실패 시 requests+정규식 파싱. 티커는 야후형(.→-)으로 정규화.
+    네트워크/파싱 실패 시 빈 dict(다른 폴백이 받음). 1회 캐시."""
+    global _WIKI_SECTOR_CACHE
+    if _WIKI_SECTOR_CACHE:
+        return _WIKI_SECTOR_CACHE
+    out = {}
+    # 1) pandas.read_html (lxml 필요)
+    try:
+        tables = pd.read_html(WIKI_SP500_URL)
+        for t in tables:
+            cols = [str(c).strip() for c in t.columns]
+            if "Symbol" in cols and "GICS Sector" in cols:
+                for _, row in t.iterrows():
+                    tic = str(row["Symbol"]).strip().replace(".", "-")
+                    sec = _norm_sector(str(row["GICS Sector"]).strip())
+                    if tic and sec in GICS_KR:
+                        out[tic] = sec
+                break
+    except Exception as e:
+        print(f"[섹터] 위키피디아 read_html 실패: {e}", file=sys.stderr)
+    # 2) requests + 정규식 폴백
+    if not out and requests is not None:
+        try:
+            headers = {"User-Agent": "Mozilla/5.0"}
+            html = requests.get(WIKI_SP500_URL, headers=headers, timeout=30).text
+            import re as _re
+            # 표 행: <td>...TICKER...</td> ... 이어지는 셀들 중 GICS 섹터
+            # 간단 파싱: 'TICKER' 링크 뒤 두 번째 <td> 가 회사명, 세 번째가 GICS 섹터
+            for m in _re.finditer(
+                r'<td[^>]*>\s*<a[^>]*>([A-Z][A-Z0-9.\-]{0,6})</a>.*?</td>\s*'
+                r'<td[^>]*>.*?</td>\s*<td[^>]*>\s*([A-Za-z &]+?)\s*</td>',
+                html, _re.S):
+                tic = m.group(1).strip().replace(".", "-")
+                sec = _norm_sector(m.group(2).strip())
+                if tic and sec in GICS_KR:
+                    out[tic] = sec
+        except Exception as e:
+            print(f"[섹터] 위키피디아 requests 파싱 실패: {e}", file=sys.stderr)
+    if out:
+        print(f"[섹터] 위키피디아에서 {len(out)}종목 GICS 섹터 확보", file=sys.stderr)
+    _WIKI_SECTOR_CACHE = out
+    return out
+
+
 # ------------------------- yfinance 유틸 ------------------------
 def _require_yf():
     if yf is None: raise RuntimeError("yfinance 설치 필요")
@@ -540,6 +614,40 @@ def market_regime(spy_close: pd.Series) -> dict:
     ma200 = float(s.rolling(200).mean().iloc[-1])
     last = float(s.iloc[-1])
     return {"risk_on": last > ma200, "spy": last, "ma200": ma200, "gap_pct": (last / ma200 - 1) * 100 if ma200 else float("nan")}
+
+FNG_URL = "https://production.dataviz.cnn.io/index/fearandgreed/graphdata"
+_FNG_CACHE = {}
+
+def _fng_rating_kr(score) -> str:
+    if score is None or _isnan(score): return "—"
+    if score < 25:  return "극단적 공포"
+    if score < 45:  return "공포"
+    if score <= 55: return "중립"
+    if score <= 75: return "탐욕"
+    return "극단적 탐욕"
+
+def fetch_fear_greed() -> dict:
+    """CNN 공포·탐욕 지수(0~100) 조회. {score, rating_kr} 반환.
+    실패 시 {score: None} (UI에서 '탐욕지수 확보 실패'). 1회 캐시."""
+    global _FNG_CACHE
+    if _FNG_CACHE:
+        return _FNG_CACHE
+    out = {"score": None, "rating_kr": "—"}
+    if requests is not None:
+        try:
+            headers = {"User-Agent": "Mozilla/5.0"}
+            r = requests.get(FNG_URL, headers=headers, timeout=20)
+            r.raise_for_status()
+            data = r.json()
+            fg = data.get("fear_and_greed", {}) if isinstance(data, dict) else {}
+            sc = fg.get("score")
+            if sc is not None:
+                out = {"score": float(sc), "rating_kr": _fng_rating_kr(float(sc))}
+                print(f"[탐욕지수] {out['score']:.0f} ({out['rating_kr']})", file=sys.stderr)
+        except Exception as e:
+            print(f"[탐욕지수] 확보 실패: {e}", file=sys.stderr)
+    _FNG_CACHE = out
+    return out
 
 def _ann_vol(close: pd.Series, window: int = VOL_WINDOW) -> float:
     r = close.pct_change().dropna()
@@ -1094,9 +1202,19 @@ MODE_LABELS = {
 }
 
 def _regime_line(regime: dict) -> str:
-    reg = "위험선호(Risk-On)" if regime.get("risk_on") else "위험회피(Risk-Off) - 신규 추천 신중"
+    """시장상태: 단정(위험선호/회피) 대신 객관 지표 2개만 — SPY 200일선 이격도 + 탐욕지수."""
     gap = regime.get("gap_pct")
-    return f"{reg} · SPY가 200일선 대비 {_fmt(gap)}" if (gap is not None and not _isnan(gap)) else reg
+    if gap is not None and not _isnan(gap):
+        pos = "위" if gap >= 0 else "아래"
+        spy_part = f"SPY 200일선 {pos}({_fmt(gap)})"
+    else:
+        spy_part = "SPY 200일선 데이터 확보 실패"
+    sc = regime.get("fng_score")
+    if sc is not None and not _isnan(sc):
+        fng_part = f"탐욕지수 {sc:.0f}/100 ({regime.get('fng_rating','—')})"
+    else:
+        fng_part = "탐욕지수 확보 실패"
+    return f"{spy_part} · {fng_part}"
 
 def _vt_block(regime: dict) -> str:
     if not regime.get("vol_target"):
@@ -1112,8 +1230,16 @@ def _html_head(mode: str, regime: dict, subtitle: str = "") -> str:
     today = datetime.now(KST).strftime("%Y-%m-%d")
     label = MODE_LABELS.get(mode, mode)
     sub = subtitle or label
-    risk = regime.get("risk_on")
-    pill_bg = "#dcfce7" if risk else "#fee2e2"; pill_fg = "#15803d" if risk else "#b91c1c"
+    sc = regime.get("fng_score")
+    # 알약 색: 탐욕지수 기준(공포=빨강 계열, 탐욕=초록 계열, 중립=회색). 단정 대신 지표 표시.
+    if sc is None or _isnan(sc):
+        pill_bg, pill_fg = "#f3f4f6", "#374151"
+    elif sc < 45:
+        pill_bg, pill_fg = "#fee2e2", "#b91c1c"
+    elif sc <= 55:
+        pill_bg, pill_fg = "#f3f4f6", "#374151"
+    else:
+        pill_bg, pill_fg = "#dcfce7", "#15803d"
     return (
         '<!doctype html><html><body style="font-family:-apple-system,BlinkMacSystemFont,'
         '\'Apple SD Gothic Neo\',Malgun Gothic,sans-serif;max-width:720px;margin:0 auto;'
@@ -1121,14 +1247,15 @@ def _html_head(mode: str, regime: dict, subtitle: str = "") -> str:
         f'<h2 style="margin:0 0 4px">📊 S&amp;P 500 데일리 리포트</h2>'
         f'<div style="color:#6b7280;font-size:13px;margin-bottom:8px">{today} 마감 기준 · {sub}</div>'
         f'<div style="margin-bottom:12px"><span style="background:{pill_bg};color:{pill_fg};'
-        f'border-radius:6px;padding:3px 10px;font-size:12px;font-weight:700">시장상태: {_regime_line(regime)}</span></div>'
+        f'border-radius:6px;padding:3px 10px;font-size:12px;font-weight:700">시장 지표: {_regime_line(regime)}</span></div>'
         + _vt_block(regime))
 
 _HTML_FOOT = ('<div style="color:#999;font-size:11px;margin-top:16px;line-height:1.6">'
-              '※ <b>시장상태(위험선호/위험회피)</b>는 탐욕지수가 아니라 '
-              '<b>SPY(S&amp;P500 ETF) 종가가 200일 이동평균선 위/아래에 있는지</b>로 판정합니다. '
-              '200일선 위=위험선호(Risk-On), 아래=위험회피(Risk-Off)이며, 괄호 안 %는 200일선 대비 이격도입니다.<br>'
-              '규칙 기반 자동 산출이며 투자 권유가 아닙니다. 데이터: Yahoo Finance / SEC EDGAR.'
+              '※ <b>시장 지표</b>는 두 가지 객관 수치만 표시합니다. '
+              '(1) <b>SPY 200일선 이격도</b>: SPY 종가가 200일 이동평균선 대비 몇 % 위/아래인지(추세 위치). '
+              '(2) <b>탐욕지수</b>: CNN Fear &amp; Greed Index(0~100, 낮을수록 공포·높을수록 탐욕). '
+              '시장 방향을 단정하지 않으며 해석은 투자자 판단입니다.<br>'
+              '규칙 기반 자동 산출이며 투자 권유가 아닙니다. 데이터: Yahoo Finance / SEC EDGAR / CNN.'
               '</div></body></html>')
 
 SECTOR_TAG_BG = "#eef2ff"; SECTOR_TAG_FG = "#4338ca"
@@ -1238,10 +1365,14 @@ def _section_table(title, note, picks, ind_map, info, sector_map, hist, images, 
 def build_final_summary(sec1, sec2, sec3, regime) -> str:
     """4) 최종 분석/결론: 3섹션 종합 + 시장상태 + 리스크 다이얼 요약(3~5문장)."""
     parts = []
-    rs = "위험선호(Risk-On)" if regime.get("risk_on") else "위험회피(Risk-Off)"
     gap = regime.get("gap_pct")
-    gap_s = f"(SPY가 200일선 {_fmt(gap)})" if (gap is not None and not _isnan(gap)) else ""
-    parts.append(f"현재 시장은 {rs} 국면입니다{gap_s}.")
+    sc = regime.get("fng_score")
+    bits = []
+    if gap is not None and not _isnan(gap):
+        bits.append(f"SPY가 200일선 {'위' if gap >= 0 else '아래'}({_fmt(gap)})")
+    if sc is not None and not _isnan(sc):
+        bits.append(f"탐욕지수 {sc:.0f}({regime.get('fng_rating','—')})")
+    parts.append("시장 지표는 " + (", ".join(bits) if bits else "데이터 확보 실패") + " 수준입니다.")
     if sec1:
         parts.append(f"추세 측면에서는 {', '.join(s for s,_,_ in sec1)} 등이 정배열·신고가 부근에서 상대강도 우위를 보입니다.")
     if sec2:
@@ -1253,8 +1384,8 @@ def build_final_summary(sec1, sec2, sec3, regime) -> str:
     if regime.get("vol_target"):
         w = regime.get("eq_exposure", 1.0)
         parts.append(f"리스크 다이얼 기준 권장 주식 노출은 약 {w*100:.0f}%이며, 나머지는 현금·단기채 비중으로 변동성을 통제하는 것을 권장합니다.")
-    elif not regime.get("risk_on"):
-        parts.append("Risk-Off 국면이므로 신규 진입은 보수적으로 접근하는 것이 바람직합니다.")
+    elif gap is not None and not _isnan(gap) and gap < 0:
+        parts.append("SPY가 200일선 아래에 있어 추세상 신규 진입은 신중할 필요가 있습니다.")
     return " ".join(parts[:5])
 
 # ---- 모드별 렌더 ----
@@ -1423,9 +1554,13 @@ def render_strategy(payload, inline_b64=False):
         html.append(f'<h3 style="margin:18px 0 2px">👀 관찰 종목</h3>'
                     f'<table style="width:100%;border-collapse:collapse;border:1px solid #c7d7fe;'
                     f'border-radius:8px;overflow:hidden">{rows}</table>')
+    _gap = regime.get("gap_pct")
+    _stance = ("추세 추종 유지" if (_gap is not None and not _isnan(_gap) and _gap >= 0) else "방어적 접근")
+    _fng = regime.get("fng_score")
+    _fng_s = f" · 탐욕지수 {_fng:.0f}({regime.get('fng_rating','—')})" if (_fng is not None and not _isnan(_fng)) else ""
     html.append('<div style="font-size:13px;color:#444;margin-top:6px">'
-                f'관찰 포인트: SPY가 200일선 대비 {_fmt(regime.get("gap_pct"))} 수준이며, '
-                f'{"추세 추종 유지" if regime.get("risk_on") else "방어적 접근"}이 기본 전제입니다.</div>')
+                f'관찰 포인트: SPY 200일선 대비 {_fmt(_gap)}{_fng_s} 수준이며, '
+                f'추세상 {_stance}이 기본 전제입니다.</div>')
     html.append(_HTML_FOOT)
     return "".join(html), images
 
@@ -1537,6 +1672,13 @@ def gather_universe_data(with_volume: bool = False) -> dict:
     """전 모드 공용 데이터 수집(1회). 종가·(옵션)거래량·지표·SPY·레짐을 반환.
     info는 비싸므로 여기서 받지 않고 호출부에서 필요한 종목만 조회한다."""
     universe, sector_map = get_sp500()
+    # 위키피디아 GICS 섹터로 sector_map 보강(가장 권위 있는 분류). 없으면 SPY 공시값 유지.
+    wiki = fetch_wikipedia_sectors()
+    if wiki:
+        for s in universe:
+            w = wiki.get(s)
+            if w in GICS_KR:
+                sector_map[s] = w
     if with_volume:
         hist, vol = download_histories(universe, with_volume=True)
     else:
@@ -1550,8 +1692,11 @@ def gather_universe_data(with_volume: bool = False) -> dict:
     for s, c in hist.items():
         ind = compute_indicators(c)
         if ind: ind_map[s] = ind
+    fng = fetch_fear_greed()
+    regime["fng_score"] = fng.get("score")
+    regime["fng_rating"] = fng.get("rating_kr")
     return {"universe": universe, "sector_map": sector_map, "hist": hist, "vol": vol,
-            "spy": spy, "regime": regime, "ind_map": ind_map}
+            "spy": spy, "regime": regime, "ind_map": ind_map, "wiki_sectors": wiki}
 
 def _tech_ok(ind) -> bool:
     return (ind.get("above_ma200") and (ind.get("macd_up") or ind.get("cross") == "golden")
@@ -1625,16 +1770,22 @@ def decide_mode(state: dict, data_date: str | None, now_kst=None, force: str | N
 
 # ---- 휴장/주말 모드 콘텐츠 빌더 ----
 def _resolve_sector(sym, sector_map, info) -> str:
-    """종목의 GICS 영문 섹터를 확정. SPY 보유종목 sector_map 우선,
-    비어있거나 비표준이면 yfinance info의 sector(영문)로 폴백."""
+    """종목의 GICS 영문 섹터를 확정(3단 폴백):
+      1) sector_map (SPY 공시 + 위키피디아 GICS, gather 단계에서 병합됨)
+      2) 위키피디아 캐시 직접 조회(안전망)
+      3) yfinance info sector → GICS 매핑(YF_SECTOR_TO_GICS)
+    못 맞추면 빈 문자열(섹터 집계에서 제외)."""
     sec = sector_map.get(sym, "") or ""
     if sec in GICS_KR:
         return sec
-    # info 폴백
-    isec = ""
+    w = _WIKI_SECTOR_CACHE.get(sym, "")
+    if w in GICS_KR:
+        return w
     if info and sym in info:
-        isec = _norm_sector(info[sym].get("sector_en", "") or "")
-    return isec if isec in GICS_KR else (sec if sec in GICS_KR else "")
+        g = _norm_yf_sector(info[sym].get("sector_en", "") or "")
+        if g in GICS_KR:
+            return g
+    return ""
 
 def build_sector_briefing(data: dict, info: dict | None = None) -> dict:
     """11개 GICS 섹터별 최근 주간/1개월 수익률·상승종목 비율.

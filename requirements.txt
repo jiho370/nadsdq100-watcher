@@ -4,3 +4,4 @@ numpy
 matplotlib
 requests
 openpyxl
+lxml
