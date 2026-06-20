@@ -1219,6 +1219,28 @@ def _bdays_between(d1: str, d2: str) -> int:
 def _kr_sector(sec_en: str) -> str:
     return GICS_KR.get(sec_en, sec_en or "기타")
 
+def _has_final_consonant(word: str) -> bool:
+    """단어 마지막 글자에 받침이 있는지. 한글은 유니코드로, 영문/숫자는 발음 끝소리로 근사."""
+    if not word:
+        return False
+    ch = word.strip()[-1]
+    code = ord(ch)
+    if 0xAC00 <= code <= 0xD7A3:          # 한글 음절: (code-0xAC00) % 28 != 0 이면 받침 있음
+        return (code - 0xAC00) % 28 != 0
+    low = ch.lower()
+    if low.isdigit():
+        # 0~9 끝소리: 0(영)2(이)4(사)5(오)9(구)=받침無, 1(일)3(삼)6(육)7(칠)8(팔)=받침有
+        return low in "13678"
+    if low.isalpha():
+        # 영문 알파벳 이름 끝소리 기준(대략): 받침 없는 끝소리 모음/우/이 계열
+        no_final = set("abeijko")  # 에이.비.이.제이.케이.오 등(받침 없음)
+        return low not in no_final
+    return False
+
+def _josa(word: str, with_final: str, without_final: str) -> str:
+    """받침 유무에 맞는 조사를 반환. 예: _josa('유지','이','가')='가', _josa('접근','이','가')='이'."""
+    return with_final if _has_final_consonant(word) else without_final
+
 def _fmt(x, suf="%") -> str:
     return "—" if (x is None or _isnan(x)) else f"{x:+.1f}{suf}"
 
@@ -1453,9 +1475,11 @@ def build_final_summary(sec1, sec2, sec3, regime) -> str:
     if sec1:
         parts.append(f"추세 측면에서는 {', '.join(s for s,_,_ in sec1)} 등이 정배열·신고가 부근에서 상대강도 우위를 보입니다.")
     if sec2:
-        parts.append(f"펀더멘탈 측면에서는 {', '.join(s for s,_,_ in sec2)}이(가) 고ROE·FCF 흑자 등 재무 건전성에서 두드러집니다.")
+        _n2 = ', '.join(s for s,_,_ in sec2)
+        parts.append(f"펀더멘탈 측면에서는 {_n2}{_josa(_n2, '이', '가')} 고ROE·FCF 흑자 등 재무 건전성에서 두드러집니다.")
     if sec3:
-        parts.append(f"한편 {', '.join(s for s,_,_ in sec3)}은(는) 거래량·변동성 급증으로 단기 이슈를 점검할 필요가 있습니다.")
+        _n3 = ', '.join(s for s,_,_ in sec3)
+        parts.append(f"한편 {_n3}{_josa(_n3, '은', '는')} 거래량·변동성 급증으로 단기 이슈를 점검할 필요가 있습니다.")
     else:
         parts.append("당일 거래량·변동성 급증으로 주목할 만한 대형 이슈는 두드러지지 않았습니다.")
     if regime.get("vol_target"):
@@ -1651,8 +1675,6 @@ def render_strategy(payload, inline_b64=False):
     regime = payload["regime"]
     images = []
     html = [_html_head("strategy", regime, "차주 관찰 포인트 (데이터 기반)")]
-    html.append('<div style="font-size:13px;color:#444;margin:6px 0">경제지표·실적 일정은 외부 검색을 사용하지 않아 '
-                '<b>데이터 확보 실패</b>로 표기합니다. 아래는 보유 데이터 기반 관찰 포인트입니다.</div>')
     html.append(_spy_chart_block(payload.get("spy"), images, inline_b64))
     html.append(_sector_missing_note(payload.get("has_sector", True)))
     if payload.get("watch_sectors"):
@@ -1663,12 +1685,13 @@ def render_strategy(payload, inline_b64=False):
         html.append('<div style="font-size:13px;margin:6px 0"><b>주목 섹터(직전 주 상대강도)</b><br>' + chips + '</div>')
     picks = payload.get("picks", [])
     if picks:
-        rows = "".join(_stock_row(s, r, payload["ind_map"], payload["info"], payload["sector_map"],
+        rows = "".join(_stock_row(s, "", payload["ind_map"], payload["info"], payload["sector_map"],
                                   payload["hist"], images, inline_b64,
                                   badge=_badge("관찰", "#1d4ed8"), chart_days=252, rank=i + 1,
-                                  card_bg="#f5f8ff", card_border="#c7d7fe")
+                                  card_bg="#f5f8ff", card_border="#c7d7fe", reason_label=None)
                        for i, (s, _sc, r) in enumerate(picks))
-        html.append(f'<h3 style="margin:18px 0 2px">👀 관찰 종목</h3>'
+        html.append(f'<h3 style="margin:18px 0 2px">👀 관찰 종목 '
+                    f'<span style="color:#9ca3af;font-size:12px">(추천이 아닌 관찰 안내)</span></h3>'
                     f'<table style="width:100%;border-collapse:collapse;border:1px solid #c7d7fe;'
                     f'border-radius:8px;overflow:hidden">{rows}</table>')
     _gap = regime.get("gap_pct")
@@ -1677,7 +1700,7 @@ def render_strategy(payload, inline_b64=False):
     _fng_s = f" · 탐욕지수 {_fng:.0f}({regime.get('fng_rating','—')})" if (_fng is not None and not _isnan(_fng)) else ""
     html.append('<div style="font-size:13px;color:#444;margin-top:6px">'
                 f'관찰 포인트: SPY 200일선 대비 {_fmt(_gap)}{_fng_s} 수준이며, '
-                f'추세상 {_stance}이 기본 전제입니다.</div>')
+                f'추세상 {_stance}{_josa(_stance, "이", "가")} 기본 전제입니다.</div>')
     html.append(_HTML_FOOT)
     return "".join(html), images
 
