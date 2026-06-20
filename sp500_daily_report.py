@@ -626,26 +626,60 @@ def _fng_rating_kr(score) -> str:
     if score <= 75: return "탐욕"
     return "극단적 탐욕"
 
+def _fng_parse(data):
+    """CNN 응답(JSON dict)에서 score 추출. 형식이 바뀌어도 최대한 견고하게."""
+    if not isinstance(data, dict):
+        return None
+    fg = data.get("fear_and_greed")
+    sc = fg.get("score") if isinstance(fg, dict) else None
+    if sc is None:
+        sc = data.get("score")
+    if sc is None:
+        return None
+    try:
+        sc = float(sc)
+    except (TypeError, ValueError):
+        return None
+    return {"score": sc, "rating_kr": _fng_rating_kr(sc)}
+
 def fetch_fear_greed() -> dict:
     """CNN 공포·탐욕 지수(0~100) 조회. {score, rating_kr} 반환.
-    실패 시 {score: None} (UI에서 '탐욕지수 확보 실패'). 1회 캐시."""
+    CNN dataviz 엔드포인트는 generic User-Agent를 403 차단하므로 '완전한 브라우저 헤더'가 필요하다.
+    실패 시 {score: None} (UI에서 '탐욕지수 확보 실패'). HTTP 상태/사유를 로그로 남긴다. 1회 캐시."""
     global _FNG_CACHE
     if _FNG_CACHE:
         return _FNG_CACHE
     out = {"score": None, "rating_kr": "—"}
-    if requests is not None:
+    if requests is None:
+        _FNG_CACHE = out
+        return out
+
+    headers = {
+        "User-Agent": ("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
+                       "(KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36"),
+        "Accept": "application/json, text/plain, */*",
+        "Accept-Language": "en-US,en;q=0.9",
+        "Referer": "https://edition.cnn.com/markets/fear-and-greed",
+        "Origin": "https://edition.cnn.com",
+    }
+    today = datetime.now(timezone.utc).strftime("%Y-%m-%d")
+    urls = [FNG_URL, f"{FNG_URL}/{today}"]
+    for url in urls:
         try:
-            headers = {"User-Agent": "Mozilla/5.0"}
-            r = requests.get(FNG_URL, headers=headers, timeout=20)
-            r.raise_for_status()
-            data = r.json()
-            fg = data.get("fear_and_greed", {}) if isinstance(data, dict) else {}
-            sc = fg.get("score")
-            if sc is not None:
-                out = {"score": float(sc), "rating_kr": _fng_rating_kr(float(sc))}
+            r = requests.get(url, headers=headers, timeout=20)
+            if r.status_code != 200:
+                print(f"[탐욕지수] {url} → HTTP {r.status_code}", file=sys.stderr)
+                continue
+            parsed = _fng_parse(r.json())
+            if parsed:
+                out = parsed
                 print(f"[탐욕지수] {out['score']:.0f} ({out['rating_kr']})", file=sys.stderr)
+                break
+            print(f"[탐욕지수] {url} → 응답에 score 없음", file=sys.stderr)
         except Exception as e:
-            print(f"[탐욕지수] 확보 실패: {e}", file=sys.stderr)
+            print(f"[탐욕지수] {url} → 오류 {type(e).__name__}: {str(e)[:100]}", file=sys.stderr)
+    if out["score"] is None:
+        print("[탐욕지수] 확보 실패 — 메일엔 '탐욕지수 확보 실패'로 표시(다른 기능 정상)", file=sys.stderr)
     _FNG_CACHE = out
     return out
 
