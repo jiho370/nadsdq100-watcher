@@ -216,6 +216,82 @@ KR_DESC = {
     "TMO": "생명과학 장비·진단(써모피셔)", "ABT": "의료기기·진단(애벗)",
 }
 
+KR_DESC.update({
+    "WDC": "하드디스크·플래시 메모리 저장장치(웨스턴디지털)", "STX": "하드디스크 저장장치(씨게이트)",
+    "MRNA": "mRNA 백신·치료제(모더나)", "GEV": "전력·에너지 설비(GE버노바)",
+    "HOOD": "주식·코인 거래 앱(로빈후드)", "COIN": "암호화폐 거래소(코인베이스)",
+    "MSTR": "비트코인 보유·BI 소프트웨어(마이크로스트래티지)", "VST": "전력 발전·소매(비스트라)",
+    "CARR": "냉난방공조 설비(캐리어)", "PWR": "전력·통신 인프라 시공(콴타서비스)",
+    "URI": "건설장비 렌탈(유나이티드렌탈스)", "CTVA": "농업 종자·작물보호제(코르테바)",
+    "DOW": "기초 화학소재(다우)", "DD": "특수 화학소재(듀폰)", "PPG": "산업용 도료·코팅(PPG)",
+    "SHW": "건축용 페인트(셔윈윌리엄스)", "NUE": "철강 제조(뉴코어)", "FCX": "구리·금 광산(프리포트맥모란)",
+    "NEM": "금 채굴(뉴몬트)", "APD": "산업용 가스(에어프로덕츠)", "ECL": "위생·수처리 솔루션(에코랩)",
+    "VMC": "건설용 골재·시멘트(벌컨머티리얼스)", "MLM": "건설용 골재(마틴마리에타)",
+    "EMR": "산업 자동화 장비(에머슨)", "ETN": "전력관리 부품(이튼)", "PH": "유압·산업부품(파커하니핀)",
+    "ITW": "산업용 부품·장비(일리노이툴웍스)", "DE": "농기계·건설장비(존디어)",
+    "GD": "방산·항공(제너럴다이내믹스)", "NOC": "방산(노스럽그러먼)", "LHX": "방산 통신·전자(L3해리스)",
+    "TDG": "항공기 부품(트랜스다임)", "TT": "냉난방공조(트레인테크놀로지스)", "JCI": "빌딩 설비·제어(존슨컨트롤스)",
+    "CMI": "디젤 엔진·발전(커민스)", "PCAR": "대형 트럭(파카)", "GWW": "산업용 MRO 유통(그레인저)",
+    "FDX": "특송·물류(페덱스)", "UPS": "특송·물류(UPS)", "UNP": "철도 화물(유니온퍼시픽)",
+    "NSC": "동부 화물 철도(노퍽서던)", "LUV": "저가 항공(사우스웨스트)", "DAL": "대형 항공(델타)",
+    "UAL": "대형 항공(유나이티드)", "WM": "폐기물 처리(웨이스트매니지먼트)", "RSG": "폐기물 처리(리퍼블릭서비스)",
+    "EMR": "산업 자동화(에머슨)", "ROK": "공장 자동화(로크웰오토메이션)", "AME": "정밀 계측·전자(아메텍)",
+    "DOV": "산업기계 다각화(도버)", "IR": "산업용 압축기·펌프(인거솔랜드)",
+    "PG": "생활용품(P&G)", "CL": "치약·생활용품(콜게이트)", "KMB": "위생용품(킴벌리클라크)",
+    "GIS": "시리얼·가공식품(제너럴밀스)", "K": "시리얼·스낵(켈라노바)", "HSY": "초콜릿·제과(허쉬)",
+    "SYY": "식자재 유통(시스코)", "ADM": "곡물 가공·유통(ADM)", "STZ": "주류(컨스텔레이션브랜즈)",
+    "MO": "담배(알트리아)", "PM": "글로벌 담배(필립모리스)", "CLX": "표백제·생활용품(클로락스)",
+    "CHD": "생활용품(처치앤드와이트)", "EL": "화장품(에스티로더)", "KVUE": "소비자 건강용품(켄뷰)",
+    "TGT": "종합 소매(타깃)", "DG": "달러 할인점(달러제너럴)", "DLTR": "달러 할인점(달러트리)",
+    "KR": "식료품 소매(크로거)", "LOW": "주택용품 소매(로우스)", "TJX": "오프프라이스 의류(TJX)",
+    "LULU": "운동복(룰루레몬)", "GM": "자동차 제조(GM)", "F": "자동차 제조(포드)",
+    "APTV": "차량 전장·부품(앱티브)", "GPC": "자동차·산업부품 유통(제뉴인파츠)",
+    "YUM": "패스트푸드 프랜차이즈(얌브랜즈)", "CMG": "패스트캐주얼 외식(치폴레)",
+    "HLT": "글로벌 호텔(힐튼)", "RCL": "크루즈(로열캐리비안)", "CCL": "크루즈(카니발)",
+    "EXPE": "온라인 여행(익스피디아)", "DHI": "주택 건설(DR호튼)", "LEN": "주택 건설(레나)",
+    "PHM": "주택 건설(펄트그룹)", "NVR": "주택 건설(NVR)",
+    "C": "대형 은행(씨티그룹)", "USB": "지역 은행(US뱅코프)", "PNC": "지역 은행(PNC)",
+    "TFC": "지역 은행(트루이스트)", "COF": "신용카드·은행(캐피탈원)", "SCHW": "증권·자산관리(찰스슈왑)",
+    "BLK": "세계 최대 자산운용(블랙록)", "BX": "사모펀드·대체투자(블랙스톤)", "KKR": "사모펀드(KKR)",
+    "APO": "사모펀드·보험(아폴로)", "SPGI": "신용평가·지수(S&P글로벌)", "MCO": "신용평가(무디스)",
+    "ICE": "거래소·데이터(인터컨티넨탈익스체인지)", "CME": "파생상품 거래소(CME)", "COIN": "암호화폐 거래소(코인베이스)",
+    "AXP": "신용카드·결제(아메리칸익스프레스)", "PGR": "자동차 보험(프로그레시브)", "TRV": "손해보험(트래블러스)",
+    "CB": "글로벌 손해보험(처브)", "AIG": "종합 보험(AIG)", "MET": "생명보험(메트라이프)",
+    "PRU": "생명보험(푸르덴셜)", "AFL": "보험(애플랙)", "ALL": "자동차·주택 보험(올스테이트)",
+    "AON": "보험 중개·컨설팅(에이온)", "MMC": "보험 중개(마쉬맥레넌)", "BRK-B": "버크셔 해서웨이(버핏 지주사)",
+    "ABBV": "면역·항암 신약(애브비)", "BMY": "항암·면역 신약(BMS)", "ZTS": "동물 의약품(조에티스)",
+    "BSX": "의료기기·심혈관(보스턴사이언티픽)", "MDT": "의료기기(메드트로닉)", "SYK": "정형외과 의료기기(스트라이커)",
+    "BDX": "의료기기·진단(벡톤디킨슨)", "EW": "심장 판막(에드워즈라이프사이언스)", "HCA": "병원 운영(HCA헬스케어)",
+    "CI": "건강보험(시그나)", "CVS": "약국·건강보험(CVS헬스)", "ELV": "건강보험(엘레번스헬스)",
+    "MCK": "의약품 유통(맥케슨)", "COR": "의약품 유통(센코라)", "CAH": "의약품 유통(카디널헬스)",
+    "BIIB": "신경질환 신약(바이오젠)", "MRNA": "mRNA 백신·치료제(모더나)",
+    "A": "생명과학 분석장비(애질런트)", "RMD": "수면호흡기 의료기기(레스메드)", "WST": "의약품 포장재(웨스트파마)",
+    "NOW": "기업용 워크플로 SW(서비스나우)", "SNOW": "클라우드 데이터 분석(스노우플레이크)",
+    "MDB": "클라우드 데이터베이스(몽고DB)", "NET": "엣지 네트워크·보안(클라우드플레어)",
+    "ZS": "클라우드 보안(지스케일러)", "TEAM": "협업 SW(아틀라시안)", "TTD": "디지털 광고 플랫폼(더트레이드데스크)",
+    "HUBS": "마케팅·CRM SW(허브스팟)", "ZM": "화상회의(줌)", "DOCU": "전자서명(도큐사인)",
+    "WDAY": "클라우드 인사·재무 SW(워크데이)", "TEL": "커넥터·센서(TE커넥티비티)", "GLW": "광섬유·디스플레이 유리(코닝)",
+    "HPQ": "PC·프린터(HP)", "HPE": "기업용 서버·네트워크(HPE)", "NTAP": "데이터 스토리지(넷앱)",
+    "STX": "하드디스크 저장장치(씨게이트)", "WDC": "저장장치(웨스턴디지털)", "KEYS": "전자 계측장비(키사이트)",
+    "FICO": "신용평가 분석SW(파이코)", "GDDY": "도메인·웹호스팅(고대디)", "FSLR": "태양광 패널(퍼스트솔라)",
+    "ENPH": "태양광 인버터(엔페이즈)", "ON": "전력·차량용 반도체(온세미)", "GFS": "반도체 파운드리(글로벌파운드리스)",
+    "TER": "반도체 테스트 장비(테러다인)", "SWKS": "무선통신 반도체(스카이웍스)", "QRVO": "RF 반도체(코보)",
+    "NEE": "전력·신재생 유틸리티(넥스트에라)", "DUK": "전력 유틸리티(듀크에너지)", "SO": "전력 유틸리티(서던컴퍼니)",
+    "D": "전력·가스 유틸리티(도미니언)", "SRE": "전력·가스 유틸리티(셈프라)", "PEG": "전력 유틸리티(PSEG)",
+    "ED": "전력 유틸리티(콘에디슨)", "PCG": "캘리포니아 전력(PG&E)", "EIX": "전력 유틸리티(에디슨인터내셔널)",
+    "WEC": "전력·가스 유틸리티(WEC에너지)", "AWK": "수도 유틸리티(아메리칸워터웍스)",
+    "VST": "전력 발전·소매(비스트라)", "GEV": "전력·에너지 설비(GE버노바)", "PWR": "전력·통신 시공(콴타서비스)",
+    "COP": "석유·가스 탐사생산(코노코필립스)", "EOG": "셰일 원유·가스(EOG리소스)",
+    "SLB": "유전 서비스(슐럼버거)", "HAL": "유전 서비스(핼리버튼)", "PSX": "정유·석유화학(필립스66)",
+    "MPC": "정유(마라톤페트롤리엄)", "VLO": "정유(발레로)", "WMB": "천연가스 파이프라인(윌리엄스)",
+    "KMI": "천연가스 파이프라인(킨더모건)", "OKE": "천연가스 미드스트림(원오크)", "OXY": "석유·가스 생산(옥시덴탈)",
+    "PLD": "물류창고 리츠(프로로지스)", "AMT": "통신탑 리츠(아메리칸타워)", "EQIX": "데이터센터 리츠(에퀴닉스)",
+    "CCI": "통신탑 리츠(크라운캐슬)", "PSA": "셀프스토리지 리츠(퍼블릭스토리지)", "O": "리테일 리츠(리얼티인컴)",
+    "WELL": "헬스케어 리츠(웰타워)", "DLR": "데이터센터 리츠(디지털리얼티)", "SPG": "쇼핑몰 리츠(사이먼프로퍼티)",
+    "CTVA": "농업 종자·작물보호제(코르테바)", "CSGP": "부동산 데이터(코스타)", "MOH": "메디케이드 건강보험(몰리나)",
+    "ROK": "공장 자동화(로크웰)", "BR": "금융 IT 서비스(브로드리지)", "JKHY": "은행 IT 솔루션(잭헨리)",
+})
+
 SP500_FALLBACK = {"AAPL": "Information Technology"} 
 
 # ===================== 구성종목(유니버스) =====================
@@ -975,12 +1051,34 @@ def _kr_sector(sec_en: str) -> str:
 def _fmt(x, suf="%") -> str:
     return "—" if (x is None or _isnan(x)) else f"{x:+.1f}{suf}"
 
-def _stock_chart(close: pd.Series, days: int = 126) -> bytes:
-    fig, ax = plt.subplots(figsize=(3.2, 1.0))
-    c = close.dropna().iloc[-days:]
-    ax.plot(c.index, c.values, color="#15803d", lw=1.2)
-    ax.axis("off"); fig.tight_layout(pad=0)
-    buf = io.BytesIO(); fig.savefig(buf, format="png", dpi=100); plt.close(fig)
+def _stock_chart(close: pd.Series, days: int = 252) -> bytes:
+    """가격선(굵게) + 50/200일 이동평균선 + 옅은 격자. 추세가 눈에 보이도록 개선.
+    (이메일 임베드용 PNG. 백테스트 차트와 별개.)"""
+    full = close.dropna()
+    c = full.iloc[-days:]
+    fig, ax = plt.subplots(figsize=(4.6, 1.55))
+    # 가격선
+    ax.plot(c.index, c.values, color="#15803d", lw=1.8, zorder=3, label="가격")
+    # 이동평균(전체 시계열로 계산 후 표시 구간만 슬라이스 → 끝부분 왜곡 방지)
+    if len(full) >= 50:
+        ma50 = full.rolling(50).mean().iloc[-days:]
+        ax.plot(ma50.index, ma50.values, color="#f59e0b", lw=1.0, alpha=0.9, zorder=2)
+    if len(full) >= 200:
+        ma200 = full.rolling(200).mean().iloc[-days:]
+        ax.plot(ma200.index, ma200.values, color="#9ca3af", lw=1.0, alpha=0.9, zorder=1)
+    # 시작/끝 대비 색으로 영역 채움(상승=연초록 / 하락=연빨강)
+    try:
+        up = float(c.iloc[-1]) >= float(c.iloc[0])
+        ax.fill_between(c.index, c.values, c.min(), color="#15803d" if up else "#b91c1c", alpha=0.06, zorder=0)
+    except Exception:
+        pass
+    ax.grid(True, axis="y", alpha=0.18, lw=0.6)
+    ax.margins(x=0.01)
+    for sp in ax.spines.values():
+        sp.set_visible(False)
+    ax.tick_params(left=False, bottom=False, labelleft=False, labelbottom=False)
+    fig.tight_layout(pad=0.2)
+    buf = io.BytesIO(); fig.savefig(buf, format="png", dpi=110); plt.close(fig)
     return buf.getvalue()
 
 # ===================== 모드 분기 / 공통 렌더 =====================
@@ -997,7 +1095,7 @@ MODE_LABELS = {
 def _regime_line(regime: dict) -> str:
     reg = "위험선호(Risk-On)" if regime.get("risk_on") else "위험회피(Risk-Off) - 신규 추천 신중"
     gap = regime.get("gap_pct")
-    return f"{reg} / SPY 200일선 대비 {_fmt(gap)}" if (gap is not None and not _isnan(gap)) else reg
+    return f"{reg} · SPY가 200일선 대비 {_fmt(gap)}" if (gap is not None and not _isnan(gap)) else reg
 
 def _vt_block(regime: dict) -> str:
     if not regime.get("vol_target"):
@@ -1013,83 +1111,128 @@ def _html_head(mode: str, regime: dict, subtitle: str = "") -> str:
     today = datetime.now(KST).strftime("%Y-%m-%d")
     label = MODE_LABELS.get(mode, mode)
     sub = subtitle or label
+    risk = regime.get("risk_on")
+    pill_bg = "#dcfce7" if risk else "#fee2e2"; pill_fg = "#15803d" if risk else "#b91c1c"
     return (
-        '<!doctype html><html><body style="font-family:Apple SD Gothic Neo,Malgun Gothic,sans-serif;'
-        'max-width:680px;margin:0 auto;color:#222">'
-        f'<h2 style="margin-bottom:2px">S&amp;P 500 데일리 리포트 / {today}</h2>'
-        f'<div style="color:#666;font-size:13px;margin-bottom:4px">{sub}</div>'
-        f'<div style="color:#888;font-size:12px;margin-bottom:12px">시장상태: {_regime_line(regime)}</div>'
+        '<!doctype html><html><body style="font-family:-apple-system,BlinkMacSystemFont,'
+        '\'Apple SD Gothic Neo\',Malgun Gothic,sans-serif;max-width:720px;margin:0 auto;'
+        'color:#111827;background:#ffffff;padding:4px">'
+        f'<h2 style="margin:0 0 4px">📊 S&amp;P 500 데일리 리포트</h2>'
+        f'<div style="color:#6b7280;font-size:13px;margin-bottom:8px">{today} 마감 기준 · {sub}</div>'
+        f'<div style="margin-bottom:12px"><span style="background:{pill_bg};color:{pill_fg};'
+        f'border-radius:6px;padding:3px 10px;font-size:12px;font-weight:700">시장상태: {_regime_line(regime)}</span></div>'
         + _vt_block(regime))
 
-_HTML_FOOT = ('<div style="color:#999;font-size:11px;margin-top:16px">규칙 기반 자동 산출 / 투자 권유가 아닙니다. '
-              '데이터: Yahoo Finance / SEC EDGAR.</div></body></html>')
+_HTML_FOOT = ('<div style="color:#999;font-size:11px;margin-top:16px;line-height:1.6">'
+              '※ <b>시장상태(위험선호/위험회피)</b>는 탐욕지수가 아니라 '
+              '<b>SPY(S&amp;P500 ETF) 종가가 200일 이동평균선 위/아래에 있는지</b>로 판정합니다. '
+              '200일선 위=위험선호(Risk-On), 아래=위험회피(Risk-Off)이며, 괄호 안 %는 200일선 대비 이격도입니다.<br>'
+              '규칙 기반 자동 산출이며 투자 권유가 아닙니다. 데이터: Yahoo Finance / SEC EDGAR.'
+              '</div></body></html>')
+
+SECTOR_TAG_BG = "#eef2ff"; SECTOR_TAG_FG = "#4338ca"
+
+def _sector_tag(sec_kr) -> str:
+    if not sec_kr or sec_kr == "기타":
+        return ""
+    return (f'<span style="background:{SECTOR_TAG_BG};color:{SECTOR_TAG_FG};border-radius:4px;'
+            f'padding:1px 6px;font-size:11px;margin-left:4px">{sec_kr}</span>')
+
+def _rank_badge(rank) -> str:
+    return (f'<span style="background:#b45309;color:#fff;border-radius:50%;width:22px;height:22px;'
+            f'display:inline-block;text-align:center;line-height:22px;font-size:12px;'
+            f'margin-right:4px">{rank}</span>')
+
+def _ret_chip(label, val) -> str:
+    if val is None or _isnan(val):
+        color = "#9ca3af"; txt = "—"
+    else:
+        color = "#15803d" if val >= 0 else "#b91c1c"; txt = f"{val:+.1f}%"
+    return ('<span style="display:inline-block;margin:2px 6px 2px 0;font-size:12px">'
+            f'<span style="color:#9ca3af">{label}</span> <b style="color:{color}">{txt}</b></span>')
+
+def _ret_chips(ind) -> str:
+    return "".join(_ret_chip(l, ind.get(k)) for l, k in
+                   [("1일","chg_1d"),("1주","chg_1w"),("1달","chg_1m"),
+                    ("6개월","chg_6m"),("1년","chg_1y"),("3년","chg_3y")])
 
 def _company_name(sym, meta) -> str:
     """회사 풀네임. info의 longName/shortName 우선, 없으면 티커."""
     return meta.get("longName") or meta.get("name") or sym
 
 def _one_liner(sym, meta) -> str:
-    """뭐 하는 회사인지 한 줄. KR_DESC(엄선) -> 영문 사업요약 축약 -> 업종 한글 순."""
+    """뭐 하는 회사인지 '항상 한글' 한 줄. KR_DESC(엄선) -> 업종 한글명 순.
+    영문 사업요약은 노출하지 않는다(가독성). KR_DESC에 없고 업종 한글도 없으면
+    업종 영문 그대로(드묾) 또는 '데이터 확보 실패'."""
     if sym in KR_DESC:
         return KR_DESC[sym]
-    ind_kr = INDUSTRY_KR.get(meta.get("industry", ""), "")
-    summary = (meta.get("summary") or "").strip()
-    if summary:
-        # 첫 문장만, 너무 길면 자름
-        first = summary.split(". ")[0].strip().rstrip(".")
-        if len(first) > 90:
-            first = first[:88].rstrip() + "…"
-        return (f"{ind_kr} · {first}" if ind_kr else first)
-    return ind_kr or meta.get("industry", "") or "—"
+    industry = meta.get("industry", "") or ""
+    ind_kr = INDUSTRY_KR.get(industry, "")
+    if ind_kr:
+        return f"{ind_kr} 분야 기업"
+    sec_kr = _kr_sector(meta.get("sector_en", "") or "")
+    if sec_kr and sec_kr != "기타":
+        return f"{sec_kr} 섹터 기업"
+    return industry or "데이터 확보 실패"
 
-def _chart_img(hist, sym, images, inline_b64, days=126):
+def _chart_img(hist, sym, images, inline_b64, days=252):
     c = hist.get(sym)
     if c is None or len(c.dropna()) < 20: return ""
     try: png = _stock_chart(c, days=days)
     except Exception: return ""
+    style = "display:block;width:100%;max-width:300px;height:auto"
     if inline_b64:
         return (f'<img src="data:image/png;base64,{base64.b64encode(png).decode()}" '
-                f'width="220" height="70" style="display:block">')
+                f'style="{style}">')
     cid = f"chart_{sym}"; images.append((cid, png))
-    return f'<img src="cid:{cid}" width="220" height="70" style="display:block">'
+    return f'<img src="cid:{cid}" style="{style}">'
 
 def _badge(label, color):
     return (f'<span style="background:{color};color:#fff;padding:1px 7px;border-radius:8px;'
             f'font-size:11px">{label}</span>')
 
 def _stock_row(sym, reason, ind_map, info, sector_map, hist, images, inline_b64,
-               badge="", is_new=False, chart_days=126):
-    """이전 build_html 카드 스타일: [뱃지][NEW] 티커 · 풀네임 / 섹터 · 한줄설명 · PER /
-    추천이유 / 수익률 + 우측 추세선 차트."""
+               badge="", is_new=False, chart_days=252, rank=None, card_bg="#ffffff",
+               card_border="#e5e7eb"):
+    """v3 카드 스타일: [순위][뱃지][NEW] 티커 (섹터태그) / 풀네임 / 한줄설명 /
+    PER·종가 / 변동률 색상칩 / 추천이유 + 우측 추세선 차트(가격+MA)."""
     ind = ind_map.get(sym, {}); meta = info.get(sym, {})
     name = _company_name(sym, meta)
-    sec = _kr_sector(sector_map.get(sym, "") or meta.get("sector_en", ""))
+    sec_kr = _kr_sector(sector_map.get(sym, "") or meta.get("sector_en", ""))
     desc = _one_liner(sym, meta)
-    pe = meta.get("pe"); pe_s = f"{float(pe):.1f}" if (pe and not _isnan(pe)) else "—"
+    pe = meta.get("pe"); pe_s = f"<b>{float(pe):.1f}</b>" if (pe and not _isnan(pe)) else "—"
+    price = meta.get("price"); price_s = f" · 종가 <b>${float(price):,.2f}</b>" if (price and not _isnan(price)) else ""
     newb = ' <span style="color:#b91c1c;font-size:11px;font-weight:700">NEW</span>' if is_new else ''
-    badge_html = (badge + " ") if badge else ""
-    rets = (f"1주 {_fmt(ind.get('chg_1w'))} · 1개월 {_fmt(ind.get('chg_1m'))} · "
-            f"6개월 {_fmt(ind.get('chg_6m'))} · 1년 {_fmt(ind.get('chg_1y'))}")
+    rb = _rank_badge(rank) if rank is not None else ""
+    bd = (badge + " ") if badge else ""
+    chart = _chart_img(hist, sym, images, inline_b64, days=chart_days)
     return (
-        '<tr><td style="padding:10px;border-bottom:1px solid #eee;vertical-align:top">'
-        f'<div style="font-weight:700">{badge_html}{newb}{sym} · {name}</div>'
-        f'<div style="color:#555;font-size:13px">{sec} · {desc} · PER {pe_s}</div>'
-        f'<div style="color:#15803d;font-size:13px;margin-top:3px">{reason}</div>'
-        f'<div style="color:#444;font-size:12px;margin-top:3px">{rets}</div>'
-        f'</td><td style="padding:10px;border-bottom:1px solid #eee">'
-        f'{_chart_img(hist, sym, images, inline_b64, days=chart_days)}</td></tr>')
+        f'<tr style="background:{card_bg}">'
+        f'<td style="padding:12px 14px;vertical-align:top;width:54%;border-bottom:1px solid {card_border}">'
+        f'<div style="font-size:15px">{rb}{bd}{newb}<b>{sym}</b>{_sector_tag(sec_kr)}</div>'
+        f'<div style="font-size:12px;color:#6b7280;margin:3px 0 1px">{name}</div>'
+        f'<div style="font-size:12px;color:#374151;margin-bottom:6px">{desc}</div>'
+        f'<div style="font-size:13px;margin-bottom:6px">PER {pe_s}{price_s}</div>'
+        f'<div style="margin-bottom:6px">{_ret_chips(ind)}</div>'
+        f'<div style="font-size:12px;color:#374151;background:#fef3c7;border-radius:6px;'
+        f'padding:8px;line-height:1.5"><b>추천 이유</b> · {reason}</div>'
+        f'</td><td style="padding:8px;vertical-align:middle;width:46%;border-bottom:1px solid {card_border}">'
+        f'{chart}</td></tr>')
 
 def _section_table(title, note, picks, ind_map, info, sector_map, hist, images, inline_b64,
-                   badge="", chart_days=126):
+                   badge="", chart_days=252, card_bg="#ffffff", card_border="#e5e7eb", numbered=True):
     if not picks:
-        body = '<div style="color:#999;font-size:13px;padding:6px 0">조건을 충족하는 종목이 없습니다(데이터 확보 실패 가능).</div>'
+        body = '<div style="color:#9ca3af;font-size:13px;padding:8px 0">조건을 충족하는 종목이 없습니다(데이터 확보 실패 가능).</div>'
     else:
         rows = "".join(_stock_row(s, r, ind_map, info, sector_map, hist, images, inline_b64,
-                                  badge=badge, chart_days=chart_days)
-                       for s, _sc, r in picks)
-        body = f'<table style="border-collapse:collapse;width:100%">{rows}</table>'
-    return (f'<h3 style="margin-bottom:2px">{title}</h3>'
-            f'<div style="color:#888;font-size:12px;margin-bottom:6px">{note}</div>{body}')
+                                  badge=badge, chart_days=chart_days,
+                                  rank=(i + 1 if numbered else None),
+                                  card_bg=card_bg, card_border=card_border)
+                       for i, (s, _sc, r) in enumerate(picks))
+        body = (f'<table style="width:100%;border-collapse:collapse;margin:8px 0;'
+                f'border:1px solid {card_border};border-radius:8px;overflow:hidden">{rows}</table>')
+    return (f'<h3 style="margin:18px 0 2px">{title}</h3>'
+            f'<div style="color:#6b7280;font-size:12px;margin-bottom:2px">{note}</div>{body}')
 
 def build_final_summary(sec1, sec2, sec3, regime) -> str:
     """4) 최종 분석/결론: 3섹션 종합 + 시장상태 + 리스크 다이얼 요약(3~5문장)."""
@@ -1127,18 +1270,18 @@ def render_sections(payload, inline_b64=False):
         exit_html = (f'<h3 style="color:#b91c1c">매도 검토 {len(exits)}건</h3>'
                      f'<ul style="color:#444;font-size:13px">{items}</ul>')
     html.append(exit_html)
-    html.append(_section_table("📈 ① 추세 우수 <span style=\"color:#888;font-size:12px\">(펀더멘탈 무관)</span>",
+    html.append(_section_table("📈 ① 추세 우수 <span style=\"color:#9ca3af;font-size:12px\">(펀더멘탈 무관)</span>",
         "정배열 + 52주 고가 근접 + 6개월 상대강도(SPY 대비) 상위.",
         sec1, ind_map, info, sector_map, hist, images, inline_b64,
-        badge=_badge("추세", "#15803d"), chart_days=252))
-    html.append(_section_table("💎 ② 펀더멘탈 우수 <span style=\"color:#888;font-size:12px\">(추세 양호)</span>",
+        badge=_badge("추세", "#15803d"), chart_days=252, card_bg="#f6fdf9", card_border="#bbf7d0"))
+    html.append(_section_table("💎 ② 펀더멘탈 우수 <span style=\"color:#9ca3af;font-size:12px\">(추세 양호)</span>",
         "ROE≥15% · FCF 흑자 · 200일선 위. 펀더멘탈 결손 종목 제외.",
         sec2, ind_map, info, sector_map, hist, images, inline_b64,
-        badge=_badge("펀더멘탈", "#1d4ed8"), chart_days=252))
-    html.append(_section_table("🔔 ③ 주목할 종목 <span style=\"color:#888;font-size:12px\">(대형 이슈/변동성)</span>",
+        badge=_badge("펀더멘탈", "#1d4ed8"), chart_days=252, card_bg="#f5f8ff", card_border="#c7d7fe"))
+    html.append(_section_table("🔔 ③ 주목할 종목 <span style=\"color:#9ca3af;font-size:12px\">(대형 이슈/변동성)</span>",
         "상대거래량 급증 · 당일 변동률 큼 · 뉴스 발생. 시총 상위 위주.",
         sec3, ind_map, info, sector_map, hist, images, inline_b64,
-        badge=_badge("주목", "#c2410c"), chart_days=126))
+        badge=_badge("주목", "#c2410c"), chart_days=252, card_bg="#fffaf5", card_border="#fed7aa"))
     summary = build_final_summary(sec1, sec2, sec3, regime)
     html.append('<h3 style="margin-bottom:2px">4) 최종 분석 / 결론</h3>'
                 f'<div style="color:#333;font-size:13px;line-height:1.6;background:#f8fafc;'
@@ -1146,22 +1289,37 @@ def render_sections(payload, inline_b64=False):
     html.append(_HTML_FOOT)
     return "".join(html), images
 
+def _sector_missing_note(has_sector) -> str:
+    if has_sector:
+        return ""
+    return ('<div style="background:#fff7ed;border:1px solid #fed7aa;color:#9a3412;'
+            'font-size:12px;padding:8px 12px;border-radius:8px;margin:6px 0">'
+            '⚠️ 섹터 데이터 확보 실패 — SPY 보유종목 공시에 섹터 정보가 없어 일부 섹터가 비어 있을 수 있습니다.</div>')
+
 def render_sector_briefing(payload, inline_b64=False):
     rows = payload["sector_rows"]; regime = payload["regime"]
     html = [_html_head("sector", regime, "11개 GICS 섹터 최근 주간 수익률·강약")]
+    html.append(_sector_missing_note(payload.get("has_sector", True)))
     trs = []
     for kr, wk, mo, breadth in rows:
-        color = "#15803d" if (not _isnan(wk) and wk >= 0) else "#b91c1c"
-        trs.append('<tr>'
-            f'<td style="padding:7px 10px;border-bottom:1px solid #eee">{kr}</td>'
-            f'<td style="padding:7px 10px;border-bottom:1px solid #eee;text-align:right;color:{color};font-weight:700">{_fmt(wk)}</td>'
-            f'<td style="padding:7px 10px;border-bottom:1px solid #eee;text-align:right">{_fmt(mo)}</td>'
-            f'<td style="padding:7px 10px;border-bottom:1px solid #eee;text-align:right">{breadth}</td></tr>')
-    html.append('<table style="border-collapse:collapse;width:100%;font-size:13px">'
-                '<tr style="color:#666"><th style="text-align:left;padding:7px 10px">섹터</th>'
-                '<th style="text-align:right;padding:7px 10px">주간</th>'
-                '<th style="text-align:right;padding:7px 10px">1개월</th>'
-                '<th style="text-align:right;padding:7px 10px">상승종목%</th></tr>'
+        color = "#15803d" if (not _isnan(wk) and wk >= 0) else ("#b91c1c" if not _isnan(wk) else "#9ca3af")
+        bar = ""
+        if not _isnan(wk):
+            w = min(100, abs(wk) * 8)
+            bar = (f'<div style="background:{"#dcfce7" if wk>=0 else "#fee2e2"};height:6px;'
+                   f'border-radius:3px;width:{w:.0f}%;margin-top:3px"></div>')
+        trs.append('<tr style="background:#ffffff">'
+            f'<td style="padding:8px 12px;border-bottom:1px solid #eee">{kr}{bar}</td>'
+            f'<td style="padding:8px 12px;border-bottom:1px solid #eee;text-align:right;color:{color};font-weight:700">{_fmt(wk)}</td>'
+            f'<td style="padding:8px 12px;border-bottom:1px solid #eee;text-align:right;color:#6b7280">{_fmt(mo)}</td>'
+            f'<td style="padding:8px 12px;border-bottom:1px solid #eee;text-align:right;color:#6b7280">{breadth}</td></tr>')
+    html.append('<table style="width:100%;border-collapse:collapse;font-size:13px;'
+                'border:1px solid #e5e7eb;border-radius:8px;overflow:hidden">'
+                '<tr style="color:#6b7280;background:#f9fafb">'
+                '<th style="text-align:left;padding:8px 12px">섹터(주간 강도 막대)</th>'
+                '<th style="text-align:right;padding:8px 12px">주간</th>'
+                '<th style="text-align:right;padding:8px 12px">1개월</th>'
+                '<th style="text-align:right;padding:8px 12px">상승종목%</th></tr>'
                 + "".join(trs) + '</table>')
     html.append(_HTML_FOOT)
     return "".join(html), []
@@ -1173,57 +1331,89 @@ def render_top10_table(payload, mode, subtitle, inline_b64=False):
     images = []
     html = [_html_head(mode, regime, subtitle)]
     if not picks:
-        html.append('<div style="color:#999;font-size:13px">조건을 충족하는 종목이 없습니다(데이터 확보 실패 가능).</div>')
+        html.append('<div style="color:#9ca3af;font-size:13px">조건을 충족하는 종목이 없습니다(데이터 확보 실패 가능).</div>')
     else:
         n_core = max(1, (len(picks) + 1) // 2)
         rrows = []
         for rank, (s, _sc, r) in enumerate(picks):
             bdg = _badge("코어", "#15803d") if rank < n_core else _badge("관찰", "#6b7280")
+            cbg = "#fffdf7" if rank < n_core else "#ffffff"
             rrows.append(_stock_row(s, r, ind_map, info, sector_map, hist, images, inline_b64,
-                                    badge=bdg, chart_days=252))
-        html.append(f'<h3>⭐ 상위 {len(picks)}종목 <span style="color:#888;font-size:13px">(코어=확신 / 관찰=후보)</span></h3>'
-                    f'<table style="border-collapse:collapse;width:100%">{"".join(rrows)}</table>')
+                                    badge=bdg, chart_days=252, rank=rank + 1,
+                                    card_bg=cbg, card_border="#fde68a"))
+        html.append(f'<h3 style="margin:18px 0 2px">⭐ 상위 {len(picks)}종목 '
+                    f'<span style="color:#9ca3af;font-size:13px">(코어=확신 / 관찰=후보)</span></h3>'
+                    f'<table style="width:100%;border-collapse:collapse;border:1px solid #fde68a;'
+                    f'border-radius:8px;overflow:hidden">{"".join(rrows)}</table>')
     html.append(_HTML_FOOT)
     return "".join(html), images
 
+def _spy_chart_block(spy, images, inline_b64, label="SPY 1년 추세"):
+    if spy is None or len(getattr(spy, "dropna", lambda: spy)()) < 20:
+        return ""
+    img = _chart_img({"_SPY": spy}, "_SPY", images, inline_b64, days=252)
+    if not img:
+        return ""
+    return (f'<div style="margin:8px 0"><div style="color:#666;font-size:12px;margin-bottom:2px">{label}</div>{img}</div>')
+
 def render_weekly(payload, inline_b64=False):
     regime = payload["regime"]
+    images = []
     html = [_html_head("weekly", regime, "그 주 SPY 등락 / 주도·부진 섹터 / 주간 최강 종목")]
     html.append(f'<div style="font-size:14px;margin:6px 0">SPY 주간 등락: <b>{_fmt(payload.get("spy_week"))}</b></div>')
+    html.append(_spy_chart_block(payload.get("spy"), images, inline_b64))
+    html.append(_sector_missing_note(payload.get("has_sector", True)))
+    def _sec_chips(items, pos=True):
+        return "".join(
+            f'<span style="display:inline-block;background:{"#dcfce7" if pos else "#fee2e2"};'
+            f'color:{"#15803d" if pos else "#b91c1c"};border-radius:4px;padding:2px 8px;'
+            f'font-size:12px;margin:2px 6px 2px 0">{kr} {_fmt(v)}</span>' for kr, v in items)
     if payload.get("lead"):
-        html.append('<div style="font-size:13px;margin:4px 0"><b>주도 섹터:</b> '
-                    + ", ".join(f"{kr} {_fmt(v)}" for kr, v in payload["lead"]) + "</div>")
+        html.append('<div style="font-size:13px;margin:6px 0"><b>주도 섹터</b><br>' + _sec_chips(payload["lead"], True) + '</div>')
     if payload.get("lag"):
-        html.append('<div style="font-size:13px;margin:4px 0"><b>부진 섹터:</b> '
-                    + ", ".join(f"{kr} {_fmt(v)}" for kr, v in payload["lag"]) + "</div>")
-    if payload.get("top_movers"):
-        items = "".join(
-            f'<li><b>{s} · {name}</b> {_fmt(v)}<br>'
-            f'<span style="color:#777">{desc}</span></li>'
-            for s, name, desc, v in payload["top_movers"])
-        html.append(f'<h3>주간 최강 종목</h3><ul style="font-size:13px;color:#444;line-height:1.6">{items}</ul>')
+        html.append('<div style="font-size:13px;margin:6px 0"><b>부진 섹터</b><br>' + _sec_chips(payload["lag"], False) + '</div>')
+    picks = payload.get("picks", [])
+    if picks:
+        rows = "".join(_stock_row(s, r, payload["ind_map"], payload["info"], payload["sector_map"],
+                                  payload["hist"], images, inline_b64,
+                                  badge=_badge("최강", "#15803d"), chart_days=252, rank=i + 1,
+                                  card_bg="#fffdf7", card_border="#fde68a")
+                       for i, (s, _sc, r) in enumerate(picks))
+        html.append(f'<h3 style="margin:18px 0 2px">🔝 주간 최강 종목</h3>'
+                    f'<table style="width:100%;border-collapse:collapse;border:1px solid #fde68a;'
+                    f'border-radius:8px;overflow:hidden">{rows}</table>')
     html.append(_HTML_FOOT)
-    return "".join(html), []
+    return "".join(html), images
 
 def render_strategy(payload, inline_b64=False):
     regime = payload["regime"]
+    images = []
     html = [_html_head("strategy", regime, "차주 관찰 포인트 (데이터 기반)")]
     html.append('<div style="font-size:13px;color:#444;margin:6px 0">경제지표·실적 일정은 외부 검색을 사용하지 않아 '
                 '<b>데이터 확보 실패</b>로 표기합니다. 아래는 보유 데이터 기반 관찰 포인트입니다.</div>')
+    html.append(_spy_chart_block(payload.get("spy"), images, inline_b64))
+    html.append(_sector_missing_note(payload.get("has_sector", True)))
     if payload.get("watch_sectors"):
-        html.append('<div style="font-size:13px;margin:4px 0"><b>주목 섹터(직전 주 상대강도):</b> '
-                    + ", ".join(f"{kr} {_fmt(v)}" for kr, v in payload["watch_sectors"]) + "</div>")
-    if payload.get("watch_names"):
-        items = "".join(
-            f'<li><b>{s} · {name}</b><br><span style="color:#777">{desc}</span><br>'
-            f'<span style="color:#15803d">{r}</span></li>'
-            for s, name, desc, r in payload["watch_names"])
-        html.append(f'<h3>관찰 종목</h3><ul style="font-size:13px;color:#444;line-height:1.6">{items}</ul>')
+        chips = "".join(
+            f'<span style="display:inline-block;background:#dcfce7;color:#15803d;border-radius:4px;'
+            f'padding:2px 8px;font-size:12px;margin:2px 6px 2px 0">{kr} {_fmt(v)}</span>'
+            for kr, v in payload["watch_sectors"])
+        html.append('<div style="font-size:13px;margin:6px 0"><b>주목 섹터(직전 주 상대강도)</b><br>' + chips + '</div>')
+    picks = payload.get("picks", [])
+    if picks:
+        rows = "".join(_stock_row(s, r, payload["ind_map"], payload["info"], payload["sector_map"],
+                                  payload["hist"], images, inline_b64,
+                                  badge=_badge("관찰", "#1d4ed8"), chart_days=252, rank=i + 1,
+                                  card_bg="#f5f8ff", card_border="#c7d7fe")
+                       for i, (s, _sc, r) in enumerate(picks))
+        html.append(f'<h3 style="margin:18px 0 2px">👀 관찰 종목</h3>'
+                    f'<table style="width:100%;border-collapse:collapse;border:1px solid #c7d7fe;'
+                    f'border-radius:8px;overflow:hidden">{rows}</table>')
     html.append('<div style="font-size:13px;color:#444;margin-top:6px">'
-                f'관찰 포인트: SPY가 200일선 {_fmt(regime.get("gap_pct"))} 수준이며, '
+                f'관찰 포인트: SPY가 200일선 대비 {_fmt(regime.get("gap_pct"))} 수준이며, '
                 f'{"추세 추종 유지" if regime.get("risk_on") else "방어적 접근"}이 기본 전제입니다.</div>')
     html.append(_HTML_FOOT)
-    return "".join(html), []
+    return "".join(html), images
 
 def build_html(tiers, exits, ind_map, info, sector_map, regime, hist, inline_b64=False):
     """tiers: list[(sym, score, reason, tier, is_new)] / exits: list[(sym, ind, why)]"""
@@ -1420,14 +1610,31 @@ def decide_mode(state: dict, data_date: str | None, now_kst=None, force: str | N
             "reason": f"휴장 {streak}일차 -> {why}"}
 
 # ---- 휴장/주말 모드 콘텐츠 빌더 ----
-def build_sector_briefing(data: dict) -> dict:
-    """11개 GICS 섹터별 최근 주간/1개월 수익률·상승종목 비율."""
+def _resolve_sector(sym, sector_map, info) -> str:
+    """종목의 GICS 영문 섹터를 확정. SPY 보유종목 sector_map 우선,
+    비어있거나 비표준이면 yfinance info의 sector(영문)로 폴백."""
+    sec = sector_map.get(sym, "") or ""
+    if sec in GICS_KR:
+        return sec
+    # info 폴백
+    isec = ""
+    if info and sym in info:
+        isec = _norm_sector(info[sym].get("sector_en", "") or "")
+    return isec if isec in GICS_KR else (sec if sec in GICS_KR else "")
+
+def build_sector_briefing(data: dict, info: dict | None = None) -> dict:
+    """11개 GICS 섹터별 최근 주간/1개월 수익률·상승종목 비율.
+    sector_map 이 비어 있으면(SPY sector 컬럼 결손) yfinance info sector 로 폴백.
+    섹터를 하나도 못 구하면 has_sector=False 로 UI에서 '데이터 확보 실패' 안내."""
     sector_map, ind_map = data["sector_map"], data["ind_map"]
+    info = info if info is not None else data.get("info")
     agg = {}
+    matched = 0
     for sym, ind in ind_map.items():
-        sec = sector_map.get(sym, "")
-        if sec not in GICS_KR:  # 11개 표준 섹터만
+        sec = _resolve_sector(sym, sector_map, info)
+        if sec not in GICS_KR:
             continue
+        matched += 1
         wk, mo = ind.get("chg_1w"), ind.get("chg_1m")
         d = agg.setdefault(sec, {"wk": [], "mo": [], "up": 0, "n": 0})
         if not _isnan(wk): d["wk"].append(wk); d["n"] += 1; d["up"] += 1 if wk > 0 else 0
@@ -1443,7 +1650,7 @@ def build_sector_briefing(data: dict) -> dict:
         breadth = f"{d['up']/d['n']*100:.0f}%" if d["n"] else "-"
         rows.append((kr, wk, mo, breadth))
     rows.sort(key=lambda r: (-r[1]) if not _isnan(r[1]) else 1e9)
-    return {"sector_rows": rows, "regime": data["regime"]}
+    return {"sector_rows": rows, "regime": data["regime"], "has_sector": matched > 0}
 
 def build_fundamental_top10(data: dict) -> dict:
     """추세 가중 제외, ROE·FCF·매출성장·이익률 종합점수 줄세우기(가치주 관점)."""
@@ -1470,23 +1677,45 @@ def build_fundamental_top10(data: dict) -> dict:
     return {"picks": picks, "ind_map": ind_map, "info": info,
             "sector_map": sector_map, "regime": data["regime"], "hist": data["hist"]}
 
+def _sector_match_count(sector_map, ind_map, info=None) -> int:
+    return sum(1 for s in ind_map if _resolve_sector(s, sector_map, info) in GICS_KR)
+
+def ensure_sector_info(data: dict, sample: int = 200) -> dict:
+    """SPY 보유종목 sector_map 으로 GICS 매칭이 충분치 않으면(컬럼 결손 등)
+    yfinance info의 sector를 표본(거래대금/모멘텀 무관, 알파벳 순 상위 sample)으로 보강.
+    이미 충분하면 추가 조회 없음(비용 절감)."""
+    sector_map, ind_map = data["sector_map"], data["ind_map"]
+    info = data.get("info") or {}
+    have = _sector_match_count(sector_map, ind_map, info)
+    if have >= max(30, len(ind_map) // 4):
+        return info  # 이미 충분
+    targets = [s for s in sorted(ind_map.keys()) if s not in info][:sample]
+    if targets:
+        fetched = get_info_for(targets)
+        info = {**info, **fetched}
+        data["info"] = info
+    return info
+
 def build_weekly_review(data: dict) -> dict:
     """주간 결산: SPY 주간 등락, 주도/부진 섹터, 주간 최강 종목."""
     ind_map, sector_map = data["ind_map"], data["sector_map"]
     spy = data.get("spy")
     spy_week = _ret(_clean_close(spy), P_1W) if (spy is not None and len(spy)) else float("nan")
-    brief = build_sector_briefing(data)["sector_rows"]
+    sinfo = ensure_sector_info(data)           # 섹터 커버리지 확보(필요시에만 조회)
+    brief_res = build_sector_briefing(data, info=sinfo)
+    brief = brief_res["sector_rows"]; has_sector = brief_res["has_sector"]
     valid = [(kr, wk) for kr, wk, _mo, _b in brief if not _isnan(wk)]
     lead = valid[:3]
     lag = sorted(valid, key=lambda x: x[1])[:3]
     movers = [(s, ind.get("chg_1w")) for s, ind in ind_map.items() if not _isnan(ind.get("chg_1w"))]
     movers.sort(key=lambda x: x[1], reverse=True)
     top = movers[:5]
-    name_info = get_info_for([s for s, _ in top])
-    top_named = [(s, _company_name(s, name_info.get(s, {})), _one_liner(s, name_info.get(s, {})), v)
-                 for s, v in top]
-    return {"spy_week": spy_week, "lead": lead, "lag": lag,
-            "top_movers": top_named, "regime": data["regime"]}
+    info = get_info_for([s for s, _ in top])
+    info = {**sinfo, **info}
+    picks = [(s, v, f"주간 {_fmt(v)} · 주간 최강 종목") for s, v in top]
+    return {"spy_week": spy_week, "lead": lead, "lag": lag, "picks": picks, "has_sector": has_sector,
+            "sector_rows": brief, "ind_map": ind_map, "info": info, "sector_map": sector_map,
+            "hist": data["hist"], "spy": data.get("spy"), "regime": data["regime"]}
 
 def build_next_week_strategy(data: dict) -> dict:
     """차주 전략(데이터 기반): 주목 섹터(직전 주 상대강도), 관찰 종목."""
@@ -1494,10 +1723,12 @@ def build_next_week_strategy(data: dict) -> dict:
     ind_map = data["ind_map"]
     # 관찰 종목: 정배열 + 6개월 모멘텀 상위 일부(추세 관점)
     trend = pick_trend(ind_map, data["sector_map"], data.get("spy"), n=5)
-    name_info = get_info_for([s for s, _, _ in trend])
-    watch_names = [(s, _company_name(s, name_info.get(s, {})), _one_liner(s, name_info.get(s, {})), r)
-                   for s, _sc, r in trend]
-    return {"watch_sectors": wk["lead"], "watch_names": watch_names, "regime": data["regime"]}
+    info = get_info_for([s for s, _, _ in trend])
+    picks = [(s, sc, r) for s, sc, r in trend]   # (sym, score, reason)
+    return {"watch_sectors": wk["lead"], "watch_lag": wk["lag"], "has_sector": wk.get("has_sector", True),
+            "picks": picks, "ind_map": ind_map, "info": {**wk.get("info", {}), **info},
+            "sector_map": data["sector_map"], "hist": data["hist"],
+            "spy": data.get("spy"), "regime": data["regime"]}
 
 def build_sections_payload(data: dict):
     """평일 4섹션: 섹션별 후보 선정 + 펀더멘탈/주목용 info·뉴스·거래량 수집."""
@@ -1610,7 +1841,8 @@ def daily_main(no_email: bool = False, force_mode: str | None = None):
         new_holdings = holdings; body_count = len(payload["picks"])
 
     elif mode == "sector":
-        payload = build_sector_briefing(data)
+        ensure_sector_info(data)
+        payload = build_sector_briefing(data, info=data.get("info"))
         preview, _ = render_sector_briefing(payload, inline_b64=True)
         subject = f"[S&P500] {today} 섹터 브리핑 (휴장 2일차)"
         new_holdings = holdings; body_count = len(payload["sector_rows"])
@@ -1664,6 +1896,8 @@ def _render_for_email(mode, payload, data, holdings, today, force_mode):
     if mode == "fund_top10":
         return render_top10_table(payload, "fund_top10", "ROE·FCF·매출성장·이익률 종합(가치주 관점)", inline_b64=False)
     if mode == "sector":
+        ensure_sector_info(data)
+        payload = build_sector_briefing(data, info=data.get("info"))
         return render_sector_briefing(payload, inline_b64=False)
     if mode == "weekly":
         return render_weekly(payload, inline_b64=False)
