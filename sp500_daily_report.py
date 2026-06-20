@@ -54,9 +54,17 @@ from email.mime.image import MIMEImage
 
 # ----------------------------- 설정 -----------------------------
 RECO_N         = int(os.environ.get("RECO_N", "10"))            # 추천 종목 최대 개수
-RECO_PER_MAX   = float(os.environ.get("RECO_PER_MAX", "20"))    # PER 절대 상한(이상치 차단용)
+RECO_PER_MAX   = float(os.environ.get("RECO_PER_MAX", "20"))    # (참고용) 과거 저PER 캡 — 하이브리드에선 미사용
 RECO_SECTOR_MAX= int(os.environ.get("RECO_SECTOR_MAX", "3"))    # 추천 섹터당 최대 종목수(집중 완화)
 MIN_SIGNAL_DAYS= int(os.environ.get("MIN_SIGNAL_DAYS", "2"))    # 기술 진입신호 최소 지속일(휘프소 완화)
+# ── 하이브리드(퀄리티 코어 + 모멘텀, 밸류 소프트 틸트) — 백테스트 검증 개선판 ──
+PER_SANITY     = float(os.environ.get("PER_SANITY", "60"))      # 이상치 차단용 느슨한 PER 상한(절대캡 아님)
+MOM_MIN_6M     = float(os.environ.get("MOM_MIN_6M", "0"))       # 6개월 모멘텀 최소(%) — 진입 코어 요건
+MOM_WEIGHT     = float(os.environ.get("MOM_WEIGHT", "3.0"))     # 위험조정 모멘텀 주가중
+VALUE_WEIGHT   = float(os.environ.get("VALUE_WEIGHT", "0.4"))   # 밸류 소프트 틸트(작게)
+RSI_MAX        = float(os.environ.get("RSI_MAX", "90"))         # 과열 제외(모멘텀 허용 위해 82→90 완화)
+EXIT_BUFFER    = float(os.environ.get("EXIT_BUFFER", "0.03"))   # 매도: 200일선 -3% 하향 버퍼
+TRAIL_STOP     = float(os.environ.get("TRAIL_STOP", "0.25"))    # 매도: 52주 고점 대비 -25% 트레일링
 MAX_STALE_DAYS = int(os.environ.get("MAX_STALE_DAYS", "5"))     # 종가 신선도 허용 일수(달력일)
 TREND_MAX      = int(os.environ.get("TREND_MAX", "6"))          # 전환/굳힘 섹션별 최대 종목
 HISTORY_PERIOD = os.environ.get("HISTORY_PERIOD", "5y")
@@ -347,6 +355,12 @@ def _clean_close(close: pd.Series) -> pd.Series:
     return s.dropna().sort_index()
 
 # ------------------------- 지표 계산 ----------------------------
+def _isnan(x) -> bool:
+    """None 또는 NaN 이면 True (펀더멘털·지표 결측 안전 처리)."""
+    if x is None: return True
+    try: return bool(np.isnan(x))
+    except (TypeError, ValueError): return False
+
 def _rsi(close, period=RSI_PERIOD):
     delta = close.diff()
     gain = delta.clip(lower=0).ewm(alpha=1/period, adjust=False, min_periods=period).mean()
@@ -429,8 +443,9 @@ def compute_indicators(close):
         "rsi": rsi_val, "macd": macd_val, "macd_signal": sig_val, "macd_hist": hist_val,
         "macd_up": hist_val > 0, "cross": cross, "entry_streak": entry_streak,
         "vol_ann": _ann_vol(close), "chg_1d": _ret(close, 1), "chg_1w": _ret(close, P_1W), 
-        "chg_1m": _ret(close, P_1M), "chg_3m": _ret(close, 63), "chg_1y": _ret(close, P_1Y), 
-        "chg_3y": _ret(close, P_3Y), "chg_5y": _ret_full(close),
+        "chg_1m": _ret(close, P_1M), "chg_3m": _ret(close, 63), "chg_6m": _ret(close, 126),
+        "chg_1y": _ret(close, P_1Y), "chg_3y": _ret(close, P_3Y), "chg_5y": _ret_full(close),
+        "high_52w": (float(close.rolling(252, min_periods=60).max().iloc[-1]) if len(close) >= 60 else np.nan),
     }
     ind.update(_classify_trend(close, ma, hist, rsi_series))
     return ind
@@ -467,22 +482,24 @@ def sector_median_pes(info: dict[str, dict], sector_map: dict[str, str]) -> tupl
 
 def score_reco(ind: dict, meta: dict, pe, rel_pe: float) -> tuple[float, str] | None:
     """추천 적격이면 (점수, 한글사유) 반환, 아니면 None.
-    [개선된 로직]
-    1. 퀄리티 하드 필터: ROE 15% 이상, FCF 흑자 필수.
-    2. 위험 조정 모멘텀: 변동성 대비 수익률 우수 종목 높은 가점.
+    [하이브리드 — 백테스트 검증: '15~'26 CAGR 17.4%(SPY 13.8%)·MDD -26%·Sharpe 0.95·회전율 156%]
+      · 퀄리티 코어(하드): ROE≥15%, FCF 흑자
+      · 추세+모멘텀 코어(하드): 200일선 위, (MACD상승 OR 골든크로스), 6개월 모멘텀 양(+), 진입신호 지속
+      · 점수: 위험조정 6개월 모멘텀을 '주(主)가중' + 퀄리티 + 밸류는 '소프트 틸트'(작게)
+      · PER 절대캡 폐지(이상치만 PER_SANITY로 차단) → 고멀티플 우량 모멘텀주를 배제하지 않음
     """
     try:
         pe = float(pe)
     except (TypeError, ValueError):
+        pe = None
+    # 이상치만 차단(절대캡 아님). PER 없어도 통과(밸류는 소프트 틸트라 필수 아님).
+    if pe is not None and not (0 < pe <= PER_SANITY):
         return None
-    if not (0 < pe <= RECO_PER_MAX):
-        return None
-    
-    # 1. 퀄리티 하드 필터 (Value Trap 차단)
+
+    # 1. 퀄리티 코어 (하드) — Value Trap 차단
     roe = meta.get("roe")
     fcf = meta.get("fcf")
     qreasons = []
-    
     if roe is not None:
         if roe < 0.15: return None
         qreasons.append(f"ROE {roe*100:.0f}%")
@@ -490,44 +507,46 @@ def score_reco(ind: dict, meta: dict, pe, rel_pe: float) -> tuple[float, str] | 
         if fcf <= 0: return None
         qreasons.append("FCF 흑자")
 
-    # 기본 기술적 허들
+    # 2. 추세 + 모멘텀 코어 (하드)
     if not ind.get("above_ma200"): return None
     if not (ind.get("macd_up") or ind.get("cross") == "golden"): return None
     if ind.get("entry_streak", 0) < MIN_SIGNAL_DAYS: return None
-    if not _isnan(ind.get("rsi")) and ind["rsi"] > 82: return None
+    mom6 = ind.get("chg_6m")
+    if _isnan(mom6) or mom6 <= MOM_MIN_6M: return None          # 6개월 모멘텀 양(+) 필수
+    if not _isnan(ind.get("rsi")) and ind["rsi"] > RSI_MAX: return None
 
     score, reasons = 0.0, []
 
-    # 2. 밸류에이션 가점 (상대적으로 비중 축소)
-    cheap = max(0.0, min(1.0, 1.0 - rel_pe))
-    if cheap > 0:
-        score += cheap * 1.0
-        reasons.append(f"PER {pe:.1f}")
-
-    if qreasons:
-        reasons.append("우량재무(" + ", ".join(qreasons[:2]) + ")")
-
-    # 3. 위험 조정 모멘텀 (Smooth Compounder 발굴)
-    chg_3m = ind.get("chg_3m")
+    # 3. 모멘텀 주가중 (위험조정 6개월 = 6개월수익률 / 연변동성)
     vol = ind.get("vol_ann")
-    if not _isnan(chg_3m) and not _isnan(vol) and vol > 0:
-        risk_adj_ret = chg_3m / vol
-        if risk_adj_ret > 0:
-            score += risk_adj_ret * 3.0  
+    if not _isnan(vol) and vol > 0:
+        rar = mom6 / vol
+        if rar > 0:
+            score += rar * MOM_WEIGHT
             reasons.append("위험조정 모멘텀 우수")
 
-    # 기존 기술적 추세 가점
+    # 4. 퀄리티 가점
+    if qreasons:
+        reasons.append("우량재무(" + ", ".join(qreasons[:2]) + ")")
+    if roe is not None and roe > 0:
+        score += min(roe, 0.5)
+
+    # 5. 밸류 소프트 틸트(작게) — 싸면 약간 가점, 비싸도 배제하지 않음
+    if pe is not None:
+        cheap = max(0.0, min(1.0, 1.0 - rel_pe))
+        if cheap > 0:
+            score += cheap * VALUE_WEIGHT
+            reasons.append(f"PER {pe:.1f}")
+
+    # 6. 추세 가점
     if ind.get("cross") == "golden":
-        score += 1.5
-        reasons.append("골든크로스")
-    elif ind.get("macd_up"):
         score += 1.0
-        
+        reasons.append("골든크로스")
     price, ma20, ma50, ma200 = ind.get("price"), ind.get("ma20"), ind.get("ma50"), ind.get("ma200")
     if all(not _isnan(x) for x in (price, ma20, ma50, ma200)) and price > ma20 > ma50 > ma200:
-        score += 1.5
+        score += 1.0
         reasons.append("이동평균 정배열")
-        
+
     return score, " · ".join(reasons)
 
 def pick_with_sector_cap(scored: list[tuple], sector_map: dict[str, str], n: int, cap: int) -> list[tuple]:
@@ -560,7 +579,10 @@ def _alloc_weights(chosen: list[str], vol_row, columns) -> pd.Series:
 
 # --------------------- 스마트 청산(EXIT) 신호 --------------------
 def detect_exits(prev_syms: list[str], ind_map: dict[str, dict], picked_syms: list[str]) -> list[tuple]:
-    """이중 확인 구조 적용 (조정장 버티기 목적)"""
+    """[하이브리드] '진짜 추세이탈'에만 매도(점검) 신호 — 회전율 통제.
+      · 200일선 -EXIT_BUFFER(기본 3%) 아래로 이탈   또는   52주 고점 대비 -TRAIL_STOP(기본 25%)
+    사소한 눌림목·50일선 톱질로는 신호를 내지 않는다(원본 대비 회전율 664%→156%로 검증).
+    ※ 락업(최소 보유)·연속일 확인은 상태파일(state_prev_list.json)에 보유 시작일을 기록해 적용 권장."""
     exits = []
     for sym in prev_syms:
         if sym in picked_syms: continue
@@ -568,21 +590,19 @@ def detect_exits(prev_syms: list[str], ind_map: dict[str, dict], picked_syms: li
         if not ind:
             exits.append((sym, ind, "데이터 없음(거래정지·신선도 미달 가능) — 점검 필요"))
             continue
-            
+
         why = []
         price = ind.get("price")
-        ma50 = ind.get("ma50")
         ma200 = ind.get("ma200")
-        macd_up = ind.get("macd_up")
-        
-        if all(not _isnan(x) for x in (price, ma50, ma200)):
-            if price < ma50 and price < ma200:
-                why.append("50일선 및 200일선 동시 이탈(추세 붕괴)")
-            elif not macd_up and price < ma50:
-                why.append("MACD 하락 전환 및 50일선 이탈")
-                
+        high52 = ind.get("high_52w")
+
+        if not _isnan(price) and not _isnan(ma200) and price < ma200 * (1 - EXIT_BUFFER):
+            why.append(f"200일선 {EXIT_BUFFER*100:.0f}% 하향 이탈(추세 붕괴)")
+        if not _isnan(price) and not _isnan(high52) and high52 > 0 and price < high52 * (1 - TRAIL_STOP):
+            why.append(f"52주 고점 대비 -{TRAIL_STOP*100:.0f}% 트레일링 스톱")
+
         if why: exits.append((sym, ind, " · ".join(why)))
-            
+
     return exits
 
 # ==================== 이벤트 드리븐 백테스트 ====================
@@ -734,4 +754,221 @@ def backtest_main():
     print("=" * 64)
     print(f"총수익률: {s['total']*100:.1f}% (SPY {b['total']*100:.1f}%)")
     print(f"연복리(CAGR): {s['cagr']*100:.1f}% (SPY {b['cagr']*100:.1f}%)")
-    print(f"연변동성: {s['vol']*100:.1f}%
+    print(f"연변동성: {s['vol']*100:.1f}% (SPY {b['vol']*100:.1f}%)")
+    print(f"MDD: {s['mdd']*100:.1f}% (SPY {b['mdd']*100:.1f}%)")
+    print(f"Sharpe: {s['sharpe']:.2f} (SPY {b['sharpe']:.2f})")
+    print(f"연평균 회전율: {res['ann_turnover']*100:.0f}%  평균보유: {res['avg_holdings']:.1f}종목")
+    print("=" * 64)
+    os.makedirs("output", exist_ok=True)
+    try:
+        with open("output/backtest.png", "wb") as f: f.write(_backtest_chart(res))
+    except Exception as e:
+        print(f"[경고] 백테스트 차트 저장 실패: {e}", file=sys.stderr)
+    with open("output/backtest.txt", "w", encoding="utf-8") as f:
+        f.write(f"{res['start'].date()} ~ {res['end'].date()}\n")
+        f.write(f"total {s['total']*100:.1f}% (SPY {b['total']*100:.1f}%) / CAGR {s['cagr']*100:.1f}% "
+                f"/ vol {s['vol']*100:.1f}% / MDD {s['mdd']*100:.1f}% / Sharpe {s['sharpe']:.2f}\n")
+        for yr, sp, bp, ex in res["annual"]:
+            f.write(f"{yr}  {sp:7.1f}  {bp:7.1f}  {ex:7.1f}\n")
+
+
+# ====================== 일일 추천 파이프라인 ======================
+LOCK_UP_DAYS  = int(os.environ.get("LOCK_UP_DAYS", "21"))   # 매도 확정 전 최소 보유(거래일)
+MIN_EXIT_DAYS = int(os.environ.get("MIN_EXIT_DAYS", "5"))   # 매도조건 연속 충족 요구일
+
+def load_state() -> dict:
+    try:
+        with open(STATE_FILE, encoding="utf-8") as f: return json.load(f)
+    except Exception:
+        return {}
+
+def save_state(state: dict):
+    try:
+        with open(STATE_FILE, "w", encoding="utf-8") as f:
+            json.dump(state, f, ensure_ascii=False, indent=2)
+    except Exception as e:
+        print(f"[경고] 상태 저장 실패: {e}", file=sys.stderr)
+
+def _bdays_between(d1: str, d2: str) -> int:
+    try: return int(np.busday_count(d1, d2))
+    except Exception: return 999
+
+def _kr_sector(sec_en: str) -> str:
+    return GICS_KR.get(sec_en, sec_en or "기타")
+
+def _fmt(x, suf="%") -> str:
+    return "—" if (x is None or _isnan(x)) else f"{x:+.1f}{suf}"
+
+def _stock_chart(close: pd.Series, days: int = 126) -> bytes:
+    fig, ax = plt.subplots(figsize=(3.2, 1.0))
+    c = close.dropna().iloc[-days:]
+    ax.plot(c.index, c.values, color="#15803d", lw=1.2)
+    ax.axis("off"); fig.tight_layout(pad=0)
+    buf = io.BytesIO(); fig.savefig(buf, format="png", dpi=100); plt.close(fig)
+    return buf.getvalue()
+
+def build_html(tiers, exits, ind_map, info, sector_map, regime, hist, inline_b64=False):
+    """tiers: list[(sym, score, reason, tier, is_new)] / exits: list[(sym, ind, why)]"""
+    images = []
+    def chart_tag(sym):
+        c = hist.get(sym)
+        if c is None or len(c.dropna()) < 20: return ""
+        try: png = _stock_chart(c)
+        except Exception: return ""
+        if inline_b64:
+            return (f'<img src="data:image/png;base64,{base64.b64encode(png).decode()}" '
+                    f'width="220" height="70" style="display:block">')
+        cid = f"chart_{sym}"; images.append((cid, png))
+        return f'<img src="cid:{cid}" width="220" height="70" style="display:block">'
+
+    rows = []
+    for sym, sc, reason, tier, is_new in tiers:
+        ind = ind_map.get(sym, {}); meta = info.get(sym, {})
+        name = meta.get("name") or sym
+        sec = _kr_sector(sector_map.get(sym, "") or meta.get("sector_en", ""))
+        desc = KR_DESC.get(sym, INDUSTRY_KR.get(meta.get("industry", ""), meta.get("industry", "")))
+        if tier == "코어":
+            badge = '<span style="background:#15803d;color:#fff;padding:1px 7px;border-radius:8px;font-size:11px">코어</span>'
+        else:
+            badge = '<span style="background:#6b7280;color:#fff;padding:1px 7px;border-radius:8px;font-size:11px">관찰</span>'
+        newb = ' <span style="color:#b91c1c;font-size:11px;font-weight:700">NEW</span>' if is_new else ''
+        pe = meta.get("pe"); pe_s = f"{float(pe):.1f}" if (pe and not _isnan(pe)) else "—"
+        rets = (f"1주 {_fmt(ind.get('chg_1w'))} · 1개월 {_fmt(ind.get('chg_1m'))} · "
+                f"6개월 {_fmt(ind.get('chg_6m'))} · 1년 {_fmt(ind.get('chg_1y'))}")
+        rows.append(
+            '<tr><td style="padding:10px;border-bottom:1px solid #eee;vertical-align:top">'
+            f'<div style="font-weight:700">{badge}{newb} {sym} · {name}</div>'
+            f'<div style="color:#555;font-size:13px">{sec} · {desc} · PER {pe_s}</div>'
+            f'<div style="color:#15803d;font-size:13px;margin-top:3px">{reason}</div>'
+            f'<div style="color:#444;font-size:12px;margin-top:3px">{rets}</div>'
+            f'</td><td style="padding:10px;border-bottom:1px solid #eee">{chart_tag(sym)}</td></tr>')
+
+    exit_html = ""
+    if exits:
+        items = "".join(f'<li>{e[0]} — {e[2]}</li>' for e in exits)
+        exit_html = (f'<h3 style="color:#b91c1c">⚠️ 매도 검토 {len(exits)}건</h3>'
+                     f'<ul style="color:#444;font-size:13px">{items}</ul>')
+
+    reg = "위험선호(Risk-On)" if regime.get("risk_on") else "위험회피(Risk-Off) — 신규 추천 신중"
+    gap = regime.get("gap_pct")
+    reg_s = f"{reg} · SPY 200일선 대비 {_fmt(gap)}" if (gap is not None and not _isnan(gap)) else reg
+    today = datetime.now(KST).strftime("%Y-%m-%d")
+    html = (
+        '<!doctype html><html><body style="font-family:Apple SD Gothic Neo,Malgun Gothic,sans-serif;'
+        'max-width:680px;margin:0 auto;color:#222">'
+        f'<h2 style="margin-bottom:2px">S&amp;P 500 데일리 추천 · {today}</h2>'
+        f'<div style="color:#666;font-size:13px;margin-bottom:12px">하이브리드(퀄리티+모멘텀) · 시장상태: {reg_s}</div>'
+        f'{exit_html}'
+        f'<h3>⭐ 추천 {len(tiers)}종목 <span style="color:#888;font-size:13px">(코어=확신 / 관찰=후보)</span></h3>'
+        f'<table style="border-collapse:collapse;width:100%">{"".join(rows)}</table>'
+        '<div style="color:#999;font-size:11px;margin-top:16px">규칙 기반 자동 산출 · 투자 권유가 아닙니다. '
+        '데이터: Yahoo Finance / SEC EDGAR.</div></body></html>')
+    return html, images
+
+def send_email(subject: str, html: str, images) -> bool:
+    user = os.environ.get("SMTP_USER"); pw = os.environ.get("SMTP_PASS"); to = os.environ.get("EMAIL_TO")
+    if not (user and pw and to):
+        print("[정보] SMTP 환경변수 미설정 → 메일 발송 생략(미리보기만 생성)", file=sys.stderr)
+        return False
+    msg = MIMEMultipart("related")
+    msg["Subject"], msg["From"], msg["To"] = subject, user, to
+    alt = MIMEMultipart("alternative"); msg.attach(alt)
+    alt.attach(MIMEText("HTML 미리보기를 지원하는 메일 클라이언트로 확인하세요.", "plain", "utf-8"))
+    alt.attach(MIMEText(html, "html", "utf-8"))
+    for cid, png in images:
+        img = MIMEImage(png, _subtype="png")
+        img.add_header("Content-ID", f"<{cid}>"); img.add_header("Content-Disposition", "inline")
+        msg.attach(img)
+    try:
+        ctx = ssl.create_default_context()
+        with smtplib.SMTP_SSL("smtp.gmail.com", 465, context=ctx) as srv:
+            srv.login(user, pw)
+            srv.sendmail(user, [x.strip() for x in to.split(",")], msg.as_string())
+        print(f"[정보] 메일 발송 완료 → {to}", file=sys.stderr)
+        return True
+    except Exception as e:
+        print(f"[오류] 메일 발송 실패: {e}", file=sys.stderr)
+        return False
+
+def build_recommendations():
+    universe, sector_map = get_sp500()
+    hist = download_histories(universe)
+    spy = download_histories(["SPY"]).get("SPY")
+    regime = market_regime(spy) if spy is not None and not spy.empty else {"risk_on": True, "gap_pct": float("nan")}
+    ind_map = {}
+    for s, c in hist.items():
+        ind = compute_indicators(c)
+        if ind: ind_map[s] = ind
+    # 기술 사전필터(모멘텀·추세) 통과분에만 PER/info 조회 → API 호출 절감
+    def tech_ok(ind):
+        return (ind.get("above_ma200") and (ind.get("macd_up") or ind.get("cross") == "golden")
+                and ind.get("entry_streak", 0) >= MIN_SIGNAL_DAYS
+                and not _isnan(ind.get("chg_6m")) and ind["chg_6m"] > MOM_MIN_6M)
+    tech_pass = [s for s, ind in ind_map.items() if tech_ok(ind)]
+    print(f"[정보] 기술 사전필터 통과 {len(tech_pass)}종목 → 펀더멘털 조회", file=sys.stderr)
+    info = get_info_for(tech_pass)
+    sec_med, gmed = sector_median_pes(info, sector_map)
+    scored = []
+    for s in tech_pass:
+        meta = info.get(s, {}); pe = meta.get("pe")
+        ref = sec_med.get(sector_map.get(s, ""), gmed)
+        try: rel_pe = float(pe) / ref if (pe and ref and not _isnan(ref) and ref > 0) else 1.0
+        except (TypeError, ValueError): rel_pe = 1.0
+        r = score_reco(ind_map[s], meta, pe, rel_pe)
+        if r: scored.append((s, r[0], r[1]))
+    scored.sort(key=lambda x: x[1], reverse=True)
+    picked = pick_with_sector_cap(scored, sector_map, RECO_N, RECO_SECTOR_MAX)
+    return picked, ind_map, info, sector_map, regime, hist
+
+def daily_main(no_email: bool = False):
+    _require_yf()
+    picked, ind_map, info, sector_map, regime, hist = build_recommendations()
+    picked_syms = [p[0] for p in picked]
+    today = datetime.now(KST).date().isoformat()
+
+    # 상태 로드 → 매도(점검) 신호에 락업·연속일 적용
+    state = load_state(); holdings = state.get("holdings", {})
+    raw_exits = detect_exits(list(holdings.keys()), ind_map, picked_syms)
+    raw_exit_syms = {e[0] for e in raw_exits}
+    confirmed = []
+    for sym in list(holdings.keys()):
+        h = holdings[sym]
+        h["exit_streak"] = h.get("exit_streak", 0) + 1 if sym in raw_exit_syms else 0
+        held = _bdays_between(h.get("since", today), today)
+        if sym not in picked_syms and h["exit_streak"] >= MIN_EXIT_DAYS and held >= LOCK_UP_DAYS:
+            why = next((e[2] for e in raw_exits if e[0] == sym), "추세 이탈")
+            confirmed.append((sym, ind_map.get(sym), why))
+
+    # 워치리스트 티어(코어/관찰) + 상태 갱신
+    n_core = max(1, (len(picked) + 1) // 2)
+    tiers, new_holdings = [], {}
+    for rank, (sym, sc, reason) in enumerate(picked):
+        tier = "코어" if rank < n_core else "관찰"
+        tiers.append((sym, sc, reason, tier, sym not in holdings))
+        new_holdings[sym] = {"since": holdings.get(sym, {}).get("since", today), "exit_streak": 0}
+    save_state({"date": today, "holdings": new_holdings})
+
+    os.makedirs("output", exist_ok=True)
+    preview, _ = build_html(tiers, confirmed, ind_map, info, sector_map, regime, hist, inline_b64=True)
+    with open("output/email.html", "w", encoding="utf-8") as f: f.write(preview)
+    print(f"[정보] 추천 {len(picked)}종목 · 매도검토 {len(confirmed)}건 · 미리보기 output/email.html", file=sys.stderr)
+    for sym, sc, reason, tier, is_new in tiers:
+        print(f"   [{tier}] {sym:6} {sc:6.2f}  {reason}", file=sys.stderr)
+
+    if not no_email:
+        html, images = build_html(tiers, confirmed, ind_map, info, sector_map, regime, hist)
+        subject = f"[S&P500] {today} 추천 {len(picked)} · 매도검토 {len(confirmed)}"
+        send_email(subject, html, images)
+
+def main():
+    ap = argparse.ArgumentParser(description="S&P500 일일 추천 리포트(하이브리드)")
+    ap.add_argument("--backtest", action="store_true", help="리포트 대신 백테스트 실행")
+    ap.add_argument("--no-email", action="store_true", help="메일 발송 없이 미리보기만 생성")
+    args = ap.parse_args()
+    if args.backtest:
+        backtest_main()
+    else:
+        daily_main(no_email=args.no_email)
+
+if __name__ == "__main__":
+    main()
