@@ -72,6 +72,8 @@ MAX_STALE_DAYS = int(os.environ.get("MAX_STALE_DAYS", "5"))     # 종가 신선�
 TREND_MAX      = int(os.environ.get("TREND_MAX", "6"))          # 전환/굳힘 섹션별 최대 종목
 HISTORY_PERIOD = os.environ.get("HISTORY_PERIOD", "5y")
 STATE_FILE     = os.environ.get("STATE_FILE", "state_prev_list.json")
+PROFILES_FILE  = os.environ.get("PROFILES_FILE", "sp500_profiles.json")  # 분기 갱신 종목 프로필
+_PROFILES_CACHE = None
 KST            = timezone(timedelta(hours=9))
 
 # 평일 4섹션 모드 설정 (각 섹션 종목 수 / 트리거 기준)
@@ -438,6 +440,32 @@ def fetch_wikipedia_sectors() -> dict:
 
 
 # ------------------------- yfinance 유틸 ------------------------
+def load_profiles() -> dict:
+    """분기 갱신 프로필(sp500_profiles.json) 로드. {meta, sector_briefings, tickers}.
+    파일 없으면 빈 구조 반환(기존 KR_DESC/위키 폴백으로 정상 동작)."""
+    global _PROFILES_CACHE
+    if _PROFILES_CACHE is not None:
+        return _PROFILES_CACHE
+    data = {"meta": {}, "sector_briefings": {}, "tickers": {}}
+    try:
+        with open(PROFILES_FILE, encoding="utf-8") as f:
+            loaded = json.load(f)
+        if isinstance(loaded, dict):
+            data["meta"] = loaded.get("meta", {}) or {}
+            data["sector_briefings"] = loaded.get("sector_briefings", {}) or {}
+            data["tickers"] = loaded.get("tickers", {}) or {}
+            print(f"[프로필] {len(data['tickers'])}종목 로드 "
+                  f"(생성 {data['meta'].get('generated','?')})", file=sys.stderr)
+    except FileNotFoundError:
+        print("[프로필] sp500_profiles.json 없음 → 기존 KR_DESC/위키 폴백 사용", file=sys.stderr)
+    except Exception as e:
+        print(f"[프로필] 로드 실패({e}) → 폴백 사용", file=sys.stderr)
+    _PROFILES_CACHE = data
+    return data
+
+def _profile(sym) -> dict:
+    return load_profiles()["tickers"].get(sym, {})
+
 def _require_yf():
     if yf is None: raise RuntimeError("yfinance 설치 필요")
 
@@ -1278,7 +1306,7 @@ def _html_head(mode: str, regime: dict, subtitle: str = "") -> str:
         '<!doctype html><html><body style="font-family:-apple-system,BlinkMacSystemFont,'
         '\'Apple SD Gothic Neo\',Malgun Gothic,sans-serif;max-width:720px;margin:0 auto;'
         'color:#111827;background:#ffffff;padding:4px">'
-        f'<h2 style="margin:0 0 4px">📊 S&amp;P 500 데일리 리포트</h2>'
+        f'<a id="top"></a><h2 style="margin:0 0 4px">📊 S&amp;P 500 데일리 리포트</h2>'
         f'<div style="color:#6b7280;font-size:13px;margin-bottom:8px">{today} 마감 기준 · {sub}</div>'
         f'<div style="margin-bottom:12px"><span style="background:{pill_bg};color:{pill_fg};'
         f'border-radius:6px;padding:3px 10px;font-size:12px;font-weight:700">시장 지표: {_regime_line(regime)}</span></div>'
@@ -1326,6 +1354,9 @@ def _one_liner(sym, meta) -> str:
     """뭐 하는 회사인지 '항상 한글' 한 줄. KR_DESC(엄선) -> 업종 한글명 순.
     영문 사업요약은 노출하지 않는다(가독성). KR_DESC에 없고 업종 한글도 없으면
     업종 영문 그대로(드묾) 또는 '데이터 확보 실패'."""
+    prof = _profile(sym)
+    if prof.get("one_liner"):
+        return prof["one_liner"]
     if sym in KR_DESC:
         return KR_DESC[sym]
     industry = meta.get("industry", "") or ""
@@ -1368,11 +1399,16 @@ def _stock_row(sym, reason, ind_map, info, sector_map, hist, images, inline_b64,
     rb = _rank_badge(rank) if rank is not None else ""
     bd = (badge + " ") if badge else ""
     chart = _chart_img(hist, sym, images, inline_b64, days=chart_days)
+    if _profile(sym).get("detail"):
+        name_html = (f'<a href="#d_{sym}" style="color:#1d4ed8;text-decoration:none">'
+                     f'{name} <span style="font-size:11px">\u25be 자세히</span></a>')
+    else:
+        name_html = name
     return (
         f'<tr style="background:{card_bg}">'
         f'<td style="padding:12px 14px;vertical-align:top;width:54%;border-bottom:1px solid {card_border}">'
         f'<div style="font-size:15px">{rb}{bd}{newb}<b>{sym}</b>{_sector_tag(sec_kr)}</div>'
-        f'<div style="font-size:12px;color:#6b7280;margin:3px 0 1px">{name}</div>'
+        f'<div style="font-size:12px;color:#6b7280;margin:3px 0 1px">{name_html}</div>'
         f'<div style="font-size:12px;color:#374151;margin-bottom:6px">{desc}</div>'
         f'<div style="font-size:13px;margin-bottom:6px">PER {pe_s}{price_s}</div>'
         f'<div style="margin-bottom:6px">{_ret_chips(ind)}</div>'
@@ -1430,6 +1466,7 @@ def render_sections(payload, inline_b64=False):
     exits = payload.get("exits", [])
     images = []
     html = [_html_head("sections", regime, "4섹션 추천(추세 / 펀더멘탈 / 주목 / 결론)")]
+    html.append(_market_overview_block(payload))
     exit_html = ""
     if exits:
         items = "".join(f'<li>{e[0]} - {e[2]}</li>' for e in exits)
@@ -1452,8 +1489,46 @@ def render_sections(payload, inline_b64=False):
     html.append('<h3 style="margin-bottom:2px">4) 최종 분석 / 결론</h3>'
                 f'<div style="color:#333;font-size:13px;line-height:1.6;background:#f8fafc;'
                 f'border-left:3px solid #15803d;padding:8px 12px">{summary}</div>')
+    html.append(_detail_section([s for s, _, _ in (sec1 + sec2 + sec3)]))
     html.append(_HTML_FOOT)
     return "".join(html), images
+
+def _market_overview_block(payload) -> str:
+    """분기 프로필의 시장 총평을 상단에 표시(있을 때만)."""
+    prof = payload.get("profiles") or load_profiles()
+    meta = prof.get("meta", {}) or {}
+    ov = meta.get("market_overview", "")
+    if not ov:
+        return ""
+    q = meta.get("quarter", "")
+    qlabel = f' <span style="color:#9ca3af;font-size:11px">({q} 분기 총평)</span>' if q else ""
+    return (f'<h3 style="margin:14px 0 2px">🧭 시장 총평{qlabel}</h3>'
+            f'<div style="font-size:13px;color:#374151;line-height:1.7;background:#f8fafc;'
+            f'border-left:3px solid #6b7280;padding:8px 12px;margin-bottom:6px">{ov}</div>')
+
+def _detail_section(syms) -> str:
+    """메일 하단 '종목 상세' — 각 종목 detail(주가 추이·원인·전망 한 문단) + 앵커."""
+    profs = load_profiles()["tickers"]
+    seen, blocks = set(), []
+    for s in syms:
+        if s in seen:
+            continue
+        seen.add(s)
+        p = profs.get(s, {})
+        det = p.get("detail", "")
+        if not det:
+            continue
+        nm = p.get("name") or s
+        blocks.append(
+            f'<div id="d_{s}" style="padding:10px 0;border-bottom:1px solid #eee">'
+            f'<div style="font-weight:700;font-size:14px">{s} · {nm}</div>'
+            f'<div style="font-size:13px;color:#374151;line-height:1.7;margin-top:4px">{det}</div>'
+            f'<div style="margin-top:4px"><a href="#top" style="color:#9ca3af;font-size:11px;'
+            f'text-decoration:none">▲ 맨 위로</a></div></div>')
+    if not blocks:
+        return ""
+    return ('<h3 style="margin:20px 0 4px">📚 종목 상세 <span style="color:#9ca3af;font-size:12px">'
+            '(기업명을 누르면 여기로 이동 · 분기 갱신)</span></h3>' + "".join(blocks))
 
 def _sector_missing_note(has_sector) -> str:
     if has_sector:
@@ -1508,6 +1583,7 @@ def render_top10_table(payload, mode, subtitle, inline_b64=False):
     picks = payload["picks"]
     images = []
     html = [_html_head(mode, regime, subtitle)]
+    html.append(_market_overview_block(payload))
     if not picks:
         html.append('<div style="color:#9ca3af;font-size:13px">조건을 충족하는 종목이 없습니다(데이터 확보 실패 가능).</div>')
     else:
@@ -1523,6 +1599,7 @@ def render_top10_table(payload, mode, subtitle, inline_b64=False):
                     f'<span style="color:#9ca3af;font-size:13px">(코어=확신 / 관찰=후보)</span></h3>'
                     f'<table style="width:100%;border-collapse:collapse;border:1px solid #fde68a;'
                     f'border-radius:8px;overflow:hidden">{"".join(rrows)}</table>')
+        html.append(_detail_section([s for s, _sc, _r in picks]))
     html.append(_HTML_FOOT)
     return "".join(html), images
 
@@ -1729,8 +1806,10 @@ def gather_universe_data(with_volume: bool = False) -> dict:
     fng = fetch_fear_greed()
     regime["fng_score"] = fng.get("score")
     regime["fng_rating"] = fng.get("rating_kr")
+    profiles = load_profiles()
     return {"universe": universe, "sector_map": sector_map, "hist": hist, "vol": vol,
-            "spy": spy, "regime": regime, "ind_map": ind_map, "wiki_sectors": wiki}
+            "spy": spy, "regime": regime, "ind_map": ind_map, "wiki_sectors": wiki,
+            "profiles": profiles}
 
 def _tech_ok(ind) -> bool:
     return (ind.get("above_ma200") and (ind.get("macd_up") or ind.get("cross") == "golden")
@@ -1809,6 +1888,9 @@ def _resolve_sector(sym, sector_map, info) -> str:
       2) 위키피디아 캐시 직접 조회(안전망)
       3) yfinance info sector → GICS 매핑(YF_SECTOR_TO_GICS)
     못 맞추면 빈 문자열(섹터 집계에서 제외)."""
+    pg = _profile(sym).get("gics_sector", "")
+    if pg in GICS_KR:
+        return pg
     sec = sector_map.get(sym, "") or ""
     if sec in GICS_KR:
         return sec

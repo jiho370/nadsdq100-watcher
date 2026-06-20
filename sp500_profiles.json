@@ -1,0 +1,3545 @@
+{
+  "meta": {
+    "schema_version": 1,
+    "generated": "2026-06-20",
+    "quarter": "2026Q2",
+    "source": "Cowork(Claude) 분기 생성 · 위키피디아 구성종목 + 웹 시황 반영 · 참고용",
+    "market_overview": "2026년 중반 S&P500은 AI 인프라 투자(연 5천억~6천억 달러 규모의 하이퍼스케일러 설비투자)가 지수를 끌어올리는 가운데, 반도체·전력설비·방산·산업재가 시장을 주도하고 에너지·소재는 상대적으로 부진한 '섹터 분산' 장세를 보였다. 기업 이익 성장은 견조하나(2분기 두 자릿수 증익 추정), AI 자본지출이 수익성(ROE)에 부담이 될 수 있다는 경계도 공존한다. 이런 국면에서는 추세(상대강도)와 펀더멘탈(ROE·FCF)의 균형, 그리고 AI 수요의 실제 매출 전환 여부를 함께 보는 종목 선택이 중요하다. ※ 이 총평은 분기 단위로 갱신되는 참고용 요약이며 실시간 시황과 차이가 있을 수 있다."
+  },
+  "sector_briefings": {
+    "Information Technology": "AI 인프라 투자 사이클의 핵심 수혜 섹터로, 반도체가 시장을 주도한다. 하이퍼스케일러의 대규모 설비투자가 이어지나 높아진 밸류에이션과 투자 회수 논쟁이 공존한다.",
+    "Health Care": "비만(GLP-1)·항암 신약이 성장을 주도하나 건강보험사는 의료비 상승으로 변동성이 컸다. 대형 제약·의료기기와 보험 간 차별화가 뚜렷하다.",
+    "Financials": "고금리 환경의 순이자이익이 우호적이고 자본시장 회복으로 투자은행이 개선됐다. 신용 사이클과 규제 완화 기대가 변수다.",
+    "Consumer Discretionary": "소비 양극화 속 가성비·필수 소비는 견조하나 고금리 민감 품목(주택용품)은 둔화됐다. 전자상거래·외식 가성비 전략이 차별화 요인이다.",
+    "Communication Services": "광고 회복과 AI 적용으로 플랫폼 대형주가 강세를 보였다. 통신은 가입자 성장으로 방어적 흐름을 이어갔다.",
+    "Industrials": "리쇼어링·인프라·방산·전력설비 수요가 구조적으로 지지한다. 특히 AI 데이터센터발 전력·전기 설비 수요가 새 성장축으로 부상했다.",
+    "Consumer Staples": "방어적 특성으로 변동성 국면에서 선호되나 가격 인상 여력 둔화로 물량 회복이 관건이 됐다.",
+    "Energy": "최근 상대적으로 부진했던 섹터로 유가·정제마진에 연동한다. 통합 메이저와 가스 미드스트림이 배당 매력과 LNG·전력 수요로 차별화된다.",
+    "Utilities": "전통적 금리 민감 섹터지만 AI 데이터센터 전력 수요로 재평가받았다. 원자력·가스 발전이 무탄소·기저전력 수요로 주목된다.",
+    "Real Estate": "금리에 가장 민감한 섹터 중 하나로 전반적으로 눌렸으나, 데이터센터·통신탑 리츠는 AI·디지털 수요로 차별화된다.",
+    "Materials": "경기·중국 수요에 연동하며 상대적으로 부진했다. 산업용 가스·전기화 관련 소재가 방어적 강세를 보인다."
+  },
+  "tickers": {
+    "A": {
+      "name": "Agilent Technologies",
+      "gics_sector": "Health Care",
+      "sub_industry": "Life Sciences Tools & Services",
+      "one_liner": "생명과학 분석장비(애질런트)",
+      "detail": ""
+    },
+    "AAPL": {
+      "name": "Apple Inc.",
+      "gics_sector": "Information Technology",
+      "sub_industry": "Technology Hardware, Storage & Peripherals",
+      "one_liner": "아이폰·맥·서비스 생태계",
+      "detail": "아이폰을 축으로 한 하드웨어 생태계와 고마진 서비스 부문이 결합된 세계 최대 시가총액 기업 중 하나다. 하드웨어 성장은 성숙기에 접어들었으나 서비스 매출과 대규모 자사주 매입이 주가를 지지해 왔다. 온디바이스 AI(Apple Intelligence) 도입에 따른 교체 수요 자극, 서비스 성장 지속성, 중국 시장 경쟁이 향후 방향을 가른다."
+    },
+    "ABBV": {
+      "name": "AbbVie",
+      "gics_sector": "Health Care",
+      "sub_industry": "Biotechnology",
+      "one_liner": "면역·항암 신약(애브비)",
+      "detail": "면역·항암 신약 중심 대형 제약사로 휴미라 특허 만료 이후 후속 약물(스카이리치·린버크)로 전환했다. 후속 면역제제 고성장으로 매출 공백을 메웠다. 신약 성장 지속, 추가 파이프라인, 약가 정책이 관건이다."
+    },
+    "ABNB": {
+      "name": "Airbnb",
+      "gics_sector": "Consumer Discretionary",
+      "sub_industry": "Hotels, Resorts & Cruise Lines",
+      "one_liner": "숙박 공유(에어비앤비)",
+      "detail": ""
+    },
+    "ABT": {
+      "name": "Abbott Laboratories",
+      "gics_sector": "Health Care",
+      "sub_industry": "Health Care Equipment",
+      "one_liner": "의료기기·진단(애벗)",
+      "detail": "의료기기·진단·영양의 다각화 헬스케어 기업이다. 연속혈당측정기 등 의료기기 성장과 진단 정상화가 실적을 지지했다. 의료기기 신제품, 진단 수요, 환율이 변수다."
+    },
+    "ACGL": {
+      "name": "Arch Capital Group",
+      "gics_sector": "Financials",
+      "sub_industry": "Property & Casualty Insurance",
+      "one_liner": "손해보험(Arch Capital Group)",
+      "detail": ""
+    },
+    "ACN": {
+      "name": "Accenture",
+      "gics_sector": "Information Technology",
+      "sub_industry": "IT Consulting & Other Services",
+      "one_liner": "IT 컨설팅(액센추어)",
+      "detail": "글로벌 IT 컨설팅 1위로 기업 디지털·AI 전환 수요의 관문 역할을 한다. AI 도입 컨설팅 수주가 성장을 뒷받침했으나 재량 지출 둔화가 부담이었다. AI 프로젝트 확대와 기업 IT 예산 회복이 관건이다."
+    },
+    "ADBE": {
+      "name": "Adobe Inc.",
+      "gics_sector": "Information Technology",
+      "sub_industry": "Application Software",
+      "one_liner": "크리에이티브·문서 SW(어도비)",
+      "detail": ""
+    },
+    "ADI": {
+      "name": "Analog Devices",
+      "gics_sector": "Information Technology",
+      "sub_industry": "Semiconductors",
+      "one_liner": "아날로그 반도체(ADI)",
+      "detail": ""
+    },
+    "ADM": {
+      "name": "Archer Daniels Midland",
+      "gics_sector": "Consumer Staples",
+      "sub_industry": "Agricultural Products & Services",
+      "one_liner": "곡물 가공·유통(ADM)",
+      "detail": ""
+    },
+    "ADP": {
+      "name": "Automatic Data Processing",
+      "gics_sector": "Industrials",
+      "sub_industry": "Human Resource & Employment Services",
+      "one_liner": "급여·인사 아웃소싱(ADP)",
+      "detail": ""
+    },
+    "ADSK": {
+      "name": "Autodesk",
+      "gics_sector": "Information Technology",
+      "sub_industry": "Application Software",
+      "one_liner": "3D 설계 CAD(오토데스크)",
+      "detail": ""
+    },
+    "AEE": {
+      "name": "Ameren",
+      "gics_sector": "Utilities",
+      "sub_industry": "Multi-Utilities",
+      "one_liner": "종합 유틸리티(Ameren)",
+      "detail": ""
+    },
+    "AEP": {
+      "name": "American Electric Power",
+      "gics_sector": "Utilities",
+      "sub_industry": "Electric Utilities",
+      "one_liner": "전력 유틸리티(AEP)",
+      "detail": ""
+    },
+    "AES": {
+      "name": "AES Corporation",
+      "gics_sector": "Utilities",
+      "sub_industry": "Independent Power Producers & Energy Traders",
+      "one_liner": "발전·전력거래(AES Corporation)",
+      "detail": ""
+    },
+    "AFL": {
+      "name": "Aflac",
+      "gics_sector": "Financials",
+      "sub_industry": "Life & Health Insurance",
+      "one_liner": "보험(애플랙)",
+      "detail": ""
+    },
+    "AIG": {
+      "name": "American International Group",
+      "gics_sector": "Financials",
+      "sub_industry": "Multi-line Insurance",
+      "one_liner": "종합 보험(AIG)",
+      "detail": ""
+    },
+    "AIZ": {
+      "name": "Assurant",
+      "gics_sector": "Financials",
+      "sub_industry": "Multi-line Insurance",
+      "one_liner": "종합 보험(Assurant)",
+      "detail": ""
+    },
+    "AJG": {
+      "name": "Arthur J. Gallagher & Co.",
+      "gics_sector": "Financials",
+      "sub_industry": "Insurance Brokers",
+      "one_liner": "보험 중개(Arthur J. Gallagher & Co.)",
+      "detail": ""
+    },
+    "AKAM": {
+      "name": "Akamai Technologies",
+      "gics_sector": "Information Technology",
+      "sub_industry": "Internet Services & Infrastructure",
+      "one_liner": "인터넷 인프라(Akamai Technologies)",
+      "detail": ""
+    },
+    "ALB": {
+      "name": "Albemarle Corporation",
+      "gics_sector": "Materials",
+      "sub_industry": "Specialty Chemicals",
+      "one_liner": "특수 화학(Albemarle Corporation)",
+      "detail": ""
+    },
+    "ALGN": {
+      "name": "Align Technology",
+      "gics_sector": "Health Care",
+      "sub_industry": "Health Care Supplies",
+      "one_liner": "의료 소모품(Align Technology)",
+      "detail": ""
+    },
+    "ALL": {
+      "name": "Allstate",
+      "gics_sector": "Financials",
+      "sub_industry": "Property & Casualty Insurance",
+      "one_liner": "자동차·주택 보험(올스테이트)",
+      "detail": ""
+    },
+    "ALLE": {
+      "name": "Allegion",
+      "gics_sector": "Industrials",
+      "sub_industry": "Building Products",
+      "one_liner": "건축자재(Allegion)",
+      "detail": ""
+    },
+    "AMAT": {
+      "name": "Applied Materials",
+      "gics_sector": "Information Technology",
+      "sub_industry": "Semiconductor Materials & Equipment",
+      "one_liner": "반도체 전공정 장비 1위",
+      "detail": "반도체 전공정 장비 1위로 AI·첨단 공정 투자 수혜를 받는다. 첨단 로직·HBM 투자 확대가 실적을 뒷받침했다. 중국 매출 비중·규제, 메모리 투자 사이클, 첨단 패키징 수요가 향후 변수다."
+    },
+    "AMCR": {
+      "name": "Amcor",
+      "gics_sector": "Materials",
+      "sub_industry": "Paper & Plastic Packaging Products & Materials",
+      "one_liner": "포장재(Amcor)",
+      "detail": ""
+    },
+    "AMD": {
+      "name": "Advanced Micro Devices",
+      "gics_sector": "Information Technology",
+      "sub_industry": "Semiconductors",
+      "one_liner": "CPU·GPU 반도체",
+      "detail": "데이터센터 CPU·GPU에서 점유율을 확대하며 AI 가속기 시장의 2위 대안으로 부상했다. MI 시리즈 가속기 수요와 서버 CPU 강세가 실적을 끌어올렸다. AI 가속기 채택 확대, 소프트웨어 생태계, 엔비디아와의 격차 축소가 관건이다."
+    },
+    "AME": {
+      "name": "Ametek",
+      "gics_sector": "Industrials",
+      "sub_industry": "Electrical Components & Equipment",
+      "one_liner": "정밀 계측·전자(아메텍)",
+      "detail": ""
+    },
+    "AMGN": {
+      "name": "Amgen",
+      "gics_sector": "Health Care",
+      "sub_industry": "Biotechnology",
+      "one_liner": "바이오 신약(암젠)",
+      "detail": "바이오 신약 대형사로 비만 치료제 파이프라인이 새 기대를 더했다. 기존 포트폴리오 안정 속 비만 신약 임상 결과가 주가 변수로 작용했다. 비만 신약 진척, 특허 대응, 신제품 성장이 관건이다."
+    },
+    "AMP": {
+      "name": "Ameriprise Financial",
+      "gics_sector": "Financials",
+      "sub_industry": "Asset Management & Custody Banks",
+      "one_liner": "자산운용·수탁(Ameriprise Financial)",
+      "detail": ""
+    },
+    "AMT": {
+      "name": "American Tower",
+      "gics_sector": "Real Estate",
+      "sub_industry": "Telecom Tower REITs",
+      "one_liner": "통신탑 리츠(아메리칸타워)",
+      "detail": ""
+    },
+    "AMZN": {
+      "name": "Amazon",
+      "gics_sector": "Consumer Discretionary",
+      "sub_industry": "Broadline Retail",
+      "one_liner": "전자상거래·AWS 클라우드",
+      "detail": "전자상거래와 클라우드(AWS)를 양대 축으로 하며 광고가 고성장 제3축으로 부상했다. 리테일 수익성 개선과 AWS 재가속이 주가 회복을 이끌었고, 2026년 설비투자를 1,250억 달러 안팎으로 상향하며 AI 수요 대응에 나섰다. AWS의 AI 수요 흡수력, 물류 효율, 광고 성장 지속이 전망의 핵심이다."
+    },
+    "ANET": {
+      "name": "Arista Networks",
+      "gics_sector": "Information Technology",
+      "sub_industry": "Communications Equipment",
+      "one_liner": "데이터센터 네트워크 장비(아리스타)",
+      "detail": "데이터센터 고속 네트워크 장비 강자로 AI 클러스터 연결 수요 수혜주다. 하이퍼스케일러 투자로 실적이 견조했다. AI 네트워킹 점유율, 고객 집중도, 화이트박스 경쟁이 관건이다."
+    },
+    "AON": {
+      "name": "Aon plc",
+      "gics_sector": "Financials",
+      "sub_industry": "Insurance Brokers",
+      "one_liner": "보험 중개·컨설팅(에이온)",
+      "detail": ""
+    },
+    "AOS": {
+      "name": "A. O. Smith",
+      "gics_sector": "Industrials",
+      "sub_industry": "Building Products",
+      "one_liner": "건축자재(A. O. Smith)",
+      "detail": ""
+    },
+    "APA": {
+      "name": "APA Corporation",
+      "gics_sector": "Energy",
+      "sub_industry": "Oil & Gas Exploration & Production",
+      "one_liner": "석유·가스 탐사생산(APA Corporation)",
+      "detail": ""
+    },
+    "APD": {
+      "name": "Air Products",
+      "gics_sector": "Materials",
+      "sub_industry": "Industrial Gases",
+      "one_liner": "산업용 가스(에어프로덕츠)",
+      "detail": ""
+    },
+    "APH": {
+      "name": "Amphenol",
+      "gics_sector": "Information Technology",
+      "sub_industry": "Electronic Components",
+      "one_liner": "전자부품(Amphenol)",
+      "detail": ""
+    },
+    "APO": {
+      "name": "Apollo Global Management",
+      "gics_sector": "Financials",
+      "sub_industry": "Asset Management & Custody Banks",
+      "one_liner": "사모펀드·보험(아폴로)",
+      "detail": ""
+    },
+    "APP": {
+      "name": "AppLovin",
+      "gics_sector": "Information Technology",
+      "sub_industry": "Application Software",
+      "one_liner": "모바일 앱 광고 플랫폼(앱러빈)",
+      "detail": ""
+    },
+    "APTV": {
+      "name": "Aptiv",
+      "gics_sector": "Consumer Discretionary",
+      "sub_industry": "Automotive Parts & Equipment",
+      "one_liner": "차량 전장·부품(앱티브)",
+      "detail": ""
+    },
+    "ARE": {
+      "name": "Alexandria Real Estate Equities",
+      "gics_sector": "Real Estate",
+      "sub_industry": "Office REITs",
+      "one_liner": "오피스 리츠(Alexandria Real Estate Equities)",
+      "detail": ""
+    },
+    "ARES": {
+      "name": "Ares Management",
+      "gics_sector": "Financials",
+      "sub_industry": "Asset Management & Custody Banks",
+      "one_liner": "자산운용·수탁(Ares Management)",
+      "detail": ""
+    },
+    "ATO": {
+      "name": "Atmos Energy",
+      "gics_sector": "Utilities",
+      "sub_industry": "Gas Utilities",
+      "one_liner": "가스 유틸리티(Atmos Energy)",
+      "detail": ""
+    },
+    "AVB": {
+      "name": "AvalonBay Communities",
+      "gics_sector": "Real Estate",
+      "sub_industry": "Multi-Family Residential REITs",
+      "one_liner": "주거용 리츠(AvalonBay Communities)",
+      "detail": ""
+    },
+    "AVGO": {
+      "name": "Broadcom",
+      "gics_sector": "Information Technology",
+      "sub_industry": "Semiconductors",
+      "one_liner": "AI 네트워킹 반도체+인프라SW(브로드컴)",
+      "detail": "AI 네트워킹·맞춤형 반도체와 인프라 소프트웨어(VMware)를 결합한 다각화 반도체 기업이다. AI 데이터센터향 커스텀 칩 수요와 소프트웨어 매출이 실적을 견인하며 주가가 강세를 보였다. AI 매출 비중 확대, VMware 통합 시너지, 비(非)AI 반도체 사이클 회복이 전망의 축이다."
+    },
+    "AVY": {
+      "name": "Avery Dennison",
+      "gics_sector": "Materials",
+      "sub_industry": "Paper & Plastic Packaging Products & Materials",
+      "one_liner": "포장재(Avery Dennison)",
+      "detail": ""
+    },
+    "AWK": {
+      "name": "American Water Works",
+      "gics_sector": "Utilities",
+      "sub_industry": "Water Utilities",
+      "one_liner": "수도 유틸리티(아메리칸워터웍스)",
+      "detail": ""
+    },
+    "AXON": {
+      "name": "Axon Enterprise",
+      "gics_sector": "Industrials",
+      "sub_industry": "Aerospace & Defense",
+      "one_liner": "테이저·바디캠(액손)",
+      "detail": ""
+    },
+    "AXP": {
+      "name": "American Express",
+      "gics_sector": "Financials",
+      "sub_industry": "Consumer Finance",
+      "one_liner": "신용카드·결제(아메리칸익스프레스)",
+      "detail": "프리미엄 카드·결제 기업으로 고신용 회원 기반이 강점이다. 견조한 소비와 회비 수익이 실적을 뒷받침했다. 소비 경기, 연체율, 젊은 회원 확보가 변수다."
+    },
+    "AZO": {
+      "name": "AutoZone",
+      "gics_sector": "Consumer Discretionary",
+      "sub_industry": "Automotive Retail",
+      "one_liner": "자동차 소매(AutoZone)",
+      "detail": ""
+    },
+    "BA": {
+      "name": "Boeing",
+      "gics_sector": "Industrials",
+      "sub_industry": "Aerospace & Defense",
+      "one_liner": "항공기 제조(보잉)",
+      "detail": "항공기 제조 양대 산맥으로 생산 정상화가 핵심 과제다. 품질·생산 차질에서 회복하며 인도량 개선이 기대됐다. 생산 정상화, 인증, 현금흐름 회복이 관건이다."
+    },
+    "BAC": {
+      "name": "Bank of America",
+      "gics_sector": "Financials",
+      "sub_industry": "Diversified Banks",
+      "one_liner": "대형 은행(뱅크오브아메리카)",
+      "detail": "대형 상업은행으로 예금 기반과 소매금융이 강점이다. 순이자이익과 신용비용이 실적을 좌우했다. 금리 환경, 예금 비용, 자산 건전성이 변수다."
+    },
+    "BALL": {
+      "name": "Ball Corporation",
+      "gics_sector": "Materials",
+      "sub_industry": "Metal, Glass & Plastic Containers",
+      "one_liner": "포장 용기(Ball Corporation)",
+      "detail": ""
+    },
+    "BAX": {
+      "name": "Baxter International",
+      "gics_sector": "Health Care",
+      "sub_industry": "Health Care Equipment",
+      "one_liner": "의료기기(Baxter International)",
+      "detail": ""
+    },
+    "BBY": {
+      "name": "Best Buy",
+      "gics_sector": "Consumer Discretionary",
+      "sub_industry": "Computer & Electronics Retail",
+      "one_liner": "전자제품 소매(Best Buy)",
+      "detail": ""
+    },
+    "BDX": {
+      "name": "Becton Dickinson",
+      "gics_sector": "Health Care",
+      "sub_industry": "Health Care Equipment",
+      "one_liner": "의료기기·진단(벡톤디킨슨)",
+      "detail": ""
+    },
+    "BEN": {
+      "name": "Franklin Resources",
+      "gics_sector": "Financials",
+      "sub_industry": "Asset Management & Custody Banks",
+      "one_liner": "자산운용·수탁(Franklin Resources)",
+      "detail": ""
+    },
+    "BF-B": {
+      "name": "Brown–Forman",
+      "gics_sector": "Consumer Staples",
+      "sub_industry": "Distillers & Vintners",
+      "one_liner": "주류(Brown–Forman)",
+      "detail": ""
+    },
+    "BG": {
+      "name": "Bunge Global",
+      "gics_sector": "Consumer Staples",
+      "sub_industry": "Agricultural Products & Services",
+      "one_liner": "농산물(Bunge Global)",
+      "detail": ""
+    },
+    "BIIB": {
+      "name": "Biogen",
+      "gics_sector": "Health Care",
+      "sub_industry": "Biotechnology",
+      "one_liner": "신경질환 신약(바이오젠)",
+      "detail": ""
+    },
+    "BKNG": {
+      "name": "Booking Holdings",
+      "gics_sector": "Consumer Discretionary",
+      "sub_industry": "Hotels, Resorts & Cruise Lines",
+      "one_liner": "온라인 여행 예약(부킹닷컴)",
+      "detail": ""
+    },
+    "BKR": {
+      "name": "Baker Hughes",
+      "gics_sector": "Energy",
+      "sub_industry": "Oil & Gas Equipment & Services",
+      "one_liner": "유전 서비스·장비(베이커휴즈)",
+      "detail": ""
+    },
+    "BLDR": {
+      "name": "Builders FirstSource",
+      "gics_sector": "Industrials",
+      "sub_industry": "Building Products",
+      "one_liner": "건축자재(Builders FirstSource)",
+      "detail": ""
+    },
+    "BLK": {
+      "name": "BlackRock",
+      "gics_sector": "Financials",
+      "sub_industry": "Asset Management & Custody Banks",
+      "one_liner": "세계 최대 자산운용(블랙록)",
+      "detail": "세계 최대 자산운용사로 ETF(iShares)·사적시장으로 영역을 넓혔다. 시장 강세와 자금 유입, 사적시장 인수가 성장을 이끌었다. 순유입, 수수료율, 사적시장 통합이 관건이다."
+    },
+    "BMY": {
+      "name": "Bristol Myers Squibb",
+      "gics_sector": "Health Care",
+      "sub_industry": "Pharmaceuticals",
+      "one_liner": "항암·면역 신약(BMS)",
+      "detail": ""
+    },
+    "BNY": {
+      "name": "BNY Mellon",
+      "gics_sector": "Financials",
+      "sub_industry": "Asset Management & Custody Banks",
+      "one_liner": "자산운용·수탁(BNY Mellon)",
+      "detail": ""
+    },
+    "BR": {
+      "name": "Broadridge Financial Solutions",
+      "gics_sector": "Industrials",
+      "sub_industry": "Data Processing & Outsourced Services",
+      "one_liner": "금융 IT 서비스(브로드리지)",
+      "detail": ""
+    },
+    "BRK-B": {
+      "name": "Berkshire Hathaway",
+      "gics_sector": "Financials",
+      "sub_industry": "Multi-Sector Holdings",
+      "one_liner": "버크셔 해서웨이(버핏 지주사)",
+      "detail": "워런 버핏이 이끄는 보험·철도·에너지·소비재 복합 지주회사로 막대한 현금성 자산을 보유한다. 보험 영업이익과 투자 포트폴리오가 실적을 좌우했다. 현금 활용(인수·자사주), 보험 수익성, 승계 이슈가 변수다."
+    },
+    "BRO": {
+      "name": "Brown & Brown",
+      "gics_sector": "Financials",
+      "sub_industry": "Insurance Brokers",
+      "one_liner": "보험 중개(Brown & Brown)",
+      "detail": ""
+    },
+    "BSX": {
+      "name": "Boston Scientific",
+      "gics_sector": "Health Care",
+      "sub_industry": "Health Care Equipment",
+      "one_liner": "의료기기·심혈관(보스턴사이언티픽)",
+      "detail": ""
+    },
+    "BX": {
+      "name": "Blackstone Inc.",
+      "gics_sector": "Financials",
+      "sub_industry": "Asset Management & Custody Banks",
+      "one_liner": "사모펀드·대체투자(블랙스톤)",
+      "detail": ""
+    },
+    "BXP": {
+      "name": "BXP, Inc.",
+      "gics_sector": "Real Estate",
+      "sub_industry": "Office REITs",
+      "one_liner": "오피스 리츠(BXP, Inc.)",
+      "detail": ""
+    },
+    "C": {
+      "name": "Citigroup",
+      "gics_sector": "Financials",
+      "sub_industry": "Diversified Banks",
+      "one_liner": "대형 은행(씨티그룹)",
+      "detail": ""
+    },
+    "CAG": {
+      "name": "Conagra Brands",
+      "gics_sector": "Consumer Staples",
+      "sub_industry": "Packaged Foods & Meats",
+      "one_liner": "가공식품(Conagra Brands)",
+      "detail": ""
+    },
+    "CAH": {
+      "name": "Cardinal Health",
+      "gics_sector": "Health Care",
+      "sub_industry": "Health Care Distributors",
+      "one_liner": "의약품 유통(카디널헬스)",
+      "detail": ""
+    },
+    "CARR": {
+      "name": "Carrier Global",
+      "gics_sector": "Industrials",
+      "sub_industry": "Building Products",
+      "one_liner": "냉난방공조 설비(캐리어)",
+      "detail": ""
+    },
+    "CASY": {
+      "name": "Casey's",
+      "gics_sector": "Consumer Staples",
+      "sub_industry": "Food Retail",
+      "one_liner": "식료품 소매(Casey's)",
+      "detail": ""
+    },
+    "CAT": {
+      "name": "Caterpillar Inc.",
+      "gics_sector": "Industrials",
+      "sub_industry": "Construction Machinery & Heavy Transportation Equipment",
+      "one_liner": "건설·광산 장비(캐터필러)",
+      "detail": "건설·광산 중장비 글로벌 1위로 경기·인프라 투자에 연동한다. 인프라·데이터센터 건설 수요가 지지했으나 일부 지역 수요 둔화가 혼재했다. 건설 사이클, 광산 자본지출, 가격·재고가 관건이다."
+    },
+    "CB": {
+      "name": "Chubb Limited",
+      "gics_sector": "Financials",
+      "sub_industry": "Property & Casualty Insurance",
+      "one_liner": "글로벌 손해보험(처브)",
+      "detail": ""
+    },
+    "CBOE": {
+      "name": "Cboe Global Markets",
+      "gics_sector": "Financials",
+      "sub_industry": "Financial Exchanges & Data",
+      "one_liner": "거래소·금융데이터(Cboe Global Markets)",
+      "detail": ""
+    },
+    "CBRE": {
+      "name": "CBRE Group",
+      "gics_sector": "Real Estate",
+      "sub_industry": "Real Estate Services",
+      "one_liner": "부동산 서비스(CBRE Group)",
+      "detail": ""
+    },
+    "CCI": {
+      "name": "Crown Castle",
+      "gics_sector": "Real Estate",
+      "sub_industry": "Telecom Tower REITs",
+      "one_liner": "통신탑 리츠(크라운캐슬)",
+      "detail": ""
+    },
+    "CCL": {
+      "name": "Carnival Corporation",
+      "gics_sector": "Consumer Discretionary",
+      "sub_industry": "Hotels, Resorts & Cruise Lines",
+      "one_liner": "크루즈(카니발)",
+      "detail": ""
+    },
+    "CDNS": {
+      "name": "Cadence Design Systems",
+      "gics_sector": "Information Technology",
+      "sub_industry": "Application Software",
+      "one_liner": "반도체 설계 EDA(케이던스)",
+      "detail": ""
+    },
+    "CDW": {
+      "name": "CDW Corporation",
+      "gics_sector": "Information Technology",
+      "sub_industry": "Technology Distributors",
+      "one_liner": "정보기술 기업(CDW Corporation)",
+      "detail": ""
+    },
+    "CEG": {
+      "name": "Constellation Energy",
+      "gics_sector": "Utilities",
+      "sub_industry": "Electric Utilities",
+      "one_liner": "미국 최대 원자력 발전(컨스텔레이션)",
+      "detail": "미국 최대 원자력 발전사로 데이터센터향 무탄소 전력 공급 계약으로 재평가받았다. AI 전력 수요와 원전 가치 부각으로 주가가 강세였다. 전력가격, 장기 공급계약, 규제가 관건이다."
+    },
+    "CF": {
+      "name": "CF Industries",
+      "gics_sector": "Materials",
+      "sub_industry": "Fertilizers & Agricultural Chemicals",
+      "one_liner": "비료·농약(CF Industries)",
+      "detail": ""
+    },
+    "CFG": {
+      "name": "Citizens Financial Group",
+      "gics_sector": "Financials",
+      "sub_industry": "Regional Banks",
+      "one_liner": "지역 은행(Citizens Financial Group)",
+      "detail": ""
+    },
+    "CHD": {
+      "name": "Church & Dwight",
+      "gics_sector": "Consumer Staples",
+      "sub_industry": "Household Products",
+      "one_liner": "생활용품(처치앤드와이트)",
+      "detail": ""
+    },
+    "CHRW": {
+      "name": "C.H. Robinson",
+      "gics_sector": "Industrials",
+      "sub_industry": "Air Freight & Logistics",
+      "one_liner": "항공화물·물류(C.H. Robinson)",
+      "detail": ""
+    },
+    "CHTR": {
+      "name": "Charter Communications",
+      "gics_sector": "Communication Services",
+      "sub_industry": "Cable & Satellite",
+      "one_liner": "케이블 인터넷·방송(차터)",
+      "detail": ""
+    },
+    "CI": {
+      "name": "Cigna",
+      "gics_sector": "Health Care",
+      "sub_industry": "Health Care Services",
+      "one_liner": "건강보험(시그나)",
+      "detail": ""
+    },
+    "CIEN": {
+      "name": "Ciena",
+      "gics_sector": "Information Technology",
+      "sub_industry": "Communications Equipment",
+      "one_liner": "통신장비(Ciena)",
+      "detail": ""
+    },
+    "CINF": {
+      "name": "Cincinnati Financial",
+      "gics_sector": "Financials",
+      "sub_industry": "Property & Casualty Insurance",
+      "one_liner": "손해보험(Cincinnati Financial)",
+      "detail": ""
+    },
+    "CL": {
+      "name": "Colgate-Palmolive",
+      "gics_sector": "Consumer Staples",
+      "sub_industry": "Household Products",
+      "one_liner": "치약·생활용품(콜게이트)",
+      "detail": ""
+    },
+    "CLX": {
+      "name": "Clorox",
+      "gics_sector": "Consumer Staples",
+      "sub_industry": "Household Products",
+      "one_liner": "표백제·생활용품(클로락스)",
+      "detail": ""
+    },
+    "CMCSA": {
+      "name": "Comcast",
+      "gics_sector": "Communication Services",
+      "sub_industry": "Cable & Satellite",
+      "one_liner": "케이블·미디어(컴캐스트)",
+      "detail": ""
+    },
+    "CME": {
+      "name": "CME Group",
+      "gics_sector": "Financials",
+      "sub_industry": "Financial Exchanges & Data",
+      "one_liner": "파생상품 거래소(CME)",
+      "detail": ""
+    },
+    "CMG": {
+      "name": "Chipotle Mexican Grill",
+      "gics_sector": "Consumer Discretionary",
+      "sub_industry": "Restaurants",
+      "one_liner": "패스트캐주얼 외식(치폴레)",
+      "detail": ""
+    },
+    "CMI": {
+      "name": "Cummins",
+      "gics_sector": "Industrials",
+      "sub_industry": "Construction Machinery & Heavy Transportation Equipment",
+      "one_liner": "디젤 엔진·발전(커민스)",
+      "detail": ""
+    },
+    "CMS": {
+      "name": "CMS Energy",
+      "gics_sector": "Utilities",
+      "sub_industry": "Multi-Utilities",
+      "one_liner": "종합 유틸리티(CMS Energy)",
+      "detail": ""
+    },
+    "CNC": {
+      "name": "Centene Corporation",
+      "gics_sector": "Health Care",
+      "sub_industry": "Managed Health Care",
+      "one_liner": "건강보험(Centene Corporation)",
+      "detail": ""
+    },
+    "CNP": {
+      "name": "CenterPoint Energy",
+      "gics_sector": "Utilities",
+      "sub_industry": "Multi-Utilities",
+      "one_liner": "종합 유틸리티(CenterPoint Energy)",
+      "detail": ""
+    },
+    "COF": {
+      "name": "Capital One",
+      "gics_sector": "Financials",
+      "sub_industry": "Consumer Finance",
+      "one_liner": "신용카드·은행(캐피탈원)",
+      "detail": ""
+    },
+    "COHR": {
+      "name": "Coherent Corp.",
+      "gics_sector": "Information Technology",
+      "sub_industry": "Electronic Components",
+      "one_liner": "전자부품(Coherent Corp.)",
+      "detail": ""
+    },
+    "COIN": {
+      "name": "Coinbase",
+      "gics_sector": "Financials",
+      "sub_industry": "Financial Exchanges & Data",
+      "one_liner": "암호화폐 거래소(코인베이스)",
+      "detail": ""
+    },
+    "COO": {
+      "name": "Cooper Companies (The)",
+      "gics_sector": "Health Care",
+      "sub_industry": "Health Care Supplies",
+      "one_liner": "의료 소모품(Cooper Companies (The))",
+      "detail": ""
+    },
+    "COP": {
+      "name": "ConocoPhillips",
+      "gics_sector": "Energy",
+      "sub_industry": "Oil & Gas Exploration & Production",
+      "one_liner": "석유·가스 탐사생산(코노코필립스)",
+      "detail": "대형 셰일·E&P 기업으로 저비용 생산과 주주환원이 특징이다. 유가와 생산 효율이 실적을 좌우했다. 유가, 생산성, 자본 규율이 변수다."
+    },
+    "COR": {
+      "name": "Cencora",
+      "gics_sector": "Health Care",
+      "sub_industry": "Health Care Distributors",
+      "one_liner": "의약품 유통(센코라)",
+      "detail": ""
+    },
+    "COST": {
+      "name": "Costco",
+      "gics_sector": "Consumer Staples",
+      "sub_industry": "Consumer Staples Merchandise Retail",
+      "one_liner": "회원제 창고형 할인점(코스트코)",
+      "detail": "회원제 창고형 할인점으로 충성도 높은 회원 기반과 멤버십 수익이 강점이다. 견조한 회원 갱신율과 매출 성장이 주가를 지지했다. 회원비 인상, 매출 성장, 높은 밸류에이션이 변수다."
+    },
+    "CPAY": {
+      "name": "Corpay",
+      "gics_sector": "Financials",
+      "sub_industry": "Transaction & Payment Processing Services",
+      "one_liner": "결제·카드(Corpay)",
+      "detail": ""
+    },
+    "CPB": {
+      "name": "Campbell's Company (The)",
+      "gics_sector": "Consumer Staples",
+      "sub_industry": "Packaged Foods & Meats",
+      "one_liner": "가공식품(Campbell's Company (The))",
+      "detail": ""
+    },
+    "CPRT": {
+      "name": "Copart",
+      "gics_sector": "Industrials",
+      "sub_industry": "Diversified Support Services",
+      "one_liner": "온라인 중고차 경매(코파트)",
+      "detail": ""
+    },
+    "CPT": {
+      "name": "Camden Property Trust",
+      "gics_sector": "Real Estate",
+      "sub_industry": "Multi-Family Residential REITs",
+      "one_liner": "주거용 리츠(Camden Property Trust)",
+      "detail": ""
+    },
+    "CRH": {
+      "name": "CRH plc",
+      "gics_sector": "Materials",
+      "sub_industry": "Construction Materials",
+      "one_liner": "건설 소재(CRH plc)",
+      "detail": ""
+    },
+    "CRL": {
+      "name": "Charles River Laboratories",
+      "gics_sector": "Health Care",
+      "sub_industry": "Life Sciences Tools & Services",
+      "one_liner": "생명과학 장비·서비스(Charles River Laboratories)",
+      "detail": ""
+    },
+    "CRM": {
+      "name": "Salesforce",
+      "gics_sector": "Information Technology",
+      "sub_industry": "Application Software",
+      "one_liner": "CRM 클라우드 SW(세일즈포스)",
+      "detail": "CRM 클라우드 1위로 AI 에이전트(Agentforce)로 신성장을 모색한다. 성장 둔화 속 수익성 개선과 AI 제품화가 주가를 지지했다. AI 매출 기여, 구독 성장 재가속이 변수다."
+    },
+    "CRWD": {
+      "name": "CrowdStrike",
+      "gics_sector": "Information Technology",
+      "sub_industry": "Systems Software",
+      "one_liner": "클라우드 엔드포인트 보안(크라우드스트라이크)",
+      "detail": ""
+    },
+    "CSCO": {
+      "name": "Cisco",
+      "gics_sector": "Information Technology",
+      "sub_industry": "Communications Equipment",
+      "one_liner": "네트워크 장비·보안(시스코)",
+      "detail": "네트워크 장비·보안 강자로 AI 데이터센터 네트워킹과 구독 전환을 추진한다. 보안·관측(Splunk) 강화와 AI 네트워킹 수주가 실적을 지지했다. 통합 시너지, 엔터프라이즈 수요 회복이 변수다."
+    },
+    "CSGP": {
+      "name": "CoStar Group",
+      "gics_sector": "Real Estate",
+      "sub_industry": "Real Estate Services",
+      "one_liner": "부동산 데이터(코스타)",
+      "detail": ""
+    },
+    "CSX": {
+      "name": "CSX Corporation",
+      "gics_sector": "Industrials",
+      "sub_industry": "Rail Transportation",
+      "one_liner": "미 동부 화물 철도",
+      "detail": ""
+    },
+    "CTAS": {
+      "name": "Cintas",
+      "gics_sector": "Industrials",
+      "sub_industry": "Diversified Support Services",
+      "one_liner": "유니폼 렌탈·기업서비스(신타스)",
+      "detail": ""
+    },
+    "CTSH": {
+      "name": "Cognizant",
+      "gics_sector": "Information Technology",
+      "sub_industry": "IT Consulting & Other Services",
+      "one_liner": "IT 컨설팅(코그니전트)",
+      "detail": ""
+    },
+    "CTVA": {
+      "name": "Corteva",
+      "gics_sector": "Materials",
+      "sub_industry": "Fertilizers & Agricultural Chemicals",
+      "one_liner": "농업 종자·작물보호제(코르테바)",
+      "detail": ""
+    },
+    "CVNA": {
+      "name": "Carvana",
+      "gics_sector": "Consumer Discretionary",
+      "sub_industry": "Automotive Retail",
+      "one_liner": "자동차 소매(Carvana)",
+      "detail": ""
+    },
+    "CVS": {
+      "name": "CVS Health",
+      "gics_sector": "Health Care",
+      "sub_industry": "Health Care Services",
+      "one_liner": "약국·건강보험(CVS헬스)",
+      "detail": ""
+    },
+    "CVX": {
+      "name": "Chevron Corporation",
+      "gics_sector": "Energy",
+      "sub_industry": "Integrated Oil & Gas",
+      "one_liner": "글로벌 석유메이저(셰브론)",
+      "detail": "글로벌 석유 메이저로 안정적 배당과 자산 포트폴리오가 강점이다. 유가와 생산량, 인수 마무리가 실적을 좌우했다. 유가, 생산 증대, 주주환원이 관건이다."
+    },
+    "D": {
+      "name": "Dominion Energy",
+      "gics_sector": "Utilities",
+      "sub_industry": "Multi-Utilities",
+      "one_liner": "전력·가스 유틸리티(도미니언)",
+      "detail": ""
+    },
+    "DAL": {
+      "name": "Delta Air Lines",
+      "gics_sector": "Industrials",
+      "sub_industry": "Passenger Airlines",
+      "one_liner": "대형 항공(델타)",
+      "detail": ""
+    },
+    "DASH": {
+      "name": "DoorDash",
+      "gics_sector": "Consumer Discretionary",
+      "sub_industry": "Specialized Consumer Services",
+      "one_liner": "음식 배달(도어대시)",
+      "detail": ""
+    },
+    "DD": {
+      "name": "DuPont",
+      "gics_sector": "Materials",
+      "sub_industry": "Specialty Chemicals",
+      "one_liner": "특수 화학소재(듀폰)",
+      "detail": ""
+    },
+    "DDOG": {
+      "name": "Datadog",
+      "gics_sector": "Information Technology",
+      "sub_industry": "Application Software",
+      "one_liner": "클라우드 모니터링(데이터독)",
+      "detail": ""
+    },
+    "DE": {
+      "name": "Deere & Company",
+      "gics_sector": "Industrials",
+      "sub_industry": "Agricultural & Farm Machinery",
+      "one_liner": "농기계·건설장비(존디어)",
+      "detail": "농기계·건설장비 1위로 농업 사이클에 연동한다. 농가 소득 둔화로 농기계 수요가 조정받았다. 농업 사이클, 정밀농업 기술, 재고 조정이 변수다."
+    },
+    "DECK": {
+      "name": "Deckers Brands",
+      "gics_sector": "Consumer Discretionary",
+      "sub_industry": "Footwear",
+      "one_liner": "신발(Deckers Brands)",
+      "detail": ""
+    },
+    "DELL": {
+      "name": "Dell Technologies",
+      "gics_sector": "Information Technology",
+      "sub_industry": "Technology Hardware, Storage & Peripherals",
+      "one_liner": "PC·서버(델)",
+      "detail": "PC·서버 기업으로 AI 서버 수주 확대가 성장 동력이 됐다. AI 인프라 수요로 서버 부문이 강세를 보였다. AI 서버 마진, PC 교체 사이클, 백로그 실현이 변수다."
+    },
+    "DG": {
+      "name": "Dollar General",
+      "gics_sector": "Consumer Staples",
+      "sub_industry": "Consumer Staples Merchandise Retail",
+      "one_liner": "달러 할인점(달러제너럴)",
+      "detail": ""
+    },
+    "DGX": {
+      "name": "Quest Diagnostics",
+      "gics_sector": "Health Care",
+      "sub_industry": "Health Care Services",
+      "one_liner": "헬스케어 서비스(Quest Diagnostics)",
+      "detail": ""
+    },
+    "DHI": {
+      "name": "D. R. Horton",
+      "gics_sector": "Consumer Discretionary",
+      "sub_industry": "Homebuilding",
+      "one_liner": "주택 건설(DR호튼)",
+      "detail": ""
+    },
+    "DHR": {
+      "name": "Danaher Corporation",
+      "gics_sector": "Health Care",
+      "sub_industry": "Life Sciences Tools & Services",
+      "one_liner": "생명과학·진단(다나허)",
+      "detail": ""
+    },
+    "DIS": {
+      "name": "Walt Disney Company (The)",
+      "gics_sector": "Communication Services",
+      "sub_industry": "Movies & Entertainment",
+      "one_liner": "미디어·테마파크(디즈니)",
+      "detail": "미디어·테마파크·스트리밍 종합 기업으로 사업 재건 중이다. 스트리밍 흑자 전환과 테마파크 수익이 실적을 좌우했다. 스트리밍 수익성, 콘텐츠, 테마파크 수요가 관건이다."
+    },
+    "DLR": {
+      "name": "Digital Realty",
+      "gics_sector": "Real Estate",
+      "sub_industry": "Data Center REITs",
+      "one_liner": "데이터센터 리츠(디지털리얼티)",
+      "detail": ""
+    },
+    "DLTR": {
+      "name": "Dollar Tree",
+      "gics_sector": "Consumer Staples",
+      "sub_industry": "Consumer Staples Merchandise Retail",
+      "one_liner": "달러 할인점(달러트리)",
+      "detail": ""
+    },
+    "DOC": {
+      "name": "Healthpeak Properties",
+      "gics_sector": "Real Estate",
+      "sub_industry": "Health Care REITs",
+      "one_liner": "헬스케어 리츠(Healthpeak Properties)",
+      "detail": ""
+    },
+    "DOV": {
+      "name": "Dover Corporation",
+      "gics_sector": "Industrials",
+      "sub_industry": "Industrial Machinery & Supplies & Components",
+      "one_liner": "산업기계 다각화(도버)",
+      "detail": ""
+    },
+    "DOW": {
+      "name": "Dow Inc.",
+      "gics_sector": "Materials",
+      "sub_industry": "Commodity Chemicals",
+      "one_liner": "기초 화학소재(다우)",
+      "detail": ""
+    },
+    "DPZ": {
+      "name": "Domino's",
+      "gics_sector": "Consumer Discretionary",
+      "sub_industry": "Restaurants",
+      "one_liner": "외식·레스토랑(Domino's)",
+      "detail": ""
+    },
+    "DRI": {
+      "name": "Darden Restaurants",
+      "gics_sector": "Consumer Discretionary",
+      "sub_industry": "Restaurants",
+      "one_liner": "외식·레스토랑(Darden Restaurants)",
+      "detail": ""
+    },
+    "DTE": {
+      "name": "DTE Energy",
+      "gics_sector": "Utilities",
+      "sub_industry": "Multi-Utilities",
+      "one_liner": "종합 유틸리티(DTE Energy)",
+      "detail": ""
+    },
+    "DUK": {
+      "name": "Duke Energy",
+      "gics_sector": "Utilities",
+      "sub_industry": "Electric Utilities",
+      "one_liner": "전력 유틸리티(듀크에너지)",
+      "detail": ""
+    },
+    "DVA": {
+      "name": "DaVita",
+      "gics_sector": "Health Care",
+      "sub_industry": "Health Care Services",
+      "one_liner": "헬스케어 서비스(DaVita)",
+      "detail": ""
+    },
+    "DVN": {
+      "name": "Devon Energy",
+      "gics_sector": "Energy",
+      "sub_industry": "Oil & Gas Exploration & Production",
+      "one_liner": "석유·가스 탐사생산(Devon Energy)",
+      "detail": ""
+    },
+    "DXCM": {
+      "name": "Dexcom",
+      "gics_sector": "Health Care",
+      "sub_industry": "Health Care Equipment",
+      "one_liner": "연속혈당측정기(덱스콤)",
+      "detail": ""
+    },
+    "EA": {
+      "name": "Electronic Arts",
+      "gics_sector": "Communication Services",
+      "sub_industry": "Interactive Home Entertainment",
+      "one_liner": "비디오게임(EA)",
+      "detail": ""
+    },
+    "EBAY": {
+      "name": "eBay Inc.",
+      "gics_sector": "Consumer Discretionary",
+      "sub_industry": "Broadline Retail",
+      "one_liner": "종합 소매(eBay Inc.)",
+      "detail": ""
+    },
+    "ECL": {
+      "name": "Ecolab",
+      "gics_sector": "Materials",
+      "sub_industry": "Specialty Chemicals",
+      "one_liner": "위생·수처리 솔루션(에코랩)",
+      "detail": ""
+    },
+    "ED": {
+      "name": "Consolidated Edison",
+      "gics_sector": "Utilities",
+      "sub_industry": "Multi-Utilities",
+      "one_liner": "전력 유틸리티(콘에디슨)",
+      "detail": ""
+    },
+    "EFX": {
+      "name": "Equifax",
+      "gics_sector": "Industrials",
+      "sub_industry": "Research & Consulting Services",
+      "one_liner": "리서치·컨설팅(Equifax)",
+      "detail": ""
+    },
+    "EG": {
+      "name": "Everest Group",
+      "gics_sector": "Financials",
+      "sub_industry": "Reinsurance",
+      "one_liner": "재보험(Everest Group)",
+      "detail": ""
+    },
+    "EIX": {
+      "name": "Edison International",
+      "gics_sector": "Utilities",
+      "sub_industry": "Electric Utilities",
+      "one_liner": "전력 유틸리티(에디슨인터내셔널)",
+      "detail": ""
+    },
+    "EL": {
+      "name": "Estée Lauder Companies (The)",
+      "gics_sector": "Consumer Staples",
+      "sub_industry": "Personal Care Products",
+      "one_liner": "화장품(에스티로더)",
+      "detail": ""
+    },
+    "ELV": {
+      "name": "Elevance Health",
+      "gics_sector": "Health Care",
+      "sub_industry": "Managed Health Care",
+      "one_liner": "건강보험(엘레번스헬스)",
+      "detail": ""
+    },
+    "EME": {
+      "name": "Emcor",
+      "gics_sector": "Industrials",
+      "sub_industry": "Construction & Engineering",
+      "one_liner": "건설·엔지니어링(Emcor)",
+      "detail": ""
+    },
+    "EMR": {
+      "name": "Emerson Electric",
+      "gics_sector": "Industrials",
+      "sub_industry": "Electrical Components & Equipment",
+      "one_liner": "산업 자동화(에머슨)",
+      "detail": ""
+    },
+    "EOG": {
+      "name": "EOG Resources",
+      "gics_sector": "Energy",
+      "sub_industry": "Oil & Gas Exploration & Production",
+      "one_liner": "셰일 원유·가스(EOG리소스)",
+      "detail": ""
+    },
+    "EPAM": {
+      "name": "EPAM Systems",
+      "gics_sector": "Information Technology",
+      "sub_industry": "IT Consulting & Other Services",
+      "one_liner": "IT 컨설팅·서비스(EPAM Systems)",
+      "detail": ""
+    },
+    "EQIX": {
+      "name": "Equinix",
+      "gics_sector": "Real Estate",
+      "sub_industry": "Data Center REITs",
+      "one_liner": "데이터센터 리츠(에퀴닉스)",
+      "detail": ""
+    },
+    "EQR": {
+      "name": "Equity Residential",
+      "gics_sector": "Real Estate",
+      "sub_industry": "Multi-Family Residential REITs",
+      "one_liner": "주거용 리츠(Equity Residential)",
+      "detail": ""
+    },
+    "EQT": {
+      "name": "EQT Corporation",
+      "gics_sector": "Energy",
+      "sub_industry": "Oil & Gas Exploration & Production",
+      "one_liner": "석유·가스 탐사생산(EQT Corporation)",
+      "detail": ""
+    },
+    "ERIE": {
+      "name": "Erie Indemnity",
+      "gics_sector": "Financials",
+      "sub_industry": "Insurance Brokers",
+      "one_liner": "보험 중개(Erie Indemnity)",
+      "detail": ""
+    },
+    "ES": {
+      "name": "Eversource Energy",
+      "gics_sector": "Utilities",
+      "sub_industry": "Electric Utilities",
+      "one_liner": "전력 유틸리티(Eversource Energy)",
+      "detail": ""
+    },
+    "ESS": {
+      "name": "Essex Property Trust",
+      "gics_sector": "Real Estate",
+      "sub_industry": "Multi-Family Residential REITs",
+      "one_liner": "주거용 리츠(Essex Property Trust)",
+      "detail": ""
+    },
+    "ETN": {
+      "name": "Eaton Corporation",
+      "gics_sector": "Industrials",
+      "sub_industry": "Electrical Components & Equipment",
+      "one_liner": "전력관리 부품(이튼)",
+      "detail": "전력관리·전기 부품 기업으로 데이터센터·전기화 수혜주다. AI 데이터센터 전력 수요로 수주잔고가 늘었다. 전력 수요 지속, 수주 실현, 공급망이 관건이다."
+    },
+    "ETR": {
+      "name": "Entergy",
+      "gics_sector": "Utilities",
+      "sub_industry": "Electric Utilities",
+      "one_liner": "전력 유틸리티(Entergy)",
+      "detail": ""
+    },
+    "EVRG": {
+      "name": "Evergy",
+      "gics_sector": "Utilities",
+      "sub_industry": "Electric Utilities",
+      "one_liner": "전력 유틸리티(Evergy)",
+      "detail": ""
+    },
+    "EW": {
+      "name": "Edwards Lifesciences",
+      "gics_sector": "Health Care",
+      "sub_industry": "Health Care Equipment",
+      "one_liner": "심장 판막(에드워즈라이프사이언스)",
+      "detail": ""
+    },
+    "EXC": {
+      "name": "Exelon",
+      "gics_sector": "Utilities",
+      "sub_industry": "Electric Utilities",
+      "one_liner": "전력 배전(엑셀론)",
+      "detail": ""
+    },
+    "EXE": {
+      "name": "Expand Energy",
+      "gics_sector": "Energy",
+      "sub_industry": "Oil & Gas Exploration & Production",
+      "one_liner": "석유·가스 탐사생산(Expand Energy)",
+      "detail": ""
+    },
+    "EXPD": {
+      "name": "Expeditors International",
+      "gics_sector": "Industrials",
+      "sub_industry": "Air Freight & Logistics",
+      "one_liner": "항공화물·물류(Expeditors International)",
+      "detail": ""
+    },
+    "EXPE": {
+      "name": "Expedia Group",
+      "gics_sector": "Consumer Discretionary",
+      "sub_industry": "Hotels, Resorts & Cruise Lines",
+      "one_liner": "온라인 여행(익스피디아)",
+      "detail": ""
+    },
+    "EXR": {
+      "name": "Extra Space Storage",
+      "gics_sector": "Real Estate",
+      "sub_industry": "Self-Storage REITs",
+      "one_liner": "셀프스토리지 리츠(Extra Space Storage)",
+      "detail": ""
+    },
+    "F": {
+      "name": "Ford Motor Company",
+      "gics_sector": "Consumer Discretionary",
+      "sub_industry": "Automobile Manufacturers",
+      "one_liner": "자동차 제조(포드)",
+      "detail": ""
+    },
+    "FANG": {
+      "name": "Diamondback Energy",
+      "gics_sector": "Energy",
+      "sub_industry": "Oil & Gas Exploration & Production",
+      "one_liner": "셰일 원유·가스(다이아몬드백)",
+      "detail": ""
+    },
+    "FAST": {
+      "name": "Fastenal",
+      "gics_sector": "Industrials",
+      "sub_industry": "Trading Companies & Distributors",
+      "one_liner": "산업용 부품 유통(패스널)",
+      "detail": ""
+    },
+    "FCX": {
+      "name": "Freeport-McMoRan",
+      "gics_sector": "Materials",
+      "sub_industry": "Copper",
+      "one_liner": "구리·금 광산(프리포트맥모란)",
+      "detail": ""
+    },
+    "FDS": {
+      "name": "FactSet",
+      "gics_sector": "Financials",
+      "sub_industry": "Financial Exchanges & Data",
+      "one_liner": "거래소·금융데이터(FactSet)",
+      "detail": ""
+    },
+    "FDX": {
+      "name": "FedEx",
+      "gics_sector": "Industrials",
+      "sub_industry": "Air Freight & Logistics",
+      "one_liner": "특송·물류(페덱스)",
+      "detail": ""
+    },
+    "FE": {
+      "name": "FirstEnergy",
+      "gics_sector": "Utilities",
+      "sub_industry": "Electric Utilities",
+      "one_liner": "전력 유틸리티(FirstEnergy)",
+      "detail": ""
+    },
+    "FFIV": {
+      "name": "F5, Inc.",
+      "gics_sector": "Information Technology",
+      "sub_industry": "Communications Equipment",
+      "one_liner": "통신장비(F5, Inc.)",
+      "detail": ""
+    },
+    "FICO": {
+      "name": "Fair Isaac",
+      "gics_sector": "Information Technology",
+      "sub_industry": "Application Software",
+      "one_liner": "신용평가 분석SW(파이코)",
+      "detail": ""
+    },
+    "FIS": {
+      "name": "Fidelity National Information Services",
+      "gics_sector": "Financials",
+      "sub_industry": "Transaction & Payment Processing Services",
+      "one_liner": "결제·카드(Fidelity National Information Services)",
+      "detail": ""
+    },
+    "FISV": {
+      "name": "Fiserv",
+      "gics_sector": "Financials",
+      "sub_industry": "Transaction & Payment Processing Services",
+      "one_liner": "결제·카드(Fiserv)",
+      "detail": ""
+    },
+    "FITB": {
+      "name": "Fifth Third Bancorp",
+      "gics_sector": "Financials",
+      "sub_industry": "Regional Banks",
+      "one_liner": "지역 은행(Fifth Third Bancorp)",
+      "detail": ""
+    },
+    "FIX": {
+      "name": "Comfort Systems USA",
+      "gics_sector": "Industrials",
+      "sub_industry": "Construction & Engineering",
+      "one_liner": "건설·엔지니어링(Comfort Systems USA)",
+      "detail": ""
+    },
+    "FOX": {
+      "name": "Fox Corporation (Class B)",
+      "gics_sector": "Communication Services",
+      "sub_industry": "Broadcasting",
+      "one_liner": "커뮤니케이션 기업(Fox Corporation (Class B))",
+      "detail": ""
+    },
+    "FOXA": {
+      "name": "Fox Corporation (Class A)",
+      "gics_sector": "Communication Services",
+      "sub_industry": "Broadcasting",
+      "one_liner": "커뮤니케이션 기업(Fox Corporation (Class A))",
+      "detail": ""
+    },
+    "FRT": {
+      "name": "Federal Realty Investment Trust",
+      "gics_sector": "Real Estate",
+      "sub_industry": "Retail REITs",
+      "one_liner": "리테일 리츠(Federal Realty Investment Trust)",
+      "detail": ""
+    },
+    "FSLR": {
+      "name": "First Solar",
+      "gics_sector": "Information Technology",
+      "sub_industry": "Semiconductors",
+      "one_liner": "태양광 패널(퍼스트솔라)",
+      "detail": ""
+    },
+    "FTNT": {
+      "name": "Fortinet",
+      "gics_sector": "Information Technology",
+      "sub_industry": "Systems Software",
+      "one_liner": "네트워크 방화벽 보안(포티넷)",
+      "detail": ""
+    },
+    "FTV": {
+      "name": "Fortive",
+      "gics_sector": "Industrials",
+      "sub_industry": "Industrial Machinery & Supplies & Components",
+      "one_liner": "산업기계·부품(Fortive)",
+      "detail": ""
+    },
+    "GD": {
+      "name": "General Dynamics",
+      "gics_sector": "Industrials",
+      "sub_industry": "Aerospace & Defense",
+      "one_liner": "방산·항공(제너럴다이내믹스)",
+      "detail": "방산·항공(걸프스트림)·조선 다각화 기업이다. 함정·전투차량 수주와 비즈니스젯 수요가 실적을 지지했다. 국방 예산, 조선 인도, 제트기 수요가 변수다."
+    },
+    "GDDY": {
+      "name": "GoDaddy",
+      "gics_sector": "Information Technology",
+      "sub_industry": "Internet Services & Infrastructure",
+      "one_liner": "도메인·웹호스팅(고대디)",
+      "detail": ""
+    },
+    "GE": {
+      "name": "GE Aerospace",
+      "gics_sector": "Industrials",
+      "sub_industry": "Aerospace & Defense",
+      "one_liner": "항공엔진·전력(GE에어로스페이스)",
+      "detail": "항공기 엔진·서비스 중심의 GE에어로스페이스로 재편됐다. 항공 수요 회복과 엔진 애프터마켓이 실적을 끌어올렸다. 항공 사이클, 엔진 인도·정비 수요, 공급망이 관건이다."
+    },
+    "GEHC": {
+      "name": "GE HealthCare",
+      "gics_sector": "Health Care",
+      "sub_industry": "Health Care Equipment",
+      "one_liner": "의료영상 장비(GE헬스케어)",
+      "detail": ""
+    },
+    "GEN": {
+      "name": "Gen Digital",
+      "gics_sector": "Information Technology",
+      "sub_industry": "Systems Software",
+      "one_liner": "시스템 소프트웨어(Gen Digital)",
+      "detail": ""
+    },
+    "GEV": {
+      "name": "GE Vernova",
+      "gics_sector": "Industrials",
+      "sub_industry": "Heavy Electrical Equipment",
+      "one_liner": "전력·에너지 설비(GE버노바)",
+      "detail": "GE에서 분사한 전력·에너지 설비 기업으로 가스터빈·그리드·풍력을 담당한다. AI 데이터센터발 전력 수요 급증으로 가스터빈·그리드 수주가 호조를 보이며 주가가 강세였다. 전력 수요 지속, 풍력 수익성, 수주 실현이 변수다."
+    },
+    "GILD": {
+      "name": "Gilead Sciences",
+      "gics_sector": "Health Care",
+      "sub_industry": "Biotechnology",
+      "one_liner": "항바이러스·항암 신약(길리어드)",
+      "detail": ""
+    },
+    "GIS": {
+      "name": "General Mills",
+      "gics_sector": "Consumer Staples",
+      "sub_industry": "Packaged Foods & Meats",
+      "one_liner": "시리얼·가공식품(제너럴밀스)",
+      "detail": ""
+    },
+    "GL": {
+      "name": "Globe Life",
+      "gics_sector": "Financials",
+      "sub_industry": "Life & Health Insurance",
+      "one_liner": "생명·건강보험(Globe Life)",
+      "detail": ""
+    },
+    "GLW": {
+      "name": "Corning Inc.",
+      "gics_sector": "Information Technology",
+      "sub_industry": "Electronic Components",
+      "one_liner": "광섬유·디스플레이 유리(코닝)",
+      "detail": ""
+    },
+    "GM": {
+      "name": "General Motors",
+      "gics_sector": "Consumer Discretionary",
+      "sub_industry": "Automobile Manufacturers",
+      "one_liner": "자동차 제조(GM)",
+      "detail": ""
+    },
+    "GNRC": {
+      "name": "Generac",
+      "gics_sector": "Industrials",
+      "sub_industry": "Electrical Components & Equipment",
+      "one_liner": "전기장비·부품(Generac)",
+      "detail": ""
+    },
+    "GOOG": {
+      "name": "Alphabet Inc. (Class C)",
+      "gics_sector": "Communication Services",
+      "sub_industry": "Interactive Media & Services",
+      "one_liner": "구글 검색·유튜브·클라우드",
+      "detail": "알파벳(구글)의 클래스C 주식으로 의결권만 다를 뿐 사업 내용은 GOOGL과 동일하다. 검색·유튜브 광고와 클라우드가 핵심이며, AI 검색 전환과 클라우드 수익성이 주가의 관건이다."
+    },
+    "GOOGL": {
+      "name": "Alphabet Inc. (Class A)",
+      "gics_sector": "Communication Services",
+      "sub_industry": "Interactive Media & Services",
+      "one_liner": "구글 검색·유튜브·클라우드",
+      "detail": "검색·유튜브 광고가 핵심 캐시카우이며 구글 클라우드가 성장 동력이다. 광고 경기와 'AI 검색 전환' 우려가 주가 변동성을 키웠으나 클라우드 흑자 전환과 자체 AI 모델 경쟁력이 긍정적으로 작용했다. 생성형 AI 검색 통합의 수익성 유지, 클라우드 점유율, 반독점 규제 리스크가 향후 변수다."
+    },
+    "GPC": {
+      "name": "Genuine Parts Company",
+      "gics_sector": "Consumer Discretionary",
+      "sub_industry": "Distributors",
+      "one_liner": "자동차·산업부품 유통(제뉴인파츠)",
+      "detail": ""
+    },
+    "GPN": {
+      "name": "Global Payments",
+      "gics_sector": "Financials",
+      "sub_industry": "Transaction & Payment Processing Services",
+      "one_liner": "결제·카드(Global Payments)",
+      "detail": ""
+    },
+    "GRMN": {
+      "name": "Garmin",
+      "gics_sector": "Consumer Discretionary",
+      "sub_industry": "Consumer Electronics",
+      "one_liner": "자유소비재 기업(Garmin)",
+      "detail": ""
+    },
+    "GS": {
+      "name": "Goldman Sachs",
+      "gics_sector": "Financials",
+      "sub_industry": "Investment Banking & Brokerage",
+      "one_liner": "투자은행(골드만삭스)",
+      "detail": "글로벌 투자은행 대표주로 트레이딩·IB·자산운용이 핵심이다. 자본시장 활성화와 딜 회복이 실적을 끌어올렸다. IB 수수료 사이클, 트레이딩 변동성, 자산운용 성장이 변수다."
+    },
+    "GWW": {
+      "name": "W. W. Grainger",
+      "gics_sector": "Industrials",
+      "sub_industry": "Industrial Machinery & Supplies & Components",
+      "one_liner": "산업용 MRO 유통(그레인저)",
+      "detail": ""
+    },
+    "HAL": {
+      "name": "Halliburton",
+      "gics_sector": "Energy",
+      "sub_industry": "Oil & Gas Equipment & Services",
+      "one_liner": "유전 서비스(핼리버튼)",
+      "detail": ""
+    },
+    "HAS": {
+      "name": "Hasbro",
+      "gics_sector": "Consumer Discretionary",
+      "sub_industry": "Leisure Products",
+      "one_liner": "레저 용품(Hasbro)",
+      "detail": ""
+    },
+    "HBAN": {
+      "name": "Huntington Bancshares",
+      "gics_sector": "Financials",
+      "sub_industry": "Regional Banks",
+      "one_liner": "지역 은행(Huntington Bancshares)",
+      "detail": ""
+    },
+    "HCA": {
+      "name": "HCA Healthcare",
+      "gics_sector": "Health Care",
+      "sub_industry": "Health Care Facilities",
+      "one_liner": "병원 운영(HCA헬스케어)",
+      "detail": ""
+    },
+    "HD": {
+      "name": "Home Depot (The)",
+      "gics_sector": "Consumer Discretionary",
+      "sub_industry": "Home Improvement Retail",
+      "one_liner": "주택용품 유통(홈디포)",
+      "detail": "주택용품 소매 1위로 주택·리모델링 경기에 연동한다. 고금리에 따른 대형 리모델링 둔화가 부담이었다. 금리·주택 거래 회복, 프로 고객 수요가 관건이다."
+    },
+    "HIG": {
+      "name": "Hartford (The)",
+      "gics_sector": "Financials",
+      "sub_industry": "Property & Casualty Insurance",
+      "one_liner": "손해보험(Hartford (The))",
+      "detail": ""
+    },
+    "HII": {
+      "name": "Huntington Ingalls Industries",
+      "gics_sector": "Industrials",
+      "sub_industry": "Aerospace & Defense",
+      "one_liner": "항공우주·방산(Huntington Ingalls Industries)",
+      "detail": ""
+    },
+    "HLT": {
+      "name": "Hilton Worldwide",
+      "gics_sector": "Consumer Discretionary",
+      "sub_industry": "Hotels, Resorts & Cruise Lines",
+      "one_liner": "글로벌 호텔(힐튼)",
+      "detail": ""
+    },
+    "HON": {
+      "name": "Honeywell",
+      "gics_sector": "Industrials",
+      "sub_industry": "Industrial Conglomerates",
+      "one_liner": "항공·자동화 산업재(하니웰)",
+      "detail": "항공·자동화·소재의 산업 복합기업으로 사업 재편을 추진 중이다. 항공 부문 강세와 포트폴리오 정리가 주가를 지지했다. 사업 분할·재편, 자동화 수요가 변수다."
+    },
+    "HOOD": {
+      "name": "Robinhood Markets",
+      "gics_sector": "Financials",
+      "sub_industry": "Investment Banking & Brokerage",
+      "one_liner": "주식·코인 거래 앱(로빈후드)",
+      "detail": ""
+    },
+    "HPE": {
+      "name": "Hewlett Packard Enterprise",
+      "gics_sector": "Information Technology",
+      "sub_industry": "Technology Hardware, Storage & Peripherals",
+      "one_liner": "기업용 서버·네트워크(HPE)",
+      "detail": ""
+    },
+    "HPQ": {
+      "name": "HP Inc.",
+      "gics_sector": "Information Technology",
+      "sub_industry": "Technology Hardware, Storage & Peripherals",
+      "one_liner": "PC·프린터(HP)",
+      "detail": ""
+    },
+    "HRL": {
+      "name": "Hormel Foods",
+      "gics_sector": "Consumer Staples",
+      "sub_industry": "Packaged Foods & Meats",
+      "one_liner": "가공식품(Hormel Foods)",
+      "detail": ""
+    },
+    "HSIC": {
+      "name": "Henry Schein",
+      "gics_sector": "Health Care",
+      "sub_industry": "Health Care Distributors",
+      "one_liner": "의약품 유통(Henry Schein)",
+      "detail": ""
+    },
+    "HST": {
+      "name": "Host Hotels & Resorts",
+      "gics_sector": "Real Estate",
+      "sub_industry": "Hotel & Resort REITs",
+      "one_liner": "호텔 리츠(Host Hotels & Resorts)",
+      "detail": ""
+    },
+    "HSY": {
+      "name": "Hershey Company (The)",
+      "gics_sector": "Consumer Staples",
+      "sub_industry": "Packaged Foods & Meats",
+      "one_liner": "초콜릿·제과(허쉬)",
+      "detail": ""
+    },
+    "HUBB": {
+      "name": "Hubbell Incorporated",
+      "gics_sector": "Industrials",
+      "sub_industry": "Industrial Machinery & Supplies & Components",
+      "one_liner": "산업기계·부품(Hubbell Incorporated)",
+      "detail": ""
+    },
+    "HUM": {
+      "name": "Humana",
+      "gics_sector": "Health Care",
+      "sub_industry": "Managed Health Care",
+      "one_liner": "건강보험(Humana)",
+      "detail": ""
+    },
+    "HWM": {
+      "name": "Howmet Aerospace",
+      "gics_sector": "Industrials",
+      "sub_industry": "Aerospace & Defense",
+      "one_liner": "항공우주·방산(Howmet Aerospace)",
+      "detail": ""
+    },
+    "IBKR": {
+      "name": "Interactive Brokers",
+      "gics_sector": "Financials",
+      "sub_industry": "Investment Banking & Brokerage",
+      "one_liner": "투자은행·증권(Interactive Brokers)",
+      "detail": ""
+    },
+    "IBM": {
+      "name": "IBM",
+      "gics_sector": "Information Technology",
+      "sub_industry": "IT Consulting & Other Services",
+      "one_liner": "IT 서비스·하이브리드 클라우드",
+      "detail": "하이브리드 클라우드·AI(watsonx)와 컨설팅·소프트웨어 중심으로 체질을 바꿨다. 소프트웨어·AI 수주 개선으로 안정적 흐름을 보였다. AI 수주 실현, 컨설팅 수요, 인프라 부문 변동성이 변수다."
+    },
+    "ICE": {
+      "name": "Intercontinental Exchange",
+      "gics_sector": "Financials",
+      "sub_industry": "Financial Exchanges & Data",
+      "one_liner": "거래소·데이터(인터컨티넨탈익스체인지)",
+      "detail": ""
+    },
+    "IDXX": {
+      "name": "Idexx Laboratories",
+      "gics_sector": "Health Care",
+      "sub_industry": "Health Care Equipment",
+      "one_liner": "동물병원 진단(아이덱스)",
+      "detail": ""
+    },
+    "IEX": {
+      "name": "IDEX Corporation",
+      "gics_sector": "Industrials",
+      "sub_industry": "Industrial Machinery & Supplies & Components",
+      "one_liner": "산업기계·부품(IDEX Corporation)",
+      "detail": ""
+    },
+    "IFF": {
+      "name": "International Flavors & Fragrances",
+      "gics_sector": "Materials",
+      "sub_industry": "Specialty Chemicals",
+      "one_liner": "특수 화학(International Flavors & Fragrances)",
+      "detail": ""
+    },
+    "INCY": {
+      "name": "Incyte",
+      "gics_sector": "Health Care",
+      "sub_industry": "Biotechnology",
+      "one_liner": "바이오테크(Incyte)",
+      "detail": ""
+    },
+    "INTC": {
+      "name": "Intel",
+      "gics_sector": "Information Technology",
+      "sub_industry": "Semiconductors",
+      "one_liner": "CPU·파운드리 종합반도체(인텔)",
+      "detail": "CPU·파운드리 종합반도체 기업으로 구조조정과 파운드리 전환의 한가운데 있다. 점유율 하락과 막대한 투자 부담으로 부진했으나 정부 지원·구조조정 기대가 일부 반영됐다. 파운드리 고객 확보, 공정 경쟁력 회복, 비용 효율화가 관건이다."
+    },
+    "INTU": {
+      "name": "Intuit",
+      "gics_sector": "Information Technology",
+      "sub_industry": "Application Software",
+      "one_liner": "세무·회계 SW(인튜이트)",
+      "detail": ""
+    },
+    "INVH": {
+      "name": "Invitation Homes",
+      "gics_sector": "Real Estate",
+      "sub_industry": "Single-Family Residential REITs",
+      "one_liner": "단독주택 리츠(Invitation Homes)",
+      "detail": ""
+    },
+    "IP": {
+      "name": "International Paper",
+      "gics_sector": "Materials",
+      "sub_industry": "Paper & Plastic Packaging Products & Materials",
+      "one_liner": "포장재(International Paper)",
+      "detail": ""
+    },
+    "IQV": {
+      "name": "IQVIA",
+      "gics_sector": "Health Care",
+      "sub_industry": "Life Sciences Tools & Services",
+      "one_liner": "생명과학 장비·서비스(IQVIA)",
+      "detail": ""
+    },
+    "IR": {
+      "name": "Ingersoll Rand",
+      "gics_sector": "Industrials",
+      "sub_industry": "Industrial Machinery & Supplies & Components",
+      "one_liner": "산업용 압축기·펌프(인거솔랜드)",
+      "detail": ""
+    },
+    "IRM": {
+      "name": "Iron Mountain",
+      "gics_sector": "Real Estate",
+      "sub_industry": "Other Specialized REITs",
+      "one_liner": "특수 리츠(Iron Mountain)",
+      "detail": ""
+    },
+    "ISRG": {
+      "name": "Intuitive Surgical",
+      "gics_sector": "Health Care",
+      "sub_industry": "Health Care Equipment",
+      "one_liner": "수술용 로봇 다빈치",
+      "detail": "수술용 로봇 '다빈치'의 독보적 기업으로 시술 건수 증가에 연동한다. 시술 확대와 신형 플랫폼 도입으로 견조한 성장을 보였다. 시술 성장률, 신제품 채택, 경쟁 진입이 관건이다."
+    },
+    "IT": {
+      "name": "Gartner",
+      "gics_sector": "Information Technology",
+      "sub_industry": "IT Consulting & Other Services",
+      "one_liner": "IT 컨설팅·서비스(Gartner)",
+      "detail": ""
+    },
+    "ITW": {
+      "name": "Illinois Tool Works",
+      "gics_sector": "Industrials",
+      "sub_industry": "Industrial Machinery & Supplies & Components",
+      "one_liner": "산업용 부품·장비(일리노이툴웍스)",
+      "detail": ""
+    },
+    "IVZ": {
+      "name": "Invesco",
+      "gics_sector": "Financials",
+      "sub_industry": "Asset Management & Custody Banks",
+      "one_liner": "자산운용·수탁(Invesco)",
+      "detail": ""
+    },
+    "J": {
+      "name": "Jacobs Solutions",
+      "gics_sector": "Industrials",
+      "sub_industry": "Construction & Engineering",
+      "one_liner": "건설·엔지니어링(Jacobs Solutions)",
+      "detail": ""
+    },
+    "JBHT": {
+      "name": "J.B. Hunt",
+      "gics_sector": "Industrials",
+      "sub_industry": "Cargo Ground Transportation",
+      "one_liner": "산업재 기업(J.B. Hunt)",
+      "detail": ""
+    },
+    "JBL": {
+      "name": "Jabil",
+      "gics_sector": "Information Technology",
+      "sub_industry": "Electronic Manufacturing Services",
+      "one_liner": "전자제품 위탁생산(Jabil)",
+      "detail": ""
+    },
+    "JCI": {
+      "name": "Johnson Controls",
+      "gics_sector": "Industrials",
+      "sub_industry": "Building Products",
+      "one_liner": "빌딩 설비·제어(존슨컨트롤스)",
+      "detail": ""
+    },
+    "JKHY": {
+      "name": "Jack Henry & Associates",
+      "gics_sector": "Financials",
+      "sub_industry": "Transaction & Payment Processing Services",
+      "one_liner": "은행 IT 솔루션(잭헨리)",
+      "detail": ""
+    },
+    "JNJ": {
+      "name": "Johnson & Johnson",
+      "gics_sector": "Health Care",
+      "sub_industry": "Pharmaceuticals",
+      "one_liner": "제약·의료기기(존슨앤드존슨)",
+      "detail": "제약·의료기기 종합 헬스케어 기업으로 방어적 성격이 강하다. 신약 파이프라인과 의료기기 회복이 실적을 지지했으나 소송 리스크가 상존한다. 핵심 신약 성장과 소송 불확실성 해소가 변수다."
+    },
+    "JPM": {
+      "name": "JPMorgan Chase",
+      "gics_sector": "Financials",
+      "sub_industry": "Diversified Banks",
+      "one_liner": "미국 최대 은행(JP모건)",
+      "detail": "미국 최대 은행으로 소매·투자은행·자산관리를 아우르는 다각화 금융사다. 고금리 환경의 순이자이익과 견조한 신용지표가 실적을 뒷받침했다. 금리 경로, 대출 건전성, 자본 규제, IB 수수료 회복이 관전 포인트다."
+    },
+    "KDP": {
+      "name": "Keurig Dr Pepper",
+      "gics_sector": "Consumer Staples",
+      "sub_industry": "Soft Drinks & Non-alcoholic Beverages",
+      "one_liner": "음료·커피(큐리그닥터페퍼)",
+      "detail": ""
+    },
+    "KEY": {
+      "name": "KeyCorp",
+      "gics_sector": "Financials",
+      "sub_industry": "Regional Banks",
+      "one_liner": "지역 은행(KeyCorp)",
+      "detail": ""
+    },
+    "KEYS": {
+      "name": "Keysight Technologies",
+      "gics_sector": "Information Technology",
+      "sub_industry": "Electronic Equipment & Instruments",
+      "one_liner": "전자 계측장비(키사이트)",
+      "detail": ""
+    },
+    "KHC": {
+      "name": "Kraft Heinz",
+      "gics_sector": "Consumer Staples",
+      "sub_industry": "Packaged Foods & Meats",
+      "one_liner": "가공식품(크래프트하인즈)",
+      "detail": ""
+    },
+    "KIM": {
+      "name": "Kimco Realty",
+      "gics_sector": "Real Estate",
+      "sub_industry": "Retail REITs",
+      "one_liner": "리테일 리츠(Kimco Realty)",
+      "detail": ""
+    },
+    "KKR": {
+      "name": "KKR & Co.",
+      "gics_sector": "Financials",
+      "sub_industry": "Asset Management & Custody Banks",
+      "one_liner": "사모펀드(KKR)",
+      "detail": "사모펀드·대체투자 대형사로 보험·인프라로 확장 중이다. 자산 증가와 실현 수익이 실적을 좌우했다. 자금 모집, 실현 환경, 보험 자산 성장이 변수다."
+    },
+    "KLAC": {
+      "name": "KLA Corporation",
+      "gics_sector": "Information Technology",
+      "sub_industry": "Semiconductor Materials & Equipment",
+      "one_liner": "반도체 검사·계측 장비",
+      "detail": "반도체 검사·계측 장비 1위로 공정 미세화 수혜가 크다. 첨단 공정·수율 관리 수요로 견조한 실적을 냈다. 첨단 공정 투자와 중국 규제 영향이 변수다."
+    },
+    "KMB": {
+      "name": "Kimberly-Clark",
+      "gics_sector": "Consumer Staples",
+      "sub_industry": "Household Products",
+      "one_liner": "위생용품(킴벌리클라크)",
+      "detail": ""
+    },
+    "KMI": {
+      "name": "Kinder Morgan",
+      "gics_sector": "Energy",
+      "sub_industry": "Oil & Gas Storage & Transportation",
+      "one_liner": "천연가스 파이프라인(킨더모건)",
+      "detail": ""
+    },
+    "KO": {
+      "name": "Coca-Cola Company (The)",
+      "gics_sector": "Consumer Staples",
+      "sub_industry": "Soft Drinks & Non-alcoholic Beverages",
+      "one_liner": "음료(코카콜라)",
+      "detail": "글로벌 음료 1위로 안정적 현금흐름과 배당이 강점이다. 가격·믹스 개선이 실적을 지지했다. 물량 성장, 환율, 건강 트렌드가 변수다."
+    },
+    "KR": {
+      "name": "Kroger",
+      "gics_sector": "Consumer Staples",
+      "sub_industry": "Food Retail",
+      "one_liner": "식료품 소매(크로거)",
+      "detail": ""
+    },
+    "KVUE": {
+      "name": "Kenvue",
+      "gics_sector": "Consumer Staples",
+      "sub_industry": "Personal Care Products",
+      "one_liner": "소비자 건강용품(켄뷰)",
+      "detail": ""
+    },
+    "L": {
+      "name": "Loews Corporation",
+      "gics_sector": "Financials",
+      "sub_industry": "Multi-line Insurance",
+      "one_liner": "종합 보험(Loews Corporation)",
+      "detail": ""
+    },
+    "LDOS": {
+      "name": "Leidos",
+      "gics_sector": "Industrials",
+      "sub_industry": "Diversified Support Services",
+      "one_liner": "기업지원 서비스(Leidos)",
+      "detail": ""
+    },
+    "LEN": {
+      "name": "Lennar",
+      "gics_sector": "Consumer Discretionary",
+      "sub_industry": "Homebuilding",
+      "one_liner": "주택 건설(레나)",
+      "detail": ""
+    },
+    "LH": {
+      "name": "Labcorp",
+      "gics_sector": "Health Care",
+      "sub_industry": "Health Care Services",
+      "one_liner": "헬스케어 서비스(Labcorp)",
+      "detail": ""
+    },
+    "LHX": {
+      "name": "L3Harris",
+      "gics_sector": "Industrials",
+      "sub_industry": "Aerospace & Defense",
+      "one_liner": "방산 통신·전자(L3해리스)",
+      "detail": ""
+    },
+    "LII": {
+      "name": "Lennox International",
+      "gics_sector": "Industrials",
+      "sub_industry": "Building Products",
+      "one_liner": "건축자재(Lennox International)",
+      "detail": ""
+    },
+    "LIN": {
+      "name": "Linde plc",
+      "gics_sector": "Materials",
+      "sub_industry": "Industrial Gases",
+      "one_liner": "세계 최대 산업용 가스(린데)",
+      "detail": "세계 최대 산업용 가스 기업으로 안정적 장기계약과 가격 결정력이 강점이다. 가격·물량 관리로 견조한 이익을 냈다. 산업 수요, 청정수소·탄소포집 프로젝트가 변수다."
+    },
+    "LITE": {
+      "name": "Lumentum",
+      "gics_sector": "Information Technology",
+      "sub_industry": "Communications Equipment",
+      "one_liner": "통신장비(Lumentum)",
+      "detail": ""
+    },
+    "LLY": {
+      "name": "Lilly (Eli)",
+      "gics_sector": "Health Care",
+      "sub_industry": "Pharmaceuticals",
+      "one_liner": "비만·당뇨 신약(일라이릴리)",
+      "detail": "비만·당뇨 치료제(GLP-1 계열)로 제약 업종 성장을 주도하는 대형 제약사다. 젭바운드·마운자로 수요 폭증으로 주가가 강하게 상승했다. 생산능력 증설, 경구용·차세대 신약, 경쟁 진입, 보험 급여 범위가 향후 핵심 변수다."
+    },
+    "LMT": {
+      "name": "Lockheed Martin",
+      "gics_sector": "Industrials",
+      "sub_industry": "Aerospace & Defense",
+      "one_liner": "방산(록히드마틴)",
+      "detail": "세계 최대 방산기업으로 전투기·미사일·우주를 아우른다. 지정학 리스크로 수주가 견조했으나 일부 프로그램 손실이 부담이었다. 국방 예산, 대형 프로그램 실행, 수출이 관건이다."
+    },
+    "LNT": {
+      "name": "Alliant Energy",
+      "gics_sector": "Utilities",
+      "sub_industry": "Electric Utilities",
+      "one_liner": "전력 유틸리티(Alliant Energy)",
+      "detail": ""
+    },
+    "LOW": {
+      "name": "Lowe's",
+      "gics_sector": "Consumer Discretionary",
+      "sub_industry": "Home Improvement Retail",
+      "one_liner": "주택용품 소매(로우스)",
+      "detail": ""
+    },
+    "LRCX": {
+      "name": "Lam Research",
+      "gics_sector": "Information Technology",
+      "sub_industry": "Semiconductor Materials & Equipment",
+      "one_liner": "식각·증착 반도체 장비(램리서치)",
+      "detail": "식각·증착 장비 강자로 메모리·첨단 로직 투자에 연동한다. HBM·3D 낸드 투자 회복이 실적 개선을 이끌었다. 메모리 자본지출 사이클과 중국 규제가 관건이다."
+    },
+    "LULU": {
+      "name": "Lululemon Athletica",
+      "gics_sector": "Consumer Discretionary",
+      "sub_industry": "Apparel, Accessories & Luxury Goods",
+      "one_liner": "운동복(룰루레몬)",
+      "detail": ""
+    },
+    "LUV": {
+      "name": "Southwest Airlines",
+      "gics_sector": "Industrials",
+      "sub_industry": "Passenger Airlines",
+      "one_liner": "저가 항공(사우스웨스트)",
+      "detail": ""
+    },
+    "LVS": {
+      "name": "Las Vegas Sands",
+      "gics_sector": "Consumer Discretionary",
+      "sub_industry": "Casinos & Gaming",
+      "one_liner": "카지노·게이밍(Las Vegas Sands)",
+      "detail": ""
+    },
+    "LYB": {
+      "name": "LyondellBasell",
+      "gics_sector": "Materials",
+      "sub_industry": "Specialty Chemicals",
+      "one_liner": "특수 화학(LyondellBasell)",
+      "detail": ""
+    },
+    "LYV": {
+      "name": "Live Nation Entertainment",
+      "gics_sector": "Communication Services",
+      "sub_industry": "Movies & Entertainment",
+      "one_liner": "영화·엔터테인먼트(Live Nation Entertainment)",
+      "detail": ""
+    },
+    "MA": {
+      "name": "Mastercard",
+      "gics_sector": "Financials",
+      "sub_industry": "Transaction & Payment Processing Services",
+      "one_liner": "글로벌 결제 네트워크(마스터카드)",
+      "detail": "글로벌 결제 네트워크 2강으로 비자와 유사한 고마진 구조를 가진다. 결제량 성장과 부가 서비스 확대가 실적을 지지했다. 소비 경기, 해외 결제, 신사업 확장이 관건이다."
+    },
+    "MAA": {
+      "name": "Mid-America Apartment Communities",
+      "gics_sector": "Real Estate",
+      "sub_industry": "Multi-Family Residential REITs",
+      "one_liner": "주거용 리츠(Mid-America Apartment Communities)",
+      "detail": ""
+    },
+    "MAR": {
+      "name": "Marriott International",
+      "gics_sector": "Consumer Discretionary",
+      "sub_industry": "Hotels, Resorts & Cruise Lines",
+      "one_liner": "글로벌 호텔(메리어트)",
+      "detail": ""
+    },
+    "MAS": {
+      "name": "Masco",
+      "gics_sector": "Industrials",
+      "sub_industry": "Building Products",
+      "one_liner": "건축자재(Masco)",
+      "detail": ""
+    },
+    "MCD": {
+      "name": "McDonald's",
+      "gics_sector": "Consumer Discretionary",
+      "sub_industry": "Restaurants",
+      "one_liner": "글로벌 패스트푸드(맥도날드)",
+      "detail": "글로벌 패스트푸드 1위로 가맹·부동산 모델이 강점이다. 가성비 메뉴로 소비 둔화에 대응했다. 동일점 매출, 가성비 전략, 환율이 변수다."
+    },
+    "MCHP": {
+      "name": "Microchip Technology",
+      "gics_sector": "Information Technology",
+      "sub_industry": "Semiconductors",
+      "one_liner": "마이크로컨트롤러(마이크로칩)",
+      "detail": ""
+    },
+    "MCK": {
+      "name": "McKesson Corporation",
+      "gics_sector": "Health Care",
+      "sub_industry": "Health Care Distributors",
+      "one_liner": "의약품 유통(맥케슨)",
+      "detail": ""
+    },
+    "MCO": {
+      "name": "Moody's Corporation",
+      "gics_sector": "Financials",
+      "sub_industry": "Financial Exchanges & Data",
+      "one_liner": "신용평가(무디스)",
+      "detail": ""
+    },
+    "MDLZ": {
+      "name": "Mondelez International",
+      "gics_sector": "Consumer Staples",
+      "sub_industry": "Packaged Foods & Meats",
+      "one_liner": "과자·초콜릿(몬델리즈)",
+      "detail": ""
+    },
+    "MDT": {
+      "name": "Medtronic",
+      "gics_sector": "Health Care",
+      "sub_industry": "Health Care Equipment",
+      "one_liner": "의료기기(메드트로닉)",
+      "detail": ""
+    },
+    "MET": {
+      "name": "MetLife",
+      "gics_sector": "Financials",
+      "sub_industry": "Life & Health Insurance",
+      "one_liner": "생명보험(메트라이프)",
+      "detail": ""
+    },
+    "META": {
+      "name": "Meta Platforms",
+      "gics_sector": "Communication Services",
+      "sub_industry": "Interactive Media & Services",
+      "one_liner": "페이스북·인스타·AI 광고",
+      "detail": "페이스북·인스타그램·왓츠앱 기반 디지털 광고 지배력에 AI 추천·생성 기능을 더했다. 비용 효율화와 광고 회복으로 주가가 크게 반등했으나, 2026년 1,150~1,350억 달러 규모의 설비투자 가이던스가 투자 회수 논쟁을 낳았다. AI·인프라 투자 회수, 광고 단가, 리얼리티랩스 적자 축소가 관전 포인트다."
+    },
+    "MGM": {
+      "name": "MGM Resorts",
+      "gics_sector": "Consumer Discretionary",
+      "sub_industry": "Casinos & Gaming",
+      "one_liner": "카지노·게이밍(MGM Resorts)",
+      "detail": ""
+    },
+    "MKC": {
+      "name": "McCormick & Company",
+      "gics_sector": "Consumer Staples",
+      "sub_industry": "Packaged Foods & Meats",
+      "one_liner": "가공식품(McCormick & Company)",
+      "detail": ""
+    },
+    "MLM": {
+      "name": "Martin Marietta Materials",
+      "gics_sector": "Materials",
+      "sub_industry": "Construction Materials",
+      "one_liner": "건설용 골재(마틴마리에타)",
+      "detail": ""
+    },
+    "MMM": {
+      "name": "3M",
+      "gics_sector": "Industrials",
+      "sub_industry": "Industrial Conglomerates",
+      "one_liner": "산업 복합기업(3M)",
+      "detail": ""
+    },
+    "MNST": {
+      "name": "Monster Beverage",
+      "gics_sector": "Consumer Staples",
+      "sub_industry": "Soft Drinks & Non-alcoholic Beverages",
+      "one_liner": "에너지 음료(몬스터)",
+      "detail": ""
+    },
+    "MO": {
+      "name": "Altria",
+      "gics_sector": "Consumer Staples",
+      "sub_industry": "Tobacco",
+      "one_liner": "담배(알트리아)",
+      "detail": ""
+    },
+    "MOS": {
+      "name": "Mosaic Company (The)",
+      "gics_sector": "Materials",
+      "sub_industry": "Fertilizers & Agricultural Chemicals",
+      "one_liner": "비료·농약(Mosaic Company (The))",
+      "detail": ""
+    },
+    "MPC": {
+      "name": "Marathon Petroleum",
+      "gics_sector": "Energy",
+      "sub_industry": "Oil & Gas Refining & Marketing",
+      "one_liner": "정유(마라톤페트롤리엄)",
+      "detail": ""
+    },
+    "MPWR": {
+      "name": "Monolithic Power Systems",
+      "gics_sector": "Information Technology",
+      "sub_industry": "Semiconductors",
+      "one_liner": "전력관리 반도체(모놀리식파워)",
+      "detail": ""
+    },
+    "MRK": {
+      "name": "Merck & Co.",
+      "gics_sector": "Health Care",
+      "sub_industry": "Pharmaceuticals",
+      "one_liner": "제약(머크)",
+      "detail": "항암제 키트루다를 핵심으로 하는 대형 제약사다. 키트루다 의존도와 특허 절벽 우려가 부담이나 파이프라인 다변화를 추진 중이다. 후속 신약, 백신·동물의약, 특허 대응이 변수다."
+    },
+    "MRNA": {
+      "name": "Moderna",
+      "gics_sector": "Health Care",
+      "sub_industry": "Biotechnology",
+      "one_liner": "mRNA 백신·치료제(모더나)",
+      "detail": ""
+    },
+    "MRSH": {
+      "name": "Marsh McLennan",
+      "gics_sector": "Financials",
+      "sub_industry": "Insurance Brokers",
+      "one_liner": "보험 중개(Marsh McLennan)",
+      "detail": ""
+    },
+    "MS": {
+      "name": "Morgan Stanley",
+      "gics_sector": "Financials",
+      "sub_industry": "Investment Banking & Brokerage",
+      "one_liner": "투자은행(모건스탠리)",
+      "detail": "투자은행·자산관리 강자로 안정적 자산관리 수수료가 강점이다. 자산관리 자금 유입과 IB 회복이 실적을 지지했다. 자산관리 순유입, 시장 환경, IB 회복이 관건이다."
+    },
+    "MSCI": {
+      "name": "MSCI Inc.",
+      "gics_sector": "Financials",
+      "sub_industry": "Financial Exchanges & Data",
+      "one_liner": "거래소·금융데이터(MSCI Inc.)",
+      "detail": ""
+    },
+    "MSFT": {
+      "name": "Microsoft",
+      "gics_sector": "Information Technology",
+      "sub_industry": "Systems Software",
+      "one_liner": "윈도우·오피스·Azure 클라우드",
+      "detail": "윈도우·오피스의 안정적 캐시카우 위에 Azure 클라우드와 코파일럿(AI)을 얹은 구조다. 클라우드·구독 전환으로 매출 가시성이 높고 OpenAI 제휴로 AI 상용화 선두에 섰으나, 데이터센터 증설에 따른 막대한 자본지출이 수익성 논쟁을 키웠다. 향후에는 AI 투자 회수 속도, Azure 성장률, 코파일럿의 실제 매출 기여, 그리고 회계연도 2027 설비투자 가이던스가 핵심 변수다."
+    },
+    "MSI": {
+      "name": "Motorola Solutions",
+      "gics_sector": "Information Technology",
+      "sub_industry": "Communications Equipment",
+      "one_liner": "통신장비(Motorola Solutions)",
+      "detail": ""
+    },
+    "MTB": {
+      "name": "M&T Bank",
+      "gics_sector": "Financials",
+      "sub_industry": "Regional Banks",
+      "one_liner": "지역 은행(M&T Bank)",
+      "detail": ""
+    },
+    "MTD": {
+      "name": "Mettler Toledo",
+      "gics_sector": "Health Care",
+      "sub_industry": "Life Sciences Tools & Services",
+      "one_liner": "생명과학 장비·서비스(Mettler Toledo)",
+      "detail": ""
+    },
+    "MU": {
+      "name": "Micron Technology",
+      "gics_sector": "Information Technology",
+      "sub_industry": "Semiconductors",
+      "one_liner": "D램·낸드 메모리(마이크론)",
+      "detail": "D램·낸드 메모리 선도 기업으로 AI 서버용 고대역폭 메모리(HBM) 수요의 직접 수혜주다. 메모리 업사이클과 HBM 공급 부족으로 실적·주가가 개선됐다. HBM 증설·수율, 메모리 가격 사이클, 공급 경쟁이 향후 변수다."
+    },
+    "NCLH": {
+      "name": "Norwegian Cruise Line Holdings",
+      "gics_sector": "Consumer Discretionary",
+      "sub_industry": "Hotels, Resorts & Cruise Lines",
+      "one_liner": "호텔·리조트·크루즈(Norwegian Cruise Line Holdings)",
+      "detail": ""
+    },
+    "NDAQ": {
+      "name": "Nasdaq, Inc.",
+      "gics_sector": "Financials",
+      "sub_industry": "Financial Exchanges & Data",
+      "one_liner": "거래소·금융데이터(Nasdaq, Inc.)",
+      "detail": ""
+    },
+    "NDSN": {
+      "name": "Nordson Corporation",
+      "gics_sector": "Industrials",
+      "sub_industry": "Industrial Machinery & Supplies & Components",
+      "one_liner": "산업기계·부품(Nordson Corporation)",
+      "detail": ""
+    },
+    "NEE": {
+      "name": "NextEra Energy",
+      "gics_sector": "Utilities",
+      "sub_industry": "Multi-Utilities",
+      "one_liner": "전력·신재생 유틸리티(넥스트에라)",
+      "detail": "미국 최대 전력·신재생 유틸리티로 데이터센터 전력 수요의 수혜가 기대된다. 신재생 파이프라인과 규제 기반 이익이 안정적이다. 전력 수요, 금리, 신재생 정책이 변수다."
+    },
+    "NEM": {
+      "name": "Newmont",
+      "gics_sector": "Materials",
+      "sub_industry": "Gold",
+      "one_liner": "금 채굴(뉴몬트)",
+      "detail": ""
+    },
+    "NFLX": {
+      "name": "Netflix",
+      "gics_sector": "Communication Services",
+      "sub_industry": "Movies & Entertainment",
+      "one_liner": "글로벌 스트리밍 1위(넷플릭스)",
+      "detail": "글로벌 스트리밍 1위로 광고형 요금제와 콘텐츠 경쟁력을 앞세웠다. 계정 공유 단속과 광고 요금제 효과로 가입자·수익성이 개선되며 주가가 강세를 보였다. 콘텐츠 투자 대비 회수, 광고 매출 성장, 신규 시장 확장이 관건이다."
+    },
+    "NI": {
+      "name": "NiSource",
+      "gics_sector": "Utilities",
+      "sub_industry": "Multi-Utilities",
+      "one_liner": "종합 유틸리티(NiSource)",
+      "detail": ""
+    },
+    "NKE": {
+      "name": "Nike, Inc.",
+      "gics_sector": "Consumer Discretionary",
+      "sub_industry": "Apparel, Accessories & Luxury Goods",
+      "one_liner": "스포츠 의류·신발(나이키)",
+      "detail": ""
+    },
+    "NOC": {
+      "name": "Northrop Grumman",
+      "gics_sector": "Industrials",
+      "sub_industry": "Aerospace & Defense",
+      "one_liner": "방산(노스럽그러먼)",
+      "detail": ""
+    },
+    "NOW": {
+      "name": "ServiceNow",
+      "gics_sector": "Information Technology",
+      "sub_industry": "Systems Software",
+      "one_liner": "기업용 워크플로 SW(서비스나우)",
+      "detail": "기업용 워크플로 자동화 SW의 대표주로 AI 기능 탑재로 성장을 이어갔다. 견조한 구독 성장과 AI 부가 수요가 실적을 뒷받침했다. AI 모듈 채택, 대형 계약, 밸류에이션이 관건이다."
+    },
+    "NRG": {
+      "name": "NRG Energy",
+      "gics_sector": "Utilities",
+      "sub_industry": "Independent Power Producers & Energy Traders",
+      "one_liner": "발전·전력거래(NRG Energy)",
+      "detail": ""
+    },
+    "NSC": {
+      "name": "Norfolk Southern",
+      "gics_sector": "Industrials",
+      "sub_industry": "Rail Transportation",
+      "one_liner": "동부 화물 철도(노퍽서던)",
+      "detail": ""
+    },
+    "NTAP": {
+      "name": "NetApp",
+      "gics_sector": "Information Technology",
+      "sub_industry": "Technology Hardware, Storage & Peripherals",
+      "one_liner": "데이터 스토리지(넷앱)",
+      "detail": ""
+    },
+    "NTRS": {
+      "name": "Northern Trust",
+      "gics_sector": "Financials",
+      "sub_industry": "Asset Management & Custody Banks",
+      "one_liner": "자산운용·수탁(Northern Trust)",
+      "detail": ""
+    },
+    "NUE": {
+      "name": "Nucor",
+      "gics_sector": "Materials",
+      "sub_industry": "Steel",
+      "one_liner": "철강 제조(뉴코어)",
+      "detail": ""
+    },
+    "NVDA": {
+      "name": "Nvidia",
+      "gics_sector": "Information Technology",
+      "sub_industry": "Semiconductors",
+      "one_liner": "AI·데이터센터용 GPU 1위",
+      "detail": "AI 가속기(GPU)와 데이터센터 컴퓨팅의 사실상 표준으로, 생성형 AI 투자 사이클의 최대 수혜주다. 하이퍼스케일러의 2026년 AI 설비투자 합산 추정치가 5천억 달러를 넘어서며 데이터센터 매출 성장이 이어졌고, 차세대 아키텍처 수요가 이를 뒷받침했다. 향후에는 설비투자 지속 여부, 추론(inference) 시장 확대, 맞춤형 칩(ASIC)·경쟁사의 추격, 그리고 높아진 기대치를 실제 가이던스가 충족하는지가 관건이다."
+    },
+    "NVR": {
+      "name": "NVR, Inc.",
+      "gics_sector": "Consumer Discretionary",
+      "sub_industry": "Homebuilding",
+      "one_liner": "주택 건설(NVR)",
+      "detail": ""
+    },
+    "NWS": {
+      "name": "News Corp (Class B)",
+      "gics_sector": "Communication Services",
+      "sub_industry": "Publishing",
+      "one_liner": "커뮤니케이션 기업(News Corp (Class B))",
+      "detail": ""
+    },
+    "NWSA": {
+      "name": "News Corp (Class A)",
+      "gics_sector": "Communication Services",
+      "sub_industry": "Publishing",
+      "one_liner": "커뮤니케이션 기업(News Corp (Class A))",
+      "detail": ""
+    },
+    "NXPI": {
+      "name": "NXP Semiconductors",
+      "gics_sector": "Information Technology",
+      "sub_industry": "Semiconductors",
+      "one_liner": "차량용 반도체(NXP)",
+      "detail": ""
+    },
+    "O": {
+      "name": "Realty Income",
+      "gics_sector": "Real Estate",
+      "sub_industry": "Retail REITs",
+      "one_liner": "리테일 리츠(리얼티인컴)",
+      "detail": ""
+    },
+    "ODFL": {
+      "name": "Old Dominion",
+      "gics_sector": "Industrials",
+      "sub_industry": "Cargo Ground Transportation",
+      "one_liner": "LTL 화물 운송(올드도미니언)",
+      "detail": ""
+    },
+    "OKE": {
+      "name": "Oneok",
+      "gics_sector": "Energy",
+      "sub_industry": "Oil & Gas Storage & Transportation",
+      "one_liner": "천연가스 미드스트림(원오크)",
+      "detail": ""
+    },
+    "OMC": {
+      "name": "Omnicom Group",
+      "gics_sector": "Communication Services",
+      "sub_industry": "Advertising",
+      "one_liner": "광고(Omnicom Group)",
+      "detail": ""
+    },
+    "ON": {
+      "name": "ON Semiconductor",
+      "gics_sector": "Information Technology",
+      "sub_industry": "Semiconductors",
+      "one_liner": "전력·차량용 반도체(온세미)",
+      "detail": ""
+    },
+    "ORCL": {
+      "name": "Oracle Corporation",
+      "gics_sector": "Information Technology",
+      "sub_industry": "Application Software",
+      "one_liner": "데이터베이스·클라우드(오라클)",
+      "detail": "데이터베이스·기업용 SW와 OCI 클라우드를 운영하며 AI 인프라 임대로 재평가받았다. 대규모 클라우드 수주잔고가 성장 기대를 키웠다. 클라우드 capex 회수, 수주 실현, 마진이 관건이다."
+    },
+    "ORLY": {
+      "name": "O’Reilly Automotive",
+      "gics_sector": "Consumer Discretionary",
+      "sub_industry": "Automotive Retail",
+      "one_liner": "자동차 부품 유통(오라일리)",
+      "detail": ""
+    },
+    "OTIS": {
+      "name": "Otis Worldwide",
+      "gics_sector": "Industrials",
+      "sub_industry": "Industrial Machinery & Supplies & Components",
+      "one_liner": "산업기계·부품(Otis Worldwide)",
+      "detail": ""
+    },
+    "OXY": {
+      "name": "Occidental Petroleum",
+      "gics_sector": "Energy",
+      "sub_industry": "Oil & Gas Exploration & Production",
+      "one_liner": "석유·가스 생산(옥시덴탈)",
+      "detail": ""
+    },
+    "PANW": {
+      "name": "Palo Alto Networks",
+      "gics_sector": "Information Technology",
+      "sub_industry": "Systems Software",
+      "one_liner": "차세대 사이버보안(팔로알토)",
+      "detail": ""
+    },
+    "PAYX": {
+      "name": "Paychex",
+      "gics_sector": "Industrials",
+      "sub_industry": "Human Resource & Employment Services",
+      "one_liner": "중소기업 급여·HR(페이첵스)",
+      "detail": ""
+    },
+    "PCAR": {
+      "name": "Paccar",
+      "gics_sector": "Industrials",
+      "sub_industry": "Construction Machinery & Heavy Transportation Equipment",
+      "one_liner": "대형 트럭(파카)",
+      "detail": ""
+    },
+    "PCG": {
+      "name": "PG&E Corporation",
+      "gics_sector": "Utilities",
+      "sub_industry": "Multi-Utilities",
+      "one_liner": "캘리포니아 전력(PG&E)",
+      "detail": ""
+    },
+    "PEG": {
+      "name": "Public Service Enterprise Group",
+      "gics_sector": "Utilities",
+      "sub_industry": "Electric Utilities",
+      "one_liner": "전력 유틸리티(PSEG)",
+      "detail": ""
+    },
+    "PEP": {
+      "name": "PepsiCo",
+      "gics_sector": "Consumer Staples",
+      "sub_industry": "Soft Drinks & Non-alcoholic Beverages",
+      "one_liner": "음료·스낵(펩시코)",
+      "detail": "음료·스낵 종합 기업으로 프리토레이 스낵이 강점이다. 가격 인상 후 물량 둔화가 부담이었다. 스낵 물량 회복, 건강 트렌드 대응이 관건이다."
+    },
+    "PFE": {
+      "name": "Pfizer",
+      "gics_sector": "Health Care",
+      "sub_industry": "Pharmaceuticals",
+      "one_liner": "제약(화이자)",
+      "detail": ""
+    },
+    "PFG": {
+      "name": "Principal Financial Group",
+      "gics_sector": "Financials",
+      "sub_industry": "Life & Health Insurance",
+      "one_liner": "생명·건강보험(Principal Financial Group)",
+      "detail": ""
+    },
+    "PG": {
+      "name": "Procter & Gamble",
+      "gics_sector": "Consumer Staples",
+      "sub_industry": "Personal Care Products",
+      "one_liner": "생활용품(P&G)",
+      "detail": "글로벌 생활용품 대표주로 브랜드력과 가격 결정력이 강점인 방어주다. 가격 인상 효과가 둔화되며 물량 성장이 관건이 됐다. 물량 회복, 환율, 원가가 변수다."
+    },
+    "PGR": {
+      "name": "Progressive Corporation",
+      "gics_sector": "Financials",
+      "sub_industry": "Property & Casualty Insurance",
+      "one_liner": "자동차 보험(프로그레시브)",
+      "detail": ""
+    },
+    "PH": {
+      "name": "Parker Hannifin",
+      "gics_sector": "Industrials",
+      "sub_industry": "Industrial Machinery & Supplies & Components",
+      "one_liner": "유압·산업부품(파커하니핀)",
+      "detail": ""
+    },
+    "PHM": {
+      "name": "PulteGroup",
+      "gics_sector": "Consumer Discretionary",
+      "sub_industry": "Homebuilding",
+      "one_liner": "주택 건설(펄트그룹)",
+      "detail": ""
+    },
+    "PKG": {
+      "name": "Packaging Corporation of America",
+      "gics_sector": "Materials",
+      "sub_industry": "Paper & Plastic Packaging Products & Materials",
+      "one_liner": "포장재(Packaging Corporation of America)",
+      "detail": ""
+    },
+    "PLD": {
+      "name": "Prologis",
+      "gics_sector": "Real Estate",
+      "sub_industry": "Industrial REITs",
+      "one_liner": "물류창고 리츠(프로로지스)",
+      "detail": ""
+    },
+    "PLTR": {
+      "name": "Palantir Technologies",
+      "gics_sector": "Information Technology",
+      "sub_industry": "Application Software",
+      "one_liner": "빅데이터 분석SW(팔란티어)",
+      "detail": "정부·기업용 빅데이터 분석 및 AI 운영 플랫폼(AIP)을 제공한다. 상업 부문 고성장과 AI 수요로 주가가 가파르게 상승했으나 높은 밸류에이션이 부담으로 지적된다. 상업 고객 확대 속도, 수익성, 기대치 충족 여부가 향후 핵심이다."
+    },
+    "PM": {
+      "name": "Philip Morris International",
+      "gics_sector": "Consumer Staples",
+      "sub_industry": "Tobacco",
+      "one_liner": "글로벌 담배(필립모리스)",
+      "detail": ""
+    },
+    "PNC": {
+      "name": "PNC Financial Services",
+      "gics_sector": "Financials",
+      "sub_industry": "Diversified Banks",
+      "one_liner": "지역 은행(PNC)",
+      "detail": ""
+    },
+    "PNR": {
+      "name": "Pentair",
+      "gics_sector": "Industrials",
+      "sub_industry": "Industrial Machinery & Supplies & Components",
+      "one_liner": "산업기계·부품(Pentair)",
+      "detail": ""
+    },
+    "PNW": {
+      "name": "Pinnacle West Capital",
+      "gics_sector": "Utilities",
+      "sub_industry": "Multi-Utilities",
+      "one_liner": "종합 유틸리티(Pinnacle West Capital)",
+      "detail": ""
+    },
+    "PODD": {
+      "name": "Insulet Corporation",
+      "gics_sector": "Health Care",
+      "sub_industry": "Health Care Equipment",
+      "one_liner": "의료기기(Insulet Corporation)",
+      "detail": ""
+    },
+    "POOL": {
+      "name": "Pool Corporation",
+      "gics_sector": "Consumer Discretionary",
+      "sub_industry": "Distributors",
+      "one_liner": "유통(Pool Corporation)",
+      "detail": ""
+    },
+    "PPG": {
+      "name": "PPG Industries",
+      "gics_sector": "Materials",
+      "sub_industry": "Specialty Chemicals",
+      "one_liner": "산업용 도료·코팅(PPG)",
+      "detail": ""
+    },
+    "PPL": {
+      "name": "PPL Corporation",
+      "gics_sector": "Utilities",
+      "sub_industry": "Electric Utilities",
+      "one_liner": "전력 유틸리티(PPL Corporation)",
+      "detail": ""
+    },
+    "PRU": {
+      "name": "Prudential Financial",
+      "gics_sector": "Financials",
+      "sub_industry": "Life & Health Insurance",
+      "one_liner": "생명보험(푸르덴셜)",
+      "detail": ""
+    },
+    "PSA": {
+      "name": "Public Storage",
+      "gics_sector": "Real Estate",
+      "sub_industry": "Self-Storage REITs",
+      "one_liner": "셀프스토리지 리츠(퍼블릭스토리지)",
+      "detail": ""
+    },
+    "PSKY": {
+      "name": "Paramount Skydance Corporation",
+      "gics_sector": "Communication Services",
+      "sub_industry": "Movies & Entertainment",
+      "one_liner": "영화·엔터테인먼트(Paramount Skydance Corporation)",
+      "detail": ""
+    },
+    "PSX": {
+      "name": "Phillips 66",
+      "gics_sector": "Energy",
+      "sub_industry": "Oil & Gas Refining & Marketing",
+      "one_liner": "정유·석유화학(필립스66)",
+      "detail": ""
+    },
+    "PTC": {
+      "name": "PTC Inc.",
+      "gics_sector": "Information Technology",
+      "sub_industry": "Application Software",
+      "one_liner": "응용 소프트웨어(PTC Inc.)",
+      "detail": ""
+    },
+    "PWR": {
+      "name": "Quanta Services",
+      "gics_sector": "Industrials",
+      "sub_industry": "Construction & Engineering",
+      "one_liner": "전력·통신 시공(콴타서비스)",
+      "detail": ""
+    },
+    "PYPL": {
+      "name": "PayPal",
+      "gics_sector": "Financials",
+      "sub_industry": "Transaction & Payment Processing Services",
+      "one_liner": "온라인 결제(페이팔)",
+      "detail": ""
+    },
+    "Q": {
+      "name": "Qnity Electronics",
+      "gics_sector": "Information Technology",
+      "sub_industry": "Semiconductor Materials & Equipment",
+      "one_liner": "반도체 소재·장비(Qnity Electronics)",
+      "detail": ""
+    },
+    "QCOM": {
+      "name": "Qualcomm",
+      "gics_sector": "Information Technology",
+      "sub_industry": "Semiconductors",
+      "one_liner": "모바일 AP·통신 모뎀(퀄컴)",
+      "detail": "모바일 AP·통신 모뎀의 강자로 자동차·IoT·온디바이스 AI로 다각화 중이다. 스마트폰 사이클 둔화 속에서도 신사업 성장과 온디바이스 AI 기대가 주가를 지지했다. 스마트폰 회복, 자동차·IoT 매출 비중, 애플 모뎀 자체화 영향이 변수다."
+    },
+    "RCL": {
+      "name": "Royal Caribbean Group",
+      "gics_sector": "Consumer Discretionary",
+      "sub_industry": "Hotels, Resorts & Cruise Lines",
+      "one_liner": "크루즈(로열캐리비안)",
+      "detail": ""
+    },
+    "REG": {
+      "name": "Regency Centers",
+      "gics_sector": "Real Estate",
+      "sub_industry": "Retail REITs",
+      "one_liner": "리테일 리츠(Regency Centers)",
+      "detail": ""
+    },
+    "REGN": {
+      "name": "Regeneron Pharmaceuticals",
+      "gics_sector": "Health Care",
+      "sub_industry": "Biotechnology",
+      "one_liner": "항체 신약(리제네론)",
+      "detail": ""
+    },
+    "RF": {
+      "name": "Regions Financial Corporation",
+      "gics_sector": "Financials",
+      "sub_industry": "Regional Banks",
+      "one_liner": "지역 은행(Regions Financial Corporation)",
+      "detail": ""
+    },
+    "RJF": {
+      "name": "Raymond James Financial",
+      "gics_sector": "Financials",
+      "sub_industry": "Investment Banking & Brokerage",
+      "one_liner": "투자은행·증권(Raymond James Financial)",
+      "detail": ""
+    },
+    "RL": {
+      "name": "Ralph Lauren Corporation",
+      "gics_sector": "Consumer Discretionary",
+      "sub_industry": "Apparel, Accessories & Luxury Goods",
+      "one_liner": "의류·액세서리(Ralph Lauren Corporation)",
+      "detail": ""
+    },
+    "RMD": {
+      "name": "ResMed",
+      "gics_sector": "Health Care",
+      "sub_industry": "Health Care Equipment",
+      "one_liner": "수면호흡기 의료기기(레스메드)",
+      "detail": ""
+    },
+    "ROK": {
+      "name": "Rockwell Automation",
+      "gics_sector": "Industrials",
+      "sub_industry": "Electrical Components & Equipment",
+      "one_liner": "공장 자동화(로크웰)",
+      "detail": ""
+    },
+    "ROL": {
+      "name": "Rollins, Inc.",
+      "gics_sector": "Industrials",
+      "sub_industry": "Environmental & Facilities Services",
+      "one_liner": "환경·시설 서비스(Rollins, Inc.)",
+      "detail": ""
+    },
+    "ROP": {
+      "name": "Roper Technologies",
+      "gics_sector": "Information Technology",
+      "sub_industry": "Electronic Equipment & Instruments",
+      "one_liner": "다각화 SW·산업재(로퍼)",
+      "detail": ""
+    },
+    "ROST": {
+      "name": "Ross Stores",
+      "gics_sector": "Consumer Discretionary",
+      "sub_industry": "Apparel Retail",
+      "one_liner": "오프프라이스 의류(로스)",
+      "detail": ""
+    },
+    "RSG": {
+      "name": "Republic Services",
+      "gics_sector": "Industrials",
+      "sub_industry": "Environmental & Facilities Services",
+      "one_liner": "폐기물 처리(리퍼블릭서비스)",
+      "detail": ""
+    },
+    "RTX": {
+      "name": "RTX Corporation",
+      "gics_sector": "Industrials",
+      "sub_industry": "Aerospace & Defense",
+      "one_liner": "방산·항공(RTX)",
+      "detail": "방산·항공 부품 대형사로 지정학적 긴장과 항공 회복의 수혜를 받는다. 방산 수주와 민항 부품 회복이 실적을 지지했다. 국방 예산, 엔진 정비, 공급망이 변수다."
+    },
+    "RVTY": {
+      "name": "Revvity",
+      "gics_sector": "Health Care",
+      "sub_industry": "Health Care Equipment",
+      "one_liner": "의료기기(Revvity)",
+      "detail": ""
+    },
+    "SATS": {
+      "name": "EchoStar",
+      "gics_sector": "Communication Services",
+      "sub_industry": "Wireless Telecommunication Services",
+      "one_liner": "무선 통신(EchoStar)",
+      "detail": ""
+    },
+    "SBAC": {
+      "name": "SBA Communications",
+      "gics_sector": "Real Estate",
+      "sub_industry": "Telecom Tower REITs",
+      "one_liner": "통신탑 리츠(SBA Communications)",
+      "detail": ""
+    },
+    "SBUX": {
+      "name": "Starbucks",
+      "gics_sector": "Consumer Discretionary",
+      "sub_industry": "Restaurants",
+      "one_liner": "글로벌 커피 체인(스타벅스)",
+      "detail": ""
+    },
+    "SCHW": {
+      "name": "Charles Schwab Corporation",
+      "gics_sector": "Financials",
+      "sub_industry": "Investment Banking & Brokerage",
+      "one_liner": "증권·자산관리(찰스슈왑)",
+      "detail": ""
+    },
+    "SHW": {
+      "name": "Sherwin-Williams",
+      "gics_sector": "Materials",
+      "sub_industry": "Specialty Chemicals",
+      "one_liner": "건축용 페인트(셔윈윌리엄스)",
+      "detail": "건축용 페인트 1위로 주택·리모델링 경기에 연동한다. 가격 결정력과 유통망이 강점이나 주택 둔화가 부담이었다. 주택 거래, 원가, 가격 전가가 관건이다."
+    },
+    "SJM": {
+      "name": "J.M. Smucker Company (The)",
+      "gics_sector": "Consumer Staples",
+      "sub_industry": "Packaged Foods & Meats",
+      "one_liner": "가공식품(J.M. Smucker Company (The))",
+      "detail": ""
+    },
+    "SLB": {
+      "name": "Schlumberger",
+      "gics_sector": "Energy",
+      "sub_industry": "Oil & Gas Equipment & Services",
+      "one_liner": "유전 서비스(슐럼버거)",
+      "detail": ""
+    },
+    "SMCI": {
+      "name": "Supermicro",
+      "gics_sector": "Information Technology",
+      "sub_industry": "Technology Hardware, Storage & Peripherals",
+      "one_liner": "AI 서버(슈퍼마이크로)",
+      "detail": "AI 서버·랙 시스템 공급업체로 엔비디아 GPU 수요와 직결된다. AI 서버 폭증으로 매출이 급성장했으나 회계 이슈·마진 변동성이 주가 변동을 키웠다. 공급 안정성, 마진, 거버넌스 신뢰 회복이 관건이다."
+    },
+    "SNA": {
+      "name": "Snap-on",
+      "gics_sector": "Industrials",
+      "sub_industry": "Industrial Machinery & Supplies & Components",
+      "one_liner": "산업기계·부품(Snap-on)",
+      "detail": ""
+    },
+    "SNDK": {
+      "name": "Sandisk",
+      "gics_sector": "Information Technology",
+      "sub_industry": "Technology Hardware, Storage & Peripherals",
+      "one_liner": "IT 하드웨어·저장장치(Sandisk)",
+      "detail": ""
+    },
+    "SNPS": {
+      "name": "Synopsys",
+      "gics_sector": "Information Technology",
+      "sub_industry": "Application Software",
+      "one_liner": "반도체 설계 EDA(시놉시스)",
+      "detail": ""
+    },
+    "SO": {
+      "name": "Southern Company",
+      "gics_sector": "Utilities",
+      "sub_industry": "Electric Utilities",
+      "one_liner": "전력 유틸리티(서던컴퍼니)",
+      "detail": ""
+    },
+    "SOLV": {
+      "name": "Solventum",
+      "gics_sector": "Health Care",
+      "sub_industry": "Health Care Technology",
+      "one_liner": "헬스케어 IT(Solventum)",
+      "detail": ""
+    },
+    "SPG": {
+      "name": "Simon Property Group",
+      "gics_sector": "Real Estate",
+      "sub_industry": "Retail REITs",
+      "one_liner": "쇼핑몰 리츠(사이먼프로퍼티)",
+      "detail": ""
+    },
+    "SPGI": {
+      "name": "S&P Global",
+      "gics_sector": "Financials",
+      "sub_industry": "Financial Exchanges & Data",
+      "one_liner": "신용평가·지수(S&P글로벌)",
+      "detail": "신용평가·지수·시장데이터의 과점 기업으로 안정적 구독 매출이 강점이다. 채권 발행 회복과 지수·데이터 성장이 실적을 지지했다. 발행 사이클, 데이터·지수 성장, 인수 시너지가 관건이다."
+    },
+    "SRE": {
+      "name": "Sempra",
+      "gics_sector": "Utilities",
+      "sub_industry": "Multi-Utilities",
+      "one_liner": "전력·가스 유틸리티(셈프라)",
+      "detail": ""
+    },
+    "STE": {
+      "name": "Steris",
+      "gics_sector": "Health Care",
+      "sub_industry": "Health Care Equipment",
+      "one_liner": "의료기기(Steris)",
+      "detail": ""
+    },
+    "STLD": {
+      "name": "Steel Dynamics",
+      "gics_sector": "Materials",
+      "sub_industry": "Steel",
+      "one_liner": "철강(Steel Dynamics)",
+      "detail": ""
+    },
+    "STT": {
+      "name": "State Street Corporation",
+      "gics_sector": "Financials",
+      "sub_industry": "Asset Management & Custody Banks",
+      "one_liner": "자산운용·수탁(State Street Corporation)",
+      "detail": ""
+    },
+    "STX": {
+      "name": "Seagate Technology",
+      "gics_sector": "Information Technology",
+      "sub_industry": "Technology Hardware, Storage & Peripherals",
+      "one_liner": "하드디스크 저장장치(씨게이트)",
+      "detail": ""
+    },
+    "STZ": {
+      "name": "Constellation Brands",
+      "gics_sector": "Consumer Staples",
+      "sub_industry": "Distillers & Vintners",
+      "one_liner": "주류(컨스텔레이션브랜즈)",
+      "detail": ""
+    },
+    "SW": {
+      "name": "Smurfit Westrock",
+      "gics_sector": "Materials",
+      "sub_industry": "Paper & Plastic Packaging Products & Materials",
+      "one_liner": "포장재(Smurfit Westrock)",
+      "detail": ""
+    },
+    "SWK": {
+      "name": "Stanley Black & Decker",
+      "gics_sector": "Industrials",
+      "sub_industry": "Industrial Machinery & Supplies & Components",
+      "one_liner": "산업기계·부품(Stanley Black & Decker)",
+      "detail": ""
+    },
+    "SWKS": {
+      "name": "Skyworks Solutions",
+      "gics_sector": "Information Technology",
+      "sub_industry": "Semiconductors",
+      "one_liner": "무선통신 반도체(스카이웍스)",
+      "detail": ""
+    },
+    "SYF": {
+      "name": "Synchrony Financial",
+      "gics_sector": "Financials",
+      "sub_industry": "Consumer Finance",
+      "one_liner": "소비자 금융(Synchrony Financial)",
+      "detail": ""
+    },
+    "SYK": {
+      "name": "Stryker Corporation",
+      "gics_sector": "Health Care",
+      "sub_industry": "Health Care Equipment",
+      "one_liner": "정형외과 의료기기(스트라이커)",
+      "detail": ""
+    },
+    "SYY": {
+      "name": "Sysco",
+      "gics_sector": "Consumer Staples",
+      "sub_industry": "Food Distributors",
+      "one_liner": "식자재 유통(시스코)",
+      "detail": ""
+    },
+    "T": {
+      "name": "AT&T",
+      "gics_sector": "Communication Services",
+      "sub_industry": "Integrated Telecommunication Services",
+      "one_liner": "이동통신(AT&T)",
+      "detail": ""
+    },
+    "TAP": {
+      "name": "Molson Coors Beverage Company",
+      "gics_sector": "Consumer Staples",
+      "sub_industry": "Brewers",
+      "one_liner": "맥주(Molson Coors Beverage Company)",
+      "detail": ""
+    },
+    "TDG": {
+      "name": "TransDigm Group",
+      "gics_sector": "Industrials",
+      "sub_industry": "Aerospace & Defense",
+      "one_liner": "항공기 부품(트랜스다임)",
+      "detail": ""
+    },
+    "TDY": {
+      "name": "Teledyne Technologies",
+      "gics_sector": "Information Technology",
+      "sub_industry": "Electronic Equipment & Instruments",
+      "one_liner": "전자장비·계측(Teledyne Technologies)",
+      "detail": ""
+    },
+    "TECH": {
+      "name": "Bio-Techne",
+      "gics_sector": "Health Care",
+      "sub_industry": "Life Sciences Tools & Services",
+      "one_liner": "생명과학 장비·서비스(Bio-Techne)",
+      "detail": ""
+    },
+    "TEL": {
+      "name": "TE Connectivity",
+      "gics_sector": "Information Technology",
+      "sub_industry": "Electronic Manufacturing Services",
+      "one_liner": "커넥터·센서(TE커넥티비티)",
+      "detail": ""
+    },
+    "TER": {
+      "name": "Teradyne",
+      "gics_sector": "Information Technology",
+      "sub_industry": "Semiconductor Materials & Equipment",
+      "one_liner": "반도체 테스트 장비(테러다인)",
+      "detail": ""
+    },
+    "TFC": {
+      "name": "Truist Financial",
+      "gics_sector": "Financials",
+      "sub_industry": "Diversified Banks",
+      "one_liner": "지역 은행(트루이스트)",
+      "detail": ""
+    },
+    "TGT": {
+      "name": "Target Corporation",
+      "gics_sector": "Consumer Staples",
+      "sub_industry": "Consumer Staples Merchandise Retail",
+      "one_liner": "종합 소매(타깃)",
+      "detail": ""
+    },
+    "TJX": {
+      "name": "TJX Companies",
+      "gics_sector": "Consumer Discretionary",
+      "sub_industry": "Apparel Retail",
+      "one_liner": "오프프라이스 의류(TJX)",
+      "detail": ""
+    },
+    "TKO": {
+      "name": "TKO Group Holdings",
+      "gics_sector": "Communication Services",
+      "sub_industry": "Movies & Entertainment",
+      "one_liner": "영화·엔터테인먼트(TKO Group Holdings)",
+      "detail": ""
+    },
+    "TMO": {
+      "name": "Thermo Fisher Scientific",
+      "gics_sector": "Health Care",
+      "sub_industry": "Life Sciences Tools & Services",
+      "one_liner": "생명과학 장비·진단(써모피셔)",
+      "detail": "생명과학 장비·진단·바이오 위탁생산의 종합 기업이다. 코로나 특수 정상화 이후 기저효과가 마무리되며 회복 국면에 들어섰다. 바이오 제약 수요, 중국 회복, 인수합병 시너지가 관건이다."
+    },
+    "TMUS": {
+      "name": "T-Mobile US",
+      "gics_sector": "Communication Services",
+      "sub_industry": "Wireless Telecommunication Services",
+      "one_liner": "미국 이동통신(T모바일)",
+      "detail": "미국 이동통신 강자로 5G 가입자 순증과 요금 경쟁력이 강점이다. 가입자 성장과 현금흐름 개선이 주가를 지지했다. 가입자 순증, 요금 경쟁, 광대역 확장이 변수다."
+    },
+    "TPL": {
+      "name": "Texas Pacific Land Corporation",
+      "gics_sector": "Energy",
+      "sub_industry": "Oil & Gas Exploration & Production",
+      "one_liner": "석유·가스 탐사생산(Texas Pacific Land Corporation)",
+      "detail": ""
+    },
+    "TPR": {
+      "name": "Tapestry, Inc.",
+      "gics_sector": "Consumer Discretionary",
+      "sub_industry": "Apparel, Accessories & Luxury Goods",
+      "one_liner": "의류·액세서리(Tapestry, Inc.)",
+      "detail": ""
+    },
+    "TRGP": {
+      "name": "Targa Resources",
+      "gics_sector": "Energy",
+      "sub_industry": "Oil & Gas Storage & Transportation",
+      "one_liner": "석유·가스 운송·저장(Targa Resources)",
+      "detail": ""
+    },
+    "TRMB": {
+      "name": "Trimble Inc.",
+      "gics_sector": "Information Technology",
+      "sub_industry": "Application Software",
+      "one_liner": "응용 소프트웨어(Trimble Inc.)",
+      "detail": ""
+    },
+    "TROW": {
+      "name": "T. Rowe Price",
+      "gics_sector": "Financials",
+      "sub_industry": "Asset Management & Custody Banks",
+      "one_liner": "자산운용·수탁(T. Rowe Price)",
+      "detail": ""
+    },
+    "TRV": {
+      "name": "Travelers Companies (The)",
+      "gics_sector": "Financials",
+      "sub_industry": "Property & Casualty Insurance",
+      "one_liner": "손해보험(트래블러스)",
+      "detail": ""
+    },
+    "TSCO": {
+      "name": "Tractor Supply",
+      "gics_sector": "Consumer Discretionary",
+      "sub_industry": "Other Specialty Retail",
+      "one_liner": "자유소비재 기업(Tractor Supply)",
+      "detail": ""
+    },
+    "TSLA": {
+      "name": "Tesla, Inc.",
+      "gics_sector": "Consumer Discretionary",
+      "sub_industry": "Automobile Manufacturers",
+      "one_liner": "전기차·에너지·자율주행",
+      "detail": "전기차 선두주자이자 에너지 저장·자율주행 플랫폼을 지향한다. 가격 경쟁과 수요 둔화로 자동차 마진이 압박받으며 주가 변동성이 컸던 반면, 에너지 사업과 자율주행 기대가 밸류에이션을 지지했다. 신모델·로보택시 상용화, FSD(자율주행) 진척, 에너지 저장 성장이 향후 방향을 가른다."
+    },
+    "TSN": {
+      "name": "Tyson Foods",
+      "gics_sector": "Consumer Staples",
+      "sub_industry": "Packaged Foods & Meats",
+      "one_liner": "가공식품(Tyson Foods)",
+      "detail": ""
+    },
+    "TT": {
+      "name": "Trane Technologies",
+      "gics_sector": "Industrials",
+      "sub_industry": "Building Products",
+      "one_liner": "냉난방공조(트레인테크놀로지스)",
+      "detail": ""
+    },
+    "TTD": {
+      "name": "Trade Desk (The)",
+      "gics_sector": "Communication Services",
+      "sub_industry": "Advertising",
+      "one_liner": "디지털 광고 플랫폼(더트레이드데스크)",
+      "detail": ""
+    },
+    "TTWO": {
+      "name": "Take-Two Interactive",
+      "gics_sector": "Communication Services",
+      "sub_industry": "Interactive Home Entertainment",
+      "one_liner": "GTA 등 게임(테이크투)",
+      "detail": ""
+    },
+    "TXN": {
+      "name": "Texas Instruments",
+      "gics_sector": "Information Technology",
+      "sub_industry": "Semiconductors",
+      "one_liner": "아날로그·임베디드 반도체(TI)",
+      "detail": "아날로그·임베디드 반도체 1위로 산업·자동차 비중이 높다. 산업 수요 둔화로 실적이 조정받았으나 대규모 자체 생산능력 투자로 장기 경쟁력을 다졌다. 산업·자동차 사이클 회복과 투자 회수 속도가 관건이다."
+    },
+    "TXT": {
+      "name": "Textron",
+      "gics_sector": "Industrials",
+      "sub_industry": "Aerospace & Defense",
+      "one_liner": "항공우주·방산(Textron)",
+      "detail": ""
+    },
+    "TYL": {
+      "name": "Tyler Technologies",
+      "gics_sector": "Information Technology",
+      "sub_industry": "Application Software",
+      "one_liner": "응용 소프트웨어(Tyler Technologies)",
+      "detail": ""
+    },
+    "UAL": {
+      "name": "United Airlines Holdings",
+      "gics_sector": "Industrials",
+      "sub_industry": "Passenger Airlines",
+      "one_liner": "대형 항공(유나이티드)",
+      "detail": ""
+    },
+    "UBER": {
+      "name": "Uber",
+      "gics_sector": "Industrials",
+      "sub_industry": "Passenger Ground Transportation",
+      "one_liner": "차량호출·배달(우버)",
+      "detail": "차량호출·배달 플랫폼 1위로 흑자 전환 이후 현금흐름이 개선됐다. 이동·배달 수요와 광고 성장이 실적을 지지했다. 이용자 성장, 자율주행 제휴, 규제가 관건이다."
+    },
+    "UDR": {
+      "name": "UDR, Inc.",
+      "gics_sector": "Real Estate",
+      "sub_industry": "Multi-Family Residential REITs",
+      "one_liner": "주거용 리츠(UDR, Inc.)",
+      "detail": ""
+    },
+    "UHS": {
+      "name": "Universal Health Services",
+      "gics_sector": "Health Care",
+      "sub_industry": "Health Care Facilities",
+      "one_liner": "의료시설(Universal Health Services)",
+      "detail": ""
+    },
+    "ULTA": {
+      "name": "Ulta Beauty",
+      "gics_sector": "Consumer Discretionary",
+      "sub_industry": "Other Specialty Retail",
+      "one_liner": "자유소비재 기업(Ulta Beauty)",
+      "detail": ""
+    },
+    "UNH": {
+      "name": "UnitedHealth Group",
+      "gics_sector": "Health Care",
+      "sub_industry": "Managed Health Care",
+      "one_liner": "최대 건강보험·헬스케어(유나이티드헬스)",
+      "detail": "미국 최대 건강보험·헬스케어 서비스 기업이다. 의료비 상승(MLR)과 정책·규제 이슈로 변동성이 컸다. 의료손해율 관리, 정부 프로그램 정책, 옵텀 성장 지속이 관건이다."
+    },
+    "UNP": {
+      "name": "Union Pacific Corporation",
+      "gics_sector": "Industrials",
+      "sub_industry": "Rail Transportation",
+      "one_liner": "철도 화물(유니온퍼시픽)",
+      "detail": ""
+    },
+    "UPS": {
+      "name": "United Parcel Service",
+      "gics_sector": "Industrials",
+      "sub_industry": "Air Freight & Logistics",
+      "one_liner": "특송·물류(UPS)",
+      "detail": ""
+    },
+    "URI": {
+      "name": "United Rentals",
+      "gics_sector": "Industrials",
+      "sub_industry": "Trading Companies & Distributors",
+      "one_liner": "건설장비 렌탈(유나이티드렌탈스)",
+      "detail": ""
+    },
+    "USB": {
+      "name": "U.S. Bancorp",
+      "gics_sector": "Financials",
+      "sub_industry": "Diversified Banks",
+      "one_liner": "지역 은행(US뱅코프)",
+      "detail": ""
+    },
+    "V": {
+      "name": "Visa Inc.",
+      "gics_sector": "Financials",
+      "sub_industry": "Transaction & Payment Processing Services",
+      "one_liner": "글로벌 결제 네트워크(비자)",
+      "detail": "글로벌 결제 네트워크 1위로 소비·국경 간 거래에 연동하는 고마진 사업이다. 견조한 소비와 해외여행 회복이 결제량을 뒷받침했다. 소비 경기, 국경 간 거래, 핀테크 경쟁이 변수다."
+    },
+    "VEEV": {
+      "name": "Veeva Systems",
+      "gics_sector": "Health Care",
+      "sub_industry": "Health Care Technology",
+      "one_liner": "헬스케어 IT(Veeva Systems)",
+      "detail": ""
+    },
+    "VICI": {
+      "name": "Vici Properties",
+      "gics_sector": "Real Estate",
+      "sub_industry": "Hotel & Resort REITs",
+      "one_liner": "호텔 리츠(Vici Properties)",
+      "detail": ""
+    },
+    "VLO": {
+      "name": "Valero Energy",
+      "gics_sector": "Energy",
+      "sub_industry": "Oil & Gas Refining & Marketing",
+      "one_liner": "정유(발레로)",
+      "detail": ""
+    },
+    "VLTO": {
+      "name": "Veralto",
+      "gics_sector": "Industrials",
+      "sub_industry": "Environmental & Facilities Services",
+      "one_liner": "환경·시설 서비스(Veralto)",
+      "detail": ""
+    },
+    "VMC": {
+      "name": "Vulcan Materials Company",
+      "gics_sector": "Materials",
+      "sub_industry": "Construction Materials",
+      "one_liner": "건설용 골재·시멘트(벌컨머티리얼스)",
+      "detail": ""
+    },
+    "VRSK": {
+      "name": "Verisk Analytics",
+      "gics_sector": "Industrials",
+      "sub_industry": "Research & Consulting Services",
+      "one_liner": "보험 데이터 분석(베리스크)",
+      "detail": ""
+    },
+    "VRSN": {
+      "name": "Verisign",
+      "gics_sector": "Information Technology",
+      "sub_industry": "Internet Services & Infrastructure",
+      "one_liner": "인터넷 인프라(Verisign)",
+      "detail": ""
+    },
+    "VRT": {
+      "name": "Vertiv",
+      "gics_sector": "Industrials",
+      "sub_industry": "Electrical Components & Equipment",
+      "one_liner": "전기장비·부품(Vertiv)",
+      "detail": ""
+    },
+    "VRTX": {
+      "name": "Vertex Pharmaceuticals",
+      "gics_sector": "Health Care",
+      "sub_industry": "Biotechnology",
+      "one_liner": "희귀질환 신약(버텍스)",
+      "detail": "낭포성 섬유증 치료제 독점 기업으로 통증·신장질환 등으로 파이프라인을 확장 중이다. 핵심 제품 안정성과 신약 기대가 주가를 지지했다. 신약 상업화 성공과 파이프라인 다변화가 변수다."
+    },
+    "VST": {
+      "name": "Vistra Corp.",
+      "gics_sector": "Utilities",
+      "sub_industry": "Electric Utilities",
+      "one_liner": "전력 발전·소매(비스트라)",
+      "detail": "발전·전력 소매 기업으로 데이터센터 전력 수요와 전력가격 상승의 수혜주다. 전력 수요 증가 기대로 주가가 강세를 보였다. 전력가격, 수요 지속, 자본배분이 변수다."
+    },
+    "VTR": {
+      "name": "Ventas",
+      "gics_sector": "Real Estate",
+      "sub_industry": "Health Care REITs",
+      "one_liner": "헬스케어 리츠(Ventas)",
+      "detail": ""
+    },
+    "VTRS": {
+      "name": "Viatris",
+      "gics_sector": "Health Care",
+      "sub_industry": "Pharmaceuticals",
+      "one_liner": "제약(Viatris)",
+      "detail": ""
+    },
+    "VZ": {
+      "name": "Verizon",
+      "gics_sector": "Communication Services",
+      "sub_industry": "Integrated Telecommunication Services",
+      "one_liner": "이동통신(버라이즌)",
+      "detail": ""
+    },
+    "WAB": {
+      "name": "Wabtec",
+      "gics_sector": "Industrials",
+      "sub_industry": "Construction Machinery & Heavy Transportation Equipment",
+      "one_liner": "건설·중장비(Wabtec)",
+      "detail": ""
+    },
+    "WAT": {
+      "name": "Waters Corporation",
+      "gics_sector": "Health Care",
+      "sub_industry": "Life Sciences Tools & Services",
+      "one_liner": "생명과학 장비·서비스(Waters Corporation)",
+      "detail": ""
+    },
+    "WBD": {
+      "name": "Warner Bros. Discovery",
+      "gics_sector": "Communication Services",
+      "sub_industry": "Broadcasting",
+      "one_liner": "영화·방송(워너브러더스디스커버리)",
+      "detail": ""
+    },
+    "WDAY": {
+      "name": "Workday, Inc.",
+      "gics_sector": "Information Technology",
+      "sub_industry": "Application Software",
+      "one_liner": "클라우드 인사·재무 SW(워크데이)",
+      "detail": ""
+    },
+    "WDC": {
+      "name": "Western Digital",
+      "gics_sector": "Information Technology",
+      "sub_industry": "Technology Hardware, Storage & Peripherals",
+      "one_liner": "저장장치(웨스턴디지털)",
+      "detail": ""
+    },
+    "WEC": {
+      "name": "WEC Energy Group",
+      "gics_sector": "Utilities",
+      "sub_industry": "Electric Utilities",
+      "one_liner": "전력·가스 유틸리티(WEC에너지)",
+      "detail": ""
+    },
+    "WELL": {
+      "name": "Welltower",
+      "gics_sector": "Real Estate",
+      "sub_industry": "Health Care REITs",
+      "one_liner": "헬스케어 리츠(웰타워)",
+      "detail": ""
+    },
+    "WFC": {
+      "name": "Wells Fargo",
+      "gics_sector": "Financials",
+      "sub_industry": "Diversified Banks",
+      "one_liner": "대형 은행(웰스파고)",
+      "detail": "대형 소매은행으로 자산 상한 해제 기대가 모멘텀으로 작용했다. 비용 효율화와 규제 완화 기대가 주가를 지지했다. 규제 제재 해소, 순이자이익, 비용 관리가 관건이다."
+    },
+    "WM": {
+      "name": "Waste Management",
+      "gics_sector": "Industrials",
+      "sub_industry": "Environmental & Facilities Services",
+      "one_liner": "폐기물 처리(웨이스트매니지먼트)",
+      "detail": ""
+    },
+    "WMB": {
+      "name": "Williams Companies",
+      "gics_sector": "Energy",
+      "sub_industry": "Oil & Gas Storage & Transportation",
+      "one_liner": "천연가스 파이프라인(윌리엄스)",
+      "detail": "천연가스 파이프라인 대형사로 안정적 수수료 기반 현금흐름과 배당이 강점이다. LNG·전력용 가스 수요가 장기 성장을 뒷받침했다. 가스 수요, 프로젝트 실행, 금리가 관건이다."
+    },
+    "WMT": {
+      "name": "Walmart",
+      "gics_sector": "Consumer Staples",
+      "sub_industry": "Consumer Staples Merchandise Retail",
+      "one_liner": "미국 최대 유통(월마트)",
+      "detail": "미국 최대 유통업체로 전자상거래·광고·멤버십으로 사업을 확장 중이다. 가성비 수요와 옴니채널 전략으로 점유율을 높이며 방어적 강세를 보였다. 전자상거래 수익화, 광고 성장, 마진 개선 지속이 전망의 축이다."
+    },
+    "WRB": {
+      "name": "W. R. Berkley Corporation",
+      "gics_sector": "Financials",
+      "sub_industry": "Property & Casualty Insurance",
+      "one_liner": "손해보험(W. R. Berkley Corporation)",
+      "detail": ""
+    },
+    "WSM": {
+      "name": "Williams-Sonoma, Inc.",
+      "gics_sector": "Consumer Discretionary",
+      "sub_industry": "Homefurnishing Retail",
+      "one_liner": "자유소비재 기업(Williams-Sonoma, Inc.)",
+      "detail": ""
+    },
+    "WST": {
+      "name": "West Pharmaceutical Services",
+      "gics_sector": "Health Care",
+      "sub_industry": "Health Care Supplies",
+      "one_liner": "의약품 포장재(웨스트파마)",
+      "detail": ""
+    },
+    "WTW": {
+      "name": "Willis Towers Watson",
+      "gics_sector": "Financials",
+      "sub_industry": "Insurance Brokers",
+      "one_liner": "보험 중개(Willis Towers Watson)",
+      "detail": ""
+    },
+    "WY": {
+      "name": "Weyerhaeuser",
+      "gics_sector": "Real Estate",
+      "sub_industry": "Timber REITs",
+      "one_liner": "임야 리츠(Weyerhaeuser)",
+      "detail": ""
+    },
+    "WYNN": {
+      "name": "Wynn Resorts",
+      "gics_sector": "Consumer Discretionary",
+      "sub_industry": "Casinos & Gaming",
+      "one_liner": "카지노·게이밍(Wynn Resorts)",
+      "detail": ""
+    },
+    "XEL": {
+      "name": "Xcel Energy",
+      "gics_sector": "Utilities",
+      "sub_industry": "Multi-Utilities",
+      "one_liner": "전력·가스 유틸리티(엑셀에너지)",
+      "detail": ""
+    },
+    "XOM": {
+      "name": "ExxonMobil",
+      "gics_sector": "Energy",
+      "sub_industry": "Integrated Oil & Gas",
+      "one_liner": "글로벌 석유메이저(엑슨모빌)",
+      "detail": "글로벌 석유 메이저로 통합 사업과 저비용 자산이 강점이다. 유가·정제마진과 가이아나·퍼미안 증산이 실적을 좌우했다. 유가, 증산 계획, 주주환원이 변수다."
+    },
+    "XYL": {
+      "name": "Xylem Inc.",
+      "gics_sector": "Industrials",
+      "sub_industry": "Industrial Machinery & Supplies & Components",
+      "one_liner": "산업기계·부품(Xylem Inc.)",
+      "detail": ""
+    },
+    "XYZ": {
+      "name": "Block, Inc.",
+      "gics_sector": "Financials",
+      "sub_industry": "Transaction & Payment Processing Services",
+      "one_liner": "결제·카드(Block, Inc.)",
+      "detail": ""
+    },
+    "YUM": {
+      "name": "Yum! Brands",
+      "gics_sector": "Consumer Discretionary",
+      "sub_industry": "Restaurants",
+      "one_liner": "패스트푸드 프랜차이즈(얌브랜즈)",
+      "detail": ""
+    },
+    "ZBH": {
+      "name": "Zimmer Biomet",
+      "gics_sector": "Health Care",
+      "sub_industry": "Health Care Equipment",
+      "one_liner": "의료기기(Zimmer Biomet)",
+      "detail": ""
+    },
+    "ZBRA": {
+      "name": "Zebra Technologies",
+      "gics_sector": "Information Technology",
+      "sub_industry": "Electronic Equipment & Instruments",
+      "one_liner": "전자장비·계측(Zebra Technologies)",
+      "detail": ""
+    },
+    "ZTS": {
+      "name": "Zoetis",
+      "gics_sector": "Health Care",
+      "sub_industry": "Pharmaceuticals",
+      "one_liner": "동물 의약품(조에티스)",
+      "detail": ""
+    }
+  }
+}
