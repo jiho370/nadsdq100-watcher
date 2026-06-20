@@ -1,31 +1,52 @@
-name: S&P500 Daily Report
+# =============================================================================
+# S&P500 데일리 리포트 + 1회성 백테스트 워크플로 (GitHub Actions)
+#
+# 이 파일은 저장소의 .github/workflows/daily-per-report.yml 경로에 두세요.
+#
+# 구성:
+#   - report   잡: 매일 cron 으로 리포트 생성/발송 (모드 자동 분기)
+#   - backtest 잡: Actions 탭 > "Run workflow" > run_backtest 체크 시에만 실행.
+#                  실제 데이터로 백테스트를 깃허브 서버가 대신 돌리고 결과(backtest.txt/png)를
+#                  아티팩트로 업로드. "가끔 한 번"만 누르면 됨(매일 돌릴 필요 없음).
+#
+# 모드 분기(report): 스크립트가 한국시간 요일 + 휴장 연속일수로 자동 판단.
+#   평일.데이터갱신=4섹션 / 휴장1=TOP10 / 휴장2=섹터 / 휴장3=펀더멘탈TOP10 /
+#   휴장4+=메일스킵 / 토=주간결산 / 일=차주전략. 매일 실행해도 중복 메일은 안 옴.
+#
+# 상태 영속화(중요): Actions 러너는 매 실행 초기화 > 휴장 streak.신규/이탈 추적이
+#   유지되려면 state_prev_list.json 을 commit-back 으로 보존해야 함(아래 마지막 스텝).
+# =============================================================================
 
-# 이 파일은 저장소의 .github/workflows/daily-per-report.yml 경로에 두어야 합니다.
+name: S&P500 Daily Report
 
 on:
   schedule:
-    # 01:00 UTC = 한국시간 10:00.
-    # 매일(*) 실행: 화~토는 미국 장마감분 기준 추천/휴장 모드, 토=주간결산·일=차주전략 모드.
-    # 스크립트가 한국시간 요일 + 휴장 연속일수로 모드를 자동 분기하며,
-    # 휴장 4일+ 연속이면 메일을 스킵하므로 매일 실행해도 중복 메일은 오지 않습니다.
-    # GitHub cron은 UTC 고정이라 서머타임을 따라가지 않습니다.
+    # 01:00 UTC = 한국시간(KST) 10:00. 매일 실행하며 스크립트가 요일.휴장으로 모드 분기.
+    # 휴장 4일+ 연속이면 메일 스킵 -> 매일 돌려도 중복 메일 없음. cron 은 UTC 고정.
     - cron: "0 1 * * *"
-  workflow_dispatch:            # 👈 "Run workflow" 수동 실행 버튼
+  workflow_dispatch:            # "Run workflow" 수동 실행 버튼
     inputs:
       force_mode:
         description: "강제 모드(검증용): sections/top10/sector/fund_top10/skip/weekly/strategy"
         required: false
         default: ""
+      run_backtest:
+        description: "백테스트를 실행할까요?(체크 시 리포트 대신 백테스트만 실행)"
+        type: boolean
+        default: false
 
 permissions:
-  contents: write               # 추천 명단 상태파일(state_prev_list.json) 커밋용
+  contents: write               # 상태파일(state_prev_list.json) commit-back용
 
 concurrency:
   group: sp500-report
   cancel-in-progress: false
 
 jobs:
+  # -- 매일 리포트 (백테스트 X) -----------------------------------------------
   report:
+    # 수동 실행에서 백테스트를 고른 경우엔 리포트 잡을 건너뜀
+    if: ${{ github.event_name == 'schedule' || github.event.inputs.run_backtest != 'true' }}
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -37,19 +58,20 @@ jobs:
           python-version: "3.12"
 
       - name: Install dependencies
-        run: pip install -r requirements.txt
+        run: pip install -r requirements.txt   # lxml 포함(위키피디아 섹터 파싱)
 
       - name: Run report and send email
         env:
           SMTP_USER:   ${{ secrets.SMTP_USER }}
           SMTP_PASS:   ${{ secrets.SMTP_PASS }}
           EMAIL_TO:    ${{ secrets.EMAIL_TO }}
-          # 선택 설정(전부 os.environ.get 패턴):
-          #   SECTION_N(섹션당 종목수=3), TREND_HIGH_FRAC(0.75), NOTABLE_RVOL(2.0),
-          #   NOTABLE_MOVE(5.0), NOTABLE_TOPN_MC(120), HOLIDAY_SKIP_STREAK(4),
-          #   WEEKLY_TOP_N(10), RECO_N, RECO_SECTOR_MAX, VOL_TARGET, SECTOR_COVERAGE_MIN(0.9) 등.
+          RECO_SECTOR_MAX: "3"
+          MIN_SIGNAL_DAYS: "2"
+          # 선택 설정(os.environ.get 패턴): SECTION_N, TREND_HIGH_FRAC, NOTABLE_RVOL,
+          #   NOTABLE_MOVE, NOTABLE_TOPN_MC, HOLIDAY_SKIP_STREAK, WEEKLY_TOP_N,
+          #   RECO_N, VOL_TARGET, SECTOR_COVERAGE_MIN 등.
           # 종목 프로필(분기 갱신): sp500_profiles.json 을 저장소에 함께 두면
-          #   종목 한줄설명·상세설명·시장/섹터 총평·GICS 섹터 분류에 사용됩니다(없어도 동작).
+          #   종목 설명.시장/섹터 총평.GICS 섹터 분류에 사용됩니다(없어도 동작).
           #   경로 변경 시 PROFILES_FILE 환경변수로 지정 가능.
         run: |
           if [ -n "${{ github.event.inputs.force_mode }}" ]; then
@@ -58,14 +80,51 @@ jobs:
             python sp500_daily_report.py
           fi
 
-      - name: Persist 추천 명단 state
+      - name: Upload preview
+        uses: actions/upload-artifact@v4
+        with:
+          name: report-preview
+          path: output/
+
+      - name: Persist 상태파일 state
         run: |
           if [ -n "$(git status --porcelain state_prev_list.json)" ]; then
             git config user.name  "github-actions[bot]"
             git config user.email "github-actions[bot]@users.noreply.github.com"
             git add state_prev_list.json
-            git commit -m "chore: update prev list [skip ci]"
+            git commit -m "chore: update state [skip ci]"
             git push
           else
-            echo "변경 없음 — 커밋 생략"
+            echo "변경 없음 - 커밋 생략"
           fi
+
+  # -- 수동 1회성 백테스트 (실제 데이터, 깃허브 서버가 대신 실행) --------------
+  backtest:
+    if: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.run_backtest == 'true' }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install -r requirements.txt
+
+      - name: Run backtest (real data)
+        env:
+          BT_YEARS:     "5"          # 검증 기간(년)
+          BT_TOPK:      "20"         # 매 리밸런싱 보유 종목수(분산 통제)
+          BT_COST_BPS:  "5"          # 거래비용(bp)
+        run: python sp500_daily_report.py --backtest
+
+      - name: Upload backtest result
+        uses: actions/upload-artifact@v4
+        with:
+          name: backtest-result      # backtest.txt(요약) + backtest.png(곡선)
+          path: output/
+
+# -- 사용법 -------------------------------------------------------------------
+# 1) 이 파일을  .github/workflows/daily-per-report.yml  로 저장하고 푸시
+# 2) 매일 KST 10시경 자동으로 리포트 메일 발송(요일.휴장에 따라 모드 자동 분기)
+# 3) 백테스트: Actions > 이 워크플로 > "Run workflow" > run_backtest 체크 후 실행
+#      -> 몇 분 뒤 Artifacts 에서 backtest.txt / backtest.png 다운로드
+# 4) 특정 모드 미리보기: "Run workflow" > force_mode 에 sector/weekly 등 입력
