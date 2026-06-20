@@ -1386,7 +1386,7 @@ def _badge(label, color):
 
 def _stock_row(sym, reason, ind_map, info, sector_map, hist, images, inline_b64,
                badge="", is_new=False, chart_days=252, rank=None, card_bg="#ffffff",
-               card_border="#e5e7eb"):
+               card_border="#e5e7eb", reason_label="추천 이유"):
     """v3 카드 스타일: [순위][뱃지][NEW] 티커 (섹터태그) / 풀네임 / 한줄설명 /
     PER·종가 / 변동률 색상칩 / 추천이유 + 우측 추세선 차트(가격+MA)."""
     ind = ind_map.get(sym, {}); meta = info.get(sym, {})
@@ -1399,21 +1399,28 @@ def _stock_row(sym, reason, ind_map, info, sector_map, hist, images, inline_b64,
     rb = _rank_badge(rank) if rank is not None else ""
     bd = (badge + " ") if badge else ""
     chart = _chart_img(hist, sym, images, inline_b64, days=chart_days)
-    if _profile(sym).get("detail"):
-        name_html = (f'<a href="#d_{sym}" style="color:#1d4ed8;text-decoration:none">'
-                     f'{name} <span style="font-size:11px">\u25be 자세히</span></a>')
-    else:
-        name_html = name
+    # 상세 설명: 카드 안에 직접 표시(이메일은 앵커 점프가 막혀 '자세히' 링크가 동작하지 않음).
+    det = _profile(sym).get("detail", "")
+    detail_html = ""
+    if det:
+        detail_html = (f'<div style="font-size:12px;color:#374151;background:#f8fafc;'
+                       f'border-left:3px solid #cbd5e1;border-radius:0 6px 6px 0;'
+                       f'padding:8px 10px;margin-top:6px;line-height:1.6">'
+                       f'<b style="color:#475569">기업 설명</b> · {det}</div>')
+    reason_html = ""
+    if reason_label and reason:
+        reason_html = (f'<div style="font-size:12px;color:#374151;background:#fef3c7;border-radius:6px;'
+                       f'padding:8px;line-height:1.5"><b>{reason_label}</b> · {reason}</div>')
     return (
         f'<tr style="background:{card_bg}">'
         f'<td style="padding:12px 14px;vertical-align:top;width:54%;border-bottom:1px solid {card_border}">'
         f'<div style="font-size:15px">{rb}{bd}{newb}<b>{sym}</b>{_sector_tag(sec_kr)}</div>'
-        f'<div style="font-size:12px;color:#6b7280;margin:3px 0 1px">{name_html}</div>'
+        f'<div style="font-size:12px;color:#6b7280;margin:3px 0 1px">{name}</div>'
         f'<div style="font-size:12px;color:#374151;margin-bottom:6px">{desc}</div>'
         f'<div style="font-size:13px;margin-bottom:6px">PER {pe_s}{price_s}</div>'
         f'<div style="margin-bottom:6px">{_ret_chips(ind)}</div>'
-        f'<div style="font-size:12px;color:#374151;background:#fef3c7;border-radius:6px;'
-        f'padding:8px;line-height:1.5"><b>추천 이유</b> · {reason}</div>'
+        f'{reason_html}'
+        f'{detail_html}'
         f'</td><td style="padding:8px;vertical-align:middle;width:46%;border-bottom:1px solid {card_border}">'
         f'{chart}</td></tr>')
 
@@ -1489,7 +1496,6 @@ def render_sections(payload, inline_b64=False):
     html.append('<h3 style="margin-bottom:2px">4) 최종 분석 / 결론</h3>'
                 f'<div style="color:#333;font-size:13px;line-height:1.6;background:#f8fafc;'
                 f'border-left:3px solid #15803d;padding:8px 12px">{summary}</div>')
-    html.append(_detail_section([s for s, _, _ in (sec1 + sec2 + sec3)]))
     html.append(_HTML_FOOT)
     return "".join(html), images
 
@@ -1599,7 +1605,6 @@ def render_top10_table(payload, mode, subtitle, inline_b64=False):
                     f'<span style="color:#9ca3af;font-size:13px">(코어=확신 / 관찰=후보)</span></h3>'
                     f'<table style="width:100%;border-collapse:collapse;border:1px solid #fde68a;'
                     f'border-radius:8px;overflow:hidden">{"".join(rrows)}</table>')
-        html.append(_detail_section([s for s, _sc, _r in picks]))
     html.append(_HTML_FOOT)
     return "".join(html), images
 
@@ -1630,12 +1635,13 @@ def render_weekly(payload, inline_b64=False):
     html.append('<div style="font-size:13px;margin:6px 0"><b>부진 섹터(하락)</b><br>' + lag_body + '</div>')
     picks = payload.get("picks", [])
     if picks:
-        rows = "".join(_stock_row(s, r, payload["ind_map"], payload["info"], payload["sector_map"],
+        rows = "".join(_stock_row(s, "", payload["ind_map"], payload["info"], payload["sector_map"],
                                   payload["hist"], images, inline_b64,
                                   badge=_badge("최강", "#15803d"), chart_days=252, rank=i + 1,
-                                  card_bg="#fffdf7", card_border="#fde68a")
+                                  card_bg="#fffdf7", card_border="#fde68a", reason_label=None)
                        for i, (s, _sc, r) in enumerate(picks))
-        html.append(f'<h3 style="margin:18px 0 2px">🔝 주간 최강 종목</h3>'
+        html.append(f'<h3 style="margin:18px 0 2px">🔝 주간 최강 종목 '
+                    f'<span style="color:#9ca3af;font-size:12px">(추천이 아닌 안내)</span></h3>'
                     f'<table style="width:100%;border-collapse:collapse;border:1px solid #fde68a;'
                     f'border-radius:8px;overflow:hidden">{rows}</table>')
     html.append(_HTML_FOOT)

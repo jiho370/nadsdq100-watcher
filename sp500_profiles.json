@@ -298,7 +298,7 @@
       "gics_sector": "Information Technology",
       "sub_industry": "Application Software",
       "one_liner": "모바일 앱 광고 플랫폼(앱러빈)",
-      "detail": ""
+      "detail": "모바일 앱 광고·머신러닝 플랫폼 기업으로, 광고 엔진(AXON) 고도화로 실적이 급증했다. 광고 효율 개선과 게임 외 영역 확장으로 주가가 강하게 올랐다. 광고 성장 지속, 신규 버티컬 확장, 경쟁이 관건이다."
     },
     "APTV": {
       "name": "Aptiv",
@@ -361,7 +361,7 @@
       "gics_sector": "Industrials",
       "sub_industry": "Aerospace & Defense",
       "one_liner": "테이저·바디캠(액손)",
-      "detail": ""
+      "detail": "테이저·바디캠·클라우드 증거관리 SW로 법집행 시장을 과점한다. 구독 매출 성장과 신제품 채택으로 고성장을 이어갔다. 구독 성장, 신제품, 높은 밸류에이션이 변수다."
     },
     "AXP": {
       "name": "American Express",
@@ -606,7 +606,7 @@
       "gics_sector": "Consumer Discretionary",
       "sub_industry": "Hotels, Resorts & Cruise Lines",
       "one_liner": "크루즈(카니발)",
-      "detail": ""
+      "detail": "세계 최대 크루즈 기업으로 팬데믹 충격 이후 수요 회복으로 반등했다. 예약 호조와 비용 관리로 실적이 개선됐다. 여행 수요, 부채 감축, 유가가 변수다."
     },
     "CDNS": {
       "name": "Cadence Design Systems",
@@ -627,7 +627,7 @@
       "gics_sector": "Utilities",
       "sub_industry": "Electric Utilities",
       "one_liner": "미국 최대 원자력 발전(컨스텔레이션)",
-      "detail": "미국 최대 원자력 발전사로 데이터센터향 무탄소 전력 공급 계약으로 재평가받았다. AI 전력 수요와 원전 가치 부각으로 주가가 강세였다. 전력가격, 장기 공급계약, 규제가 관건이다."
+      "detail": "미국 최대 원자력 발전사로 데이터센터향 무탄소 전력 공급 계약으로 재평가받았다. AI 전력 수요와 원전 가치 부각으로 주가가 크게 올랐다. 전력가격, 장기 공급계약, 규제·증설이 관건이다."
     },
     "CF": {
       "name": "CF Industries",
@@ -767,7 +767,7 @@
       "gics_sector": "Financials",
       "sub_industry": "Financial Exchanges & Data",
       "one_liner": "암호화폐 거래소(코인베이스)",
-      "detail": ""
+      "detail": "미국 대표 암호화폐 거래소로 거래대금·암호화폐 시황에 크게 연동한다. 암호화폐 강세와 신상품·규제 명확화 기대로 주가 변동성이 컸다. 거래량 사이클, 규제, 신사업(스테이블코인·커스터디)이 관건이다."
     },
     "COO": {
       "name": "Cooper Companies (The)",
@@ -851,7 +851,7 @@
       "gics_sector": "Information Technology",
       "sub_industry": "Systems Software",
       "one_liner": "클라우드 엔드포인트 보안(크라우드스트라이크)",
-      "detail": ""
+      "detail": "클라우드 엔드포인트 보안 선두 기업으로 플랫폼 통합 전략으로 성장했다. 보안 수요와 모듈 확장이 실적을 지지했다. 신규 모듈 채택, 경쟁, 대형 장애 이후 신뢰가 관건이다."
     },
     "CSCO": {
       "name": "Cisco",
@@ -935,7 +935,7 @@
       "gics_sector": "Consumer Discretionary",
       "sub_industry": "Specialized Consumer Services",
       "one_liner": "음식 배달(도어대시)",
-      "detail": ""
+      "detail": "음식·소매 배달 플랫폼 1위로 흑자 전환과 신규 카테고리 확장이 성장을 이끌었다. 주문 증가와 광고·구독 수익으로 수익성이 개선됐다. 주문 성장, 신사업, 경쟁·규제가 변수다."
     },
     "DD": {
       "name": "DuPont",
@@ -1348,7 +1348,7 @@
       "gics_sector": "Information Technology",
       "sub_industry": "Application Software",
       "one_liner": "신용평가 분석SW(파이코)",
-      "detail": ""
+      "detail": "신용평가 점수(FICO)와 분석 SW를 제공하는 과점 기업으로, 가격 결정력이 강하다. 점수 가격 인상과 SW 성장으로 실적·주가가 견조했다. 주택·대출 사이클, 가격 정책, SW 성장이 변수다."
     },
     "FIS": {
       "name": "Fidelity National Information Services",
@@ -1621,7 +1621,7 @@
       "gics_sector": "Financials",
       "sub_industry": "Investment Banking & Brokerage",
       "one_liner": "주식·코인 거래 앱(로빈후드)",
-      "detail": ""
+      "detail": "주식·옵션·암호화폐를 다루는 리테일 거래 앱으로, 거래 활성화와 암호화폐 강세의 수혜를 받았다. 신규 상품(선물·예측시장)·자산관리 확장과 거래대금 증가로 흑자 기반이 강화되며 주가가 크게 올랐다. 거래량 사이클, 암호화폐 시황, 신사업 확장, 규제가 관건이다."
     },
     "HPE": {
       "name": "Hewlett Packard Enterprise",
@@ -1684,7 +1684,7 @@
       "gics_sector": "Industrials",
       "sub_industry": "Aerospace & Defense",
       "one_liner": "항공우주·방산(Howmet Aerospace)",
-      "detail": ""
+      "detail": "항공우주용 엔진 부품·소재 기업으로 민항·방산 수요 회복의 수혜주다. 항공 사이클 회복으로 실적·주가가 강세였다. 항공 인도·정비 수요, 방산, 공급망이 관건이다."
     },
     "IBKR": {
       "name": "Interactive Brokers",
@@ -2230,7 +2230,7 @@
       "gics_sector": "Health Care",
       "sub_industry": "Biotechnology",
       "one_liner": "mRNA 백신·치료제(모더나)",
-      "detail": ""
+      "detail": "mRNA 기반 백신·치료제 기업으로, 코로나 특수 종료 후 매출이 급감하며 주가가 크게 조정받았다(PER이 음수인 것은 적자 상태를 반영). 최근에는 호흡기·항암 등 파이프라인 기대와 낙폭 과대 인식이 반등을 이끌었다. 신규 백신 상업화, 비용 절감, 파이프라인 성과가 향후 핵심 변수다."
     },
     "MRSH": {
       "name": "Marsh McLennan",
@@ -2286,7 +2286,7 @@
       "gics_sector": "Information Technology",
       "sub_industry": "Semiconductors",
       "one_liner": "D램·낸드 메모리(마이크론)",
-      "detail": "D램·낸드 메모리 선도 기업으로 AI 서버용 고대역폭 메모리(HBM) 수요의 직접 수혜주다. 메모리 업사이클과 HBM 공급 부족으로 실적·주가가 개선됐다. HBM 증설·수율, 메모리 가격 사이클, 공급 경쟁이 향후 변수다."
+      "detail": "D램·낸드 메모리 선도 기업으로 AI 서버용 고대역폭 메모리(HBM) 수요의 직접 수혜주다. 메모리 업사이클과 HBM 공급 부족으로 실적·주가가 개선됐다. HBM 증설·수율, 메모리 가격 사이클, 공급 경쟁이 변수다."
     },
     "NCLH": {
       "name": "Norwegian Cruise Line Holdings",
@@ -2321,7 +2321,7 @@
       "gics_sector": "Materials",
       "sub_industry": "Gold",
       "one_liner": "금 채굴(뉴몬트)",
-      "detail": ""
+      "detail": "세계 최대 금광 기업으로 금 가격 강세의 수혜를 받았다. 안전자산 선호와 금값 상승으로 주가가 반등했다. 금 가격, 생산 비용, 자산 효율이 변수다."
     },
     "NFLX": {
       "name": "Netflix",
@@ -2363,7 +2363,7 @@
       "gics_sector": "Utilities",
       "sub_industry": "Independent Power Producers & Energy Traders",
       "one_liner": "발전·전력거래(NRG Energy)",
-      "detail": ""
+      "detail": "전력 발전·소매 기업으로 전력 수요 증가와 자본 효율화로 주목받았다. 데이터센터 전력 수요 기대가 주가를 끌어올렸다. 전력가격, 수요 지속, 자본배분이 변수다."
     },
     "NSC": {
       "name": "Norfolk Southern",
@@ -2496,7 +2496,7 @@
       "gics_sector": "Information Technology",
       "sub_industry": "Systems Software",
       "one_liner": "차세대 사이버보안(팔로알토)",
-      "detail": ""
+      "detail": "차세대 사이버보안 플랫폼 기업으로 통합(플랫폼화) 전략으로 성장 중이다. 보안 수요와 플랫폼 채택이 실적을 뒷받침했다. 플랫폼 전환 속도, 경쟁, 매출 인식이 변수다."
     },
     "PAYX": {
       "name": "Paychex",
@@ -2566,7 +2566,7 @@
       "gics_sector": "Industrials",
       "sub_industry": "Industrial Machinery & Supplies & Components",
       "one_liner": "유압·산업부품(파커하니핀)",
-      "detail": ""
+      "detail": "유압·산업용 부품 다각화 기업으로 항공우주·산업 수요에 연동한다. 항공 회복과 포트폴리오 개선이 실적을 지지했다. 산업 사이클, 항공 수요, 마진이 변수다."
     },
     "PHM": {
       "name": "PulteGroup",
@@ -2594,7 +2594,7 @@
       "gics_sector": "Information Technology",
       "sub_industry": "Application Software",
       "one_liner": "빅데이터 분석SW(팔란티어)",
-      "detail": "정부·기업용 빅데이터 분석 및 AI 운영 플랫폼(AIP)을 제공한다. 상업 부문 고성장과 AI 수요로 주가가 가파르게 상승했으나 높은 밸류에이션이 부담으로 지적된다. 상업 고객 확대 속도, 수익성, 기대치 충족 여부가 향후 핵심이다."
+      "detail": "정부·기업용 빅데이터 분석 및 AI 운영 플랫폼(AIP)을 제공한다. 상업 부문 고성장과 AI 수요로 주가가 가파르게 상승했으나 높은 밸류에이션이 부담으로 지적된다. 상업 고객 확대 속도, 수익성, 기대치 충족 여부가 핵심이다."
     },
     "PM": {
       "name": "Philip Morris International",
@@ -2692,7 +2692,7 @@
       "gics_sector": "Industrials",
       "sub_industry": "Construction & Engineering",
       "one_liner": "전력·통신 시공(콴타서비스)",
-      "detail": ""
+      "detail": "전력·통신 인프라 시공 기업으로 전력망 현대화·데이터센터 전력 인프라 수요의 수혜주다. 수주잔고 증가로 주가가 강세였다. 전력 투자 사이클, 인력·수익성, 수주 실현이 변수다."
     },
     "PYPL": {
       "name": "PayPal",
@@ -2720,7 +2720,7 @@
       "gics_sector": "Consumer Discretionary",
       "sub_industry": "Hotels, Resorts & Cruise Lines",
       "one_liner": "크루즈(로열캐리비안)",
-      "detail": ""
+      "detail": "글로벌 크루즈 기업으로 여행 수요 회복과 예약·객단가 상승의 수혜를 받았다. 강한 예약 수요와 수익성 개선으로 주가가 크게 올랐다. 여행 수요 지속, 유가·비용, 부채 축소가 관건이다."
     },
     "REG": {
       "name": "Regency Centers",
@@ -2951,7 +2951,7 @@
       "gics_sector": "Information Technology",
       "sub_industry": "Technology Hardware, Storage & Peripherals",
       "one_liner": "하드디스크 저장장치(씨게이트)",
-      "detail": ""
+      "detail": "엔터프라이즈·데이터센터용 하드디스크(HDD) 양대 기업으로, AI·클라우드의 대용량 저장 수요 직접 수혜주다. 고용량 HAMR 드라이브 채택과 데이터센터 투자로 실적·주가가 강하게 반등했다. 데이터센터 수요 지속, 신기술 전환, 공급 규율이 향후 방향을 가른다."
     },
     "STZ": {
       "name": "Constellation Brands",
@@ -3098,7 +3098,7 @@
       "gics_sector": "Energy",
       "sub_industry": "Oil & Gas Exploration & Production",
       "one_liner": "석유·가스 탐사생산(Texas Pacific Land Corporation)",
-      "detail": ""
+      "detail": "텍사스 퍼미안 분지의 토지·로열티 기업으로, 시추 없이 원유·가스 생산 로열티와 용수 사업으로 고마진을 낸다. 퍼미안 생산 증가와 자본 효율로 주가가 강세였다. 유가·생산량, 로열티 구조, 밸류에이션이 관건이다."
     },
     "TPR": {
       "name": "Tapestry, Inc.",
@@ -3161,7 +3161,7 @@
       "gics_sector": "Industrials",
       "sub_industry": "Building Products",
       "one_liner": "냉난방공조(트레인테크놀로지스)",
-      "detail": ""
+      "detail": "냉난방공조(HVAC) 기업으로 데이터센터 냉각·건물 효율 수요의 수혜를 받았다. AI 데이터센터 냉각 수요가 새 성장축이 됐다. 데이터센터 수요, 건물 경기, 가격 결정력이 관건이다."
     },
     "TTD": {
       "name": "Trade Desk (The)",
@@ -3259,7 +3259,7 @@
       "gics_sector": "Industrials",
       "sub_industry": "Trading Companies & Distributors",
       "one_liner": "건설장비 렌탈(유나이티드렌탈스)",
-      "detail": ""
+      "detail": "건설장비 렌탈 1위로 인프라·대형 프로젝트 수요에 연동한다. 비주택·인프라 건설 수요가 실적을 지지했다. 건설 사이클, 가동률, 인수합병이 관건이다."
     },
     "USB": {
       "name": "U.S. Bancorp",
@@ -3329,7 +3329,7 @@
       "gics_sector": "Industrials",
       "sub_industry": "Electrical Components & Equipment",
       "one_liner": "전기장비·부품(Vertiv)",
-      "detail": ""
+      "detail": "데이터센터 전력·냉각 인프라 기업으로 AI 데이터센터 투자의 핵심 수혜주다. 전력·열관리 수요 급증으로 수주·주가가 강세였다. 데이터센터 투자 지속, 공급망, 마진이 관건이다."
     },
     "VRTX": {
       "name": "Vertex Pharmaceuticals",
@@ -3343,7 +3343,7 @@
       "gics_sector": "Utilities",
       "sub_industry": "Electric Utilities",
       "one_liner": "전력 발전·소매(비스트라)",
-      "detail": "발전·전력 소매 기업으로 데이터센터 전력 수요와 전력가격 상승의 수혜주다. 전력 수요 증가 기대로 주가가 강세를 보였다. 전력가격, 수요 지속, 자본배분이 변수다."
+      "detail": "발전·전력 소매 기업으로 데이터센터 전력 수요와 전력가격 상승의 수혜주다. AI발 전력 수요 기대로 주가가 강세를 보였다. 전력가격, 수요 지속, 원자력·가스 발전 자산 가치가 변수다."
     },
     "VTR": {
       "name": "Ventas",
@@ -3399,7 +3399,7 @@
       "gics_sector": "Information Technology",
       "sub_industry": "Technology Hardware, Storage & Peripherals",
       "one_liner": "저장장치(웨스턴디지털)",
-      "detail": ""
+      "detail": "하드디스크·플래시 저장장치 기업으로, AI 데이터센터의 대용량 스토리지 수요와 메모리 업사이클의 수혜를 받았다. 고용량 HDD와 낸드 수요가 회복되며 주가가 가파르게 상승했고, 플래시 사업 분사 기대도 더해졌다. 향후에는 데이터센터 스토리지 수요 지속, 메모리 가격 사이클, 사업 분할 효과가 관건이다."
     },
     "WEC": {
       "name": "WEC Energy Group",
