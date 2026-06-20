@@ -1,0 +1,71 @@
+name: S&P500 Daily Report
+
+# 이 파일은 저장소의 .github/workflows/daily-per-report.yml 경로에 두어야 합니다.
+
+on:
+  schedule:
+    # 01:00 UTC = 한국시간 10:00.
+    # 매일(*) 실행: 화~토는 미국 장마감분 기준 추천/휴장 모드, 토=주간결산·일=차주전략 모드.
+    # 스크립트가 한국시간 요일 + 휴장 연속일수로 모드를 자동 분기하며,
+    # 휴장 4일+ 연속이면 메일을 스킵하므로 매일 실행해도 중복 메일은 오지 않습니다.
+    # GitHub cron은 UTC 고정이라 서머타임을 따라가지 않습니다.
+    - cron: "0 1 * * *"
+  workflow_dispatch:            # 👈 "Run workflow" 수동 실행 버튼
+    inputs:
+      force_mode:
+        description: "강제 모드(검증용): sections/top10/sector/fund_top10/skip/weekly/strategy"
+        required: false
+        default: ""
+
+permissions:
+  contents: write               # 추천 명단 상태파일(state_prev_list.json) 커밋용
+
+concurrency:
+  group: sp500-report
+  cancel-in-progress: false
+
+jobs:
+  report:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Run report and send email
+        env:
+          SMTP_USER:   ${{ secrets.SMTP_USER }}
+          SMTP_PASS:   ${{ secrets.SMTP_PASS }}
+          EMAIL_TO:    ${{ secrets.EMAIL_TO }}
+          # 선택 설정(전부 os.environ.get 패턴):
+          #   SECTION_N(섹션당 종목수=3), TREND_HIGH_FRAC(0.75), NOTABLE_RVOL(2.0),
+          #   NOTABLE_MOVE(5.0), NOTABLE_TOPN_MC(120), HOLIDAY_SKIP_STREAK(4),
+          #   WEEKLY_TOP_N(10), RECO_N, RECO_SECTOR_MAX, VOL_TARGET, SECTOR_COVERAGE_MIN(0.9) 등.
+          # 종목 프로필(분기 갱신): sp500_profiles.json 을 저장소에 함께 두면
+          #   종목 한줄설명·상세설명·시장/섹터 총평·GICS 섹터 분류에 사용됩니다(없어도 동작).
+          #   경로 변경 시 PROFILES_FILE 환경변수로 지정 가능.
+        run: |
+          if [ -n "${{ github.event.inputs.force_mode }}" ]; then
+            python sp500_daily_report.py --force-mode "${{ github.event.inputs.force_mode }}"
+          else
+            python sp500_daily_report.py
+          fi
+
+      - name: Persist 추천 명단 state
+        run: |
+          if [ -n "$(git status --porcelain state_prev_list.json)" ]; then
+            git config user.name  "github-actions[bot]"
+            git config user.email "github-actions[bot]@users.noreply.github.com"
+            git add state_prev_list.json
+            git commit -m "chore: update prev list [skip ci]"
+            git push
+          else
+            echo "변경 없음 — 커밋 생략"
+          fi
