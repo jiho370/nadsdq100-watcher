@@ -972,6 +972,36 @@ def pick_notable(ind_map: dict[str, dict], info: dict[str, dict], vol_stats: dic
     return pick_with_sector_cap(scored, sector_map, n, max(1, RECO_SECTOR_MAX))
 
 
+def pick_oversold(ind_map: dict[str, dict], sector_map: dict[str, str], n: int = SECTION_N) -> list[tuple]:
+    """과매도 후 기술적 반등이 예견되는 종목.
+    조건(추세 안에서의 눌림목/반등):
+      - 200일선 위(중장기 상승추세는 유지 = '떨어지는 칼' 회피)
+      - RSI 과매도권에서 회복 중(28~48): 바닥에서 막 올라오는 구간
+      - 최근 1개월 눌림(chg_1m < 0) 또는 1주 약세지만, 당일 반등(chg_1d > 0)
+    정렬: 과매도 깊이(RSI 낮을수록) + 당일 반등 강도. 낙폭과대 반등 후보를 위로."""
+    scored = []
+    for sym, ind in ind_map.items():
+        if not ind.get("above_ma200"):
+            continue
+        rsi = ind.get("rsi")
+        if _isnan(rsi) or not (28 <= rsi <= 48):
+            continue
+        chg1m, chg1w, chg1d = ind.get("chg_1m"), ind.get("chg_1w"), ind.get("chg_1d")
+        pulled_back = (not _isnan(chg1m) and chg1m < 0) or (not _isnan(chg1w) and chg1w < 0)
+        if not pulled_back:
+            continue
+        if _isnan(chg1d) or chg1d <= 0:     # 당일 반등(턴) 신호
+            continue
+        # 점수: 과매도 깊이(48-RSI) + 당일 반등폭. 깊이 큰 쪽 우선.
+        score = (48 - rsi) + min(chg1d, 10) * 0.5
+        rsi_s = f"RSI {rsi:.0f}(과매도권)"
+        pb = f"1개월 {_fmt(chg1m)}" if (not _isnan(chg1m) and chg1m < 0) else f"1주 {_fmt(chg1w)}"
+        reason = f"{rsi_s} · {pb} 눌림 후 당일 {_fmt(chg1d)} 반등 · 200일선 위"
+        scored.append((sym, float(score), reason))
+    scored.sort(key=lambda x: x[1], reverse=True)
+    return pick_with_sector_cap(scored, sector_map, n, max(1, RECO_SECTOR_MAX))
+
+
 def pick_with_sector_cap(scored: list[tuple], sector_map: dict[str, str], n: int, cap: int) -> list[tuple]:
     out, per_sec = [], {}
     for sym, sc, reason in scored:
@@ -1276,13 +1306,16 @@ def _stock_chart(close: pd.Series, days: int = 252) -> bytes:
 
 # ===================== 모드 분기 / 공통 렌더 =====================
 MODE_LABELS = {
-    "sections":     "평일 4섹션 추천",
-    "top10":        "통합 TOP 10 (휴장 1일차)",
-    "sector":       "섹터 브리핑 (휴장 2일차)",
-    "fund_top10":   "펀더멘탈 TOP 10 (휴장 3일차)",
-    "skip":         "메일 스킵 (휴장 4일+ )",
-    "weekly":       "주간 결산 (토요일)",
-    "strategy":     "차주 전략 (일요일)",
+    "sections":     "데일리 4섹션 추천",
+    "trend_momo":   "정배열 모멘텀 (휴장 1일차)",
+    "oversold":     "과매도 기술적 반등 (휴장 2일차)",
+    "skip":         "메일 스킵 (휴장 3일+)",
+    # 아래는 --force-mode 검증용으로만 유지(자동 분기에선 미사용)
+    "top10":        "통합 TOP 10",
+    "sector":       "섹터 브리핑",
+    "fund_top10":   "펀더멘탈 TOP 10",
+    "weekly":       "주간 결산",
+    "strategy":     "차주 전략",
 }
 
 def _regime_line(regime: dict) -> str:
@@ -1421,14 +1454,7 @@ def _stock_row(sym, reason, ind_map, info, sector_map, hist, images, inline_b64,
     rb = _rank_badge(rank) if rank is not None else ""
     bd = (badge + " ") if badge else ""
     chart = _chart_img(hist, sym, images, inline_b64, days=chart_days)
-    # 상세 설명: 카드 안에 직접 표시(이메일은 앵커 점프가 막혀 '자세히' 링크가 동작하지 않음).
-    det = _profile(sym).get("detail", "")
-    detail_html = ""
-    if det:
-        detail_html = (f'<div style="font-size:12px;color:#374151;background:#f8fafc;'
-                       f'border-left:3px solid #cbd5e1;border-radius:0 6px 6px 0;'
-                       f'padding:8px 10px;margin-top:6px;line-height:1.6">'
-                       f'<b style="color:#475569">기업 설명</b> · {det}</div>')
+    # 기업 설명은 카드의 한 줄(desc=one_liner)로 충분 — 긴 detail 칸은 표시하지 않음.
     reason_html = ""
     if reason_label and reason:
         reason_html = (f'<div style="font-size:12px;color:#374151;background:#fef3c7;border-radius:6px;'
@@ -1442,7 +1468,6 @@ def _stock_row(sym, reason, ind_map, info, sector_map, hist, images, inline_b64,
         f'<div style="font-size:13px;margin-bottom:6px">PER {pe_s}{price_s}</div>'
         f'<div style="margin-bottom:6px">{_ret_chips(ind)}</div>'
         f'{reason_html}'
-        f'{detail_html}'
         f'</td><td style="padding:8px;vertical-align:middle;width:46%;border-bottom:1px solid {card_border}">'
         f'{chart}</td></tr>')
 
@@ -1888,25 +1913,17 @@ def decide_mode(state: dict, data_date: str | None, now_kst=None, force: str | N
         return {"mode": force, "streak": streak, "data_updated": data_updated,
                 "reason": f"강제 모드 지정(--force-mode {force})"}
 
-    if wd == 5:   # 토요일
-        return {"mode": "weekly", "streak": streak, "data_updated": data_updated,
-                "reason": "한국시간 토요일 -> 주간 결산"}
-    if wd == 6:   # 일요일
-        return {"mode": "strategy", "streak": streak, "data_updated": data_updated,
-                "reason": "한국시간 일요일 -> 차주 전략"}
-
+    # 요일과 무관하게 '전날 미국장 데이터가 갱신됐는지'(=휴장 streak)로만 분기한다.
     if data_updated:
         return {"mode": "sections", "streak": 0, "data_updated": True,
-                "reason": "평일 / 데이터 갱신됨 -> 4섹션 추천"}
-    # 휴장(데이터 동일)
+                "reason": "데이터 갱신됨(전날 미국장 있음) -> 4섹션 추천"}
+    # 휴장(데이터가 직전 실행과 동일)
     if streak == 1:
-        m = "top10";       why = "통합 TOP 10"
+        m = "trend_momo";  why = "정배열 모멘텀 종목"
     elif streak == 2:
-        m = "sector";      why = "섹터 브리핑"
-    elif streak == 3:
-        m = "fund_top10";  why = "펀더멘탈 TOP 10"
+        m = "oversold";    why = "과매도 기술적 반등 예견 종목"
     else:
-        m = "skip";        why = "메일 스킵(같은 데이터 반복)"
+        m = "skip";        why = "메일 스킵(같은 데이터 반복, 휴장 3일+)"
     return {"mode": m, "streak": streak, "data_updated": False,
             "reason": f"휴장 {streak}일차 -> {why}"}
 
@@ -2050,12 +2067,57 @@ def build_weekly_review(data: dict) -> dict:
             "sector_rows": brief, "ind_map": ind_map, "info": info, "sector_map": sector_map,
             "hist": data["hist"], "spy": data.get("spy"), "regime": data["regime"]}
 
+def render_holiday_list(payload, mode, subtitle, note, badge_label, badge_color, inline_b64=False):
+    """휴장 모드(정배열모멘텀/과매도반등) 공용 렌더: SPY 차트 + 종목 카드 리스트(추천 아닌 안내)."""
+    regime = payload["regime"]; images = []
+    html = [_html_head(mode, regime, subtitle)]
+    html.append(_spy_chart_block(payload.get("spy"), images, inline_b64))
+    html.append(f'<div style="font-size:12px;color:#6b7280;margin:6px 0">{note}</div>')
+    picks = payload.get("picks", [])
+    if picks:
+        rows = "".join(_stock_row(s, "", payload["ind_map"], payload["info"], payload["sector_map"],
+                                  payload["hist"], images, inline_b64,
+                                  badge=_badge(badge_label, badge_color), chart_days=252, rank=i + 1,
+                                  card_bg="#fbfdff", card_border="#dbeafe", reason_label=None)
+                       for i, (s, _sc, r) in enumerate(picks))
+        html.append('<table style="width:100%;border-collapse:collapse;border:1px solid #dbeafe;'
+                    f'border-radius:8px;overflow:hidden">{rows}</table>')
+    else:
+        html.append('<div style="color:#9ca3af;font-size:13px;padding:8px 0">조건을 충족하는 종목이 없습니다.</div>')
+    html.append(_HTML_FOOT)
+    return "".join(html), images
+
+def build_trend_momo(data: dict) -> dict:
+    """휴장 1일차: 정배열 + 6개월 모멘텀 상위 종목(추세 관점 안내)."""
+    ind_map = data["ind_map"]; sector_map = data["sector_map"]
+    trend = pick_trend(ind_map, sector_map, data.get("spy"), n=WEEKLY_TOP_N)
+    info = get_info_for([s for s, _, _ in trend])
+    return {"picks": trend, "ind_map": ind_map, "info": info, "sector_map": sector_map,
+            "hist": data["hist"], "spy": data.get("spy"), "regime": data["regime"]}
+
+def build_oversold(data: dict) -> dict:
+    """휴장 2일차: 과매도 후 기술적 반등 예견 종목(200일선 위 눌림목 반등)."""
+    ind_map = data["ind_map"]; sector_map = data["sector_map"]
+    picks = pick_oversold(ind_map, sector_map, n=WEEKLY_TOP_N)
+    info = get_info_for([s for s, _, _ in picks])
+    return {"picks": picks, "ind_map": ind_map, "info": info, "sector_map": sector_map,
+            "hist": data["hist"], "spy": data.get("spy"), "regime": data["regime"]}
+
 def build_next_week_strategy(data: dict) -> dict:
-    """차주 전략(데이터 기반): 주목 섹터(직전 주 상대강도), 관찰 종목."""
+    """차주 전략(데이터 기반): 다음 주 관점.
+    - 주목 섹터: 직전 주 상대강도 상위(주간결산과 공유하되 '다음 주 주도 가능' 관점).
+    - 관찰 종목: 꾸준한 상승 추세(정배열+200일선 위)이되, '이번 주 급등(주간결산 최강)과 겹치지 않는'
+      종목 위주로 골라 주간결산과 차별화. 즉 '이미 터진 종목'이 아니라 '다음 주 이어볼 종목'."""
     wk = build_weekly_review(data)
     ind_map = data["ind_map"]
-    # 관찰 종목: 정배열 + 6개월 모멘텀 상위 일부(추세 관점)
-    trend = pick_trend(ind_map, data["sector_map"], data.get("spy"), n=5)
+    weekly_winners = {s for s, _, _ in wk.get("picks", [])}   # 이번 주 최강(주간결산)과 중복 회피
+    # 추세 후보를 넉넉히 뽑은 뒤 주간 최강과 겹치는 종목 제외
+    trend = pick_trend(ind_map, data["sector_map"], data.get("spy"), n=15)
+    trend = [t for t in trend if t[0] not in weekly_winners][:5]
+    if len(trend) < 5:  # 제외 후 모자라면 원래 후보로 채움
+        extra = [t for t in pick_trend(ind_map, data["sector_map"], data.get("spy"), n=15)
+                 if t[0] not in {x[0] for x in trend}]
+        trend = (trend + extra)[:5]
     info = get_info_for([s for s, _, _ in trend])
     picks = [(s, sc, r) for s, sc, r in trend]   # (sym, score, reason)
     return {"watch_sectors": wk["lead"], "watch_lag": wk["lag"], "has_sector": wk.get("has_sector", True),
@@ -2158,26 +2220,44 @@ def daily_main(no_email: bool = False, force_mode: str | None = None):
         subject = f"[S&P500] {today} 4섹션 추천(추세/펀더멘탈/주목)"
         body_count = len(sec1) + len(sec2) + len(sec3)
 
+    elif mode == "trend_momo":
+        payload = build_trend_momo(data)
+        preview, _ = render_holiday_list(
+            payload, "trend_momo", "휴장 1일차 · 정배열 모멘텀 종목 (추천이 아닌 안내)",
+            "정배열(종가>20>50>200일선) + 6개월 모멘텀 상위. 강한 상승 추세가 이어지는 종목입니다.",
+            "정배열", "#15803d", inline_b64=True)
+        subject = f"[S&P500] {today} 정배열 모멘텀 (휴장 1일차)"
+        new_holdings = holdings; body_count = len(payload["picks"])
+
+    elif mode == "oversold":
+        payload = build_oversold(data)
+        preview, _ = render_holiday_list(
+            payload, "oversold", "휴장 2일차 · 과매도 기술적 반등 예견 종목 (추천이 아닌 안내)",
+            "200일선 위에서 RSI 과매도권(28~48) 회복 + 눌림 후 당일 반등. 기술적 반등 가능성을 보는 관찰 목록입니다.",
+            "반등주목", "#c2410c", inline_b64=True)
+        subject = f"[S&P500] {today} 과매도 반등 관찰 (휴장 2일차)"
+        new_holdings = holdings; body_count = len(payload["picks"])
+
     elif mode == "top10":
         picked, ind_map, info, sector_map, regime, hist = build_recommendations(data)
         confirmed, tiers, new_holdings = _compute_exits_and_tiers(picked, ind_map, holdings, today)
         payload = {"picks": picked, "ind_map": ind_map, "info": info,
                    "sector_map": sector_map, "regime": regime, "hist": hist}
         preview, _ = render_top10_table(payload, "top10", "하이브리드(퀄리티+모멘텀) 통합 점수 상위", inline_b64=True)
-        subject = f"[S&P500] {today} 통합 TOP{len(picked)} (휴장 1일차)"
+        subject = f"[S&P500] {today} 통합 TOP{len(picked)}"
         body_count = len(picked)
 
     elif mode == "fund_top10":
         payload = build_fundamental_top10(data)
         preview, _ = render_top10_table(payload, "fund_top10", "ROE·FCF·매출성장·이익률 종합(가치주 관점)", inline_b64=True)
-        subject = f"[S&P500] {today} 펀더멘탈 TOP{len(payload['picks'])} (휴장 3일차)"
+        subject = f"[S&P500] {today} 펀더멘탈 TOP{len(payload['picks'])}"
         new_holdings = holdings; body_count = len(payload["picks"])
 
     elif mode == "sector":
         ensure_sector_info(data)
         payload = build_sector_briefing(data, info=data.get("info"))
         preview, _ = render_sector_briefing(payload, inline_b64=True)
-        subject = f"[S&P500] {today} 섹터 브리핑 (휴장 2일차)"
+        subject = f"[S&P500] {today} 섹터 브리핑"
         new_holdings = holdings; body_count = len(payload["sector_rows"])
 
     elif mode == "weekly":
@@ -2224,6 +2304,16 @@ def _render_for_email(mode, payload, data, holdings, today, force_mode):
              "regime": data["regime"], "hist": data["hist"], "sec1": sec1, "sec2": sec2,
              "sec3": sec3, "exits": confirmed}
         return render_sections(p, inline_b64=False)
+    if mode == "trend_momo":
+        return render_holiday_list(
+            payload, "trend_momo", "휴장 1일차 · 정배열 모멘텀 종목 (추천이 아닌 안내)",
+            "정배열(종가>20>50>200일선) + 6개월 모멘텀 상위. 강한 상승 추세가 이어지는 종목입니다.",
+            "정배열", "#15803d", inline_b64=False)
+    if mode == "oversold":
+        return render_holiday_list(
+            payload, "oversold", "휴장 2일차 · 과매도 기술적 반등 예견 종목 (추천이 아닌 안내)",
+            "200일선 위에서 RSI 과매도권(28~48) 회복 + 눌림 후 당일 반등. 기술적 반등 가능성을 보는 관찰 목록입니다.",
+            "반등주목", "#c2410c", inline_b64=False)
     if mode == "top10":
         return render_top10_table(payload, "top10", "하이브리드(퀄리티+모멘텀) 통합 점수 상위", inline_b64=False)
     if mode == "fund_top10":
@@ -2243,7 +2333,8 @@ def main():
     ap.add_argument("--backtest", action="store_true", help="리포트 대신 백테스트 실행")
     ap.add_argument("--no-email", action="store_true", help="메일 발송 없이 미리보기만 생성")
     ap.add_argument("--force-mode", default=None,
-                    choices=["sections", "top10", "sector", "fund_top10", "skip", "weekly", "strategy"],
+                    choices=["sections", "trend_momo", "oversold", "skip",
+                             "top10", "sector", "fund_top10", "weekly", "strategy"],
                     help="휴장/주말을 기다리지 않고 특정 모드를 강제 실행(검증용)")
     args = ap.parse_args()
     if args.backtest:
