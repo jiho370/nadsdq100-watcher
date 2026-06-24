@@ -1,5 +1,5 @@
 {
-  "date": "2026-06-23",
+  "date": "2026-06-24",
   "holdings": {
     "SNDK": {
       "since": "2026-06-23",
@@ -17,19 +17,11 @@
       "since": "2026-06-23",
       "exit_streak": 0
     },
-    "COHR": {
-      "since": "2026-06-23",
-      "exit_streak": 0
-    },
-    "GLW": {
-      "since": "2026-06-23",
-      "exit_streak": 0
-    },
     "VRT": {
       "since": "2026-06-23",
       "exit_streak": 0
     }
   },
-  "last_data_date": "2026-06-22",
+  "last_data_date": "2026-06-23",
   "holiday_streak": 0
 }
