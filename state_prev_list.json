@@ -1,5 +1,5 @@
 {
-  "date": "2026-06-24",
+  "date": "2026-06-25",
   "holdings": {
     "SNDK": {
       "since": "2026-06-23",
@@ -9,19 +9,31 @@
       "since": "2026-06-23",
       "exit_streak": 0
     },
+    "INTC": {
+      "since": "2026-06-25",
+      "exit_streak": 0
+    },
     "WDC": {
       "since": "2026-06-23",
       "exit_streak": 0
     },
-    "NVDA": {
-      "since": "2026-06-23",
+    "SPG": {
+      "since": "2026-06-25",
       "exit_streak": 0
     },
-    "VRT": {
-      "since": "2026-06-23",
+    "MAS": {
+      "since": "2026-06-25",
+      "exit_streak": 0
+    },
+    "FDX": {
+      "since": "2026-06-25",
+      "exit_streak": 0
+    },
+    "GLW": {
+      "since": "2026-06-25",
       "exit_streak": 0
     }
   },
-  "last_data_date": "2026-06-23",
+  "last_data_date": "2026-06-24",
   "holiday_streak": 0
 }
