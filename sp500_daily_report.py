@@ -1495,18 +1495,47 @@ def _rank_badge(rank) -> str:
             f'display:inline-block;text-align:center;line-height:22px;font-size:12px;'
             f'margin-right:4px">{rank}</span>')
 
-def _ret_chip(label, val) -> str:
+_RET_HORIZONS = (("1일", "chg_1d"), ("1주", "chg_1w"), ("1달", "chg_1m"),
+                 ("6개월", "chg_6m"), ("1년", "chg_1y"), ("3년", "chg_3y"))
+
+_SECTOR_RET_AVG_CACHE = {}
+def _sector_ret_avgs(ind_map: dict, sector_map: dict) -> dict:
+    """섹터별 각 기간 등락률 중앙값. {섹터: {기간키: 중앙값}}. 같은 ind_map 객체는 1회만 계산(캐시)."""
+    key = id(ind_map)
+    cached = _SECTOR_RET_AVG_CACHE.get(key)
+    if cached is not None:
+        return cached
+    keys = [k for _, k in _RET_HORIZONS]
+    bysec = {}
+    for s, ind in ind_map.items():
+        sec = sector_map.get(s, "")
+        if not sec:
+            continue
+        d = bysec.setdefault(sec, {k: [] for k in keys})
+        for k in keys:
+            v = ind.get(k)
+            if not _isnan(v):
+                d[k].append(v)
+    out = {sec: {k: (float(np.median(v)) if v else None) for k, v in hs.items()}
+           for sec, hs in bysec.items()}
+    _SECTOR_RET_AVG_CACHE.clear()      # 한 번에 하나의 ind_map만 보관(메모리 누수 방지)
+    _SECTOR_RET_AVG_CACHE[key] = out
+    return out
+
+def _ret_chip(label, val, avg=None) -> str:
     if val is None or _isnan(val):
         color = "#9ca3af"; txt = "—"
     else:
         color = "#15803d" if val >= 0 else "#b91c1c"; txt = f"{val:+.1f}%"
-    return ('<span style="display:inline-block;margin:2px 6px 2px 0;font-size:12px">'
-            f'<span style="color:#9ca3af">{label}</span> <b style="color:{color}">{txt}</b></span>')
+    avg_html = ""
+    if avg is not None and not _isnan(avg):
+        avg_html = f' <span style="color:#9ca3af;font-size:11px">섹 {avg:+.1f}%</span>'
+    return ('<span style="display:inline-block;margin:2px 8px 2px 0;font-size:12px">'
+            f'<span style="color:#9ca3af">{label}</span> <b style="color:{color}">{txt}</b>{avg_html}</span>')
 
-def _ret_chips(ind) -> str:
-    return "".join(_ret_chip(l, ind.get(k)) for l, k in
-                   [("1일","chg_1d"),("1주","chg_1w"),("1달","chg_1m"),
-                    ("6개월","chg_6m"),("1년","chg_1y"),("3년","chg_3y")])
+def _ret_chips(ind, sec_avg: dict | None = None) -> str:
+    sec_avg = sec_avg or {}
+    return "".join(_ret_chip(l, ind.get(k), sec_avg.get(k)) for l, k in _RET_HORIZONS)
 
 def _company_name(sym, meta) -> str:
     """회사 풀네임. info의 longName/shortName 우선, 없으면 티커."""
@@ -1553,6 +1582,7 @@ def _stock_row(sym, reason, ind_map, info, sector_map, hist, images, inline_b64,
     PER·종가 / 변동률 색상칩 / 추천이유 + 우측 추세선 차트(가격+MA)."""
     ind = ind_map.get(sym, {}); meta = info.get(sym, {})
     name = _company_name(sym, meta)
+    sec_avg = _sector_ret_avgs(ind_map, sector_map).get(sector_map.get(sym, ""), {})
     sec_kr = _kr_sector(sector_map.get(sym, "") or meta.get("sector_en", ""))
     desc = _one_liner(sym, meta)
     pe = meta.get("pe"); pe_s = f"<b>{float(pe):.1f}</b>" if (pe and not _isnan(pe)) else "—"
@@ -1573,7 +1603,7 @@ def _stock_row(sym, reason, ind_map, info, sector_map, hist, images, inline_b64,
         f'<div style="font-size:12px;color:#6b7280;margin:3px 0 1px">{name}</div>'
         f'<div style="font-size:12px;color:#374151;margin-bottom:6px">{desc}</div>'
         f'<div style="font-size:13px;margin-bottom:6px">PER {pe_s}{price_s}</div>'
-        f'<div style="margin-bottom:6px">{_ret_chips(ind)}</div>'
+        f'<div style="margin-bottom:6px">{_ret_chips(ind, sec_avg)}</div>'
         f'{reason_html}'
         f'</td><td style="padding:8px;vertical-align:middle;width:46%;border-bottom:1px solid {card_border}">'
         f'{chart}</td></tr>')
@@ -2031,34 +2061,60 @@ def _last_data_date(hist: dict) -> str | None:
     if not dates: return None
     return max(dates).date().isoformat()
 
+def _expected_last_session(now_kst) -> str:
+    """KST 현재시각 기준 '직전 미국 정규장' 날짜(YYYY-MM-DD).
+    미국 동부시각으로 근사 변환 후 가장 최근 평일을 반환한다. 미국 공휴일은 반영하지 않으므로,
+    공휴일 다음 실행에선 실제 data_date 가 이 값보다 하루 뒤처져 '휴장'으로 올바르게 감지된다."""
+    et = now_kst - timedelta(hours=13)        # KST(UTC+9) -> ET(서머타임 근사 UTC-4)
+    d = et.date()
+    if et.hour < 17:                          # 미국장 마감(16:00 ET) 전이면 당일 세션 미확정 -> 전일 기준
+        d = d - timedelta(days=1)
+    while d.weekday() >= 5:                    # 토(5)/일(6) 제외
+        d = d - timedelta(days=1)
+    return d.isoformat()
+
 def decide_mode(state: dict, data_date: str | None, now_kst=None, force: str | None = None) -> dict:
-    """모드 분기: KST 요일 + 휴장 streak.
-    - 토/일 요일 모드가 휴장 streak 보다 우선.
-    - 데이터가 직전 실행과 동일하면 휴장(streak+1), 갱신되면 streak=0.
+    """모드 분기(달력 기준 휴장 판정 + 같은 날 중복실행 방지).
+    - 데이터가 직전 실행보다 갱신됨 -> 4섹션(sections), streak=0.
+    - 갱신 안 됨 & '최신 세션을 이미 보유'(data_date >= 직전 정규장) -> 같은 세션 재실행 = 중복 -> skip_dup.
+    - 갱신 안 됨 & 데이터가 달력상 뒤처짐 -> 실제 휴장 -> streak 따라 trend_momo/oversold/skip.
+      (단 같은 KST 날 재실행이면 streak 증가 없이 skip_dup)
     반환: {mode, streak, reason, data_updated}"""
     now = now_kst or datetime.now(KST)
-    wd = now.weekday()  # 0=월 ... 5=토 6=일
+    today_kst = now.date().isoformat()
     prev_date = state.get("last_data_date")
+    prev_run_kst = state.get("last_run_kst")
+    prev_streak = int(state.get("holiday_streak", 0))
     data_updated = (data_date is not None and data_date != prev_date)
-    streak = 0 if data_updated else int(state.get("holiday_streak", 0)) + 1
+    expected = _expected_last_session(now)
+    data_current = (data_date is not None and data_date >= expected)
 
     if force:
+        streak = 0 if data_updated else (prev_streak if data_current else prev_streak + 1)
         return {"mode": force, "streak": streak, "data_updated": data_updated,
                 "reason": f"강제 모드 지정(--force-mode {force})"}
 
-    # 요일과 무관하게 '전날 미국장 데이터가 갱신됐는지'(=휴장 streak)로만 분기한다.
     if data_updated:
         return {"mode": "sections", "streak": 0, "data_updated": True,
-                "reason": "데이터 갱신됨(전날 미국장 있음) -> 4섹션 추천"}
-    # 휴장(데이터가 직전 실행과 동일)
+                "reason": f"데이터 갱신됨(최신 세션 {data_date}) -> 4섹션 추천"}
+
+    # 데이터가 직전 실행과 동일 ----------------------------------------------------
+    if data_current:        # 최신 세션을 이미 보유 = 같은 날/같은 세션 재실행(휴장 아님)
+        return {"mode": "skip_dup", "streak": prev_streak, "data_updated": False,
+                "reason": f"최신 세션({data_date}) 이미 처리됨 -> 중복 발송 방지 스킵"}
+    if prev_run_kst == today_kst:   # 휴장 데이터로 같은 날 재실행 -> streak 증가 금지
+        return {"mode": "skip_dup", "streak": prev_streak, "data_updated": False,
+                "reason": "같은 날 재실행(휴장 데이터 동일) -> 중복 발송 방지 스킵"}
+
+    streak = prev_streak + 1        # 새 KST 날인데 새 세션 없음 = 실제 휴장
     if streak == 1:
         m = "trend_momo";  why = "정배열 모멘텀 종목"
     elif streak == 2:
         m = "oversold";    why = "과매도 기술적 반등 예견 종목"
     else:
-        m = "skip";        why = "메일 스킵(같은 데이터 반복, 휴장 3일+)"
+        m = "skip";        why = "메일 스킵(휴장 3일+)"
     return {"mode": m, "streak": streak, "data_updated": False,
-            "reason": f"휴장 {streak}일차 -> {why}"}
+            "reason": f"휴장 {streak}일차(최신세션 {data_date} < 예상 {expected}) -> {why}"}
 
 # ---- 휴장/주말 모드 콘텐츠 빌더 ----
 def _resolve_sector(sym, sector_map, info) -> str:
@@ -2334,11 +2390,17 @@ def daily_main(no_email: bool = False, force_mode: str | None = None):
     regime = data["regime"]; sector_map = data["sector_map"]
     ind_map = data["ind_map"]; hist = data["hist"]
 
-    # ---- streak >= 4: 메일 스킵(state는 정상 갱신) ----
+    # ---- 같은 날/같은 세션 재실행: 중복 발송 방지(상태 변경 없이 종료) ----
+    if mode == "skip_dup":
+        print(f"[정보] {reason} -> 메일 발송 생략(상태 유지).", file=sys.stderr)
+        return
+
+    # ---- 휴장 3일+: 메일 스킵(state는 정상 갱신) ----
     if mode == "skip":
         print(f"[정보] 휴장 {streak}일차 -> 메일 발송 스킵(같은 데이터 반복). state만 갱신.", file=sys.stderr)
         new_state = dict(state)
-        new_state.update({"date": today, "last_data_date": data_date, "holiday_streak": streak})
+        new_state.update({"date": today, "last_data_date": data_date,
+                          "holiday_streak": streak, "last_run_kst": today})
         save_state(new_state)
         return
 
@@ -2420,9 +2482,10 @@ def daily_main(no_email: bool = False, force_mode: str | None = None):
     with open("output/email.html", "w", encoding="utf-8") as f: f.write(preview)
     print(f"[정보] 모드={mode} 항목={body_count} 미리보기 output/email.html", file=sys.stderr)
 
-    # 상태 갱신(holdings 로직 보존 + 휴장 streak/마지막 데이터 날짜 기록)
+    # 상태 갱신(holdings 로직 보존 + 휴장 streak/마지막 데이터 날짜/실행 KST일 기록)
     new_state = {"date": today, "holdings": new_holdings,
-                 "last_data_date": data_date, "holiday_streak": streak}
+                 "last_data_date": data_date, "holiday_streak": streak,
+                 "last_run_kst": today}
     save_state(new_state)
 
     if not no_email:
