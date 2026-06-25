@@ -389,6 +389,69 @@ YF_SECTOR_TO_GICS = {
 
 WIKI_SP500_URL = "https://en.wikipedia.org/wiki/List_of_S%26P_500_companies"
 _WIKI_SECTOR_CACHE = {}   # {ticker(야후형, .→-): GICS 섹터}
+_WIKI_SUBIND_CACHE = {}   # {ticker(야후형, .→-): GICS Sub-Industry(영문)} — 세분 비교용
+_SUBIND_MAP = {}          # 실행 중 채워지는 ticker→Sub-Industry 전역 맵(gather_universe_data)
+
+# GICS Sub-Industry(영문) → 한글(자주 등장하는 것 위주, 없으면 영문 그대로 표시)
+SUBIND_KR = {
+    "Semiconductors": "반도체",
+    "Semiconductor Materials & Equipment": "반도체 장비·소재",
+    "Systems Software": "시스템 소프트웨어",
+    "Application Software": "응용 소프트웨어",
+    "Internet Services & Infrastructure": "인터넷 서비스·인프라",
+    "IT Consulting & Other Services": "IT 컨설팅·서비스",
+    "Technology Hardware, Storage & Peripherals": "IT 하드웨어·저장장치",
+    "Communications Equipment": "통신장비",
+    "Electronic Equipment & Instruments": "전자장비·계측",
+    "Electronic Components": "전자부품",
+    "Electronic Manufacturing Services": "전자제조 서비스(EMS)",
+    "Interactive Media & Services": "인터랙티브 미디어·서비스",
+    "Movies & Entertainment": "영화·엔터테인먼트",
+    "Pharmaceuticals": "제약",
+    "Biotechnology": "바이오테크",
+    "Health Care Equipment": "헬스케어 장비",
+    "Health Care Services": "헬스케어 서비스",
+    "Managed Health Care": "건강보험(관리의료)",
+    "Life Sciences Tools & Services": "생명과학 도구·서비스",
+    "Diversified Banks": "종합은행",
+    "Regional Banks": "지역은행",
+    "Investment Banking & Brokerage": "투자은행·증권",
+    "Asset Management & Custody Banks": "자산운용·수탁",
+    "Transaction & Payment Processing Services": "결제·거래처리",
+    "Financial Exchanges & Data": "거래소·금융데이터",
+    "Property & Casualty Insurance": "손해보험",
+    "Life & Health Insurance": "생명·건강보험",
+    "Multi-line Insurance": "종합보험",
+    "Aerospace & Defense": "항공우주·방산",
+    "Industrial Machinery & Supplies & Components": "산업기계·부품",
+    "Construction Machinery & Heavy Transportation Equipment": "건설·중장비",
+    "Electrical Components & Equipment": "전기부품·장비",
+    "Building Products": "건축자재",
+    "Air Freight & Logistics": "항공화물·물류",
+    "Passenger Airlines": "여객 항공",
+    "Railroads": "철도",
+    "Integrated Oil & Gas": "종합 석유·가스",
+    "Oil & Gas Exploration & Production": "석유·가스 시추·생산(E&P)",
+    "Oil & Gas Equipment & Services": "석유·가스 장비·서비스",
+    "Oil & Gas Storage & Transportation": "석유·가스 저장·운송",
+    "Semiconductor Equipment": "반도체 장비",
+    "Automobile Manufacturers": "완성차 제조",
+    "Automotive Parts & Equipment": "자동차 부품",
+    "Hotels, Resorts & Cruise Lines": "호텔·리조트·크루즈",
+    "Restaurants": "외식",
+    "Broadline Retail": "종합 소매",
+    "Apparel, Accessories & Luxury Goods": "의류·명품",
+    "Home Improvement Retail": "홈임프루브먼트 소매",
+    "Hypermarkets & Super Centers": "대형마트",
+    "Packaged Foods & Meats": "포장식품·육가공",
+    "Soft Drinks & Non-alcoholic Beverages": "음료(비주류)",
+    "Electric Utilities": "전력 유틸리티",
+    "Multi-Utilities": "복합 유틸리티",
+    "Specialty Chemicals": "특수화학",
+    "Industrial Gases": "산업용 가스",
+    "Data Center REITs": "데이터센터 리츠",
+    "Telecom Tower REITs": "통신타워 리츠",
+}
 
 def _norm_yf_sector(sec: str) -> str:
     """yfinance/임의 섹터 문자열을 GICS 표준명으로. 못 맞추면 빈 문자열."""
@@ -414,11 +477,16 @@ def fetch_wikipedia_sectors() -> dict:
         for t in tables:
             cols = [str(c).strip() for c in t.columns]
             if "Symbol" in cols and "GICS Sector" in cols:
+                has_sub = "GICS Sub-Industry" in cols
                 for _, row in t.iterrows():
                     tic = str(row["Symbol"]).strip().replace(".", "-")
                     sec = _norm_sector(str(row["GICS Sector"]).strip())
                     if tic and sec in GICS_KR:
                         out[tic] = sec
+                        if has_sub:                       # 세분 비교용 Sub-Industry 동시 수집
+                            si = str(row["GICS Sub-Industry"]).strip()
+                            if si and si.lower() != "nan":
+                                _WIKI_SUBIND_CACHE[tic] = si
                 break
     except Exception as e:
         print(f"[섹터] 위키피디아 read_html 실패: {e}", file=sys.stderr)
@@ -441,7 +509,8 @@ def fetch_wikipedia_sectors() -> dict:
         except Exception as e:
             print(f"[섹터] 위키피디아 requests 파싱 실패: {e}", file=sys.stderr)
     if out:
-        print(f"[섹터] 위키피디아에서 {len(out)}종목 GICS 섹터 확보", file=sys.stderr)
+        print(f"[섹터] 위키피디아에서 {len(out)}종목 GICS 섹터 확보"
+              f"(Sub-Industry {len(_WIKI_SUBIND_CACHE)}종목)", file=sys.stderr)
     _WIKI_SECTOR_CACHE = out
     return out
 
@@ -817,6 +886,35 @@ def sector_median_pes(info: dict[str, dict], sector_map: dict[str, str]) -> tupl
         if len(by_sec[sec]) < 3 and not np.isnan(global_med): med[sec] = global_med
     return med, global_med
 
+# ── 세분 비교(동종업종) 기준: GICS Sub-Industry → 섹터 → 전체 순 폴백 ──
+MIN_PEER = int(os.environ.get("MIN_PEER", "4"))   # Sub-Industry 표본이 이 미만이면 섹터로 폴백
+
+def _peer_label(sym: str, sector_map: dict) -> str:
+    """종목의 동종업종 한글 라벨. Sub-Industry 있으면 그 한글명, 없으면 GICS 섹터 한글명."""
+    si = _SUBIND_MAP.get(sym, "")
+    if si:
+        return SUBIND_KR.get(si, si)
+    return _kr_sector(sector_map.get(sym, "") or "")
+
+def _peer_median_resolver(values_by_sym: dict, sector_map: dict, min_n: int = MIN_PEER):
+    """sym→기준중앙값 해석함수 반환. 동종업종(Sub-Industry) 표본이 min_n 이상일 때만 그 중앙값을 주고,
+    표본이 적으면 '비교 안 함' = None 을 반환한다(섹터/전체로 폴백하지 않음).
+    단 Sub-Industry 데이터가 아예 없으면(_SUBIND_MAP 빈 경우) 섹터 단위로 폴백해 기능을 유지한다."""
+    use_sub = bool(_SUBIND_MAP)
+    keyf = (lambda s: _SUBIND_MAP.get(s, "")) if use_sub else (lambda s: sector_map.get(s, ""))
+    groups = {}
+    for s, v in values_by_sym.items():
+        if v is None or _isnan(v):
+            continue
+        k = keyf(s)
+        if k:
+            groups.setdefault(k, []).append(v)
+    med = {k: float(np.median(v)) for k, v in groups.items() if len(v) >= min_n}
+
+    def ref(s: str):
+        return med.get(keyf(s))      # 표본 부족/미분류 → None(비교 생략)
+    return ref
+
 def score_reco(ind: dict, meta: dict, pe, rel_pe: float) -> tuple[float, str] | None:
     """추천 적격이면 (점수, 한글사유) 반환, 아니면 None.
     [하이브리드 — 백테스트 검증: '15~'26 CAGR 17.4%(SPY 13.8%)·MDD -26%·Sharpe 0.95·회전율 156%]
@@ -943,28 +1041,28 @@ def pick_trend(ind_map: dict[str, dict], sector_map: dict[str, str],
 
 
 def pick_fundamental(ind_map: dict[str, dict], info: dict[str, dict],
-                     sector_map: dict[str, str], sector_pes: dict | None = None,
-                     exclude: set | None = None, n: int = SECTION_N) -> list[tuple]:
+                     sector_map: dict[str, str], exclude: set | None = None,
+                     n: int = SECTION_N) -> list[tuple]:
     """② 펀더멘탈 우수 + 추세 우수 (엄격 교집합).
-    '펀더멘탈 미달을 제외'하는 게 아니라 '우량 + 섹터대비 저평가 + 확실한 추세'를 동시에 만족하는 종목만.
+    '펀더멘탈 미달을 제외'하는 게 아니라 '우량 + 동종대비 저평가 + 확실한 추세'를 동시에 만족하는 종목만.
     하드 게이트(모두 충족해야 통과):
       · 퀄리티 : ROE ≥ FUND_ROE_MIN, FCF 흑자 (둘 다 데이터 필수 - 결손 종목 제외)
-      · 섹터대비 밸류 : PER 존재 & PER ÷ 섹터중앙값PER ≤ relpe_cap  (섹터별 기준 - 기술주↔금융주 PER 차이 보정)
+      · 동종대비 밸류 : PER ÷ 동종업종(GICS Sub-Industry) 중앙값PER ≤ relpe_cap
+                       (반도체↔소프트웨어처럼 같은 IT 안에서도 다른 PER 수준을 보정. 표본 적으면 섹터로 폴백)
       · 확실한 추세 : 정배열(price>ma20>ma50>ma200) & 6개월 모멘텀 > FUND_MOM_MIN & (MACD 상승 or 골든크로스)
-    정렬 : 퀄리티(ROE·성장·이익률) + 섹터대비 저평가폭 + 위험조정 모멘텀.
+    정렬 : 퀄리티(ROE·성장·이익률) + 동종대비 저평가폭 + 위험조정 모멘텀.
     후보가 n 미만이면 '밸류 게이트만' relpe_relax 로 1회 완화(추세·퀄리티는 그대로)."""
-    if sector_pes is None:
-        sector_pes, _gm = sector_median_pes(info, sector_map)
     exclude = exclude or set()
 
-    # 동일 섹터 평균(중앙값) 6개월 추세 — 종목이 자기 섹터 대비 얼마나 강한지 함께 보여주기 위함.
-    _mom_bkt = {}
-    for _s, _ind in ind_map.items():
-        _sec = sector_map.get(_s, "") or "(기타)"
-        _v = _ind.get("chg_6m")
-        if not _isnan(_v):
-            _mom_bkt.setdefault(_sec, []).append(_v)
-    sec_mom = {k: float(np.median(v)) for k, v in _mom_bkt.items() if v}
+    # 동종업종(Sub-Industry) 기준 PER·6개월 추세 중앙값 리졸버 (표본 적으면 섹터→전체로 폴백)
+    _pe_by_sym = {}
+    for _s, _m in info.items():
+        try: _p = float(_m.get("pe"))
+        except (TypeError, ValueError): continue
+        if 0 < _p <= 200:
+            _pe_by_sym[_s] = _p
+    pe_ref = _peer_median_resolver(_pe_by_sym, sector_map)
+    mom_ref = _peer_median_resolver({_s: _i.get("chg_6m") for _s, _i in ind_map.items()}, sector_map)
 
     def _scan(relpe_cap: float) -> list[tuple]:
         out = []
@@ -986,12 +1084,11 @@ def pick_fundamental(ind_map: dict[str, dict], info: dict[str, dict],
             except (TypeError, ValueError): pe = None
             if pe is None or not (0 < pe <= PER_SANITY):   # 밸류 평가 불가/이상치 → 제외
                 continue
-            sec = sector_map.get(sym, "") or "(기타)"
-            smed = sector_pes.get(sec)
-            if smed is None or _isnan(smed) or smed <= 0:
+            pmed = pe_ref(sym)                        # 동종업종 중앙 PER(표본 적으면 섹터/전체)
+            if pmed is None or _isnan(pmed) or pmed <= 0:
                 continue
-            rel_pe = pe / smed
-            if rel_pe > relpe_cap:                   # 섹터 중앙값 대비 비싸면 제외
+            rel_pe = pe / pmed
+            if rel_pe > relpe_cap:                   # 동종 중앙값 대비 비싸면 제외
                 continue
             # 3) 확실한 추세 (하드)
             price, ma20, ma50, ma200 = ind.get("price"), ind.get("ma20"), ind.get("ma50"), ind.get("ma200")
@@ -1007,25 +1104,26 @@ def pick_fundamental(ind_map: dict[str, dict], info: dict[str, dict],
             # 점수: 퀄리티 + 섹터대비 저평가폭 + 위험조정 모멘텀
             score = min(roe, 0.6) * 100.0
             rg, pm = meta.get("rev_growth"), meta.get("profit_margin")
-            bits = [f"ROE {roe*100:.0f}%", "FCF흑자", f"PER {pe:.0f}(섹터중앙 {smed:.0f})"]
+            bits = [f"ROE {roe*100:.0f}%", "FCF흑자", f"PER {pe:.0f}(섹터중앙 {pmed:.0f})"]
             if not _isnan(rg):
                 score += max(0.0, rg) * 30.0
                 bits.append(f"매출성장 {rg*100:.0f}%")
             if not _isnan(pm):
                 score += max(0.0, pm) * 20.0
                 bits.append(f"이익률 {pm*100:.0f}%")
-            cheap = max(0.0, 1.0 - rel_pe)           # 섹터 중앙값보다 싼 정도
+            cheap = max(0.0, 1.0 - rel_pe)           # 동종 중앙값보다 싼 정도
             score += cheap * 40.0
             vol = ind.get("vol_ann")
             if not _isnan(vol) and vol > 0:
                 score += (mom6 / vol) * 5.0          # 위험조정 6개월 모멘텀 소폭 가점
             tag = "정배열" + ("·골든크로스" if ind.get("cross") == "golden" else "")
-            sm = sec_mom.get(sec)
+            sm = mom_ref(sym)
             mom_txt = f"6M {mom6:+.0f}%"
             if sm is not None and not _isnan(sm):
                 edge = mom6 - sm
                 mom_txt += f"(섹터평균 {sm:+.0f}% · {'+' if edge >= 0 else ''}{edge:.0f}%p)"
-            reason = "우량+섹터대비 저평가(" + " / ".join(bits) + f") · {tag}·{mom_txt}"
+            plabel = _peer_label(sym, sector_map)
+            reason = f"[{plabel}] 우량+섹터대비 저평가(" + " / ".join(bits) + f") · {tag}·{mom_txt}"
             out.append((sym, float(score), reason))
         out.sort(key=lambda x: x[1], reverse=True)
         return out
@@ -1499,28 +1597,20 @@ def _rank_badge(rank) -> str:
 _RET_HORIZONS = (("1일", "chg_1d"), ("1주", "chg_1w"), ("1달", "chg_1m"),
                  ("6개월", "chg_6m"), ("1년", "chg_1y"), ("3년", "chg_3y"))
 
-_SECTOR_RET_AVG_CACHE = {}
-def _sector_ret_avgs(ind_map: dict, sector_map: dict) -> dict:
-    """섹터별 각 기간 등락률 중앙값. {섹터: {기간키: 중앙값}}. 같은 ind_map 객체는 1회만 계산(캐시)."""
+_PEER_RET_AVG_CACHE = {}
+def _peer_ret_avgs(ind_map: dict, sector_map: dict) -> dict:
+    """종목별 동종업종(Sub-Industry) 기간 등락률 중앙값. {sym: {기간키: 기준중앙값}}.
+    동종 표본이 적으면 섹터→전체로 폴백(_peer_median_resolver). 같은 ind_map 객체는 1회만 계산(캐시)."""
     key = id(ind_map)
-    cached = _SECTOR_RET_AVG_CACHE.get(key)
+    cached = _PEER_RET_AVG_CACHE.get(key)
     if cached is not None:
         return cached
     keys = [k for _, k in _RET_HORIZONS]
-    bysec = {}
-    for s, ind in ind_map.items():
-        sec = sector_map.get(s, "")
-        if not sec:
-            continue
-        d = bysec.setdefault(sec, {k: [] for k in keys})
-        for k in keys:
-            v = ind.get(k)
-            if not _isnan(v):
-                d[k].append(v)
-    out = {sec: {k: (float(np.median(v)) if v else None) for k, v in hs.items()}
-           for sec, hs in bysec.items()}
-    _SECTOR_RET_AVG_CACHE.clear()      # 한 번에 하나의 ind_map만 보관(메모리 누수 방지)
-    _SECTOR_RET_AVG_CACHE[key] = out
+    resolvers = {k: _peer_median_resolver({s: ind.get(k) for s, ind in ind_map.items()}, sector_map)
+                 for k in keys}
+    out = {s: {k: resolvers[k](s) for k in keys} for s in ind_map}
+    _PEER_RET_AVG_CACHE.clear()        # 한 번에 하나의 ind_map만 보관(메모리 누수 방지)
+    _PEER_RET_AVG_CACHE[key] = out
     return out
 
 def _ret_chip(label, val, avg=None) -> str:
@@ -1530,7 +1620,7 @@ def _ret_chip(label, val, avg=None) -> str:
         color = "#15803d" if val >= 0 else "#b91c1c"; txt = f"{val:+.1f}%"
     avg_html = ""
     if avg is not None and not _isnan(avg):
-        avg_html = f' <span style="color:#9ca3af;font-size:11px">섹 {avg:+.1f}%</span>'
+        avg_html = f' <span style="color:#9ca3af;font-size:11px">섹터 {avg:+.1f}%</span>'
     return ('<span style="display:inline-block;margin:2px 8px 2px 0;font-size:12px">'
             f'<span style="color:#9ca3af">{label}</span> <b style="color:{color}">{txt}</b>{avg_html}</span>')
 
@@ -1583,8 +1673,8 @@ def _stock_row(sym, reason, ind_map, info, sector_map, hist, images, inline_b64,
     PER·종가 / 변동률 색상칩 / 추천이유 + 우측 추세선 차트(가격+MA)."""
     ind = ind_map.get(sym, {}); meta = info.get(sym, {})
     name = _company_name(sym, meta)
-    sec_avg = _sector_ret_avgs(ind_map, sector_map).get(sector_map.get(sym, ""), {})
-    sec_kr = _kr_sector(sector_map.get(sym, "") or meta.get("sector_en", ""))
+    sec_avg = _peer_ret_avgs(ind_map, sector_map).get(sym, {})        # 동종업종(Sub-Industry) 기준 등락 평균
+    sec_kr = _peer_label(sym, sector_map) or _kr_sector(sector_map.get(sym, "") or meta.get("sector_en", ""))
     desc = _one_liner(sym, meta)
     pe = meta.get("pe"); pe_s = f"<b>{float(pe):.1f}</b>" if (pe and not _isnan(pe)) else "—"
     price = meta.get("price"); price_s = f" · 종가 <b>${float(price):,.2f}</b>" if (price and not _isnan(price)) else ""
@@ -2008,6 +2098,9 @@ def gather_universe_data(with_volume: bool = False) -> dict:
             w = wiki.get(s)
             if w in GICS_KR:
                 sector_map[s] = w
+    # 세분 비교용 Sub-Industry 전역 맵 채움(없으면 빈 맵 → 비교가 섹터로 자동 폴백).
+    global _SUBIND_MAP
+    _SUBIND_MAP = {s: _WIKI_SUBIND_CACHE[s] for s in universe if s in _WIKI_SUBIND_CACHE}
     if with_volume:
         hist, vol = download_histories(universe, with_volume=True)
     else:
@@ -2043,11 +2136,18 @@ def build_recommendations(data: dict | None = None):
     tech_pass = [s for s, ind in ind_map.items() if _tech_ok(ind)]
     print(f"[정보] 기술 사전필터 통과 {len(tech_pass)}종목 -> 펀더멘털 조회", file=sys.stderr)
     info = get_info_for(tech_pass)
-    sec_med, gmed = sector_median_pes(info, sector_map)
+    # 밸류 기준도 동종업종(Sub-Industry) 중앙 PER 사용(표본 적으면 섹터→전체 폴백)
+    _pe_by_sym = {}
+    for _s, _m in info.items():
+        try: _p = float(_m.get("pe"))
+        except (TypeError, ValueError): continue
+        if 0 < _p <= 200:
+            _pe_by_sym[_s] = _p
+    pe_ref = _peer_median_resolver(_pe_by_sym, sector_map)
     scored = []
     for s in tech_pass:
         meta = info.get(s, {}); pe = meta.get("pe")
-        ref = sec_med.get(sector_map.get(s, ""), gmed)
+        ref = pe_ref(s)
         try: rel_pe = float(pe) / ref if (pe and ref and not _isnan(ref) and ref > 0) else 1.0
         except (TypeError, ValueError): rel_pe = 1.0
         r = score_reco(ind_map[s], meta, pe, rel_pe)
@@ -2348,8 +2448,7 @@ def build_sections_payload(data: dict):
 
     # 섹션 간 종목 중복 제거: 우량+저평가+추세를 동시 충족하는 ②펀더멘탈에 우선권을 주고,
     # ①추세·③주목은 펀더멘탈에 이미 뽑힌 종목을 제외해 같은 급등주가 세 섹션에 반복되지 않게 한다.
-    sector_pes, _gm = sector_median_pes(info, sector_map)
-    sec2 = pick_fundamental(ind_map, info, sector_map, sector_pes=sector_pes)     # ② 우선 선정
+    sec2 = pick_fundamental(ind_map, info, sector_map)     # ② 우선 선정(동종업종 기준 밸류)
     used = {s for s, _, _ in sec2}
     sec1 = pick_trend(ind_map, sector_map, spy, exclude=used)                     # ① 펀더멘탈과 중복 제외
     used |= {s for s, _, _ in sec1}
