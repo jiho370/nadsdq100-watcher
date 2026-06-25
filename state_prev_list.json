@@ -9,7 +9,7 @@
       "since": "2026-06-23",
       "exit_streak": 0
     },
-    "INTC": {
+    "STX": {
       "since": "2026-06-25",
       "exit_streak": 0
     },
@@ -25,15 +25,12 @@
       "since": "2026-06-25",
       "exit_streak": 0
     },
-    "FDX": {
-      "since": "2026-06-25",
-      "exit_streak": 0
-    },
-    "GLW": {
+    "DELL": {
       "since": "2026-06-25",
       "exit_streak": 0
     }
   },
-  "last_data_date": "2026-06-24",
-  "holiday_streak": 1
+  "last_data_date": "2026-06-25",
+  "holiday_streak": 0,
+  "last_run_kst": "2026-06-25"
 }
