@@ -20,15 +20,12 @@
 name: S&P500 Daily Report
 
 on:
+  # 자동 스케줄은 하루 1회(기존 23:00 UTC). 스케줄 실행은 중복이면 자동 스킵(하루 1통).
+  # 점검용으로 직접 workflow_dispatch(아래) 강제 실행할 때만 ALLOW_RESEND=1 이 되어,
+  # 같은 세션이어도 skip 없이 4섹션 메일이 다시 발송된다(원하는 만큼 점검 가능).
   schedule:
-    # 경험적 지연 보정: 직전 라이브 cron(23:00 UTC)이 GitHub 큐 지연으로 매일 ~6시간 밀려
-    # KST 14:08 에 도착했음(첨부 메일 2건: 05:07~05:09 UTC, 편차 2분). 도착을 4시간 당기려
-    # 트리거를 4시간 앞당김: 19:00 UTC → (동일 지연 가정) ≈ KST 10시 도착.
-    #  ※ GitHub 예약 cron 지연은 날·부하에 따라 변동 → 정시 보장 아님. 너무 이르면 시(時)를
-    #    뒤로, 너무 늦으면 앞으로 미세조정. 정확한 10시가 필요하면 외부 트리거로 아래
-    #    workflow_dispatch 를 KST 10:00 에 호출(발송시간_외부트리거_설정.md).
-    - cron: "0 19 * * *"
-  workflow_dispatch:            # 수동/외부 트리거 — 지연 없이 즉시 실행('지금 발송'에 사용)
+    - cron: "0 23 * * *"
+  workflow_dispatch:            # 점검용 강제 실행 — 같은 세션이어도 재발송(skip 안 함)
     inputs:
       force_mode:
         description: "강제 모드(검증용): sections/top10/sector/fund_top10/skip/weekly/strategy"
@@ -54,10 +51,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Set up Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v6
         with:
           python-version: "3.12"
 
@@ -71,6 +68,10 @@ jobs:
           EMAIL_TO:    ${{ secrets.EMAIL_TO }}
           RECO_SECTOR_MAX: "3"
           MIN_SIGNAL_DAYS: "2"
+          # 점검용 강제 실행(workflow_dispatch)일 때만 1 → 같은 세션이어도 재발송(skip 안 함).
+          # 스케줄 자동 실행은 0 → 중복이면 스킵(하루 1통 유지).
+          ALLOW_RESEND: ${{ github.event_name == 'workflow_dispatch' && '1' || '0' }}
+
           # 선택 설정(os.environ.get 패턴): SECTION_N, TREND_HIGH_FRAC, NOTABLE_RVOL,
           #   NOTABLE_MOVE, NOTABLE_TOPN_MC, HOLIDAY_SKIP_STREAK, WEEKLY_TOP_N,
           #   RECO_N, VOL_TARGET, SECTOR_COVERAGE_MIN 등.
@@ -85,10 +86,12 @@ jobs:
           fi
 
       - name: Upload preview
-        uses: actions/upload-artifact@v4
+        if: ${{ always() }}
+        uses: actions/upload-artifact@v6
         with:
           name: report-preview
           path: output/
+          if-no-files-found: ignore   # 휴장/중복(skip·skip_dup) 실행은 output/ 가 비어도 경고 없이 통과
 
       - name: Persist 상태파일 state
         run: |
@@ -107,8 +110,8 @@ jobs:
     if: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.run_backtest == 'true' }}
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
+      - uses: actions/checkout@v6
+      - uses: actions/setup-python@v6
         with:
           python-version: "3.12"
       - run: pip install -r requirements.txt
@@ -121,7 +124,7 @@ jobs:
         run: python sp500_daily_report.py --backtest
 
       - name: Upload backtest result
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: backtest-result      # backtest.txt(요약) + backtest.png(곡선)
           path: output/
