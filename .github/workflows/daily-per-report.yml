@@ -21,10 +21,14 @@ name: S&P500 Daily Report
 
 on:
   schedule:
-    # 01:00 UTC = 한국시간(KST) 10:00. 매일 실행하며 스크립트가 요일.휴장으로 모드 분기.
-    # 휴장 4일+ 연속이면 메일 스킵 -> 매일 돌려도 중복 메일 없음. cron 은 UTC 고정.
-    - cron: "0 1 * * *"
-  workflow_dispatch:            # "Run workflow" 수동 실행 버튼
+    # 경험적 지연 보정: 직전 라이브 cron(23:00 UTC)이 GitHub 큐 지연으로 매일 ~6시간 밀려
+    # KST 14:08 에 도착했음(첨부 메일 2건: 05:07~05:09 UTC, 편차 2분). 도착을 4시간 당기려
+    # 트리거를 4시간 앞당김: 19:00 UTC → (동일 지연 가정) ≈ KST 10시 도착.
+    #  ※ GitHub 예약 cron 지연은 날·부하에 따라 변동 → 정시 보장 아님. 너무 이르면 시(時)를
+    #    뒤로, 너무 늦으면 앞으로 미세조정. 정확한 10시가 필요하면 외부 트리거로 아래
+    #    workflow_dispatch 를 KST 10:00 에 호출(발송시간_외부트리거_설정.md).
+    - cron: "0 19 * * *"
+  workflow_dispatch:            # 수동/외부 트리거 — 지연 없이 즉시 실행('지금 발송'에 사용)
     inputs:
       force_mode:
         description: "강제 모드(검증용): sections/top10/sector/fund_top10/skip/weekly/strategy"
