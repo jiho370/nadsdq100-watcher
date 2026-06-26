@@ -451,6 +451,27 @@ SUBIND_KR = {
     "Industrial Gases": "산업용 가스",
     "Data Center REITs": "데이터센터 리츠",
     "Telecom Tower REITs": "통신타워 리츠",
+    # 반도체 세분 옵션(SEMI_GRANULAR=1)용 합성 그룹 라벨
+    "Semiconductors - Fabless": "반도체(팹리스)",
+    "Semiconductors - IDM": "반도체(IDM·종합)",
+    "Semiconductors - Foundry": "반도체(파운드리)",
+}
+
+# ── (별도 옵션) 반도체 세분: GICS 'Semiconductors' 를 팹리스/IDM/파운드리로 쪼갬 ──
+# 표준 분류(GICS·yfinance)엔 없어서 수동 매핑. SEMI_GRANULAR=1 일 때만 적용(기본 off).
+# 주의: S&P500엔 순수 파운드리(TSM·GFS 등)가 거의 없어 사실상 팹리스↔IDM 구분이 됨.
+SEMI_GRANULAR = os.environ.get("SEMI_GRANULAR", "0") == "1"
+SEMI_OVERRIDE = {
+    # 팹리스(설계 전문, 생산 위탁)
+    "NVDA": "Semiconductors - Fabless", "AVGO": "Semiconductors - Fabless",
+    "AMD":  "Semiconductors - Fabless", "QCOM": "Semiconductors - Fabless",
+    "MPWR": "Semiconductors - Fabless",
+    # IDM(설계+자체 생산)·메모리 포함
+    "INTC": "Semiconductors - IDM", "TXN": "Semiconductors - IDM", "MU": "Semiconductors - IDM",
+    "ADI":  "Semiconductors - IDM", "MCHP": "Semiconductors - IDM", "ON": "Semiconductors - IDM",
+    "NXPI": "Semiconductors - IDM", "SWKS": "Semiconductors - IDM", "QRVO": "Semiconductors - IDM",
+    # 파운드리(순수 위탁생산) — S&P500 편입 시에만 의미
+    "GFS": "Semiconductors - Foundry",
 }
 
 def _norm_yf_sector(sec: str) -> str:
@@ -2067,13 +2088,27 @@ def build_html(tiers, exits, ind_map, info, sector_map, regime, hist, inline_b64
         '데이터: Yahoo Finance / SEC EDGAR.</div></body></html>')
     return html, images
 
+def _parse_recipients(raw: str) -> list[str]:
+    """EMAIL_TO 를 여러 주소로 파싱. 쉼표/세미콜론/줄바꿈/공백 모두 구분자로 허용, 중복·빈값 제거."""
+    if not raw:
+        return []
+    for sep in (";", "\n", "\r", "\t"):
+        raw = raw.replace(sep, ",")
+    out = []
+    for part in raw.split(","):
+        addr = part.strip().strip("<>").strip()
+        if addr and "@" in addr and addr not in out:
+            out.append(addr)
+    return out
+
 def send_email(subject: str, html: str, images) -> bool:
-    user = os.environ.get("SMTP_USER"); pw = os.environ.get("SMTP_PASS"); to = os.environ.get("EMAIL_TO")
-    if not (user and pw and to):
-        print("[정보] SMTP 환경변수 미설정 → 메일 발송 생략(미리보기만 생성)", file=sys.stderr)
+    user = os.environ.get("SMTP_USER"); pw = os.environ.get("SMTP_PASS")
+    recipients = _parse_recipients(os.environ.get("EMAIL_TO", ""))   # 여러 곳 동시 발송 지원
+    if not (user and pw and recipients):
+        print("[정보] SMTP 환경변수 미설정/수신자 없음 → 메일 발송 생략(미리보기만 생성)", file=sys.stderr)
         return False
     msg = MIMEMultipart("related")
-    msg["Subject"], msg["From"], msg["To"] = subject, user, to
+    msg["Subject"], msg["From"], msg["To"] = subject, user, ", ".join(recipients)
     alt = MIMEMultipart("alternative"); msg.attach(alt)
     alt.attach(MIMEText("HTML 미리보기를 지원하는 메일 클라이언트로 확인하세요.", "plain", "utf-8"))
     alt.attach(MIMEText(html, "html", "utf-8"))
@@ -2085,8 +2120,8 @@ def send_email(subject: str, html: str, images) -> bool:
         ctx = ssl.create_default_context()
         with smtplib.SMTP_SSL("smtp.gmail.com", 465, context=ctx) as srv:
             srv.login(user, pw)
-            srv.sendmail(user, [x.strip() for x in to.split(",")], msg.as_string())
-        print(f"[정보] 메일 발송 완료 → {to}", file=sys.stderr)
+            srv.sendmail(user, recipients, msg.as_string())          # 봉투 수신자 = 전체 목록
+        print(f"[정보] 메일 발송 완료 → {len(recipients)}명: {', '.join(recipients)}", file=sys.stderr)
         return True
     except Exception as e:
         print(f"[오류] 메일 발송 실패: {e}", file=sys.stderr)
@@ -2118,6 +2153,14 @@ def gather_universe_data(with_volume: bool = False) -> dict:
     # 세분 비교용 Sub-Industry 전역 맵 채움(없으면 빈 맵 → 비교가 섹터로 자동 폴백).
     global _SUBIND_MAP
     _SUBIND_MAP = {s: _WIKI_SUBIND_CACHE[s] for s in universe if s in _WIKI_SUBIND_CACHE}
+    if SEMI_GRANULAR:        # (옵션) 반도체를 팹리스/IDM/파운드리로 세분 — 기본 'Semiconductors' 덮어씀
+        uni = set(universe)
+        n_over = 0
+        for t, g in SEMI_OVERRIDE.items():
+            if t in uni:
+                _SUBIND_MAP[t] = g
+                n_over += 1
+        print(f"[섹터] 반도체 세분 옵션 적용: {n_over}종목 (팹리스/IDM/파운드리)", file=sys.stderr)
     if with_volume:
         hist, vol = download_histories(universe, with_volume=True)
     else:
