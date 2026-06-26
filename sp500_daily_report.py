@@ -471,9 +471,9 @@ def fetch_wikipedia_sectors() -> dict:
     if _WIKI_SECTOR_CACHE:
         return _WIKI_SECTOR_CACHE
     out = {}
-    # 1) pandas.read_html (lxml 필요)
-    try:
-        tables = pd.read_html(WIKI_SP500_URL)
+
+    def _parse_tables(tables) -> bool:
+        """read_html 결과에서 Symbol/GICS Sector(+Sub-Industry) 표를 찾아 out·캐시 채움."""
         for t in tables:
             cols = [str(c).strip() for c in t.columns]
             if "Symbol" in cols and "GICS Sector" in cols:
@@ -487,29 +487,46 @@ def fetch_wikipedia_sectors() -> dict:
                             si = str(row["GICS Sub-Industry"]).strip()
                             if si and si.lower() != "nan":
                                 _WIKI_SUBIND_CACHE[tic] = si
-                break
-    except Exception as e:
-        print(f"[섹터] 위키피디아 read_html 실패: {e}", file=sys.stderr)
-    # 2) requests + 정규식 폴백
+                return True
+        return False
+
+    # 1) requests(User-Agent) -> read_html(text): 403 회피 + Sub-Industry 동시 확보(가장 견고)
+    if requests is not None:
+        try:
+            from io import StringIO
+            html = requests.get(WIKI_SP500_URL, headers={"User-Agent": "Mozilla/5.0"}, timeout=30).text
+            _parse_tables(pd.read_html(StringIO(html)))
+        except Exception as e:
+            print(f"[섹터] 위키 requests+read_html 실패: {e}", file=sys.stderr)
+    # 2) read_html(url) 직접
+    if not out:
+        try:
+            _parse_tables(pd.read_html(WIKI_SP500_URL))
+        except Exception as e:
+            print(f"[섹터] 위키 read_html(url) 실패: {e}", file=sys.stderr)
+    # 3) 최후: 정규식(섹터 + 4번째 셀 Sub-Industry 까지)
     if not out and requests is not None:
         try:
-            headers = {"User-Agent": "Mozilla/5.0"}
-            html = requests.get(WIKI_SP500_URL, headers=headers, timeout=30).text
+            html = requests.get(WIKI_SP500_URL, headers={"User-Agent": "Mozilla/5.0"}, timeout=30).text
             import re as _re
-            # 표 행: <td>...TICKER...</td> ... 이어지는 셀들 중 GICS 섹터
-            # 간단 파싱: 'TICKER' 링크 뒤 두 번째 <td> 가 회사명, 세 번째가 GICS 섹터
             for m in _re.finditer(
-                r'<td[^>]*>\s*<a[^>]*>([A-Z][A-Z0-9.\-]{0,6})</a>.*?</td>\s*'
-                r'<td[^>]*>.*?</td>\s*<td[^>]*>\s*([A-Za-z &]+?)\s*</td>',
+                r'<td[^>]*>\s*<a[^>]*>([A-Z][A-Z0-9.\-]{0,6})</a>.*?</td>\s*'        # 티커
+                r'<td[^>]*>.*?</td>\s*'                                              # 회사명
+                r'<td[^>]*>\s*([A-Za-z &,\-]+?)\s*</td>\s*'                          # GICS 섹터
+                r'<td[^>]*>\s*(?:<a[^>]*>)?\s*([A-Za-z0-9 &,\-/().]+?)\s*(?:</a>)?\s*</td>',  # Sub-Industry
                 html, _re.S):
                 tic = m.group(1).strip().replace(".", "-")
                 sec = _norm_sector(m.group(2).strip())
                 if tic and sec in GICS_KR:
                     out[tic] = sec
+                    si = m.group(3).strip()
+                    if si and si.lower() != "nan":
+                        _WIKI_SUBIND_CACHE[tic] = si
         except Exception as e:
-            print(f"[섹터] 위키피디아 requests 파싱 실패: {e}", file=sys.stderr)
+            print(f"[섹터] 위키 정규식 파싱 실패: {e}", file=sys.stderr)
+
     if out:
-        print(f"[섹터] 위키피디아에서 {len(out)}종목 GICS 섹터 확보"
+        print(f"[섹터] 위키에서 {len(out)}종목 GICS 섹터 확보 "
               f"(Sub-Industry {len(_WIKI_SUBIND_CACHE)}종목)", file=sys.stderr)
     _WIKI_SECTOR_CACHE = out
     return out
@@ -887,7 +904,7 @@ def sector_median_pes(info: dict[str, dict], sector_map: dict[str, str]) -> tupl
     return med, global_med
 
 # ── 세분 비교(동종업종) 기준: GICS Sub-Industry → 섹터 → 전체 순 폴백 ──
-MIN_PEER = int(os.environ.get("MIN_PEER", "4"))   # Sub-Industry 표본이 이 미만이면 섹터로 폴백
+MIN_PEER = int(os.environ.get("MIN_PEER", "3"))   # 동종업종(Sub-Industry) 표본이 이 미만이면 비교 생략
 
 def _peer_label(sym: str, sector_map: dict) -> str:
     """종목의 동종업종 한글 라벨. Sub-Industry 있으면 그 한글명, 없으면 GICS 섹터 한글명."""
