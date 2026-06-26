@@ -5,8 +5,8 @@
       "since": "2026-06-23",
       "exit_streak": 0
     },
-    "STX": {
-      "since": "2026-06-25",
+    "WDC": {
+      "since": "2026-06-23",
       "exit_streak": 0
     },
     "INTC": {
@@ -17,23 +17,23 @@
       "since": "2026-06-23",
       "exit_streak": 0
     },
-    "WDC": {
-      "since": "2026-06-23",
-      "exit_streak": 0
-    },
     "SPG": {
       "since": "2026-06-25",
+      "exit_streak": 0
+    },
+    "MAS": {
+      "since": "2026-06-26",
       "exit_streak": 0
     },
     "AMAT": {
       "since": "2026-06-26",
       "exit_streak": 0
     },
-    "TER": {
+    "GLW": {
       "since": "2026-06-26",
       "exit_streak": 0
     },
-    "GLW": {
+    "TER": {
       "since": "2026-06-26",
       "exit_streak": 0
     }
