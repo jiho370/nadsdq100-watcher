@@ -1,16 +1,16 @@
 {
-  "date": "2026-06-26",
+  "date": "2026-06-27",
   "holdings": {
     "SNDK": {
       "since": "2026-06-23",
       "exit_streak": 0
     },
-    "WDC": {
-      "since": "2026-06-23",
-      "exit_streak": 0
-    },
     "INTC": {
       "since": "2026-06-26",
+      "exit_streak": 0
+    },
+    "DD": {
+      "since": "2026-06-27",
       "exit_streak": 0
     },
     "MU": {
@@ -25,20 +25,20 @@
       "since": "2026-06-26",
       "exit_streak": 0
     },
-    "AAPL": {
-      "since": "2026-06-26",
+    "ABBV": {
+      "since": "2026-06-27",
       "exit_streak": 0
     },
-    "AMAT": {
-      "since": "2026-06-26",
+    "HLT": {
+      "since": "2026-06-27",
       "exit_streak": 0
     },
-    "GLW": {
-      "since": "2026-06-26",
+    "HWM": {
+      "since": "2026-06-27",
       "exit_streak": 0
     }
   },
-  "last_data_date": "2026-06-25",
+  "last_data_date": "2026-06-26",
   "holiday_streak": 0,
-  "last_run_kst": "2026-06-26"
+  "last_run_kst": "2026-06-27"
 }
