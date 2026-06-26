@@ -20,11 +20,13 @@
 name: S&P500 Daily Report
 
 on:
-  # 자동 스케줄은 하루 1회(기존 23:00 UTC). 스케줄 실행은 중복이면 자동 스킵(하루 1통).
-  # 점검용으로 직접 workflow_dispatch(아래) 강제 실행할 때만 ALLOW_RESEND=1 이 되어,
-  # 같은 세션이어도 skip 없이 4섹션 메일이 다시 발송된다(원하는 만큼 점검 가능).
+  # 자동 스케줄은 하루 1회 — '미국 정규장 마감(16:00 ET) 직후' 그날 종가로 조사·발송.
+  #   미국장 마감: 서머타임(EDT) 20:00 UTC / 겨울(EST) 21:00 UTC.
+  #   22:00 UTC 로 두면 두 경우 모두 마감 1~2시간 뒤(EOD 데이터 안정화) → KST 07시경.
+  #   (더 빨리 원하면 21:30 UTC 등으로 당길 수 있으나, 겨울엔 마감 직후라 데이터가 덜 굳을 수 있음.)
+  #   스케줄 실행은 중복이면 자동 스킵(하루 1통). 정확한 정시가 필요하면 외부 트리거(가이드 참고).
   schedule:
-    - cron: "0 23 * * *"
+    - cron: "0 22 * * *"
   workflow_dispatch:            # 점검용 강제 실행 — 같은 세션이어도 재발송(skip 안 함)
     inputs:
       force_mode:
@@ -65,9 +67,11 @@ jobs:
         env:
           SMTP_USER:   ${{ secrets.SMTP_USER }}
           SMTP_PASS:   ${{ secrets.SMTP_PASS }}
-          EMAIL_TO:    ${{ secrets.EMAIL_TO }}
+          EMAIL_TO:    ${{ secrets.EMAIL_TO }}   # 여러 곳: 시크릿 값에 쉼표로 나열(예: a@x.com, b@y.com, c@z.com)
           RECO_SECTOR_MAX: "3"
           MIN_SIGNAL_DAYS: "2"
+          SEMI_GRANULAR: "1"        # 반도체를 팹리스/IDM/파운드리로 세분 비교. "0"이면 GICS 기본(반도체 통합)
+          MIN_PEER: "3"             # 같은 동종업종이 3종목 이상이면 비교, 미만이면 비교 생략
           # 점검용 강제 실행(workflow_dispatch)일 때만 1 → 같은 세션이어도 재발송(skip 안 함).
           # 스케줄 자동 실행은 0 → 중복이면 스킵(하루 1통 유지).
           ALLOW_RESEND: ${{ github.event_name == 'workflow_dispatch' && '1' || '0' }}
