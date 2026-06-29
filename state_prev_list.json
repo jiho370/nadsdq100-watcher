@@ -1,5 +1,5 @@
 {
-  "date": "2026-06-27",
+  "date": "2026-06-29",
   "holdings": {
     "SNDK": {
       "since": "2026-06-23",
@@ -9,8 +9,8 @@
       "since": "2026-06-26",
       "exit_streak": 0
     },
-    "DD": {
-      "since": "2026-06-27",
+    "GLW": {
+      "since": "2026-06-29",
       "exit_streak": 0
     },
     "MU": {
@@ -33,12 +33,12 @@
       "since": "2026-06-27",
       "exit_streak": 0
     },
-    "HWM": {
-      "since": "2026-06-27",
+    "VRTX": {
+      "since": "2026-06-29",
       "exit_streak": 0
     }
   },
   "last_data_date": "2026-06-26",
   "holiday_streak": 0,
-  "last_run_kst": "2026-06-27"
+  "last_run_kst": "2026-06-29"
 }
