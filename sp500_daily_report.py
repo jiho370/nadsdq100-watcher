@@ -953,6 +953,43 @@ def _peer_median_resolver(values_by_sym: dict, sector_map: dict, min_n: int = MI
         return med.get(keyf(s))      # 표본 부족/미분류 → None(비교 생략)
     return ref
 
+def entry_label(ind: dict) -> str:
+    """진입 적합도 라벨 — 종목이 좋은 것과 '지금 사기 좋은 것'은 다르다.
+      A: 신규 진입 검토 가능  (50일선 근처, RSI 45~70, 과열 없음)
+      B: 관심 유지·눌림목 대기 (좋은 종목이나 현재 가격이 다소 높음)
+      C: 과열 주의            (50일선 대비 +15% 이상 또는 RSI 75 이상)
+      D: 이벤트 확인 전 보류  (추세 불안정 또는 데이터 불충분)
+    """
+    price  = ind.get("price")
+    ma50   = ind.get("ma50")
+    ma200  = ind.get("ma200")
+    rsi    = ind.get("rsi")
+    mom1m  = ind.get("chg_1m")
+
+    # 데이터 부족 → D
+    if any(_isnan(x) for x in (price, ma50, ma200)):
+        return "D"
+
+    # 200일선 아래 → D (이미 하드필터에서 걸러지지만 방어적 처리)
+    if price < ma200:
+        return "D"
+
+    gap50 = (price / ma50 - 1.0) * 100 if ma50 and not _isnan(ma50) else float("nan")
+
+    # 과열 → C
+    if (not _isnan(gap50) and gap50 > 15) or (not _isnan(rsi) and rsi >= 75):
+        return "C"
+
+    # 신규 진입 적합: 50일선 ±8% 이내 + RSI 45~70
+    in_zone = (not _isnan(gap50) and -8 <= gap50 <= 8)
+    rsi_ok  = (not _isnan(rsi) and 45 <= rsi <= 70)
+    if in_zone and rsi_ok:
+        return "A"
+
+    # 그 외(50일선 +8~+15% 범위 등) → B
+    return "B"
+
+
 def score_reco(ind: dict, meta: dict, pe, rel_pe: float) -> tuple[float, str] | None:
     """추천 적격이면 (점수, 한글사유) 반환, 아니면 None.
     [하이브리드 — 백테스트 검증: '15~'26 CAGR 17.4%(SPY 13.8%)·MDD -26%·Sharpe 0.95·회전율 156%]
@@ -960,6 +997,7 @@ def score_reco(ind: dict, meta: dict, pe, rel_pe: float) -> tuple[float, str] | 
       · 추세+모멘텀 코어(하드): 200일선 위, (MACD상승 OR 골든크로스), 6개월 모멘텀 양(+), 진입신호 지속
       · 점수: 위험조정 6개월 모멘텀을 '주(主)가중' + 퀄리티 + 밸류는 '소프트 틸트'(작게)
       · PER 절대캡 폐지(이상치만 PER_SANITY로 차단) → 고멀티플 우량 모멘텀주를 배제하지 않음
+      · FCF yield 가점 추가 (v5.1): 시총 대비 FCF가 클수록 실질 가치 반영
     """
     try:
         pe = float(pe)
@@ -1003,6 +1041,15 @@ def score_reco(ind: dict, meta: dict, pe, rel_pe: float) -> tuple[float, str] | 
         reasons.append("우량재무(" + ", ".join(qreasons[:2]) + ")")
     if roe is not None and roe > 0:
         score += min(roe, 0.5)
+
+    # 4b. FCF yield 가점 (v5.1) — PER보다 실질 현금창출력 반영
+    mktcap = meta.get("marketCap")
+    if fcf and mktcap and not _isnan(fcf) and not _isnan(mktcap) and mktcap > 0:
+        fcf_yield = fcf / mktcap  # 예: 0.05 = 5%
+        if fcf_yield > 0:
+            score += min(fcf_yield * 20, 1.5)   # 최대 1.5점 가점(FCF yield 7.5%+ 상한)
+            if fcf_yield >= 0.03:
+                reasons.append(f"FCF수익률 {fcf_yield*100:.1f}%")
 
     # 5. 밸류 소프트 틸트(작게) — 싸면 약간 가점, 비싸도 배제하지 않음
     if pe is not None:
@@ -1049,8 +1096,9 @@ def pick_trend(ind_map: dict[str, dict], sector_map: dict[str, str],
     """1) 추세 우수 (펀더멘탈 무관).
     조건: 정배열(price>ma20>ma50>ma200) + 현재가 >= 52주고가 x TREND_HIGH_FRAC + 6개월 모멘텀 양(+).
     정렬: 상대강도 = (1+종목6M수익률) / (1+SPY6M수익률).
+    v5.1 추가: 50일선 대비 과열(+15% 초과) 종목은 감점 → 추격매수 위험 경고 표시.
     exclude: 다른 섹션에 이미 뽑힌 종목(중복 표시 방지).
-    반환: [(sym, score=상대강도, reason)]"""
+    반환: [(sym, score=상대강도보정, reason)]"""
     spy6 = _spy_ret_6m(spy_close)
     exclude = exclude or set()
     scored = []
@@ -1072,8 +1120,23 @@ def pick_trend(ind_map: dict[str, dict], sector_map: dict[str, str],
             rs = (1.0 + mom6 / 100.0) / (1.0 + spy6 / 100.0)
         else:
             rs = 1.0 + mom6 / 100.0
-        reason = f"정배열 / 52주고가 근접 / 상대강도 {rs:.2f}(SPY 대비)"
-        scored.append((sym, float(rs), reason))
+
+        # 50일선 대비 위치 계산 (진입 적합도 판단용)
+        gap50 = (price / ma50 - 1.0) * 100 if (ma50 and not _isnan(ma50)) else float("nan")
+        lbl = entry_label(ind)
+
+        # 과열 감점: 50일선 +15% 초과는 상대강도에서 패널티
+        score = rs
+        if not _isnan(gap50) and gap50 > 15:
+            score *= 0.85   # 15% 감점 → 순위는 낮아지지만 완전 배제는 안 함
+
+        # reason에 50일선 위치 + 진입라벨 명시
+        gap50_txt = f"50일선 {gap50:+.1f}%" if not _isnan(gap50) else ""
+        overheat_warn = " ⚠️추격주의" if lbl == "C" else ""
+        reason = (f"정배열 / 52주고가 근접 / 상대강도 {rs:.2f}(SPY 대비)"
+                  + (f" / {gap50_txt}" if gap50_txt else "")
+                  + f" / 진입적합 [{lbl}]{overheat_warn}")
+        scored.append((sym, float(score), reason))
     scored.sort(key=lambda x: x[1], reverse=True)
     return pick_with_sector_cap(scored, sector_map, n, max(1, RECO_SECTOR_MAX))
 
@@ -1139,7 +1202,7 @@ def pick_fundamental(ind_map: dict[str, dict], info: dict[str, dict],
                 continue
             if not (ind.get("macd_up") or ind.get("cross") == "golden"):
                 continue
-            # 점수: 퀄리티 + 섹터대비 저평가폭 + 위험조정 모멘텀
+            # 점수: 퀄리티 + 섹터대비 저평가폭 + 위험조정 모멘텀 + FCF yield(v5.1)
             score = min(roe, 0.6) * 100.0
             rg, pm = meta.get("rev_growth"), meta.get("profit_margin")
             bits = [f"ROE {roe*100:.0f}%", "FCF흑자", f"PER {pe:.0f}(섹터중앙 {pmed:.0f})"]
@@ -1154,6 +1217,14 @@ def pick_fundamental(ind_map: dict[str, dict], info: dict[str, dict],
             vol = ind.get("vol_ann")
             if not _isnan(vol) and vol > 0:
                 score += (mom6 / vol) * 5.0          # 위험조정 6개월 모멘텀 소폭 가점
+            # FCF yield 가점 (v5.1)
+            mktcap = meta.get("marketCap")
+            if fcf and mktcap and not _isnan(mktcap) and mktcap > 0:
+                fcf_yield = fcf / mktcap
+                if fcf_yield > 0:
+                    score += min(fcf_yield * 150, 8.0)  # 최대 8점(FCF yield 5.3%+ 상한)
+                    if fcf_yield >= 0.03:
+                        bits.append(f"FCF수익률 {fcf_yield*100:.1f}%")
             tag = "정배열" + ("·골든크로스" if ind.get("cross") == "golden" else "")
             sm = mom_ref(sym)
             mom_txt = f"6M {mom6:+.0f}%"
@@ -1161,7 +1232,11 @@ def pick_fundamental(ind_map: dict[str, dict], info: dict[str, dict],
                 edge = mom6 - sm
                 mom_txt += f"(섹터평균 {sm:+.0f}% · {'+' if edge >= 0 else ''}{edge:.0f}%p)"
             plabel = _peer_label(sym, sector_map)
-            reason = f"[{plabel}] 우량+섹터대비 저평가(" + " / ".join(bits) + f") · {tag}·{mom_txt}"
+            # 진입적합도 라벨 추가 (v5.1)
+            lbl = entry_label(ind)
+            lbl_txt = {"A": "신규진입검토", "B": "눌림목대기", "C": "⚠️과열주의", "D": "확인필요"}.get(lbl, "")
+            reason = (f"[{plabel}] 우량+섹터대비 저평가(" + " / ".join(bits) + f") · {tag}·{mom_txt}"
+                      + (f" · 진입[{lbl}]{lbl_txt}" if lbl_txt else ""))
             out.append((sym, float(score), reason))
         out.sort(key=lambda x: x[1], reverse=True)
         return out
@@ -1753,7 +1828,8 @@ def _section_table(title, note, picks, ind_map, info, sector_map, hist, images, 
             f'<div style="color:#6b7280;font-size:12px;margin-bottom:2px">{note}</div>{body}')
 
 def build_final_summary(sec1, sec2, sec3, regime) -> str:
-    """4) 최종 결론 — 문장 대신 라벨+키워드 위주(스캔하기 좋게)."""
+    """4) 최종 결론 — '좋은 종목 나열'이 아닌 '투자 행동 판단' 중심으로.
+    v5.1: 진입 적합도(A/B/C)별로 종목을 분류해 표시."""
     def _names(sec):
         return ", ".join(s for s, _, _ in sec) if sec else "—"
 
@@ -1769,17 +1845,83 @@ def build_final_summary(sec1, sec2, sec3, regime) -> str:
     elif gap is not None and not _isnan(gap) and gap < 0:
         mk.append("신규 진입 신중")
 
-    lines = [
-        ("시장",     " · ".join(mk) if mk else "데이터 확보 실패", "#6b7280"),
-        ("추세",     f"{_names(sec1)} — 정배열·52주 신고가·상대강도 우위", "#15803d"),
-        ("펀더멘탈", f"{_names(sec2)} — 고ROE·FCF흑자·섹터대비 저PER·추세 양호", "#1d4ed8"),
-        ("주목",     (f"{_names(sec3)} — 거래량·변동성 급증" if sec3 else "당일 대형 이슈 없음"), "#c2410c"),
+    # 진입 적합도(A/B/C)별 종목 분류 — reason 문자열에서 [A]/[B]/[C] 추출
+    def _label_from_reason(reason: str) -> str:
+        for lbl in ("A", "B", "C", "D"):
+            if f"[{lbl}]" in reason:
+                return lbl
+        return "B"   # 라벨 없으면(추세섹션 일부) B로 간주
+
+    all_picks = list(sec1) + list(sec2)
+    entry_a = [s for s, _, r in all_picks if _label_from_reason(r) == "A"]
+    entry_b = [s for s, _, r in all_picks if _label_from_reason(r) == "B"]
+    entry_c = [s for s, _, r in all_picks if _label_from_reason(r) == "C"]
+
+    # 시장 국면 판단 (단정 금지 — 두 지표 기반 단순 분류)
+    if gap is not None and not _isnan(gap) and sc is not None and not _isnan(sc):
+        if gap >= 0 and sc >= 55:
+            stance = "관망 우선 (추세는 양호하나 탐욕 과열 — 신규 진입 시 비중 조절)"
+            stance_color = "#c2410c"
+        elif gap >= 0 and sc >= 40:
+            stance = "중립 (추세 양호 · 감정 중립 — A등급 중심 선별 진입 가능)"
+            stance_color = "#1d4ed8"
+        elif gap >= 0:
+            stance = "방어적 공격 (추세 위지만 공포 — 역발상 기회, 단 비중 제한)"
+            stance_color = "#15803d"
+        elif sc < 40:
+            stance = "방어 (추세 아래 + 공포 — 신규 진입 자제, 기존 보유 점검)"
+            stance_color = "#b91c1c"
+        else:
+            stance = "방어 (추세 이탈 — 신중)"
+            stance_color = "#b91c1c"
+    else:
+        stance = "데이터 확보 실패 — 시장 국면 판단 보류"
+        stance_color = "#9ca3af"
+
+    def _sym_chips(syms, color):
+        if not syms:
+            return '<span style="color:#9ca3af">해당 없음</span>'
+        return " ".join(
+            f'<span style="background:{color}1a;color:{color};border-radius:6px;'
+            f'padding:1px 7px;font-size:12px;font-weight:600">{s}</span>'
+            for s in syms)
+
+    lines_html = [
+        # 시장 국면
+        f'<div style="display:flex;gap:8px;align-items:baseline;margin:4px 0">'
+        f'<span style="flex:0 0 90px;font-weight:700;font-size:12px;color:#6b7280">시장 국면</span>'
+        f'<span style="color:{stance_color};font-size:13px;font-weight:600">{stance}</span></div>',
+
+        # 신규 진입 검토 (A)
+        f'<div style="display:flex;gap:8px;align-items:baseline;margin:4px 0">'
+        f'<span style="flex:0 0 90px;font-weight:700;font-size:12px;color:#15803d">신규진입[A]</span>'
+        f'<span style="font-size:13px">{_sym_chips(entry_a, "#15803d")}'
+        f'<span style="color:#9ca3af;font-size:11px;margin-left:6px">50일선 근처·RSI정상</span></span></div>',
+
+        # 눌림목 대기 (B)
+        f'<div style="display:flex;gap:8px;align-items:baseline;margin:4px 0">'
+        f'<span style="flex:0 0 90px;font-weight:700;font-size:12px;color:#1d4ed8">눌림대기[B]</span>'
+        f'<span style="font-size:13px">{_sym_chips(entry_b, "#1d4ed8")}'
+        f'<span style="color:#9ca3af;font-size:11px;margin-left:6px">좋은 종목, 가격 다소 높음</span></span></div>',
+
+        # 과열 주의 (C)
+        f'<div style="display:flex;gap:8px;align-items:baseline;margin:4px 0">'
+        f'<span style="flex:0 0 90px;font-weight:700;font-size:12px;color:#c2410c">과열주의[C]</span>'
+        f'<span style="font-size:13px">{_sym_chips(entry_c, "#c2410c")}'
+        f'<span style="color:#9ca3af;font-size:11px;margin-left:6px">추격매수 자제</span></span></div>',
+
+        # 이벤트 감시
+        f'<div style="display:flex;gap:8px;align-items:baseline;margin:4px 0">'
+        f'<span style="flex:0 0 90px;font-weight:700;font-size:12px;color:#c2410c">이벤트감시</span>'
+        f'<span style="color:#374151;font-size:13px">'
+        f'{(_names(sec3) + " — 거래량·변동성 급증") if sec3 else "당일 대형 이슈 없음"}</span></div>',
+
+        # 시장 지표 요약
+        f'<div style="display:flex;gap:8px;align-items:baseline;margin:4px 0">'
+        f'<span style="flex:0 0 90px;font-weight:700;font-size:12px;color:#6b7280">시장지표</span>'
+        f'<span style="color:#374151;font-size:13px">{" · ".join(mk) if mk else "확보 실패"}</span></div>',
     ]
-    return "".join(
-        f'<div style="display:flex;gap:8px;align-items:baseline;margin:3px 0">'
-        f'<span style="flex:0 0 60px;font-weight:700;font-size:12px;color:{c}">{lab}</span>'
-        f'<span style="color:#374151;font-size:13px;line-height:1.5">{txt}</span></div>'
-        for lab, txt, c in lines)
+    return "".join(lines_html)
 
 # ---- 모드별 렌더 ----
 def render_sections(payload, inline_b64=False):
@@ -1797,21 +1939,25 @@ def render_sections(payload, inline_b64=False):
                      f'<ul style="color:#444;font-size:13px">{items}</ul>')
     html.append(exit_html)
     html.append(_section_table("📈 ① 추세 우수 <span style=\"color:#9ca3af;font-size:12px\">(펀더멘탈 무관)</span>",
-        "정배열 + 52주 고가 근접 + 6개월 상대강도(SPY 대비) 상위.",
+        "정배열 + 52주 고가 근접 + 6개월 상대강도(SPY 대비) 상위. 진입적합 [A]=신규검토 [B]=눌림대기 [C]=과열주의.",
         sec1, ind_map, info, sector_map, hist, images, inline_b64,
         badge=_badge("추세", "#15803d"), chart_days=252, card_bg="#f6fdf9", card_border="#bbf7d0"))
     html.append(_section_table("💎 ② 펀더멘탈 우수 <span style=\"color:#9ca3af;font-size:12px\">(추세도 우수)</span>",
-        "ROE≥15% · FCF 흑자 · 섹터 중앙값 이하 PER(섹터별 밸류) · 정배열+모멘텀. '우량·저평가·추세' 동시 충족만. (종목 6M 추세를 동일 섹터 평균과 함께 표기)",
+        "ROE≥15% · FCF 흑자 · FCF수익률 · 섹터 중앙값 이하 PER(섹터별 밸류) · 정배열+모멘텀. '우량·저평가·추세' 동시 충족만. 진입[A/B/C] 라벨 참고.",
         sec2, ind_map, info, sector_map, hist, images, inline_b64,
         badge=_badge("펀더멘탈", "#1d4ed8"), chart_days=252, card_bg="#f5f8ff", card_border="#c7d7fe"))
-    html.append(_section_table("🔔 ③ 주목할 종목 <span style=\"color:#9ca3af;font-size:12px\">(대형 이슈/변동성)</span>",
-        "상대거래량 급증 · 당일 변동률 큼 · 최근 48시간 내 뉴스. 시총 상위 위주.",
+    html.append(_section_table("🔔 ③ 이벤트 감시 <span style=\"color:#9ca3af;font-size:12px\">(추천 아님 — 대형 이슈/변동성)</span>",
+        "상대거래량 급증 · 당일 변동률 큼 · 최근 48시간 내 뉴스. 시총 상위 위주. 투자 후보가 아닌 '무슨 일이 생겼는지 확인할 종목'입니다.",
         sec3, ind_map, info, sector_map, hist, images, inline_b64,
-        badge=_badge("주목", "#c2410c"), chart_days=252, card_bg="#fffaf5", card_border="#fed7aa"))
+        badge=_badge("이벤트감시", "#c2410c"), chart_days=252, card_bg="#fffaf5", card_border="#fed7aa"))
     summary = build_final_summary(sec1, sec2, sec3, regime)
-    html.append('<h3 style="margin-bottom:2px">4) 최종 분석 / 결론</h3>'
-                f'<div style="color:#333;font-size:13px;line-height:1.6;background:#f8fafc;'
-                f'border-left:3px solid #15803d;padding:8px 12px">{summary}</div>')
+    html.append('<h3 style="margin-bottom:2px">4) 오늘의 행동 판단</h3>'
+                f'<div style="color:#333;font-size:13px;line-height:1.8;background:#f8fafc;'
+                f'border-left:3px solid #15803d;padding:10px 14px">{summary}</div>'
+                '<div style="color:#9ca3af;font-size:11px;margin-top:4px">'
+                '진입라벨 [A]=신규진입검토(50일선 근처·RSI정상) '
+                '[B]=눌림목대기(좋은 종목이나 가격 다소 높음) '
+                '[C]=과열주의(추격매수 자제) — 종목 품질과 타이밍은 별개입니다.</div>')
     html.append(_HTML_FOOT)
     return "".join(html), images
 
