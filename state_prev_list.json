@@ -1,5 +1,5 @@
 {
-  "date": "2026-06-30",
+  "date": "2026-07-01",
   "holdings": {
     "SNDK": {
       "since": "2026-06-23",
@@ -25,20 +25,20 @@
       "since": "2026-06-30",
       "exit_streak": 0
     },
-    "GLW": {
-      "since": "2026-06-29",
+    "KMI": {
+      "since": "2026-07-01",
+      "exit_streak": 0
+    },
+    "VRT": {
+      "since": "2026-07-01",
       "exit_streak": 0
     },
     "KLAC": {
       "since": "2026-06-30",
       "exit_streak": 0
-    },
-    "WDC": {
-      "since": "2026-06-30",
-      "exit_streak": 0
     }
   },
-  "last_data_date": "2026-06-29",
+  "last_data_date": "2026-06-30",
   "holiday_streak": 0,
-  "last_run_kst": "2026-06-30"
+  "last_run_kst": "2026-07-01"
 }
