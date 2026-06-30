@@ -52,6 +52,14 @@ from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from email.mime.image import MIMEImage
 
+# ── AI 해석 레이어(선택) — 모듈 없거나 키 없으면 자동 폴백(빈 dict) ──
+try:
+    from ai_commentary import build_ai_layer, fetch_news_headlines
+except Exception:
+    def build_ai_layer(*a, **k): return {}
+    def fetch_news_headlines(*a, **k): return {}
+_AI: dict = {}   # daily_main 에서 채움. 렌더 함수들이 읽는 전역(기존 _SUBIND_MAP 패턴과 동일).
+
 # ----------------------------- 설정 -----------------------------
 RECO_N         = int(os.environ.get("RECO_N", "10"))            # 추천 종목 최대 개수
 RECO_PER_MAX   = float(os.environ.get("RECO_PER_MAX", "20"))    # (참고용) 과거 저PER 캡 — 하이브리드에선 미사용
@@ -1800,6 +1808,20 @@ def _stock_row(sym, reason, ind_map, info, sector_map, hist, images, inline_b64,
     if reason_label and reason:
         reason_html = (f'<div style="font-size:12px;color:#374151;background:#fef3c7;border-radius:6px;'
                        f'padding:8px;line-height:1.5"><b>{reason_label}</b> · {reason}</div>')
+
+    # AI 해석(있으면): '왜 지금' 근거 + 뉴스 요약 + 호재/악재 라벨
+    ai_r = (_AI.get("rationales") or {}).get(sym) if _AI else None
+    if ai_r and (ai_r.get("why") or ai_r.get("news")):
+        flag = ai_r.get("flag")
+        flag_color = {"호재": "#15803d", "악재": "#b91c1c", "중립": "#6b7280"}.get(flag, "#6b7280")
+        flag_chip = (f'<span style="background:{flag_color}1a;color:{flag_color};border-radius:6px;'
+                     f'padding:1px 7px;font-size:11px;font-weight:700;margin-left:6px">{flag}</span>') if flag else ""
+        why_s = f'{ai_r["why"]}' if ai_r.get("why") else ""
+        news_s = (f'<div style="margin-top:4px;color:#6b7280">🗞 {ai_r["news"]}{flag_chip}</div>'
+                  if ai_r.get("news") else "")
+        reason_html += (f'<div style="font-size:12px;color:#374151;background:#eff6ff;border-radius:6px;'
+                        f'padding:8px;line-height:1.5;margin-top:6px">'
+                        f'<b style="color:#1d4ed8">AI 해석</b> · {why_s}{news_s}</div>')
     return (
         f'<tr style="background:{card_bg}">'
         f'<td style="padding:12px 14px;vertical-align:top;width:54%;border-bottom:1px solid {card_border}">'
@@ -1921,6 +1943,18 @@ def build_final_summary(sec1, sec2, sec3, regime) -> str:
         f'<span style="flex:0 0 90px;font-weight:700;font-size:12px;color:#6b7280">시장지표</span>'
         f'<span style="color:#374151;font-size:13px">{" · ".join(mk) if mk else "확보 실패"}</span></div>',
     ]
+
+    # AI 교차검증 경고(있으면): 지표끼리/지표-뉴스 모순 종목
+    ai_warns = (_AI or {}).get("warnings") or []
+    if ai_warns:
+        items = "".join(
+            f'<div style="font-size:12px;color:#92400e;margin:2px 0">'
+            f'<b>{w.get("sym","")}</b> — {w.get("note","")}</div>' for w in ai_warns)
+        lines_html.append(
+            f'<div style="display:flex;gap:8px;align-items:baseline;margin:4px 0">'
+            f'<span style="flex:0 0 90px;font-weight:700;font-size:12px;color:#b45309">AI 검증</span>'
+            f'<span style="font-size:13px">{items}</span></div>')
+
     return "".join(lines_html)
 
 # ---- 모드별 렌더 ----
@@ -1964,6 +1998,13 @@ def render_sections(payload, inline_b64=False):
 def _market_overview_block(payload) -> str:
     """시장 총평: 섹터별 최근(1주) 추이를 단어/칩 위주로 동적 요약.
     분기 정적 텍스트(meta.market_overview)는 더 이상 쓰지 않음 — 매일 시세로 자동 생성."""
+    # AI 총평이 있으면 우선 사용(없으면 아래 시세 기반 자동 생성으로 폴백)
+    ai_mo = (_AI or {}).get("market_overview")
+    if ai_mo:
+        return ('<h3 style="margin:14px 0 2px">🧭 시장 총평 '
+                '<span style="color:#9ca3af;font-size:11px">(AI 해석)</span></h3>'
+                '<div style="background:#f8fafc;border-left:3px solid #6b7280;padding:8px 12px;'
+                f'margin-bottom:6px;font-size:13px;color:#374151;line-height:1.6">{ai_mo}</div>')
     ind_map = payload.get("ind_map") or {}
     sector_map = payload.get("sector_map") or {}
     buckets = {}
@@ -2792,6 +2833,18 @@ def daily_main(no_email: bool = False, force_mode: str | None = None):
         subject = f"[S&P500] {today} 4섹션 추천"
         new_holdings = holdings; body_count = len(sec1+sec2+sec3); mode = "sections"
 
+    # ---- AI 해석 레이어(총평+근거+검증). 키 없으면 build_ai_layer 가 {} 반환 → 폴백. ----
+    global _AI
+    ai_syms = _picks_for_ai(mode, payload)
+    if ai_syms:
+        news = fetch_news_headlines(ai_syms, yf)
+        _AI = build_ai_layer(ai_syms, ind_map, regime, news,
+                             (data.get("profiles") or {}).get("sector_briefings"))
+    else:
+        _AI = {}
+    if _AI:   # AI가 실제로 생성됐을 때만 미리보기를 반영본으로 재렌더(키 없으면 추가 비용 0)
+        preview = _render_for_email(mode, payload, data, holdings, today, force_mode, inline_b64=True)[0]
+
     with open("output/email.html", "w", encoding="utf-8") as f: f.write(preview)
     print(f"[정보] 모드={mode} 항목={body_count} 미리보기 output/email.html", file=sys.stderr)
 
@@ -2806,8 +2859,8 @@ def daily_main(no_email: bool = False, force_mode: str | None = None):
         html, images = _render_for_email(mode, payload if mode != "sections" else None, data, holdings, today, force_mode)
         send_email(subject, html, images)
 
-def _render_for_email(mode, payload, data, holdings, today, force_mode):
-    """메일 발송용 CID 인라인 렌더(미리보기와 동일 내용, inline_b64=False)."""
+def _render_for_email(mode, payload, data, holdings, today, force_mode, inline_b64=False):
+    """렌더 디스패치. inline_b64=False=메일용 CID, True=미리보기용 data-URI."""
     if mode == "sections":
         sec1, sec2, sec3, info = build_sections_payload(data)
         merged = [(s, sc, r) for s, sc, r in (sec1 + sec2 + sec3)]
@@ -2815,30 +2868,39 @@ def _render_for_email(mode, payload, data, holdings, today, force_mode):
         p = {"ind_map": data["ind_map"], "info": info, "sector_map": data["sector_map"],
              "regime": data["regime"], "hist": data["hist"], "sec1": sec1, "sec2": sec2,
              "sec3": sec3, "exits": confirmed}
-        return render_sections(p, inline_b64=False)
+        return render_sections(p, inline_b64=inline_b64)
     if mode == "trend_momo":
         return render_holiday_list(
             payload, "trend_momo", "휴장 1일차 · 정배열 모멘텀 종목 (추천이 아닌 안내)",
             "정배열(종가>20>50>200일선) + 6개월 모멘텀 상위. 강한 상승 추세가 이어지는 종목입니다.",
-            "정배열", "#15803d", inline_b64=False)
+            "정배열", "#15803d", inline_b64=inline_b64)
     if mode == "oversold":
         return render_holiday_list(
             payload, "oversold", "휴장 2일차 · 과매도 기술적 반등 예견 종목 (추천이 아닌 안내)",
             "200일선 위에서 RSI 과매도권(28~48) 회복 + 눌림 후 당일 반등. 기술적 반등 가능성을 보는 관찰 목록입니다.",
-            "반등주목", "#c2410c", inline_b64=False)
+            "반등주목", "#c2410c", inline_b64=inline_b64)
     if mode == "top10":
-        return render_top10_table(payload, "top10", "하이브리드(퀄리티+모멘텀) 통합 점수 상위", inline_b64=False)
+        return render_top10_table(payload, "top10", "하이브리드(퀄리티+모멘텀) 통합 점수 상위", inline_b64=inline_b64)
     if mode == "fund_top10":
-        return render_top10_table(payload, "fund_top10", "ROE·FCF·매출성장·이익률 종합(가치주 관점)", inline_b64=False)
+        return render_top10_table(payload, "fund_top10", "ROE·FCF·매출성장·이익률 종합(가치주 관점)", inline_b64=inline_b64)
     if mode == "sector":
         ensure_sector_info(data)
         payload = build_sector_briefing(data, info=data.get("info"))
-        return render_sector_briefing(payload, inline_b64=False)
+        return render_sector_briefing(payload, inline_b64=inline_b64)
     if mode == "weekly":
-        return render_weekly(payload, inline_b64=False)
+        return render_weekly(payload, inline_b64=inline_b64)
     if mode == "strategy":
-        return render_strategy(payload, inline_b64=False)
-    return render_sector_briefing(payload, inline_b64=False)
+        return render_strategy(payload, inline_b64=inline_b64)
+    return render_sector_briefing(payload, inline_b64=inline_b64)
+
+
+def _picks_for_ai(mode, payload) -> list[str]:
+    """현재 모드의 payload 에서 AI 해석 대상 심볼 추출."""
+    if mode == "sections":
+        merged = (payload.get("sec1") or []) + (payload.get("sec2") or []) + (payload.get("sec3") or [])
+        return [s for s, *_ in merged]
+    picks = payload.get("picks") or []
+    return [(p[0] if isinstance(p, (list, tuple)) else p) for p in picks]
 
 def main():
     ap = argparse.ArgumentParser(description="S&P500 일일 추천 리포트(하이브리드 / 다모드)")
