@@ -1,16 +1,16 @@
 {
-  "date": "2026-07-01",
+  "date": "2026-07-02",
   "holdings": {
     "SNDK": {
       "since": "2026-06-23",
       "exit_streak": 0
     },
-    "MU": {
-      "since": "2026-06-23",
-      "exit_streak": 0
-    },
     "INTC": {
       "since": "2026-06-26",
+      "exit_streak": 0
+    },
+    "DELL": {
+      "since": "2026-07-02",
       "exit_streak": 0
     },
     "SPG": {
@@ -21,24 +21,24 @@
       "since": "2026-06-26",
       "exit_streak": 0
     },
-    "APH": {
-      "since": "2026-06-30",
+    "DVA": {
+      "since": "2026-07-02",
       "exit_streak": 0
     },
-    "KMI": {
-      "since": "2026-07-01",
-      "exit_streak": 0
-    },
-    "VRT": {
-      "since": "2026-07-01",
+    "GLW": {
+      "since": "2026-07-02",
       "exit_streak": 0
     },
     "KLAC": {
       "since": "2026-06-30",
       "exit_streak": 0
+    },
+    "MU": {
+      "since": "2026-06-23",
+      "exit_streak": 0
     }
   },
-  "last_data_date": "2026-06-30",
+  "last_data_date": "2026-07-01",
   "holiday_streak": 0,
-  "last_run_kst": "2026-07-01"
+  "last_run_kst": "2026-07-02"
 }
