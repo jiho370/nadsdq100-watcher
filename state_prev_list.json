@@ -1,16 +1,16 @@
 {
-  "date": "2026-07-02",
+  "date": "2026-07-03",
   "holdings": {
-    "SNDK": {
-      "since": "2026-06-23",
+    "AMD": {
+      "since": "2026-07-03",
       "exit_streak": 0
     },
-    "INTC": {
-      "since": "2026-06-26",
+    "MRNA": {
+      "since": "2026-07-03",
       "exit_streak": 0
     },
-    "DELL": {
-      "since": "2026-07-02",
+    "AMAT": {
+      "since": "2026-07-03",
       "exit_streak": 0
     },
     "SPG": {
@@ -25,20 +25,20 @@
       "since": "2026-07-02",
       "exit_streak": 0
     },
-    "GLW": {
-      "since": "2026-07-02",
+    "SNDK": {
+      "since": "2026-06-23",
       "exit_streak": 0
     },
     "KLAC": {
       "since": "2026-06-30",
       "exit_streak": 0
     },
-    "MU": {
-      "since": "2026-06-23",
+    "GLW": {
+      "since": "2026-07-02",
       "exit_streak": 0
     }
   },
-  "last_data_date": "2026-07-01",
+  "last_data_date": "2026-07-02",
   "holiday_streak": 0,
-  "last_run_kst": "2026-07-02"
+  "last_run_kst": "2026-07-03"
 }
