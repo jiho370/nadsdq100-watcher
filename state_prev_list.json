@@ -1,5 +1,5 @@
 {
-  "date": "2026-07-03",
+  "date": "2026-07-04",
   "holdings": {
     "AMD": {
       "since": "2026-07-03",
@@ -39,6 +39,6 @@
     }
   },
   "last_data_date": "2026-07-02",
-  "holiday_streak": 0,
-  "last_run_kst": "2026-07-03"
+  "holiday_streak": 1,
+  "last_run_kst": "2026-07-04"
 }
