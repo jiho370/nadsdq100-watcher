@@ -54,10 +54,13 @@ from email.mime.image import MIMEImage
 
 # ── AI 해석 레이어(선택) — 모듈 없거나 키 없으면 자동 폴백(빈 dict) ──
 try:
-    from ai_commentary import build_ai_layer, fetch_news_headlines
+    from ai_commentary import (build_ai_layer, fetch_news_headlines,
+                               dump_context, load_ai_result)
 except Exception:
     def build_ai_layer(*a, **k): return {}
     def fetch_news_headlines(*a, **k): return {}
+    def dump_context(*a, **k): return False
+    def load_ai_result(*a, **k): return {}
 _AI: dict = {}   # daily_main 에서 채움. 렌더 함수들이 읽는 전역(기존 _SUBIND_MAP 패턴과 동일).
 
 # ----------------------------- 설정 -----------------------------
@@ -897,6 +900,8 @@ def compute_indicators(close):
         "vol_ann": _ann_vol(close), "chg_1d": _ret(close, 1), "chg_1w": _ret(close, P_1W), 
         "chg_1m": _ret(close, P_1M), "chg_3m": _ret(close, 63), "chg_6m": _ret(close, 126),
         "chg_1y": _ret(close, P_1Y), "chg_3y": _ret(close, P_3Y), "chg_5y": _ret_full(close),
+        # 12-1 모멘텀(최근 1개월 제외한 12개월 수익률) — 백테스트 최우수 모델. %단위.
+        "chg_12_1": ((float(close.iloc[-21] / close.iloc[-252]) - 1.0) * 100 if len(close) >= 252 else np.nan),
         "high_52w": (float(close.rolling(252, min_periods=60).max().iloc[-1]) if len(close) >= 60 else np.nan),
     }
     ind.update(_classify_trend(close, ma, hist, rsi_series))
@@ -1036,13 +1041,17 @@ def score_reco(ind: dict, meta: dict, pe, rel_pe: float) -> tuple[float, str] | 
 
     score, reasons = 0.0, []
 
-    # 3. 모멘텀 주가중 (위험조정 6개월 = 6개월수익률 / 연변동성)
+    # 3. 모멘텀 주가중 — 백테스트 결과 '12-1 모멘텀'이 초과수익·낮은 회전율에서 최우수.
+    #    (12-1 없으면 6개월로 폴백) 위험조정 = 모멘텀 / 연변동성
+    mom_primary = ind.get("chg_12_1")
+    if _isnan(mom_primary):
+        mom_primary = mom6
     vol = ind.get("vol_ann")
-    if not _isnan(vol) and vol > 0:
-        rar = mom6 / vol
+    if not _isnan(vol) and vol > 0 and not _isnan(mom_primary):
+        rar = mom_primary / vol
         if rar > 0:
             score += rar * MOM_WEIGHT
-            reasons.append("위험조정 모멘텀 우수")
+            reasons.append("위험조정 12-1 모멘텀 우수")
 
     # 4. 퀄리티 가점
     if qreasons:
@@ -2330,6 +2339,14 @@ def gather_universe_data(with_volume: bool = False) -> dict:
     """전 모드 공용 데이터 수집(1회). 종가·(옵션)거래량·지표·SPY·레짐을 반환.
     info는 비싸므로 여기서 받지 않고 호출부에서 필요한 종목만 조회한다."""
     universe, sector_map = get_sp500()
+    # 워런트/발행예정(WI)/유닛 등 '실거래 시세 없는' 표식 티커 제거 → 다운로드 실패 소음 방지.
+    #   (BRK-B·BF-B 같은 클래스주는 유지: -A/-B 제외, -W/-WI/-WS/-U/-RT/-R 만 배제)
+    _BAD_SUFFIX = ("-W", "-WI", "-WS", "-WD", "-U", "-UN", "-RT", "-R", ".W", ".U")
+    _before = len(universe)
+    universe = [s for s in universe if not any(s.upper().endswith(x) for x in _BAD_SUFFIX)]
+    sector_map = {s: v for s, v in sector_map.items() if s in set(universe)}
+    if _before != len(universe):
+        print(f"[유니버스] 비거래 표식 티커 {_before - len(universe)}개 제외", file=sys.stderr)
     # 위키피디아 GICS 섹터로 sector_map 보강(가장 권위 있는 분류). 없으면 SPY 공시값 유지.
     wiki = fetch_wikipedia_sectors()
     if wiki:
@@ -2729,7 +2746,8 @@ def _compute_exits_and_tiers(picked, ind_map, holdings, today):
         new_holdings[sym] = {"since": holdings.get(sym, {}).get("since", today), "exit_streak": 0}
     return confirmed, tiers, new_holdings
 
-def daily_main(no_email: bool = False, force_mode: str | None = None):
+def daily_main(no_email: bool = False, force_mode: str | None = None,
+               emit_context: str | None = None, ai_json: str | None = None):
     _require_yf()
     today = datetime.now(KST).date().isoformat()
     state = load_state(); holdings = state.get("holdings", {})
@@ -2833,28 +2851,40 @@ def daily_main(no_email: bool = False, force_mode: str | None = None):
         subject = f"[S&P500] {today} 4섹션 추천"
         new_holdings = holdings; body_count = len(sec1+sec2+sec3); mode = "sections"
 
-    # ---- AI 해석 레이어(총평+근거+검증). 키 없으면 build_ai_layer 가 {} 반환 → 폴백. ----
+    # ---- AI 해석 레이어 ----
+    #  emit_context: phase1(스케줄 태스크) — 컨텍스트만 JSON 으로 내보내고 발송 안 함
+    #  ai_json:      phase2 — Claude 가 작성한 해석 JSON 을 주입해 발송
+    #  둘 다 없으면: build_ai_layer 단일 실행(api/cli 백엔드). 키/CLI 없으면 {} 폴백.
     global _AI
     ai_syms = _picks_for_ai(mode, payload)
-    if ai_syms:
-        news = fetch_news_headlines(ai_syms, yf)
-        _AI = build_ai_layer(ai_syms, ind_map, regime, news,
-                             (data.get("profiles") or {}).get("sector_briefings"))
+    sec_briefs = (data.get("profiles") or {}).get("sector_briefings")
+    if emit_context:
+        ok = dump_context(emit_context, ai_syms, ind_map, regime,
+                          fetch_news_headlines(ai_syms, yf), sec_briefs)
+        print(f"[AI] phase1 컨텍스트 저장: {emit_context} ({'OK' if ok else '대상 없음'})", file=sys.stderr)
+        _AI = {}
+    elif ai_json:
+        _AI = load_ai_result(ai_json)
+        print(f"[AI] phase2 해석 주입: {ai_json} ({'적용' if _AI else '폴백'})", file=sys.stderr)
+    elif ai_syms:
+        _AI = build_ai_layer(ai_syms, ind_map, regime, fetch_news_headlines(ai_syms, yf), sec_briefs)
     else:
         _AI = {}
-    if _AI:   # AI가 실제로 생성됐을 때만 미리보기를 반영본으로 재렌더(키 없으면 추가 비용 0)
+    if _AI:   # AI가 실제로 채워졌을 때만 미리보기를 반영본으로 재렌더
         preview = _render_for_email(mode, payload, data, holdings, today, force_mode, inline_b64=True)[0]
 
     with open("output/email.html", "w", encoding="utf-8") as f: f.write(preview)
     print(f"[정보] 모드={mode} 항목={body_count} 미리보기 output/email.html", file=sys.stderr)
 
-    # 상태 갱신(holdings 로직 보존 + 휴장 streak/마지막 데이터 날짜/실행 KST일 기록)
-    new_state = {"date": today, "holdings": new_holdings,
-                 "last_data_date": data_date, "holiday_streak": streak,
-                 "last_run_kst": today}
-    save_state(new_state)
+    # phase1(emit_context)은 상태를 갱신하지 않는다 — 갱신하면 phase2가 skip_dup으로 발송을 건너뛴다.
+    if not emit_context:
+        # 상태 갱신(holdings 로직 보존 + 휴장 streak/마지막 데이터 날짜/실행 KST일 기록)
+        new_state = {"date": today, "holdings": new_holdings,
+                     "last_data_date": data_date, "holiday_streak": streak,
+                     "last_run_kst": today}
+        save_state(new_state)
 
-    if not no_email:
+    if not no_email and not emit_context:
         # 메일용은 CID 인라인(가벼움) — 모드별 렌더 재호출
         html, images = _render_for_email(mode, payload if mode != "sections" else None, data, holdings, today, force_mode)
         send_email(subject, html, images)
@@ -2910,11 +2940,16 @@ def main():
                     choices=["sections", "trend_momo", "oversold", "skip",
                              "top10", "sector", "fund_top10", "weekly", "strategy"],
                     help="휴장/주말을 기다리지 않고 특정 모드를 강제 실행(검증용)")
+    ap.add_argument("--emit-context", default=None, metavar="PATH",
+                    help="phase1: AI 입력 컨텍스트를 JSON 으로 저장하고 발송하지 않음(스케줄 태스크용)")
+    ap.add_argument("--ai-json", default=None, metavar="PATH",
+                    help="phase2: Claude 가 작성한 해석 JSON 을 주입해 발송(스케줄 태스크용)")
     args = ap.parse_args()
     if args.backtest:
         backtest_main()
     else:
-        daily_main(no_email=args.no_email, force_mode=args.force_mode)
+        daily_main(no_email=args.no_email, force_mode=args.force_mode,
+                   emit_context=args.emit_context, ai_json=args.ai_json)
 
 if __name__ == "__main__":
     main()

@@ -1,0 +1,8 @@
+# 비밀번호 평문 포함 — 절대 푸시 금지 (자동화는 GitHub Secrets 사용)
+run_daily.bat
+
+__pycache__/
+*.pyc
+output/*.html
+output/*.png
+data/

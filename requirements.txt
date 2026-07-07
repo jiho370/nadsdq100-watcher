@@ -6,3 +6,4 @@ requests
 openpyxl
 lxml
 anthropic        # AI 해석 레이어(총평/근거/검증). 키 없으면 자동 폴백되므로 미설치여도 무방.
+pykrx            # 코스피200 구성종목·펀더멘탈(KRX 공식). 실패 시 캐시 폴백.

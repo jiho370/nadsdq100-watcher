@@ -36,6 +36,9 @@ import sys
 import json
 import math
 
+import shutil
+import subprocess
+
 # anthropic SDK 는 '있으면 사용, 없으면 폴백'. import 실패가 전체를 막지 않게 한다.
 try:
     import anthropic
@@ -44,19 +47,29 @@ except Exception:
 
 
 # ----------------------------- 설정 -----------------------------
+# AI_BACKEND:
+#   "api" (기본) — Anthropic API(ANTHROPIC_API_KEY 필요, 종량 과금)
+#   "cli"        — 로컬 Claude Code CLI(`claude -p`) 호출. Pro/Max '구독'으로 동작, API 키 불필요.
+#                  단, 이 코드를 실행하는 머신에 Claude Code 가 설치·로그인돼 있어야 함(=내 PC).
+AI_BACKEND    = os.environ.get("AI_BACKEND", "api").strip().lower()
+CLAUDE_BIN    = os.environ.get("CLAUDE_BIN", "claude")   # PATH 에 없으면 절대경로 지정
+AI_MODEL      = os.environ.get("AI_MODEL", "claude-sonnet-4-6")
+AI_MAX_PICKS  = int(os.environ.get("AI_MAX_PICKS", "12"))
+AI_TIMEOUT    = float(os.environ.get("AI_TIMEOUT", "120"))
+
+
 def _enabled() -> bool:
     if os.environ.get("AI_ENABLED", "1") != "1":
         return False
+    if AI_BACKEND == "cli":
+        # 구독 경로: claude 실행파일이 있어야 함(키 불필요)
+        return shutil.which(CLAUDE_BIN) is not None or os.path.exists(CLAUDE_BIN)
+    # api 경로: SDK + 키 필요
     if anthropic is None:
         return False
     if not os.environ.get("ANTHROPIC_API_KEY"):
         return False
     return True
-
-
-AI_MODEL      = os.environ.get("AI_MODEL", "claude-sonnet-4-6")
-AI_MAX_PICKS  = int(os.environ.get("AI_MAX_PICKS", "12"))
-AI_TIMEOUT    = float(os.environ.get("AI_TIMEOUT", "40"))
 
 
 def _log(msg: str):
@@ -229,28 +242,88 @@ def build_ai_layer(picks, ind_map, regime,
         return {}
 
     try:
-        client = anthropic.Anthropic(timeout=AI_TIMEOUT)
-        msg = client.messages.create(
-            model=AI_MODEL,
-            max_tokens=2000,
-            temperature=0,
-            system=_SYSTEM,
-            messages=[{
-                "role": "user",
-                "content": _INSTRUCTION + json.dumps(ctx, ensure_ascii=False),
-            }],
-        )
-        text = "".join(b.text for b in msg.content if getattr(b, "type", "") == "text")
+        if AI_BACKEND == "cli":
+            text = _call_cli(ctx)
+        else:
+            text = _call_api(ctx)
+        if not text:
+            _log("빈 응답 → 폴백.")
+            return {}
         parsed = _extract_json(text)
         if parsed is None:
             _log("응답 JSON 파싱 실패 → 폴백.")
             return {}
         result = _normalize(parsed)
-        _log(f"생성 완료: 총평 {len(result['market_overview'])}자 · "
+        _log(f"[{AI_BACKEND}] 생성 완료: 총평 {len(result['market_overview'])}자 · "
              f"근거 {len(result['rationales'])}종목 · 경고 {len(result['warnings'])}건.")
         return result
     except Exception as e:
         _log(f"호출 실패({type(e).__name__}: {e}) → 폴백.")
+        return {}
+
+
+def _call_api(ctx: dict) -> str:
+    """Anthropic API 백엔드(종량 과금)."""
+    client = anthropic.Anthropic(timeout=AI_TIMEOUT)
+    msg = client.messages.create(
+        model=AI_MODEL,
+        max_tokens=2000,
+        temperature=0,
+        system=_SYSTEM,
+        messages=[{"role": "user",
+                   "content": _INSTRUCTION + json.dumps(ctx, ensure_ascii=False)}],
+    )
+    return "".join(b.text for b in msg.content if getattr(b, "type", "") == "text")
+
+
+def _call_cli(ctx: dict) -> str:
+    """로컬 Claude Code CLI(`claude -p`) 백엔드 — Pro/Max '구독'으로 동작(API 키 불필요).
+    시스템 지시는 단일 프롬프트에 합쳐 버전 차이에 견고하게. JSON 엔벨로프/평문 모두 처리."""
+    prompt = (_SYSTEM + "\n\n" + _INSTRUCTION + json.dumps(ctx, ensure_ascii=False))
+    # 프롬프트를 argv 로 넘기면 Windows 명령줄 길이 제한(WinError 206)에 걸린다 → stdin 으로 전달.
+    cmd = [CLAUDE_BIN, "-p", "--output-format", "json"]
+    # 한국어 Windows 기본 인코딩(cp949)이 claude 의 UTF-8 출력을 못 읽어 깨진다 → UTF-8 강제.
+    proc = subprocess.run(cmd, input=prompt, capture_output=True, text=True,
+                          encoding="utf-8", errors="replace", timeout=AI_TIMEOUT)
+    if proc.returncode != 0:
+        raise RuntimeError(f"claude CLI rc={proc.returncode}: {(proc.stderr or '')[:200]}")
+    out = (proc.stdout or "").strip()
+    # --output-format json 은 {"result":"<응답텍스트>", "is_error":bool, ...} 엔벨로프를 준다.
+    try:
+        env = json.loads(out)
+        if isinstance(env, dict):
+            if env.get("is_error"):   # 미로그인/한도초과 등 → 폴백(에러문구를 본문으로 쓰지 않음)
+                raise RuntimeError(f"claude CLI is_error: {str(env.get('result'))[:160]}")
+            if isinstance(env.get("result"), str):
+                return env["result"]
+    except json.JSONDecodeError:
+        pass
+    return out   # 평문으로 떨어진 경우 그대로(이후 _extract_json 이 처리)
+
+
+# --------- 2단계(phase) 핸드오프: Cowork 스케줄 태스크에서 'Claude가 해석가' ---------
+def dump_context(path, picks, ind_map, regime,
+                 news_by_sym: dict | None = None,
+                 sector_briefs: dict | None = None) -> bool:
+    """phase1: AI 입력 컨텍스트(숫자 확정본)를 JSON 파일로 저장.
+    스케줄 태스크의 Claude 가 이 파일만 읽고 해석을 작성한다(새 숫자 생성 금지). 대상 없으면 False."""
+    ctx = _build_context(picks, ind_map, regime, news_by_sym, sector_briefs)
+    if not ctx["stocks"]:
+        return False
+    with open(path, "w", encoding="utf-8") as f:
+        json.dump(ctx, f, ensure_ascii=False, indent=2)
+    return True
+
+
+def load_ai_result(path) -> dict:
+    """phase2: Claude 가 작성한 해석 JSON 파일을 읽어 _AI 형태로 정규화. 실패 시 {} (폴백)."""
+    try:
+        with open(path, "r", encoding="utf-8") as f:
+            txt = f.read()
+        parsed = _extract_json(txt)
+        return _normalize(parsed) if parsed else {}
+    except Exception as e:
+        _log(f"ai-json 로드 실패({e}) → 폴백.")
         return {}
 
 
