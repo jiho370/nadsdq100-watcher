@@ -1,0 +1,106 @@
+# =============================================================================
+# 데일리·주간 시장 리포트 (GitHub Actions — PC 꺼져 있어도 자동 발송)
+#
+# 스케줄: UTC 22:30 월~토  =  KST 07:30 화~일
+#   · 화~토(KST): 전일 시장 점검(미국·한국·코인·세계) + 종목추천(S&P500 + 코스피200)
+#   · 일(KST):    주간 자산배분 리포트
+#   · 월(KST):    발송 없음 (스케줄 자체가 없음 + 코드도 이중 방어)
+#   요일 분기는 daily_ai_report.py 가 'KST 기준'으로 스스로 판단한다.
+#
+# 필요한 저장소 Secrets (Settings > Secrets and variables > Actions):
+#   SMTP_USER          Gmail 주소
+#   SMTP_PASS          Gmail 앱 비밀번호
+#   EMAIL_TO           수신자(쉼표로 여러 명)
+#   ANTHROPIC_API_KEY  AI 해설용(없으면 지표 기반 해설로 자동 폴백 — 발송은 계속됨)
+#
+# 상태 영속화: 러너는 매번 초기화되므로 output/ 의 상태 json(보유목록·발송기록·KRX캐시)을
+#   실행 후 저장소에 commit-back 한다.
+# =============================================================================
+
+name: Daily & Weekly Market Report
+
+on:
+  schedule:
+    - cron: "30 22 * * 1-6"   # UTC 월~토 22:30 = KST 화~일 07:30 (Actions cron은 UTC)
+  workflow_dispatch:
+    inputs:
+      mode:
+        description: "강제 모드: (빈값)=요일 자동 / daily / weekly / preview(발송 없음)"
+        required: false
+        default: ""
+
+permissions:
+  contents: write               # 상태파일 commit-back용
+
+concurrency:
+  group: market-report
+  cancel-in-progress: false
+
+jobs:
+  report:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Run report and send email
+        env:
+          # ── AI 해설: 클라우드에선 API 백엔드(키 없으면 자동으로 지표 기반 폴백)
+          AI_BACKEND: "api"
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          REPORT_MODEL: "claude-sonnet-4-6"
+          REPORT_WEB: "1"            # 웹검색으로 뉴스 보강(비용 아끼려면 "0")
+          REPORT_WEB_USES: "6"
+          AI_TIMEOUT: "900"
+          # ── 발송
+          SMTP_USER: ${{ secrets.SMTP_USER }}
+          SMTP_PASS: ${{ secrets.SMTP_PASS }}
+          EMAIL_TO:  ${{ secrets.EMAIL_TO }}
+          # ── 전략 파라미터 (STRATEGY.md)
+          SELL_TRAIL: "0.20"         # 트레일링 스톱 -20%
+          SELL_MA_BUFFER: "0.03"     # 200일선 -3% 이탈
+        run: |
+          MODE="${{ github.event.inputs.mode }}"
+          if [ "$MODE" = "weekly" ]; then
+            python daily_ai_report.py --weekly --force
+          elif [ "$MODE" = "daily" ]; then
+            python daily_ai_report.py --daily --force
+          elif [ "$MODE" = "preview" ]; then
+            python daily_ai_report.py --daily --no-email
+          else
+            python daily_ai_report.py
+          fi
+
+      - name: Upload preview artifact
+        if: ${{ always() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: report-preview
+          path: output/*.html
+          if-no-files-found: ignore
+
+      - name: Persist state (holdings·last_sent·KRX cache)
+        if: ${{ always() }}
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add -f output/ai_holdings.json output/kr_holdings.json \
+                     output/last_sent.json output/kospi200_cache.json 2>/dev/null || true
+          git add state_prev_list.json 2>/dev/null || true
+          if [ -n "$(git status --porcelain --cached)" ]; then
+            git commit -m "chore: update report state [skip ci]"
+            git pull --rebase origin ${GITHUB_REF_NAME} || true
+            git push
+          else
+            echo "상태 변경 없음 - 커밋 생략"
+          fi
