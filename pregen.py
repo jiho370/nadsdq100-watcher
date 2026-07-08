@@ -1,20 +1,23 @@
 #!/usr/bin/env python3
 """
-pregen.py — 로컬 PC에서 Pro 구독 CLI(claude -p)로 AI 검증을 '미리' 생성 (메일 2통 체계).
+pregen.py — 로컬 PC에서 Pro 구독 CLI(claude -p)로 AI 검증+서술을 '미리' 생성 (메일 2통 체계).
 
   --kr : 한국장 메일(다음날 08:00)용. 실행 창 = 저녁 16시 이후(장 마감 확정) 또는
          다음날 새벽 08시 이전(부팅 보충). 장중(08~16시)엔 데이터가 애매해 스킵.
-         → output/pregen_kr.json  (for_kst = 다음 08:00 발송일)
+         검증+종목별 서술까지 미리 씀(시황 총평만 예외 — 19시엔 미국장 미개장이라 다음날 확정
+         수치로 발송 시점에 경량 콜 1회). → output/pregen_kr.json (for_kst = 다음 08:00 발송일)
   --us : 미국장 메일(당일 17:00)용. 실행 창 = 06시(미국장 마감 후)~16시(발송 전).
-         그 외 시각엔 이미 발송됐거나 데이터 미확정이라 스킵.
-         → output/pregen_us.json  (for_kst = 오늘)
+         이 시점엔 해당 세션이 이미 마감 확정이라 검증+서술+시황 총평까지 전부 미리 씀.
+         그 외 시각엔 이미 발송됐거나 데이터 미확정이라 스킵. → output/pregen_us.json (for_kst = 오늘)
 
 아침/오후 GitHub Actions 는 pregen_{kr,us}.json 의 for_kst 가 발송일과 일치하면
-검증 단계(웹검색)를 통째로 생략 → API 비용이 haiku 서술만 남는다.
-PC가 꺼져 있어 파일이 없으면 Actions 가 API 검증으로 자동 폴백 — 발송엔 지장 없음.
+검증 단계(웹검색)를 생략하고, written(사전서술)까지 있으면 서술 단계(haiku)도 생략한다
+→ PC가 켜져 있던 날은 발송 시점 API 호출이 사실상 0회(KR은 시황 4문장만 예외, 경량 콜 1회).
+PC가 꺼져 있어 파일이 없으면 Actions 가 API 검증+서술로 자동 폴백 — 발송엔 지장 없음.
 
-작업 스케줄러(register_pregen_task.ps1): KR=매일 19:00, US=매일 09:30,
-둘 다 StartWhenAvailable(놓치면 다음 부팅 시 실행 — 시간 창 가드가 유효성 판단).
+작업 스케줄러(register_pregen_task.ps1): KR=19:00+22:00(재시도), US=09:30+12:30(재시도),
+전부 StartWhenAvailable(놓치면 다음 부팅 시 실행 — 시간 창 가드가 유효성 판단, 재시도는
+이미 성공한 날엔 최신 결과로 덮어쓰기만 함 — 멱등).
 """
 from __future__ import annotations
 import os, sys, json, argparse, datetime
@@ -55,16 +58,53 @@ def _headlines(cands, suffix=""):
         _log(f"헤드라인 수집 생략({e})")
 
 
-def _save(name: str, for_kst: str, ver: dict, now):
+def _save(name: str, for_kst: str, ver: dict, now, written=None, sells_written=None, market_written=None):
+    """written(종목별 서술)까지 실으면 발송 시점 write_stage 호출도 생략된다(API 0회).
+    market_written 은 US pregen(09:30, 이미 마감 확정)만 채운다 — KR pregen(19:00)은
+    밤사이 미국장이 아직 개장 전이라 시황 총평을 못 쓴다(발송 시점에 경량 콜 1회만 남음)."""
     night_notes = " / ".join(x for x in (ver.get("market_overview"), ver.get("macro"),
                                          ver.get("risks")) if x)
     os.makedirs("output", exist_ok=True)
     path = f"output/pregen_{name}.json"
+    payload = {"for_kst": for_kst, "generated": now.isoformat(timespec="minutes"),
+               "by_sym": ver["by_sym"], "night_notes": night_notes}
+    if written:
+        payload["written"] = written
+    if sells_written:
+        payload["sells_written"] = sells_written
+    if market_written:
+        payload["market_written"] = market_written
     with open(path, "w", encoding="utf-8") as f:
-        json.dump({"for_kst": for_kst, "generated": now.isoformat(timespec="minutes"),
-                   "by_sym": ver["by_sym"], "night_notes": night_notes}, f,
-                  ensure_ascii=False, indent=1)
-    _log(f"저장: {path} (대상일 {for_kst} · 종목 {len(ver['by_sym'])})")
+        json.dump(payload, f, ensure_ascii=False, indent=1)
+    _log(f"저장: {path} (대상일 {for_kst} · 종목 {len(ver['by_sym'])} · 서술캐시 {len(written or {})}건)")
+
+
+def _write_ahead(groups: dict, market: dict, vmap: dict, n_buy: int, n_watch: int,
+                kr_n_buy: int, kr_n_watch: int, need_market: bool):
+    """verify_stage 성공 뒤 write_stage까지 미리 실행 — 종목별 서술을 캐시한다(구독 CLI, $0).
+    실패해도 예외를 여기서 흡수해 verify 캐시(검색 생략 효과)는 그대로 저장되게 한다.
+    반환: (written, sells_written, market_written) — 실패 시 모두 {}."""
+    try:
+        AR.attach_plans(groups)
+        fb, fw, *_ = AR._apply_verdicts(groups.get("buy_now") or [], groups.get("watch") or [],
+                                        vmap, n_buy, n_watch)
+        kfb, kfw, *_ = AR._apply_verdicts(groups.get("kr_buy") or [], groups.get("kr_watch") or [],
+                                          vmap, kr_n_buy, kr_n_watch)
+        final_pairs = ([(c, "buy") for c in fb] + [(c, "watch") for c in fw]
+                       + [(c, "buy") for c in kfb] + [(c, "watch") for c in kfw])
+        sells = (groups.get("sells") or []) + (groups.get("kr_sells") or [])
+        parsed = AR.write_stage(final_pairs, sells, market, vmap, need_market)
+        written = {str(r["symbol"]): r for r in (parsed.get("stocks") or [])
+                   if isinstance(r, dict) and r.get("symbol")}
+        sells_written = {str(r["symbol"]): (r.get("comment") or "") for r in (parsed.get("sells") or [])
+                         if isinstance(r, dict) and r.get("symbol")}
+        market_written = ({k: parsed[k] for k in ("market_overview", "macro", "signal_note", "risks")
+                          if parsed.get(k)} if need_market else {})
+        _log(f"서술 사전생성 {len(written)}종목" + (" (시황 포함)" if market_written else ""))
+        return written, sells_written, market_written
+    except Exception as e:
+        _log(f"서술 사전생성 실패({type(e).__name__}: {e}) → 검증만 저장(서술은 발송 시점 API)")
+        return {}, {}, {}
 
 
 def run_kr():
@@ -87,7 +127,13 @@ def run_kr():
     ver = AR.verify_stage(groups, market)
     if not ver.get("by_sym"):
         _log("검증 실패 — 파일 미생성(아침에 API 폴백)"); sys.exit(1)
-    _save("kr", for_kst, ver, now)
+    # 시황 총평(need_market)은 여기서 안 씀 — 19시엔 미국장이 아직 개장 전이라 배경(night_notes)만
+    # 남기고, 발송 시점(08:00)에 그때 확정된 수치로 경량 콜 1회만 쓴다.
+    written, sells_written, _mkt = _write_ahead(
+        groups, market, ver["by_sym"],
+        n_buy=AR.FINAL_BUY, n_watch=AR.FINAL_WATCH,   # groups에 buy_now/watch가 없어 실질 무해
+        kr_n_buy=AR.KR_FINAL_BUY, kr_n_watch=AR.KR_FINAL_WATCH, need_market=False)
+    _save("kr", for_kst, ver, now, written=written, sells_written=sells_written)
 
 
 def run_us():
@@ -108,7 +154,15 @@ def run_us():
     ver = AR.verify_stage(groups, market)
     if not ver.get("by_sym"):
         _log("검증 실패 — 파일 미생성(오후에 API 폴백)"); sys.exit(1)
-    _save("us", for_kst, ver, now)
+    # 09:30엔 미국장이 이미 마감 확정이라 시황 총평까지 지금 다 쓸 수 있다 → need_market=True.
+    # verify_stage가 이미 market_overview 등을 냈으면 write_stage가 자동으로 빈 값 처리(중복 방지).
+    written, sells_written, market_written = _write_ahead(
+        groups, market, ver["by_sym"],
+        n_buy=AR.FINAL_BUY, n_watch=AR.FINAL_WATCH,
+        kr_n_buy=AR.KR_FINAL_BUY, kr_n_watch=AR.KR_FINAL_WATCH,   # groups에 kr_buy/kr_watch 없어 무해
+        need_market=not bool(ver.get("market_overview")))
+    _save("us", for_kst, ver, now, written=written, sells_written=sells_written,
+          market_written=market_written)
 
 
 if __name__ == "__main__":

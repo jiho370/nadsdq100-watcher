@@ -261,6 +261,36 @@ def write_stage(final_pairs, sells, market, vmap, need_market: bool) -> dict:
     return p if isinstance(p, dict) else {}
 
 
+# ------------------------- 2-b: 시황 4문장만(경량, 종목 JSON 없음) -------------------------
+_M_SYSTEM = (
+    "당신은 한국 개인투자자용 아침 주식 보고서의 '시황 총평만' 쓰는 애널리스트다.\n"
+    "규칙: 1) 제공된 수치만 사용, 새 숫자·뉴스를 만들지 않는다. 2) 쉬운 한국어, 한자 금지. "
+    "3) 각 필드 1~2문장. 4) 출력은 지정된 JSON 하나만."
+)
+_M_SCHEMA = (
+    '{"market_overview":"전일 미국+세계 시장 1-2문장(제공된 수치 근거)",\n'
+    ' "macro":"환율·한국·코인 흐름 한 줄",\n'
+    ' "signal_note":"제공된 신호 중 오늘 가장 중요한 변화 1-2문장(등급은 바꾸지 말 것)",\n'
+    ' "risks":"이번 주 공통 리스크 1-2문장"}')
+
+
+def write_market_stage(market) -> dict:
+    """시황 4문장만 작성(종목 JSON 없음 → 토큰 최소). pregen에 market_written이 없을 때
+    (한국 메일 — 저녁 pregen 시점엔 미국장이 아직 개장 전이라 밤에 못 씀) 발송 시점에 쓰는
+    경량 호출. 실패해도 빈 dict(필드가 비게 될 뿐, 발송은 계속됨)."""
+    if not _enabled():
+        return {}
+    instr = (f"아래 수치로 시황 총평을 작성하라. 출력 스키마(JSON 하나만):\n{_M_SCHEMA}\n\n"
+             f"CONTEXT.market = {json.dumps(market, ensure_ascii=False)}\n")
+    try:
+        text = (_call_cli(instr, False, system=_M_SYSTEM) if AI_BACKEND == "cli"
+                else _call_api(instr, False, system=_M_SYSTEM, model=MODEL_WRITE, max_tokens=600))
+        p = _extract_json(text or "")
+        return p if isinstance(p, dict) else {}
+    except Exception as e:
+        _log(f"시황 서술 실패({type(e).__name__}: {e})"); return {}
+
+
 # ------------------------- verdict 적용(기존 로직 유지) -------------------------
 def _apply_verdicts(buy_pool, watch_pool, vmap, n_buy, n_watch):
     """1단계 verdict 반영해 최종 목록 확정. AI가 없으면 전원 '유지'로 동작."""
@@ -318,7 +348,9 @@ def _mk_item(c, kind, vmap, wmap, dem=(), rest=()):
 
 def build_report(groups: dict, market: dict, pregen: dict | None = None) -> dict:
     """groups={"buy_now","watch","kr_buy","kr_watch","sells","kr_sells"(선택)}
-    pregen = pregen.py 가 전날 밤 만든 dict(있으면 검증 단계 생략 → 검색 비용 0).
+    pregen = pregen.py 가 미리 만든 dict. by_sym 이 있으면 검증 단계 생략(검색 비용 0).
+    written(종목별 서술)까지 있으면 서술 단계도 생략(캐시에 없는 심볼만 _auto_fields 무료 대체)
+    → pregen 이 완전할 때(PC가 켜져 있던 날)는 발송 시점 AI 호출이 0회가 된다.
     실패 시 {} 반환(호출부가 deterministic_report 폴백)."""
     attach_plans(groups)          # 계획은 AI 유무와 무관하게 항상 확정
     if not _enabled():
@@ -330,35 +362,52 @@ def build_report(groups: dict, market: dict, pregen: dict | None = None) -> dict
     if not (buy_pool or watch_pool or kr_buy_pool or kr_watch_pool or sells):
         return {}
     try:
-        # ── 1단계: 검증. pregen 있으면 생략(밤에 구독 CLI로 이미 검증됨 → $0)
+        # ── 1단계: 검증. pregen 있으면 생략(밤/아침에 구독 CLI로 이미 검증됨 → $0)
         if pregen and pregen.get("by_sym"):
-            # pregen 은 by_sym(종목 검증)과 night_notes(밤 시점 시황 배경)만 갖는다.
-            # 시황 문장은 아침 종가가 확정된 뒤 haiku 가 새로 쓴다(need_market=True) —
-            # night_notes 는 그 배경 지식으로 market 컨텍스트에 주입.
-            ver = {"by_sym": pregen["by_sym"]}; need_market = True
+            # pregen 은 by_sym(종목 검증) + night_notes(밤 시점 시황 배경) + (있으면)
+            # written/market_written(사전서술)을 갖는다.
+            ver = {"by_sym": pregen["by_sym"]}
             if pregen.get("night_notes"):
                 market = dict(market, night_notes=str(pregen["night_notes"])[:900])
             _log(f"pregen 사용({pregen.get('generated','?')}) → 검증 단계 생략(검색 0회)")
         else:
-            ver = verify_stage(groups, market); need_market = not bool(ver.get("market_overview"))
+            ver = verify_stage(groups, market)
             if not ver:
-                _log("검증 실패 → 전원 유지로 서술만 진행"); ver = {"by_sym": {}}; need_market = True
+                _log("검증 실패 → 전원 유지로 서술만 진행"); ver = {"by_sym": {}}
         vmap = ver.get("by_sym") or {}
 
         # ── 코드가 최종 목록 확정
         fb, fw, fx, dem, rest = _apply_verdicts(buy_pool, watch_pool, vmap, FINAL_BUY, FINAL_WATCH)
         kfb, kfw, kfx, kdem, krest = _apply_verdicts(kr_buy_pool, kr_watch_pool, vmap,
                                                      KR_FINAL_BUY, KR_FINAL_WATCH)
-
-        # ── 2단계: 서술은 '최종 종목만'(풀 전체 아님 → 토큰 절약)
         final_pairs = ([(c, "buy") for c in fb] + [(c, "watch") for c in fw]
                        + [(c, "buy") for c in kfb] + [(c, "watch") for c in kfw])
-        parsed = write_stage(final_pairs, sells, market, vmap, need_market)
-        wmap = {str(r["symbol"]): r for r in (parsed.get("stocks") or []) if isinstance(r, dict) and r.get("symbol")}
-        smap = {str(r["symbol"]): r for r in (parsed.get("sells") or []) if isinstance(r, dict) and r.get("symbol")}
+
+        # ── 2단계: 서술. pregen에 사전서술(written)이 있으면 캐시만 쓰고 write_stage 자체를
+        #    건너뛴다(API 0회). 캐시에 없는 심볼(후보풀 변동 등 드문 경우)만 _auto_fields 무료 대체.
+        cached_written = (pregen or {}).get("written") or {}
+        cached_sells = (pregen or {}).get("sells_written") or {}
+        cached_market = (pregen or {}).get("market_written") or {}
+        if cached_written:
+            wmap, gaps = {}, 0
+            for c, _kind in final_pairs:
+                sym = str(c["symbol"])
+                if sym in cached_written:
+                    wmap[sym] = cached_written[sym]
+                else:
+                    wmap[sym] = _auto_fields(c); gaps += 1
+            smap = {str(s["symbol"]): {"comment": cached_sells.get(str(s["symbol"]), "")} for s in sells}
+            market_fields = cached_market or (write_market_stage(market) if not ver.get("market_overview") else {})
+            _log(f"사전서술 캐시 사용({len(cached_written)}종목 · 부족분 {gaps}건 무료 대체)")
+        else:
+            need_market = not bool(ver.get("market_overview"))
+            parsed = write_stage(final_pairs, sells, market, vmap, need_market)
+            wmap = {str(r["symbol"]): r for r in (parsed.get("stocks") or []) if isinstance(r, dict) and r.get("symbol")}
+            smap = {str(r["symbol"]): r for r in (parsed.get("sells") or []) if isinstance(r, dict) and r.get("symbol")}
+            market_fields = parsed
 
         def pick(field):
-            return (ver.get(field) or (parsed.get(field) or "")).strip()
+            return (ver.get(field) or (market_fields.get(field) or "")).strip()
 
         out = {
             "market_overview": pick("market_overview"), "macro": pick("macro"),
@@ -433,6 +482,27 @@ def _call_cli(instruction, web=True, system=None):
     return out
 
 
+# ------------------------- 무AI 서술(공용) -------------------------
+def _auto_fields(c) -> dict:
+    """AI 없이 지표+프로필만으로 만드는 최소 서술 필드(비용 $0). deterministic_report와
+    build_report의 '사전서술 캐시에 없는 심볼(드묾)' 대체용이 공용으로 쓴다."""
+    sym = str(c.get("symbol"))
+    r = c.get("ret") or {}
+    pts = []
+    if c.get("rsi") is not None or r.get("3m") is not None:
+        pts.append("①추세: " + " · ".join(x for x in (
+            f"RSI {c['rsi']:.0f}" if c.get("rsi") is not None else "",
+            f"3개월 {r['3m']:+.1f}%" if r.get("3m") is not None else "",
+            f"6개월 {r['6m']:+.1f}%" if r.get("6m") is not None else "") if x))
+    prof = _profiles().get(sym)
+    if prof:
+        pts.append("②사업: " + prof[:140])
+    if c.get("headlines"):
+        pts.append("③뉴스: " + str(c["headlines"][0])[:120])
+    return {"name": c.get("name", ""), "category": c.get("industry") or c.get("sector", ""),
+            "summary": (c.get("score_reason") or prof or "")[:90], "points": pts, "comment": ""}
+
+
 # ------------------------- 무AI 폴백 -------------------------
 def deterministic_report(groups: dict, market: dict) -> dict:
     """AI 실패 시 지표+프로필+계획만으로 구성. 계획·프로필 덕에 무AI여도 꽤 상세하다."""
@@ -445,22 +515,9 @@ def deterministic_report(groups: dict, market: dict) -> dict:
 
     def item(c, kind):
         sym = str(c.get("symbol"))
-        r = c.get("ret") or {}
-        pts = []
-        if c.get("rsi") is not None or r.get("3m") is not None:
-            pts.append("①추세: " + " · ".join(x for x in (
-                f"RSI {c['rsi']:.0f}" if c.get("rsi") is not None else "",
-                f"3개월 {r['3m']:+.1f}%" if r.get("3m") is not None else "",
-                f"6개월 {r['6m']:+.1f}%" if r.get("6m") is not None else "") if x))
-        prof = _profiles().get(sym)
-        if prof:
-            pts.append("②사업: " + prof[:140])
-        if c.get("headlines"):
-            pts.append("③뉴스: " + str(c["headlines"][0])[:120])
-        d = {"symbol": sym, "name": c.get("name", ""),
-             "category": c.get("industry") or c.get("sector", ""),
-             "summary": (c.get("score_reason") or prof or "")[:90],
-             "points": pts, "news": "", "catalyst": "", "comment": "", "flag": None,
+        af = _auto_fields(c)
+        d = {"symbol": sym, "name": af["name"], "category": af["category"], "summary": af["summary"],
+             "points": af["points"], "news": "", "catalyst": "", "comment": "", "flag": None,
              "verdict_reason": "", "plan": c.get("plan") or {}, "hot": bool(c.get("hot"))}
         if kind == "watch":
             d["trigger"] = c.get("trigger") or "20일선 회복 확인 후 매수 검토"

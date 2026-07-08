@@ -87,12 +87,37 @@
   전 종목 1회 생성(`sp500_profiles.json` detail + `kospi200_profiles.json`), 데일리는 재사용. 분기 1회
   `python gen_profiles.py --refresh` (로컬, ANTHROPIC_API_KEY 필요, ~$0.1).
 - **사전 검증(`pregen.py` — Pro 구독, $0)**: 로컬 PC 작업 스케줄러 2개(놓치면 다음 부팅 시 실행,
-  StartWhenAvailable) — `StockPregenKR`(매일 19:00, `--kr`: 한국장 마감 확정 데이터 검증 →
-  `pregen_kr.json`, 다음날 08:00 메일용)과 `StockPregenUS`(매일 09:30, `--us`: 새벽 마감된 미국장
-  검증(풀 버퍼 +3) → `pregen_us.json`, 당일 17:00 메일용). 유효 시간 창은 pregen.py 가 스스로 판단
+  StartWhenAvailable) — `StockPregenKR`(`--kr`: 한국장 마감 확정 데이터 검증 → `pregen_kr.json`,
+  다음날 08:00 메일용)과 `StockPregenUS`(`--us`: 새벽 마감된 미국장 검증(풀 버퍼 +3) →
+  `pregen_us.json`, 당일 17:00 메일용). 유효 시간 창은 pregen.py 가 스스로 판단
   (KR: 16시~다음날 8시 / US: 6~16시, 창 밖이면 스킵). Actions 는 for_kst 가 발송일과 일치할 때만
-  사용해 **검증 단계 생략(웹검색 0회)** → haiku 서술만. 시황 문장은 night_notes(배경)를 참고해
-  발송 시점 확정 수치로 haiku 가 작성. 등록: 관리자 PowerShell `.\register_pregen_task.ps1` 1회.
+  사용해 **검증 단계 생략(웹검색 0회)**. 등록: 관리자 PowerShell `.\register_pregen_task.ps1` 1회.
+
+### 완전 사전생성 + 재시도 트리거 개편 (2026-07-09 추가 — 메일 2통 분리로 생긴 여유시간 활용)
+메일이 국장/미장으로 분리되면서 pregen 시점(KR 19:00 · US 09:30)에 이미 해당 세션 데이터가
+마감 확정된다는 점을 반영해 API 개입을 더 줄임. 목표: pregen 있는 날 발송 시점 API 호출 **0회**
+(KR은 시황 4문장만 예외).
+- **`pregen.py`가 `write_stage`까지 실행**(`_write_ahead`): verify_stage 성공 뒤 `_apply_verdicts`로
+  최종 목록을 재현하고 종목별 서술(summary/points/comment)까지 미리 만들어 `pregen_{kr,us}.json`에
+  `written`(종목별)·`sells_written`·(US만) `market_written`으로 저장. 서술 생성이 실패해도 verify
+  캐시는 그대로 저장(예외 흡수) — 검증 생략 효과는 유지.
+  - US(09:30)는 세션이 이미 마감 확정이라 시황 4문장(`market_written`)까지 전부 사전생성.
+  - KR(19:00)은 미국장이 아직 개장 전이라 시황만 예외 — 발송 시점(08:00)에 신설된 경량 함수
+    `ai_report.write_market_stage()`(종목 JSON 없이 시황 4문장만, haiku)로 저비용 보충.
+- **`ai_report.build_report`가 `written` 캐시를 활용**: 캐시가 있으면 `write_stage` 호출 자체를
+  생략, 캐시에 없는 심볼(후보풀 변동 등 드문 경우)만 신설 `_auto_fields()`(지표+프로필 기반 무료
+  대체, `deterministic_report`와 공유)로 채운다 — 이 경로에서는 API 호출이 전혀 발생하지 않는다.
+  pregen에 `written`이 없고 `by_sym`만 있으면(서술 생성만 실패한 날) 기존처럼 `write_stage` 1회만
+  호출(검증은 여전히 생략). pregen 자체가 없으면(PC 꺼짐) 기존 전체 폴백(검증+서술 2회) 그대로.
+- **재시도 트리거**(`register_pregen_task.ps1`): 시간 여유가 커진 만큼(KR 19:00→08:00=13시간,
+  US 09:30→16:40=7시간10분) 코드 변경 없이 트리거만 하나씩 추가 — `StockPregenKR` 19:00+22:00,
+  `StockPregenUS` 09:30+12:30. `run_pregen.ps1`이 성공 시마다 최신본으로 덮어써 커밋하므로 재시도는
+  멱등(부작용 없음) — CLI 일시 오류로 인한 API 폴백 발생 빈도를 낮춘다.
+- 예상 비용: pregen 완전 성공 날 사실상 $0(KR은 haiku 경량 콜 1회 · 수백 토큰), 서술만 실패한 날
+  기존과 동일(haiku 1회), PC 꺼진 날만 기존 폴백(~$0.12).
+- 검증: `/tmp` 오프라인 mock 테스트로 완전캐시(API 0회)·부분캐시(무료 대체)·검증만 캐시(1회)·
+  캐시 없음(2회)·`_write_ahead` 성공/실패 경로를 모두 확인(수동 삭제된 스크립트 — 재현 필요시 이
+  섹션 참고해 재작성).
 - 매도 카드에 처분 계획 표기, 한국 매도는 `groups["kr_sells"]`로 합류(report["sells"]에 통합).
 - workflow env: `REPORT_MODEL_VERIFY=claude-sonnet-5`, `REPORT_MODEL_WRITE=claude-haiku-4-5`, `REPORT_WEB_USES=4`.
 
