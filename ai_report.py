@@ -1,14 +1,31 @@
 #!/usr/bin/env python3
 """
-ai_report.py — Claude(구독 CLI 또는 API)로 'S&P500 종목추천 보고서' 생성.
+ai_report.py — 2단계(검증→서술) AI 리포트 생성기. 비용 최소화 설계.
 
-구조(중요): 종목 선정은 코드가 '점수(백테스트 최적 가중치) + 진입 적합도'로 확정한다.
-  · 지금 매수(buy_now)  = 점수 상위 & 과열 아님(지금 진입하기 좋은)
-  · 관찰(watch)         = 점수 상위지만 과열/비쌈(좋은 종목, 내려오면 매수)
-AI 는 종목을 바꾸지 않고 각 종목의 '설명'만 쓴다(=매번 동일 종목, 일관성 보장).
+역할 분담 (STRATEGY.md §5 + 2026-07 비용 개편):
+  · 규칙(코드)      = 후보 발굴 + '실행 계획' 확정.
+                      매수 분할 가격·비율, 손절선, 관찰→매수 전환 조건, 매도 처분 계획은
+                      전부 entry_plan.py 가 지표로 계산한다. AI는 이 숫자를 바꿀 수 없다.
+  · 프로필 캐시     = 종목 사업 설명(②펀더멘털 축)은 sp500_profiles.json /
+                      kospi200_profiles.json 에서 재사용(분기 1회 gen_profiles.py 로 생성).
+                      매일 AI에게 "무슨 회사인지" 다시 묻지 않는다.
+  · AI 1단계(검증)  = sonnet + web_search(≤REPORT_WEB_USES회): 후보별 최신 악재·촉매 점검,
+                      verdict(유지/강등/제외) + 뉴스 한 줄. 출력은 초압축 JSON(토큰 절약).
+                      ※ pregen.json(전날 밤 PC에서 구독 CLI로 생성)이 있으면 이 단계를
+                        통째로 건너뛴다 → 검색 비용 0.
+  · AI 2단계(서술)  = haiku(검색 없음): '최종 확정된' 종목만 대상으로 상세 서술
+                      (summary + 4축 points + 실행 코멘트). 토큰 대부분이 저가 모델로 간다.
+  · 코드(최종)      = verdict 반영해 최종 목록 확정. AI는 종목 '추가' 불가(할루시네이션 차단).
 
-무료(구독) 경로: AI_BACKEND=cli → 로컬 claude -p. 실패/키없음 시 {} 반환(호출부 폴백).
-_call_cli/_call_api 는 system 파라미터로 주간 리포트(weekly_report.py)도 재사용.
+호출 경로:
+  AI_BACKEND=api  → Anthropic API (GitHub Actions). 모델은 아래 env로 지정.
+  AI_BACKEND=cli  → 로컬 claude -p (Pro 구독, PC에서 pregen.py 가 사용).
+실패 사다리: 검증 실패 → 전원 '유지' 취급으로 서술만 / 서술 실패 → deterministic_report
+  (프로필+계획 덕에 무AI여도 꽤 상세) → 발송은 절대 안 거른다.
+
+모델 env (opus는 코드에서 차단):
+  REPORT_MODEL_VERIFY  기본 claude-sonnet-5      — 검증(웹검색 필요 → 판단력 있는 모델)
+  REPORT_MODEL_WRITE   기본 claude-haiku-4-5     — 서술(입력에 사실이 다 있음 → 저가 모델)
 """
 from __future__ import annotations
 import os, sys, json, shutil, subprocess
@@ -23,13 +40,29 @@ except Exception:
     def _extract_json(t):
         try: return json.loads(t)
         except Exception: return None
+import entry_plan as EP
 
-AI_BACKEND     = os.environ.get("AI_BACKEND", "cli").strip().lower()
-CLAUDE_BIN     = os.environ.get("CLAUDE_BIN", "claude")
-REPORT_MODEL   = os.environ.get("REPORT_MODEL", "claude-sonnet-4-6")
-REPORT_WEB_USES = int(os.environ.get("REPORT_WEB_USES", "6"))
-REPORT_WEB     = os.environ.get("REPORT_WEB", "1") == "1"     # 기본 ON(웹검색으로 뉴스·환율). 5pm 배치라 시간 무방.
-AI_TIMEOUT     = float(os.environ.get("AI_TIMEOUT", "1200"))  # 20분 — 웹검색 넉넉히
+AI_BACKEND      = os.environ.get("AI_BACKEND", "cli").strip().lower()
+CLAUDE_BIN      = os.environ.get("CLAUDE_BIN", "claude")
+REPORT_WEB_USES = int(os.environ.get("REPORT_WEB_USES", "4"))   # 8→4: 검색이 최대 비용원
+REPORT_WEB      = os.environ.get("REPORT_WEB", "1") == "1"
+AI_TIMEOUT      = float(os.environ.get("AI_TIMEOUT", "1200"))
+
+
+def _no_opus(name: str, fallback: str) -> str:
+    """opus 계열 모델 차단(사용자 정책: 비용). 지정돼도 sonnet/haiku 폴백."""
+    return fallback if "opus" in (name or "").lower() else name
+
+MODEL_VERIFY = _no_opus(os.environ.get("REPORT_MODEL_VERIFY",
+                        os.environ.get("REPORT_MODEL", "claude-sonnet-5")), "claude-sonnet-5")
+MODEL_WRITE  = _no_opus(os.environ.get("REPORT_MODEL_WRITE", "claude-haiku-4-5"), "claude-haiku-4-5")
+
+# 최종 채택 수(코드가 확정) — 상세 카드가 길어져 미국 5→4로 축소(env로 조절)
+FINAL_BUY      = int(os.environ.get("REPORT_FINAL_BUY", "4"))
+FINAL_WATCH    = int(os.environ.get("REPORT_FINAL_WATCH", "4"))
+KR_FINAL_BUY   = int(os.environ.get("KR_FINAL_BUY", "3"))
+KR_FINAL_WATCH = int(os.environ.get("KR_FINAL_WATCH", "2"))
+MIN_BUY        = 3
 
 
 def _log(m): print(f"[REPORT] {m}", file=sys.stderr)
@@ -43,181 +76,343 @@ def _enabled():
     return anthropic is not None and bool(os.environ.get("ANTHROPIC_API_KEY"))
 
 
-_SYSTEM = (
-    "당신은 한국 개인투자자(수신자: 투자에 관심 있는 아버지)에게 매일 보내는 '시장 점검·종목추천 보고서'"
-    "(미국 S&P500 + 코스피200 + 지수·코인 신호)를 쓰는 애널리스트다. 규칙:\n"
-    "1) 종목 지표 수치는 제공된 JSON 값만 인용한다. 새로운 종목 수치를 지어내지 않는다.\n"
-    "2) 종목 목록은 이미 확정돼 있다. 종목을 추가/삭제/이동하지 말고, 주어진 각 종목의 '설명'만 쓴다.\n"
-    "3) 뉴스·시황·환율은 web_search 로 최신 정보를 찾고, 제공된 headlines 도 참고한다. 확인 안 되면 빈 값(지어내지 않음).\n"
-    "4) 단정적 매수/매도 단언·수익 보장 금지. 핵심만 아주 간결하게(요약·불릿). 어려운 말 금지.\n"
-    "5) 한자(漢字) 절대 금지(예: 前日比 → 전일 대비). 이동평균은 '20일선/50일선/200일선'.\n"
-    "6) flag가 '중립'이거나 재료가 없으면 news는 빈 문자열(\"\"). '확인 어려움' 같은 문구 금지.\n"
-    "7) 최종 출력은 지정된 JSON 하나만(코드블록·군더더기 없이)."
-)
+# ------------------------- 프로필 캐시 -------------------------
+_PROFILES = None
 
-_SCHEMA = (
-    '{\n'
-    '  "market_overview": "시장 한 줄 요약(추세+심리)",\n'
-    '  "macro": "환율(USD/KRW)·코스피 등 한 줄",\n'
-    '  "buy_now": [ {"symbol":"AAA","name":"회사명","category":"세부분류(반도체·파운드리 등)",\n'
-    '     "summary":"무슨 회사+왜 지금 진입 좋은지 한 줄","points":["핵심1","핵심2"],\n'
-    '     "entry":"지금 진입 방법 한 줄(예: 현재가 분할 매수)","news":"최근 이슈 한 줄(없으면 \\"\\")",\n'
-    '     "flag":"호재|악재|중립"} ],\n'
-    '  "watch": [ {"symbol":"BBB","name":"회사명","category":"세부분류",\n'
-    '     "summary":"왜 좋은 종목인지 한 줄","points":["핵심1","핵심2"],\n'
-    '     "target":"어디까지 내려오면 매수 검토(예: 50일선 근처/과열 진정 시)","news":"...(없으면 \\"\\")",\n'
-    '     "flag":"호재|악재|중립"} ],\n'
-    '  "kr_buy": [ {"symbol":"005930","name":"회사명","category":"업종",\n'
-    '     "summary":"무슨 회사+왜 지금 진입 좋은지 한 줄","points":["핵심1","핵심2"],\n'
-    '     "entry":"지금 진입 방법 한 줄","news":"...(없으면 \\"\\")","flag":"호재|악재|중립"} ],\n'
-    '  "kr_watch": [ {"symbol":"000660","name":"회사명","category":"업종",\n'
-    '     "summary":"왜 좋은 종목인지 한 줄","points":["핵심1"],\n'
-    '     "target":"어디까지 오면 매수 검토","news":"...","flag":"호재|악재|중립"} ],\n'
-    '  "signal_note": "핵심 6자산(나스닥100·S&P500·코스피·코스닥·비트코인·이더리움) 신호 요약 1-2문장",\n'
-    '  "sells": [ {"symbol":"CCC","comment":"왜 지금 정리를 고려할 만한지 한 줄(reason+뉴스)"} ],\n'
-    '  "risks": "공통 유의사항 한 줄"\n'
-    '}'
-)
-
-
-def _lean(cands):
-    return [{k: v for k, v in c.items() if k != "closes"} for c in cands]
-
-
-def _instruction(buy_now, watch, sells, market, kr_buy=None, kr_watch=None):
-    kr_part = ""
-    if kr_buy or kr_watch:
-        kr_part = (
-            "- kr_buy/kr_watch(코스피200 종목): 미국 종목과 같은 요령으로 각 종목 설명만 쓴다. "
-            "symbol은 6자리 종목코드 그대로. 수치는 CONTEXT 값만.\n"
-            f"CONTEXT.kr_buy = {json.dumps(_lean(kr_buy or []), ensure_ascii=False)}\n"
-            f"CONTEXT.kr_watch = {json.dumps(_lean(kr_watch or []), ensure_ascii=False)}\n")
-    sig_part = ""
-    if market.get("signals"):
-        sig_part = ("- signal_note: market.signals(핵심 6자산의 추세 신호·상태)를 근거로 오늘 가장 중요한 "
-                    "신호 변화를 1-2문장으로. 신호 등급 자체는 코드가 확정했으니 바꾸지 말 것.\n")
-    return (
-        "아래 그룹의 시장·종목 보고서를 작성하라. 종목·신호는 이미 확정이니 바꾸지 말고 설명만 쓴다.\n"
-        + sig_part + kr_part +
-        "- buy_now(지금 매수 검토): 점수 상위 & 상승 추세가 살아있는 종목(과열이어도 강하면 포함). "
-        "각 종목 왜 '지금' 좋은지 + entry(지금 진입 방법). 단 hot=true(과열) 종목은 entry에 "
-        "'한 번에 말고 분할 매수'를 반드시 강조.\n"
-        "- watch(관찰·눌림목): 점수 상위지만 지금 하락·조정 중인 종목. "
-        "각 종목 왜 좋은지 + target(반등/조정 마무리 확인 후 매수, 예: 20일선 회복 시).\n"
-        "- sells(매도 검토): 이미 매도 시그널이 뜬 보유 종목(reason 참고). 각 종목에 왜 지금 "
-        "정리를 고려할 만한지 comment 한 줄(reason + 뉴스). 없으면 빈 배열.\n"
-        "- category(세부분류)는 구체적으로(특히 반도체는 팹리스·파운드리·메모리·장비 등으로).\n"
-        "- news: web_search + 제공된 headlines 로 각 종목 최근 이슈 1문장(없으면 빈 문자열, 지어내지 말 것).\n"
-        "- market_overview: market 집계(SPY 200일선 이격·탐욕지수·섹터 등락·world)로 전일 미국+세계 시장 1-2문장.\n"
-        "- macro: 환율(USD/KRW)·한국(코스피/코스닥)·코인(BTC/ETH) 전일 흐름 한 줄(market.signals·world 값 사용, "
-        "web_search 보강. 모르면 빈 문자열, '확인 어려움' 쓰지 말 것).\n\n"
-        f"출력 스키마(JSON):\n{_SCHEMA}\n\n"
-        f"CONTEXT.market = {json.dumps(market, ensure_ascii=False)}\n\n"
-        f"CONTEXT.buy_now = {json.dumps(_lean(buy_now), ensure_ascii=False)}\n\n"
-        f"CONTEXT.watch = {json.dumps(_lean(watch), ensure_ascii=False)}\n\n"
-        f"CONTEXT.sells = {json.dumps(sells, ensure_ascii=False)}\n"
-    )
-
-
-def _desc_map(items):
+def _profiles() -> dict:
+    """{sym: "한줄 + 상세"} — sp500_profiles.json(tickers) + kospi200_profiles.json.
+    gen_profiles.py 가 분기 1회 채운다. 없어도 동작(빈 문자열)."""
+    global _PROFILES
+    if _PROFILES is not None:
+        return _PROFILES
     out = {}
-    for r in items or []:
-        if isinstance(r, dict) and r.get("symbol"):
-            out[r["symbol"]] = r
+    try:
+        d = json.load(open("sp500_profiles.json", encoding="utf-8"))
+        for sym, t in (d.get("tickers") or {}).items():
+            txt = " ".join(x for x in (t.get("one_liner"), t.get("detail")) if x).strip()
+            if txt:
+                out[sym] = txt
+    except Exception:
+        pass
+    try:
+        d = json.load(open("kospi200_profiles.json", encoding="utf-8"))
+        for sym, t in (d.get("tickers") or {}).items():
+            txt = " ".join(x for x in (t.get("one_liner"), t.get("detail")) if x).strip()
+            if txt:
+                out[sym] = txt
+    except Exception:
+        pass
+    _PROFILES = out
     return out
 
 
-def _norm_item(sym, d, fallback, kind):
-    """AI 설명(d)을 고정 종목(sym)에 매핑. 없으면 fallback(candidate)로 최소 구성."""
-    d = d or {}
-    flag = d.get("flag") if d.get("flag") in ("호재", "악재", "중립") else None
-    pts = d.get("points")
-    if isinstance(pts, str):
-        pts = [pts]
-    pts = [str(x).strip() for x in (pts or []) if str(x).strip()][:3]
-    item = {
-        "symbol": sym, "name": (d.get("name") or fallback.get("name") or "").strip(),
-        "category": (d.get("category") or fallback.get("sector") or "").strip(),
-        "summary": (d.get("summary") or "").strip(),
-        "points": pts, "news": (d.get("news") or "").strip(), "flag": flag,
-    }
-    if kind == "buy":
-        item["entry"] = (d.get("entry") or "").strip()
-        item["hot"] = bool(fallback.get("hot"))
-    else:
-        item["target"] = (d.get("target") or d.get("entry") or "").strip()
+# ------------------------- 계획 주입(코드 확정) -------------------------
+def attach_plans(groups: dict):
+    """모든 후보에 entry_plan 결과를 붙인다(렌더·AI 컨텍스트 공용). 제자리 수정."""
+    for key, krw in (("buy_now", False), ("kr_buy", True)):
+        for c in groups.get(key) or []:
+            c["plan"] = EP.buy_plan(c, krw=krw)
+            c["plan_text"] = EP.plan_text(c["plan"])
+    for key, krw in (("watch", False), ("kr_watch", True)):
+        for c in groups.get(key) or []:
+            c["trigger"] = EP.watch_trigger(c, krw=krw)
+            c["plan"] = EP.buy_plan(c, krw=krw)          # 전환 시 쓸 분할 계획(표시용)
+            c["plan_text"] = EP.plan_text(c["plan"])
+    for s in groups.get("sells") or []:
+        s["plan"] = EP.sell_plan(s)
+    for s in groups.get("kr_sells") or []:
+        s["plan"] = EP.sell_plan(s, krw=True)
+
+
+# ------------------------- 1단계: 검증(sonnet + 웹검색) -------------------------
+_V_SYSTEM = (
+    "당신은 규칙 기반으로 선정된 주식 후보를 '최신 정보로 검증'하는 애널리스트다. 한국어로 답한다.\n"
+    "임무: 각 후보의 심각한 악재(실적 쇼크·가이던스 하향·소송/규제·회계 이슈·공매도 리포트)와 "
+    "다가올 촉매(실적 발표·신제품·이벤트)를 확인해 verdict를 부여한다.\n"
+    "규칙:\n"
+    "1) 웹검색 횟수가 제한된다. 종목별로 따로 검색하지 말고 섹터·공통 이슈로 묶어 검색하고, "
+    "급등락 종목(1주 ±7% 이상)과 kind=sell 종목을 우선 확인한다.\n"
+    "2) verdict: 악재 없음='매수유지' / 이벤트 대기·단기 불확실='관찰강등' / 명백한 악재='제외'(신중히, 사유 필수). "
+    "관찰 후보는 '관찰유지' 또는 '제외'만.\n"
+    "3) 확인 안 된 내용은 쓰지 않는다. 수치를 지어내지 않는다.\n"
+    "4) 출력은 지정된 JSON 하나만. 문장은 짧게(뉴스·촉매 각 한 줄)."
+)
+
+_V_SCHEMA = (
+    '{"market_overview":"전일 미국+세계 시장 1-2문장(제공된 market 수치+검색 근거)",\n'
+    ' "macro":"환율·한국·코인 흐름 한 줄",\n'
+    ' "signal_note":"제공된 신호 중 오늘 가장 중요한 변화 1-2문장(등급은 바꾸지 말 것)",\n'
+    ' "risks":"이번 주 공통 리스크 1-2문장(FOMC/실적시즌/지정학 등 구체적으로)",\n'
+    ' "stocks":[{"symbol":"AAA","verdict":"매수유지|관찰강등|관찰유지|제외","verdict_reason":"강등/제외 사유(유지면 빈칸)",\n'
+    '   "news":"최근 이슈 한 줄(없으면 빈칸)","catalyst":"다가올 이벤트/촉매 한 줄(없으면 빈칸)","flag":"호재|악재|중립"}]}'
+)
+
+
+def _v_stock(c, kind):
+    """검증 입력은 최소 필드만(토큰 절약). 판단에 필요한 것: 정체+최근 급등락+헤드라인."""
+    r = c.get("ret") or {}
+    return {"symbol": c.get("symbol"), "name": c.get("name"), "kind": kind,
+            "sector": c.get("sector"), "ret_1w": r.get("1w"), "ret_1m": r.get("1m"),
+            "hot": bool(c.get("hot")), "headlines": (c.get("headlines") or [])[:4]}
+
+
+def verify_stage(groups, market) -> dict:
+    """반환: {"by_sym":{sym:{verdict,verdict_reason,news,catalyst,flag}},
+             "market_overview","macro","signal_note","risks"}  실패 시 {}."""
+    stocks = ([_v_stock(c, "buy") for c in groups.get("buy_now") or []]
+              + [_v_stock(c, "watch") for c in groups.get("watch") or []]
+              + [_v_stock(c, "buy") for c in groups.get("kr_buy") or []]
+              + [_v_stock(c, "watch") for c in groups.get("kr_watch") or []]
+              + [{"symbol": s.get("symbol"), "name": s.get("name"), "kind": "sell",
+                  "reason": s.get("reason")} for s in (groups.get("sells") or []) + (groups.get("kr_sells") or [])])
+    instr = (
+        "후보 목록을 검증하라. 각 symbol마다 stocks 항목 하나씩 반드시 출력.\n"
+        f"출력 스키마(JSON 하나만):\n{_V_SCHEMA}\n\n"
+        f"CONTEXT.market = {json.dumps(market, ensure_ascii=False)}\n"
+        f"CONTEXT.stocks = {json.dumps(stocks, ensure_ascii=False)}\n")
+    try:
+        try:
+            text = (_call_cli(instr, REPORT_WEB, system=_V_SYSTEM) if AI_BACKEND == "cli"
+                    else _call_api(instr, REPORT_WEB, system=_V_SYSTEM, model=MODEL_VERIFY, max_tokens=3000))
+        except Exception as e1:
+            _log(f"검증 1차 실패({type(e1).__name__}) → 웹검색 없이 재시도")
+            text = (_call_cli(instr, False, system=_V_SYSTEM) if AI_BACKEND == "cli"
+                    else _call_api(instr, False, system=_V_SYSTEM, model=MODEL_VERIFY, max_tokens=3000))
+        p = _extract_json(text or "")
+        if not isinstance(p, dict):
+            return {}
+        by = {}
+        for r in p.get("stocks") or []:
+            if isinstance(r, dict) and r.get("symbol"):
+                by[str(r["symbol"])] = r
+        return {"by_sym": by,
+                "market_overview": (p.get("market_overview") or "").strip(),
+                "macro": (p.get("macro") or "").strip(),
+                "signal_note": (p.get("signal_note") or "").strip(),
+                "risks": (p.get("risks") or "").strip()}
+    except Exception as e:
+        _log(f"검증 실패({type(e).__name__}: {e})"); return {}
+
+
+# ------------------------- 2단계: 서술(haiku, 검색 없음) -------------------------
+_W_SYSTEM = (
+    "당신은 한국 개인투자자(수신자: 투자에 관심 있는 아버지)용 아침 주식 보고서의 서술을 쓰는 애널리스트다.\n"
+    "규칙:\n"
+    "1) 제공된 JSON의 수치·사실만 사용한다. 새 숫자·뉴스를 만들지 않는다. verified가 비어 있으면 headlines만 근거로 쓴다.\n"
+    "2) points는 정확히 4개, 순서대로 ①추세(지표 수치 인용) ②펀더멘털·사업(profile 요약+재무 수치) "
+    "③뉴스(verified.news/headlines 근거) ④촉매 또는 리스크(verified.catalyst, 없으면 주의점).\n"
+    "각 point는 구체 수치를 포함한 완결된 한 문장.\n"
+    "3) plan(매수 계획)과 trigger(전환 조건)는 코드가 확정한 값이다 — 바꾸거나 새로 만들지 말 것. "
+    "comment에는 뉴스·촉매를 반영한 실행 조언 한 줄만(예: '실적 발표 22일 전이라 2차분은 발표 후에').\n"
+    "4) 쉬운 한국어. 한자 금지. 이동평균은 '20일선/50일선/200일선'. 단정적 수익 보장 금지.\n"
+    "5) 출력은 지정된 JSON 하나만."
+)
+
+_W_SCHEMA = (
+    '{"market_overview":"(요청된 경우만) 전일 시장 1-2문장","macro":"(요청된 경우만) 한 줄",\n'
+    ' "signal_note":"(요청된 경우만) 1-2문장","risks":"(요청된 경우만) 1-2문장",\n'
+    ' "stocks":[{"symbol":"AAA","name":"회사명","category":"세부분류(반도체는 팹리스·파운드리·메모리·장비 등)",\n'
+    '   "summary":"무슨 회사 + 왜 지금 좋은지/왜 관찰인지 한 줄","points":["①","②","③","④"],\n'
+    '   "comment":"계획에 덧붙일 실행 조언 한 줄"}],\n'
+    ' "sells":[{"symbol":"CCC","comment":"왜 지금 정리인지 한 줄(reason+뉴스 결합)"}]}'
+)
+
+
+def _w_stock(c, kind, vmap):
+    """서술 입력: 지표+프로필+검증결과. closes 등 무거운 필드는 제외."""
+    v = vmap.get(str(c.get("symbol"))) or {}
+    r = c.get("ret") or {}
+    gap200 = None
+    if c.get("price") and c.get("ma200"):
+        gap200 = round((c["price"] / c["ma200"] - 1) * 100, 1)
+    d = {"symbol": c.get("symbol"), "name": c.get("name"), "kind": kind,
+         "sector": c.get("sector"), "industry": c.get("industry"),
+         "price": c.get("price"), "rsi": c.get("rsi"), "pe": c.get("pe"),
+         "gap200_pct": gap200, "ret": r, "hot": bool(c.get("hot")),
+         "roe": c.get("roe"), "rev_growth": c.get("rev_growth"),
+         "profit_margin": c.get("profit_margin"),
+         "profile": _profiles().get(str(c.get("symbol")), ""),
+         "headlines": (c.get("headlines") or [])[:4],
+         "verified": {k: v.get(k) for k in ("news", "catalyst", "flag") if v.get(k)},
+         "plan": c.get("plan_text") or ""}
+    if kind == "watch":
+        d["trigger"] = c.get("trigger") or ""
+    return d
+
+
+def write_stage(final_pairs, sells, market, vmap, need_market: bool) -> dict:
+    """final_pairs=[(cand,kind)] 최종 확정 종목만 서술(풀 전체가 아님 → 토큰 절약).
+    need_market=True면 시황 문장도 haiku가 작성(검증 단계를 건너뛴 pregen 경로)."""
+    stocks = [_w_stock(c, kind, vmap) for c, kind in final_pairs]
+    sell_in = [{"symbol": s.get("symbol"), "name": s.get("name"), "reason": s.get("reason"),
+                "ret_pct": s.get("ret_pct"),
+                "verified": (vmap.get(str(s.get("symbol"))) or {}).get("news", "")} for s in sells]
+    mk = ("- market_overview/macro/signal_note/risks 도 작성하라(market 수치 근거).\n"
+          if need_market else "- 시황 필드는 생략(이미 있음). stocks/sells만.\n")
+    instr = (
+        "각 종목의 상세 서술을 작성하라. symbol마다 stocks 항목 하나씩 반드시 출력.\n" + mk +
+        f"출력 스키마(JSON 하나만):\n{_W_SCHEMA}\n\n"
+        f"CONTEXT.market = {json.dumps(market, ensure_ascii=False)}\n"
+        f"CONTEXT.stocks = {json.dumps(stocks, ensure_ascii=False)}\n"
+        f"CONTEXT.sells = {json.dumps(sell_in, ensure_ascii=False)}\n")
+    text = (_call_cli(instr, False, system=_W_SYSTEM) if AI_BACKEND == "cli"
+            else _call_api(instr, False, system=_W_SYSTEM, model=MODEL_WRITE, max_tokens=6000))
+    p = _extract_json(text or "")
+    return p if isinstance(p, dict) else {}
+
+
+# ------------------------- verdict 적용(기존 로직 유지) -------------------------
+def _apply_verdicts(buy_pool, watch_pool, vmap, n_buy, n_watch):
+    """1단계 verdict 반영해 최종 목록 확정. AI가 없으면 전원 '유지'로 동작."""
+    keep, demoted, excluded = [], [], []
+    for c in buy_pool:
+        v = ((vmap.get(str(c["symbol"])) or {}).get("verdict") or "매수유지").strip()
+        if v == "제외":
+            excluded.append(c)
+        elif v in ("관찰강등", "관찰", "강등"):
+            demoted.append(c)
+        else:
+            keep.append(c)
+    watch_keep = []
+    for c in watch_pool:
+        if ((vmap.get(str(c["symbol"])) or {}).get("verdict") or "").strip() == "제외":
+            excluded.append(c)
+        else:
+            watch_keep.append(c)
+    final_buy = keep[:n_buy]
+    restore_n = min(MIN_BUY, n_buy) - len(final_buy)   # 과도 제외 시 강등분에서 복원
+    restored = []
+    if restore_n > 0 and demoted:
+        restored = demoted[:restore_n]; demoted = demoted[restore_n:]
+        final_buy += restored
+    used = {c["symbol"] for c in final_buy}
+    final_watch = [c for c in demoted + watch_keep if c["symbol"] not in used][:n_watch]
+    return (final_buy, final_watch, excluded,
+            {c["symbol"] for c in demoted}, {c["symbol"] for c in restored})
+
+
+# ------------------------- 조립 -------------------------
+def _mk_item(c, kind, vmap, wmap, dem=(), rest=()):
+    """후보 c + 검증(vmap) + 서술(wmap) → 렌더용 아이템. AI가 없어도 최소 구성이 된다."""
+    sym = str(c["symbol"])
+    v = vmap.get(sym) or {}
+    w = wmap.get(sym) or {}
+    flag = v.get("flag") if v.get("flag") in ("호재", "악재", "중립") else None
+    pts = [str(x).strip() for x in (w.get("points") or []) if str(x).strip()][:4]
+    item = {"symbol": sym,
+            "name": (w.get("name") or c.get("name") or "").strip(),
+            "category": (w.get("category") or c.get("industry") or c.get("sector") or "").strip(),
+            "summary": (w.get("summary") or c.get("score_reason") or "").strip(),
+            "points": pts, "flag": flag,
+            "news": (v.get("news") or "").strip(),
+            "catalyst": (v.get("catalyst") or "").strip(),
+            "comment": (w.get("comment") or "").strip(),
+            "verdict_reason": (v.get("verdict_reason") or "").strip(),
+            "plan": c.get("plan") or {}, "hot": bool(c.get("hot"))}
+    if kind == "watch":
+        item["trigger"] = c.get("trigger") or ""
+    if sym in dem:  item["ai_demoted"] = True
+    if sym in rest: item["ai_restored"] = True
     return item
 
 
-def build_report(groups: dict, market: dict) -> dict:
-    """groups={"buy_now":[cand...],"watch":[cand...]} → 보고서 dict. 실패/비활성 시 {}."""
+def build_report(groups: dict, market: dict, pregen: dict | None = None) -> dict:
+    """groups={"buy_now","watch","kr_buy","kr_watch","sells","kr_sells"(선택)}
+    pregen = pregen.py 가 전날 밤 만든 dict(있으면 검증 단계 생략 → 검색 비용 0).
+    실패 시 {} 반환(호출부가 deterministic_report 폴백)."""
+    attach_plans(groups)          # 계획은 AI 유무와 무관하게 항상 확정
     if not _enabled():
-        _log("비활성 → 폴백."); return {}
-    buy_now = groups.get("buy_now") or []
-    watch = groups.get("watch") or []
-    sells = groups.get("sells") or []
-    kr_buy = groups.get("kr_buy") or []
-    kr_watch = groups.get("kr_watch") or []
-    if not (buy_now or watch or sells):
+        _log("AI 비활성 → 폴백."); return {}
+    buy_pool, watch_pool = groups.get("buy_now") or [], groups.get("watch") or []
+    kr_buy_pool, kr_watch_pool = groups.get("kr_buy") or [], groups.get("kr_watch") or []
+    sells = (groups.get("sells") or []) + (groups.get("kr_sells") or [])
+    # 메일 분리 후 KR 전용/US 전용 groups 로도 호출된다 — 어느 쪽이든 내용이 있으면 진행
+    if not (buy_pool or watch_pool or kr_buy_pool or kr_watch_pool or sells):
         return {}
     try:
-        instr = _instruction(buy_now, watch, sells, market, kr_buy, kr_watch)
-        try:                                  # 1차: 기본은 웹검색 OFF(빠름). REPORT_WEB=1이면 ON.
-            text = _call_cli(instr, REPORT_WEB) if AI_BACKEND == "cli" else _call_api(instr, REPORT_WEB)
-        except Exception as e1:               # 실패 시 웹검색 없이 재시도(새 형식 유지)
-            _log(f"1차 실패({type(e1).__name__}) → 웹검색 없이 재시도")
-            text = _call_cli(instr, False) if AI_BACKEND == "cli" else _call_api(instr, False)
-        parsed = _extract_json(text or "")
-        if parsed is None:
-            _log("JSON 파싱 실패 → 폴백."); return {}
-        bmap = _desc_map(parsed.get("buy_now"))
-        wmap = _desc_map(parsed.get("watch"))
-        smap = _desc_map(parsed.get("sells"))
-        kbmap = _desc_map(parsed.get("kr_buy"))
-        kwmap = _desc_map(parsed.get("kr_watch"))
+        # ── 1단계: 검증. pregen 있으면 생략(밤에 구독 CLI로 이미 검증됨 → $0)
+        if pregen and pregen.get("by_sym"):
+            # pregen 은 by_sym(종목 검증)과 night_notes(밤 시점 시황 배경)만 갖는다.
+            # 시황 문장은 아침 종가가 확정된 뒤 haiku 가 새로 쓴다(need_market=True) —
+            # night_notes 는 그 배경 지식으로 market 컨텍스트에 주입.
+            ver = {"by_sym": pregen["by_sym"]}; need_market = True
+            if pregen.get("night_notes"):
+                market = dict(market, night_notes=str(pregen["night_notes"])[:900])
+            _log(f"pregen 사용({pregen.get('generated','?')}) → 검증 단계 생략(검색 0회)")
+        else:
+            ver = verify_stage(groups, market); need_market = not bool(ver.get("market_overview"))
+            if not ver:
+                _log("검증 실패 → 전원 유지로 서술만 진행"); ver = {"by_sym": {}}; need_market = True
+        vmap = ver.get("by_sym") or {}
+
+        # ── 코드가 최종 목록 확정
+        fb, fw, fx, dem, rest = _apply_verdicts(buy_pool, watch_pool, vmap, FINAL_BUY, FINAL_WATCH)
+        kfb, kfw, kfx, kdem, krest = _apply_verdicts(kr_buy_pool, kr_watch_pool, vmap,
+                                                     KR_FINAL_BUY, KR_FINAL_WATCH)
+
+        # ── 2단계: 서술은 '최종 종목만'(풀 전체 아님 → 토큰 절약)
+        final_pairs = ([(c, "buy") for c in fb] + [(c, "watch") for c in fw]
+                       + [(c, "buy") for c in kfb] + [(c, "watch") for c in kfw])
+        parsed = write_stage(final_pairs, sells, market, vmap, need_market)
+        wmap = {str(r["symbol"]): r for r in (parsed.get("stocks") or []) if isinstance(r, dict) and r.get("symbol")}
+        smap = {str(r["symbol"]): r for r in (parsed.get("sells") or []) if isinstance(r, dict) and r.get("symbol")}
+
+        def pick(field):
+            return (ver.get(field) or (parsed.get(field) or "")).strip()
+
         out = {
-            "market_overview": (parsed.get("market_overview") or "").strip(),
-            "macro": (parsed.get("macro") or "").strip(),
-            "signal_note": (parsed.get("signal_note") or "").strip(),
-            "risks": (parsed.get("risks") or "").strip(),
-            # 멤버십은 코드가 강제(점수·진입·매도시그널 기준). AI는 설명만.
-            "buy_now": [_norm_item(c["symbol"], bmap.get(c["symbol"]), c, "buy") for c in buy_now],
-            "watch": [_norm_item(c["symbol"], wmap.get(c["symbol"]), c, "watch") for c in watch],
-            "kr_buy": [_norm_item(c["symbol"], kbmap.get(c["symbol"]), c, "buy") for c in kr_buy],
-            "kr_watch": [_norm_item(c["symbol"], kwmap.get(c["symbol"]), c, "watch") for c in kr_watch],
+            "market_overview": pick("market_overview"), "macro": pick("macro"),
+            "signal_note": pick("signal_note"), "risks": pick("risks"),
+            "buy_now": [_mk_item(c, "buy", vmap, wmap, dem, rest) for c in fb],
+            "watch": [_mk_item(c, "watch", vmap, wmap, dem, rest) for c in fw],
+            "kr_buy": [_mk_item(c, "buy", vmap, wmap, kdem, krest) for c in kfb],
+            "kr_watch": [_mk_item(c, "watch", vmap, wmap, kdem, krest) for c in kfw],
+            "ai_excluded": [{"symbol": c["symbol"], "name": c.get("name", ""),
+                             "reason": ((vmap.get(str(c["symbol"])) or {}).get("verdict_reason") or "").strip()}
+                            for c in fx + kfx],
             "sells": [{"symbol": s["symbol"], "name": s.get("name", ""), "reason": s.get("reason", ""),
-                       "since": s.get("since"), "ret_pct": s.get("ret_pct"),
-                       "comment": ((smap.get(s["symbol"]) or {}).get("comment") or "").strip()}
+                       "since": s.get("since"), "ret_pct": s.get("ret_pct"), "plan": s.get("plan", ""),
+                       "comment": ((smap.get(str(s["symbol"])) or {}).get("comment")
+                                   or (vmap.get(str(s["symbol"])) or {}).get("news") or "").strip()}
                       for s in sells],
         }
-        _log(f"[{AI_BACKEND}] 생성: 지금매수 {len(out['buy_now'])} · 관찰 {len(out['watch'])} · 매도 {len(out['sells'])}")
+        _log(f"[{AI_BACKEND}] 완료: 미국 {len(out['buy_now'])}/{len(out['watch'])} · "
+             f"한국 {len(out['kr_buy'])}/{len(out['kr_watch'])} · 제외 {len(out['ai_excluded'])} · "
+             f"매도 {len(out['sells'])} · pregen={'O' if pregen else 'X'}")
         return out
     except Exception as e:
         _log(f"호출 실패({type(e).__name__}: {e}) → 폴백."); return {}
 
 
-def _call_api(instruction, web=True, system=None):
+# ------------------------- API/CLI 호출 -------------------------
+def _call_api(instruction, web=True, system=None, model=None, max_tokens=6000):
+    """Anthropic API. 시스템 프롬프트에 cache_control — 같은 실행 내 재시도/재호출 때
+    캐시 적중(입력 90% 할인). 일 1회 실행이라 날짜 간 캐시는 TTL(5분)상 해당 없음."""
     client = anthropic.Anthropic(timeout=AI_TIMEOUT)
     kw = {}
     if web:
-        kw["tools"] = [{"type": "web_search_20250305", "name": "web_search", "max_uses": REPORT_WEB_USES}]
+        kw["tools"] = [{"type": "web_search_20250305", "name": "web_search",
+                        "max_uses": REPORT_WEB_USES}]
     msg = client.messages.create(
-        model=REPORT_MODEL, max_tokens=4000, system=system or _SYSTEM,
+        model=_no_opus(model or MODEL_VERIFY, "claude-sonnet-5"),
+        max_tokens=max_tokens,
+        system=[{"type": "text", "text": system or _V_SYSTEM,
+                 "cache_control": {"type": "ephemeral"}}],
         messages=[{"role": "user", "content": instruction}], **kw)
     return "".join(b.text for b in msg.content if getattr(b, "type", "") == "text")
 
 
 def _call_cli(instruction, web=True, system=None):
-    prompt = (system or _SYSTEM) + "\n\n" + instruction
+    """로컬 claude -p (Pro 구독 — API 키·과금 없음). pregen.py 와 weekly_report.py 가 사용."""
+    prompt = (system or _V_SYSTEM) + "\n\n" + instruction
     cmd = [CLAUDE_BIN, "-p", "--output-format", "json"]
     if web:
         cmd += ["--allowedTools", "WebSearch,WebFetch"]
-    to = AI_TIMEOUT if web else min(AI_TIMEOUT, 150)   # 웹 없으면 빠름
+    to = AI_TIMEOUT if web else min(AI_TIMEOUT, 300)
     proc = subprocess.run(cmd, input=prompt, capture_output=True, text=True,
                           encoding="utf-8", errors="replace", timeout=to)
     out = (proc.stdout or "").strip()
     if proc.returncode != 0:
-        # 에러 상세를 최대한 노출(빈 stderr 대비 stdout·JSON 엔벨로프까지 확인)
         msg = (proc.stderr or "").strip() or out
         try:
             env = json.loads(out)
@@ -238,8 +433,10 @@ def _call_cli(instruction, web=True, system=None):
     return out
 
 
+# ------------------------- 무AI 폴백 -------------------------
 def deterministic_report(groups: dict, market: dict) -> dict:
-    """AI 생성 실패 시 지표만으로 새 형식(지금매수/관찰/매도) 리포트를 구성 → 발송 누락 방지."""
+    """AI 실패 시 지표+프로필+계획만으로 구성. 계획·프로필 덕에 무AI여도 꽤 상세하다."""
+    attach_plans(groups)
     spy = market.get("spy", {}) or {}; fg = market.get("fear_greed", {}) or {}
     gap, sc, rt = spy.get("gap_pct"), fg.get("score"), fg.get("rating")
     mo = "지표 기반 자동 선정본"
@@ -247,27 +444,42 @@ def deterministic_report(groups: dict, market: dict) -> dict:
         mo = f"SPY 200일선 대비 {gap:+.1f}%" + (f", 탐욕지수 {sc:.0f}({rt})" if sc is not None else "") + " — 지표 기반 자동 선정."
 
     def item(c, kind):
-        d = {"symbol": c.get("symbol"), "name": c.get("name", ""), "category": c.get("sector", ""),
-             "summary": (c.get("score_reason") or "")[:70], "points": [], "news": "", "flag": None}
-        if kind == "buy":
-            d["entry"] = "현재가 분할 매수 검토" + (" (과열 — 소량/눌림 대기)" if c.get("hot") else "")
-            d["hot"] = bool(c.get("hot"))
-        else:
-            d["target"] = "20일선/50일선 회복 확인 후 매수 검토"
+        sym = str(c.get("symbol"))
+        r = c.get("ret") or {}
+        pts = []
+        if c.get("rsi") is not None or r.get("3m") is not None:
+            pts.append("①추세: " + " · ".join(x for x in (
+                f"RSI {c['rsi']:.0f}" if c.get("rsi") is not None else "",
+                f"3개월 {r['3m']:+.1f}%" if r.get("3m") is not None else "",
+                f"6개월 {r['6m']:+.1f}%" if r.get("6m") is not None else "") if x))
+        prof = _profiles().get(sym)
+        if prof:
+            pts.append("②사업: " + prof[:140])
+        if c.get("headlines"):
+            pts.append("③뉴스: " + str(c["headlines"][0])[:120])
+        d = {"symbol": sym, "name": c.get("name", ""),
+             "category": c.get("industry") or c.get("sector", ""),
+             "summary": (c.get("score_reason") or prof or "")[:90],
+             "points": pts, "news": "", "catalyst": "", "comment": "", "flag": None,
+             "verdict_reason": "", "plan": c.get("plan") or {}, "hot": bool(c.get("hot"))}
+        if kind == "watch":
+            d["trigger"] = c.get("trigger") or "20일선 회복 확인 후 매수 검토"
         return d
+    sells = (groups.get("sells") or []) + (groups.get("kr_sells") or [])
     return {"market_overview": mo, "macro": "", "signal_note": "",
-            "risks": "지표 기반 자동본(AI 해설 생략). 투자 권유 아님.",
-            "buy_now": [item(c, "buy") for c in groups.get("buy_now", [])],
-            "watch": [item(c, "watch") for c in groups.get("watch", [])],
-            "kr_buy": [item(c, "buy") for c in groups.get("kr_buy", [])],
-            "kr_watch": [item(c, "watch") for c in groups.get("kr_watch", [])],
+            "risks": "지표 기반 자동본(AI 검증 생략). 투자 권유 아님.",
+            "buy_now": [item(c, "buy") for c in (groups.get("buy_now") or [])[:FINAL_BUY]],
+            "watch": [item(c, "watch") for c in (groups.get("watch") or [])[:FINAL_WATCH]],
+            "kr_buy": [item(c, "buy") for c in (groups.get("kr_buy") or [])[:KR_FINAL_BUY]],
+            "kr_watch": [item(c, "watch") for c in (groups.get("kr_watch") or [])[:KR_FINAL_WATCH]],
+            "ai_excluded": [],
             "sells": [{"symbol": s.get("symbol"), "name": s.get("name", ""), "reason": s.get("reason", ""),
-                       "since": s.get("since"), "ret_pct": s.get("ret_pct"), "comment": ""}
-                      for s in groups.get("sells", [])]}
+                       "since": s.get("since"), "ret_pct": s.get("ret_pct"),
+                       "plan": s.get("plan", ""), "comment": ""} for s in sells]}
 
 
 # ------------------------- HTML 렌더 -------------------------
-def _esc(s): return (s or "").replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
+def _esc(s): return (str(s) if s is not None else "").replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
 
 
 def _chip(label, color="#6b7280", strong=False):
@@ -294,26 +506,68 @@ def _metric_chips(m):
     return "".join(out)
 
 
+def _plan_table(plan: dict, comment: str = ""):
+    """entry_plan.buy_plan 결과를 분할매수 표로. 코드 확정값 — 리포트의 '실행' 핵심."""
+    if not plan or not plan.get("tranches"):
+        return ""
+    krw = plan.get("krw", False)
+    rows = "".join(
+        f'<tr><td style="padding:2px 8px;color:#374151">{t["label"]}</td>'
+        f'<td style="padding:2px 8px;font-weight:700">{EP._fmt(t["price"], krw)}</td>'
+        f'<td style="padding:2px 8px">{t["pct"]}%</td>'
+        f'<td style="padding:2px 8px;color:#6b7280">{_esc(t["basis"])}</td></tr>'
+        for t in plan["tranches"])
+    stop = plan.get("stop") or {}
+    stop_row = (f'<tr><td style="padding:2px 8px;color:#b91c1c">손절</td>'
+                f'<td style="padding:2px 8px;font-weight:700;color:#b91c1c">{EP._fmt(stop.get("price"), krw)}</td>'
+                f'<td style="padding:2px 8px;color:#b91c1c">전량</td>'
+                f'<td style="padding:2px 8px;color:#b91c1c">{_esc(stop.get("basis"))}</td></tr>') if stop else ""
+    note = (f'<div style="font-size:11px;color:#6b7280;margin-top:2px">{_esc(plan.get("note"))}</div>'
+            if plan.get("note") else "")
+    cmt = (f'<div style="font-size:12px;color:#1d4ed8;margin-top:3px">💬 {_esc(comment)}</div>'
+           if comment else "")
+    return (
+        '<div style="background:#eff6ff;border-radius:6px;padding:6px 8px;margin-top:6px">'
+        '<div style="font-size:12px;font-weight:700;color:#1d4ed8">🎯 매수 계획 (규칙 확정)</div>'
+        f'<table style="border-collapse:collapse;font-size:12px;margin-top:2px">{rows}{stop_row}</table>'
+        f'{note}{cmt}</div>')
+
+
 def _card(i, r, metrics_by_sym, kind):
     flag_color = {"호재": "#15803d", "악재": "#b91c1c", "중립": "#6b7280"}
     sym = r.get("symbol"); m = metrics_by_sym.get(sym, {})
     fl = r.get("flag")
     flag_chip = _chip(fl, flag_color.get(fl, "#6b7280"), True) if fl else ""
     cat_chip = _chip(_esc(r.get("category")), "#7c3aed") if r.get("category") else ""
-    hot_chip = _chip("⚠️과열·분할", "#c2410c", True) if (kind == "buy" and r.get("hot")) else ""
+    hot_chip = _chip("과열·분할", "#c2410c", True) if (kind == "buy" and r.get("hot")) else ""
+    ai_chip = ""
+    if r.get("ai_demoted"):
+        ai_chip = _chip("AI 강등", "#0e7490", True)
+    elif r.get("ai_restored"):
+        ai_chip = _chip("AI 유보·소량만", "#0e7490", True)
     pts = "".join(f'<li style="margin:1px 0">{_esc(p)}</li>' for p in r.get("points", []))
     pts_html = (f'<ul style="margin:6px 0 0;padding-left:16px;font-size:12px;color:#374151;'
                 f'line-height:1.55">{pts}</ul>') if pts else ""
     if kind == "buy":
-        act = (f'<div style="font-size:12px;color:#1d4ed8;background:#eff6ff;border-radius:6px;'
-               f'padding:5px 8px;margin-top:6px">🎯 지금 진입: {_esc(r.get("entry"))}</div>') if r.get("entry") else ""
+        act = _plan_table(r.get("plan"), r.get("comment"))
     else:
-        act = (f'<div style="font-size:12px;color:#c2410c;background:#fff7ed;border-radius:6px;'
-               f'padding:5px 8px;margin-top:6px">⏳ 매수 조건: {_esc(r.get("target"))}</div>') if r.get("target") else ""
+        act = ""
+        if r.get("trigger") or r.get("plan"):
+            act = (f'<div style="font-size:12px;color:#c2410c;background:#fff7ed;border-radius:6px;'
+                   f'padding:5px 8px;margin-top:6px">&#9203; 매수 전환 조건: {_esc(r.get("trigger"))}'
+                   + (f'<div style="color:#9a3412;margin-top:2px">전환 시 계획: {_esc(EP.plan_text(r.get("plan") or {}))}</div>'
+                      if r.get("plan") else "")
+                   + (f'<div style="color:#1d4ed8;margin-top:2px">&#128172; {_esc(r.get("comment"))}</div>'
+                      if r.get("comment") else "")
+                   + '</div>')
+    vr = r.get("verdict_reason") or ""
+    vr_html = (f'<div style="font-size:11px;color:#0e7490;margin-top:4px;line-height:1.5">[AI] {_esc(vr)}</div>'
+               if vr and (r.get("ai_demoted") or r.get("ai_restored")) else "")
     _nw = r.get("news") or ""
-    show = _nw and fl != "중립" and ("확인" not in _nw)
-    news = (f'<div style="color:#6b7280;font-size:11px;margin-top:5px;line-height:1.5">🗞 {_esc(_nw)}</div>'
-            if show else "")
+    news = (f'<div style="color:#6b7280;font-size:11px;margin-top:5px;line-height:1.5">&#128480; {_esc(_nw)}</div>'
+            if (_nw and fl != "중립" and "확인" not in _nw) else "")
+    cata = (f'<div style="color:#7c3aed;font-size:11px;margin-top:3px;line-height:1.5">&#128197; {_esc(r.get("catalyst"))}</div>'
+            if r.get("catalyst") else "")
     chart = f'<img src="cid:chart_{sym}" style="width:100%;border-radius:6px">'
     return (
         f'<table role="presentation" width="100%" style="border-collapse:collapse;border:1px solid #e5e7eb;'
@@ -321,9 +575,9 @@ def _card(i, r, metrics_by_sym, kind):
         f'<td width="56%" valign="top" style="padding:12px 14px">'
         f'<div style="font-size:15px;font-weight:700">{i}. {_esc(sym)} '
         f'<span style="color:#6b7280;font-size:12px;font-weight:400">{_esc(r.get("name"))}</span></div>'
-        f'<div style="margin:4px 0 2px">{cat_chip}{hot_chip}{flag_chip}</div>'
+        f'<div style="margin:4px 0 2px">{cat_chip}{hot_chip}{ai_chip}{flag_chip}</div>'
         f'<div style="font-size:13px;color:#111;margin-top:4px;line-height:1.5">{_esc(r.get("summary"))}</div>'
-        f'{pts_html}{act}{news}</td>'
+        f'{pts_html}{act}{vr_html}{news}{cata}</td>'
         f'<td width="44%" valign="top" style="padding:12px 12px 12px 0">{chart}'
         f'<div style="margin-top:6px">{_metric_chips(m)}</div></td></tr></table>')
 
@@ -333,20 +587,37 @@ def _sell_card(i, s):
     ret_chip = (_chip(f'추천이후 {ret:+.0f}%', "#15803d" if (ret or 0) >= 0 else "#b91c1c", True)
                 if ret is not None else "")
     since = f' · {_esc(s.get("since"))} 추천' if s.get("since") else ""
-    cmt = f'<div style="font-size:12px;color:#374151;margin-top:4px;line-height:1.5">{_esc(s.get("comment"))}</div>' if s.get("comment") else ""
+    plan = (f'<div style="font-size:12px;color:#7f1d1d;background:#fff1f2;border-radius:6px;'
+            f'padding:5px 8px;margin-top:5px"><b>처분 계획:</b> {_esc(s.get("plan"))}</div>') if s.get("plan") else ""
+    cmt = (f'<div style="font-size:12px;color:#374151;margin-top:4px;line-height:1.5">{_esc(s.get("comment"))}</div>'
+           if s.get("comment") else "")
     return (
         f'<div style="border:1px solid #fecaca;border-radius:10px;padding:11px 13px;margin:8px 0;background:#fef2f2">'
         f'<div style="font-size:14px;font-weight:700">{i}. {_esc(s.get("symbol"))} '
         f'<span style="color:#6b7280;font-size:12px;font-weight:400">{_esc(s.get("name"))}{since}</span> {ret_chip}</div>'
-        f'<div style="font-size:12px;color:#b91c1c;margin-top:3px">⚠ {_esc(s.get("reason"))}</div>{cmt}</div>')
+        f'<div style="font-size:12px;color:#b91c1c;margin-top:3px">&#9888; {_esc(s.get("reason"))}</div>{plan}{cmt}</div>')
+
+
+def _excluded_html(items):
+    if not items:
+        return ""
+    rows = "".join(
+        f'<div style="font-size:12px;color:#374151;margin:3px 0">'
+        f'<b>{_esc(x.get("symbol"))}</b> {_esc(x.get("name"))} — {_esc(x.get("reason") or "사유 미기재")}</div>'
+        for x in items)
+    return (
+        '<div style="border:1px solid #e5e7eb;border-radius:10px;padding:10px 13px;margin:10px 0;background:#f8fafc">'
+        '<div style="font-size:13px;font-weight:700;color:#0e7490">AI 검증에서 제외된 후보</div>'
+        '<div style="font-size:11px;color:#9ca3af;margin:2px 0 4px">규칙이 뽑았지만 최신 뉴스·리스크 점검에서 탈락</div>'
+        + rows + '</div>')
 
 
 def render_report_html(report, as_of="", metrics_by_sym=None, market_html="", signals_html="",
-                       kr_sells=None, banner=""):
-    """일일 리포트 HTML.
-    market_html  = 전일 세계시장 요약 표(market_signals.world_table_html)
-    signals_html = 핵심 6자산 신호 카드(market_signals.signal_cards_html)
-    banner       = 휴장 안내 등 상단 배너 텍스트"""
+                       kr_sells=None, banner="", title=None, show_spy=True):
+    """일일 리포트 HTML — 메일 2통 분리 지원.
+    title    = 헤더 제목(없으면 기본). KR 장전/US 마감 메일이 각자 지정.
+    show_spy = SPY 큰 차트 표시 여부(KR 전용 메일은 SPY 데이터가 없어 False).
+    미국/한국 섹션은 해당 카드가 있을 때만 그린다."""
     if not report:
         return ""
     metrics_by_sym = metrics_by_sym or {}
@@ -358,53 +629,61 @@ def render_report_html(report, as_of="", metrics_by_sym=None, market_html="", si
     sell_html = ""
     if sells:
         sell_cards = "".join(_sell_card(i, s) for i, s in enumerate(sells, 1))
-        sell_html = ('<h3 style="margin:18px 0 2px">🔴 미국 매도 · 차익실현 검토 <span style="color:#9ca3af;font-size:12px">'
-                     '(이전 추천 종목 중 추세 이탈)</span></h3>' + sell_cards)
+        sell_html = ('<h3 style="margin:18px 0 2px">&#128308; 매도 · 차익실현 검토 <span style="color:#9ca3af;font-size:12px">'
+                     '(이전 추천 종목 중 추세 이탈 — 처분 계획 포함)</span></h3>' + sell_cards)
     kr_sell_html = ""
     if kr_sells:
         kr_sell_cards = "".join(_sell_card(i, s) for i, s in enumerate(kr_sells, 1))
-        kr_sell_html = ('<h3 style="margin:18px 0 2px">🔴 한국 매도 · 차익실현 검토 <span style="color:#9ca3af;font-size:12px">'
+        kr_sell_html = ('<h3 style="margin:18px 0 2px">&#128308; 한국 매도 · 차익실현 검토 <span style="color:#9ca3af;font-size:12px">'
                         '(이전 추천 종목 중 추세 이탈)</span></h3>' + kr_sell_cards)
     sub = f' <span style="color:#9ca3af;font-size:12px">({_esc(as_of)} 종가 기준)</span>' if as_of else ""
-    spy = '<img src="cid:spy_chart" style="width:100%;max-width:640px;border-radius:8px;margin:8px 0">'
+    spy = ('<img src="cid:spy_chart" style="width:100%;max-width:640px;border-radius:8px;margin:8px 0">'
+           if show_spy else "")
     banner_html = (f'<div style="background:#fffbeb;border:1px solid #fcd34d;border-radius:8px;padding:7px 11px;'
-                   f'font-size:12px;color:#92400e;margin:8px 0">ℹ️ {_esc(banner)}</div>') if banner else ""
+                   f'font-size:12px;color:#92400e;margin:8px 0">&#8505;&#65039; {_esc(banner)}</div>') if banner else ""
     market_sec = ""
     if market_html:
-        market_sec = ('<h3 style="margin:14px 0 6px">🌐 전일 시장 요약 <span style="color:#9ca3af;font-size:12px">'
+        market_sec = ('<h3 style="margin:14px 0 6px">&#127760; 전일 시장 요약 <span style="color:#9ca3af;font-size:12px">'
                       '(미국 · 한국 · 코인 · 세계)</span></h3>' + market_html)
     signals_sec = ""
     if signals_html:
         note = _esc(report.get("signal_note") or "")
         note_html = (f'<div style="font-size:13px;color:#111;margin:4px 0 8px;line-height:1.55">{note}</div>'
                      if note else "")
-        signals_sec = ('<h3 style="margin:18px 0 4px">🧭 지수·코인 추세 신호 <span style="color:#9ca3af;font-size:12px">'
+        signals_sec = ('<h3 style="margin:18px 0 4px">&#129517; 지수·코인 추세 신호 <span style="color:#9ca3af;font-size:12px">'
                        '(규칙 기반 — STRATEGY.md)</span></h3>' + note_html + signals_html)
     kr_sec = ""
     if kr_buy_cards or kr_watch_cards:
         kr_sec = (
-            '<h3 style="margin:18px 0 2px">🇰🇷 코스피200 지금 매수 검토 <span style="color:#9ca3af;font-size:12px">'
-            '(펀더멘탈 필터 + 추세 상위)</span></h3>' + (kr_buy_cards or '<div style="font-size:12px;color:#6b7280">해당 없음</div>')
-            + ('<h3 style="margin:18px 0 2px">🇰🇷 코스피200 관찰 · 내려오면 매수</h3>' + kr_watch_cards if kr_watch_cards else ""))
+            '<h3 style="margin:18px 0 2px">&#127472;&#127479; 코스피200 지금 매수 검토 <span style="color:#9ca3af;font-size:12px">'
+            '(펀더멘탈 필터 + 추세 상위 · AI 검증 통과)</span></h3>' + (kr_buy_cards or '<div style="font-size:12px;color:#6b7280">해당 없음</div>')
+            + ('<h3 style="margin:18px 0 2px">&#127472;&#127479; 코스피200 관찰 · 내려오면 매수</h3>' + kr_watch_cards if kr_watch_cards else ""))
+    # 미국 섹션도 (한국처럼) 카드가 있을 때만 — KR 전용 메일에서 빈 헤더 방지
+    us_sec = ""
+    if buy_cards or watch_cards:
+        us_sec = (
+            f'<h3 style="margin:16px 0 2px">&#11088; 미국(S&amp;P500) 지금 매수 검토 <span style="color:#9ca3af;font-size:12px">'
+            f'(규칙 선별 · AI 검증 통과)</span></h3>{buy_cards}'
+            + (f'<h3 style="margin:18px 0 2px">&#128064; 미국 관찰 · 내려오면 매수 <span style="color:#9ca3af;font-size:12px">'
+               f'(좋은 종목이나 지금은 조정 중 · AI 강등 포함)</span></h3>{watch_cards}' if watch_cards else ""))
+    head = _esc(title) if title else "&#128200; 데일리 시장 점검 · 종목추천"
     return (
         f'<div style="font-family:-apple-system,BlinkMacSystemFont,\'Segoe UI\',\'Malgun Gothic\',sans-serif;'
         f'max-width:700px;margin:0 auto;color:#111">'
-        f'<h2 style="margin:6px 0">📈 데일리 시장 점검 · 종목추천{sub}</h2>'
+        f'<h2 style="margin:6px 0">{head}{sub}</h2>'
         f'{banner_html}'
         f'<div style="background:#f8fafc;border-left:3px solid #6b7280;padding:8px 12px;font-size:13px;'
-        f'line-height:1.6;margin:8px 0"><b>🧭 시장</b> {_esc(report.get("market_overview"))}<br>'
-        f'<b>🌐 환율·한국·코인</b> {_esc(report.get("macro"))}</div>'
+        f'line-height:1.6;margin:8px 0"><b>&#129517; 시장</b> {_esc(report.get("market_overview"))}<br>'
+        f'<b>&#127760; 환율·한국·코인</b> {_esc(report.get("macro"))}</div>'
         f'{market_sec}'
         f'{signals_sec}'
         f'{spy}'
-        f'<h3 style="margin:16px 0 2px">⭐ 미국(S&P500) 지금 매수 검토 <span style="color:#9ca3af;font-size:12px">'
-        f'(점수 상위 · 200일선 위 · 52주 고점 -25% 이내)</span></h3>{buy_cards}'
-        f'<h3 style="margin:18px 0 2px">👀 미국 관찰 · 내려오면 매수 <span style="color:#9ca3af;font-size:12px">'
-        f'(좋은 종목이나 지금은 조정 중)</span></h3>{watch_cards}'
+        f'{us_sec}'
+        f'{_excluded_html(report.get("ai_excluded"))}'
         f'{sell_html}'
         f'{kr_sec}'
         f'{kr_sell_html}'
         f'<div style="font-size:11px;color:#9ca3af;margin-top:14px;line-height:1.5">'
-        f'⚠️ {_esc(report.get("risks"))}<br>정보 제공용이며 투자 권유가 아닙니다. 판단·책임은 본인에게 있습니다.<br>'
-        f'매도 규칙: 트레일링 -20% 또는 200일선 -3% 이탈 (미국·한국 공통).</div>'
+        f'&#9888;&#65039; {_esc(report.get("risks"))}<br>정보 제공용이며 투자 권유가 아닙니다. 판단·책임은 본인에게 있습니다.<br>'
+        f'매도 규칙: 트레일링 -20% 또는 200일선 -3% 이탈 (미국·한국 공통). 전략 근거: STRATEGY.md</div>'
         f'</div>')

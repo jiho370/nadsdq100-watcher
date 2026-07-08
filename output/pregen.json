@@ -1,0 +1,151 @@
+{
+ "for_kst": "2026-07-10",
+ "generated": "2026-07-09T04:53+09:00",
+ "by_sym": {
+  "DELL": {
+   "symbol": "DELL",
+   "verdict": "매수유지",
+   "verdict_reason": "",
+   "news": "트럼프 'Buy Dell' 공개 발언 + Raymond James AI 수요 긍정 코멘트",
+   "catalyst": "AI 서버 수주 모멘텀 확인(다음 실적 발표)",
+   "flag": "호재"
+  },
+  "WBD": {
+   "symbol": "WBD",
+   "verdict": "관찰강등",
+   "verdict_reason": "캘리포니아·뉴욕주가 Paramount-WBD 110B달러 합병에 법률팀 고용, 주 단위 소송 리스크 현실화로 M&A 클로징 불확실성 증가",
+   "news": "캘리포니아주 소송 준비 보도로 주가 약세, DOJ 승인은 완료",
+   "catalyst": "합병 최종 클로징 목표 2026년 여름 말 — 주 소송 제기 여부가 분기점",
+   "flag": "악재"
+  },
+  "GOOGL": {
+   "symbol": "GOOGL",
+   "verdict": "매수유지",
+   "verdict_reason": "",
+   "news": "AI 지출 자본시장 민감성 우려 및 DeepSeek 자체 칩 개발 경쟁 심화",
+   "catalyst": "Q2 실적 발표 — AI 수익화 진행 상황 핵심 확인",
+   "flag": "중립"
+  },
+  "GOOG": {
+   "symbol": "GOOG",
+   "verdict": "매수유지",
+   "verdict_reason": "",
+   "news": "GOOGL과 동일 — DeepSeek 경쟁 및 AI 지출 지속성 의구심",
+   "catalyst": "Q2 실적 발표",
+   "flag": "중립"
+  },
+  "CNC": {
+   "symbol": "CNC",
+   "verdict": "매수유지",
+   "verdict_reason": "",
+   "news": "아칸소주 메디케이드 확장 프로그램 자금 문제로 철수",
+   "catalyst": "오바마케어 보험사 보험료 인상 신청 승인 여부 — 마진 개선 촉매",
+   "flag": "중립"
+  },
+  "CHRW": {
+   "symbol": "CHRW",
+   "verdict": "매수유지",
+   "verdict_reason": "",
+   "news": "몽고메리 소송 일리노이 지방법원 환송 결정으로 법률 불확실성 지속",
+   "catalyst": "Q2 실적 발표 임박 — 운임 회복 여부 핵심 지표",
+   "flag": "중립"
+  },
+  "APA": {
+   "symbol": "APA",
+   "verdict": "매수유지",
+   "verdict_reason": "",
+   "news": "트럼프 이란 추가 공습 위협으로 유가 급등, E&P 섹터 동반 강세",
+   "catalyst": "이란 지정학 전개 및 유가 방향성 — 협상 타결 시 단기 반락 위험",
+   "flag": "호재"
+  },
+  "VTRS": {
+   "symbol": "VTRS",
+   "verdict": "매수유지",
+   "verdict_reason": "",
+   "news": "일본 IgA 신장병 Phase 3 긍정 결과 + 신규 대출 조달 성공",
+   "catalyst": "일본 허가 신청 일정 및 파이프라인 추가 업데이트",
+   "flag": "호재"
+  },
+  "VLO": {
+   "symbol": "VLO",
+   "verdict": "매수유지",
+   "verdict_reason": "",
+   "news": "이란 공습 위협에 유가·휘발유 가격 급등, 정제 마진 수혜 극대화",
+   "catalyst": "유가 지속 여부 — 이란 협상 진전 시 마진 급반전 가능",
+   "flag": "호재"
+  },
+  "MU": {
+   "symbol": "MU",
+   "verdict": "관찰유지",
+   "verdict_reason": "",
+   "news": "Samsung Q2 후 메모리 베어마켓 진입, Burry가 MU 신규 공매도 추가 진입 확인",
+   "catalyst": "HBM4 고객 수요 재확인 및 삼성·SK Hynix 감산 폭 발표",
+   "flag": "악재"
+  },
+  "STX": {
+   "symbol": "STX",
+   "verdict": "관찰유지",
+   "verdict_reason": "",
+   "news": "메모리·스토리지 섹터 전반 조정으로 동반 급락(-12.3%)",
+   "catalyst": "Melius Research 신규 커버리지 의견·목표가 공개 주목",
+   "flag": "악재"
+  },
+  "INTC": {
+   "symbol": "INTC",
+   "verdict": "관찰유지",
+   "verdict_reason": "",
+   "news": "반도체 셀오프 주도(-22.1%), HSBC $200 목표가(불리쉬) vs BofA '버블' 경고 팽팽",
+   "catalyst": "7월 23일 Q2 실적 — 18A 파운드리 수율·외부 매출 가이던스가 방향 결정",
+   "flag": "악재"
+  },
+  "AMD": {
+   "symbol": "AMD",
+   "verdict": "관찰유지",
+   "verdict_reason": "",
+   "news": "Broadcom-Apple 칩 딜 이후 반사 하락, 반도체 섹터 동반 셀오프(-11%)",
+   "catalyst": "데이터센터 GPU MI300X 공급 현황 및 분기 가이던스 업데이트",
+   "flag": "악재"
+  },
+  "FIX": {
+   "symbol": "FIX",
+   "verdict": "관찰유지",
+   "verdict_reason": "",
+   "news": "뚜렷한 악재 없이 고밸류에이션 부담으로 수익 실현 집중(-15.2%), 수주 잔고 $125억 유지",
+   "catalyst": "데이터센터 냉각 추가 수주 발표 여부",
+   "flag": "중립"
+  },
+  "LRCX": {
+   "symbol": "LRCX",
+   "verdict": "제외",
+   "verdict_reason": "SK Hynix HBM 생산 확장 축소 보도가 반도체 장비 발주 사이클에 직접 타격, 주간 -23.3%로 후보군 최대 낙폭 + 'AI 내러티브로 완전 고평가' 경고 — 수요 가시성 회복 전까지 보유 근거 불충분",
+   "news": "삼성 실적 후 장비주 낙폭 주도, Russell Top 50 편입에도 '완전 고평가' 분석",
+   "catalyst": "HBM4 장비 수주 확인 및 고객사 CapEx 가이던스 재확인 시 재검토",
+   "flag": "악재"
+  },
+  "FLEX": {
+   "symbol": "FLEX",
+   "verdict": "관찰유지",
+   "verdict_reason": "",
+   "news": "Russell 2500 지수 제외 결정으로 인덱스 매도 압력 + AI 부문 스핀오프 일정 불확실",
+   "catalyst": "AI 스핀오프 밸류에이션 및 분사 일정 공개",
+   "flag": "악재"
+  },
+  "AMAT": {
+   "symbol": "AMAT",
+   "verdict": "제외",
+   "verdict_reason": "Michael Burry가 6월 30일 AMAT 공매도 진입 확인(NVDA·MU 동반), SK Hynix HBM 축소로 메모리 장비 수요 직접 타격 + 주간 -21% 낙폭 — CEO 30% 성장 가이던스에도 단기 수요 가시성 미확보",
+   "news": "Burry AMAT·NVDA·MU 동시 공매도 공시, SK Hynix HBM 축소 보도가 직접 트리거",
+   "catalyst": "삼성·SK Hynix CapEx 재확인 및 DRAM 장비 발주 재개 시점",
+   "flag": "악재"
+  },
+  "HPE": {
+   "symbol": "HPE",
+   "verdict": "관찰유지",
+   "verdict_reason": "",
+   "news": "ScanSource 딜 확장으로 Juniper 네트워크 유통 강화, AI 인프라 수혜 기대",
+   "catalyst": "AI 서버 수주 및 Juniper 통합 시너지 가시화",
+   "flag": "중립"
+  }
+ },
+ "night_notes": "SPY $745.48은 200일 이동평균 대비 +8% 괴리로 기술적 강세 구간을 유지하나 Fear & Greed 42(공포)로 투자심리는 위축; 에너지·금융 섹터는 이란 지정학 리스크로 반등, 반도체·산업재는 삼성 Q2 실적 후 셀오프로 섹터 로테이션이 심화되고 있다. / 이란 지정학 긴장에 유가 급등(Brent 97달러 돌파), 삼성 실적 충격이 한국 코스피 반도체 종목에 직격탄, Fed 매파 스탠스(Warsh 의장) 지속으로 달러 강세. / 7월 23일 INTC 실적 포함 본격 실적 시즌 개막으로 반도체 섹터 향방이 갈릴 수 있으며, 이란 분쟁에 따른 유가 변동성 확대가 소비·운임 전반에 2차 충격을 줄 수 있다."
+}

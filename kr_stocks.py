@@ -21,7 +21,9 @@ CACHE = "output/kospi200_cache.json"
 KR_HOLDINGS = "output/kr_holdings.json"
 ROE_MIN = float(os.environ.get("KR_ROE_MIN", "0.08"))
 PER_MAX = float(os.environ.get("KR_PER_MAX", "40"))
-N_BUY, N_WATCH = 3, 2
+# 후보 '풀' 크기 — AI 검증(강등/제외) 후 최종 채택은 ai_report가 3/2로 확정
+N_BUY = int(os.environ.get("KR_POOL_BUY", "4"))
+N_WATCH = int(os.environ.get("KR_POOL_WATCH", "3"))
 
 
 def _log(m): print(f"[KR] {m}", file=sys.stderr)
@@ -176,3 +178,15 @@ def update_holdings(buy_syms: list, ind_map: dict, today: str) -> list:
     sells = H.update(state, buy_syms, ind_map, today)
     H.save(state, KR_HOLDINGS)
     return sells
+
+
+def add_holdings(buy_syms: list, ind_map: dict, today: str):
+    """AI 검증 후 '최종 매수'로 확정된 종목만 보유목록에 편입."""
+    import holdings as H
+    state = H.load(KR_HOLDINGS)
+    holdings = state.setdefault("holdings", {})
+    for sym in buy_syms:
+        if sym not in holdings:
+            p = (ind_map.get(sym) or {}).get("price")
+            holdings[sym] = {"since": today, "entry_price": p, "peak": p}
+    H.save(state, KR_HOLDINGS)

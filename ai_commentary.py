@@ -53,7 +53,7 @@ except Exception:
 #                  단, 이 코드를 실행하는 머신에 Claude Code 가 설치·로그인돼 있어야 함(=내 PC).
 AI_BACKEND    = os.environ.get("AI_BACKEND", "api").strip().lower()
 CLAUDE_BIN    = os.environ.get("CLAUDE_BIN", "claude")   # PATH 에 없으면 절대경로 지정
-AI_MODEL      = os.environ.get("AI_MODEL", "claude-sonnet-4-6")
+AI_MODEL      = os.environ.get("AI_MODEL", "claude-haiku-4-5")   # 해석 레이어는 저가 모델로 충분
 AI_MAX_PICKS  = int(os.environ.get("AI_MAX_PICKS", "12"))
 AI_TIMEOUT    = float(os.environ.get("AI_TIMEOUT", "120"))
 

@@ -45,14 +45,17 @@
 - 한자 사용 금지, "MA20" 대신 "20일선" 표기, 중립 종목은 아래에 아무것도 안 씀.
 - PowerShell에 명령 붙일 때 뒤에 한글 설명(괄호) 붙이면 오류남 — 명령어만.
 
-### 스케줄 동작 (2026-07-07 전면 개편 — GitHub Actions 클라우드)
-- **자동화는 이제 GitHub Actions**(`.github/workflows/report.yml`) — PC 꺼져 있어도 발송.
-  UTC 22:30 월~토 = **KST 07:30 화~일**. 설정법은 `GITHUB_SETUP.md`.
-- `daily_ai_report.py`가 **KST 요일**로 분기: 화~토=일일(전일 미국·한국·코인·세계 시황 + 지수신호 + S&P500/코스피200 종목추천), 일=주간 자산배분, 월=발송 없음.
-- 휴장일에도 발송은 계속(코인·세계는 매일 새로움) — 미국/한국 휴장 시 상단 배너로 안내.
-  중복 발송 가드는 KST 날짜 기준(`output/last_sent.json`), 발송 성공 시에만 기록.
-- AI 해설은 클라우드에서 `AI_BACKEND=api`(ANTHROPIC_API_KEY 시크릿). 키 없거나 실패 시 지표 기반 폴백 → 발송 절대 안 거름.
-- 수동 옵션: `--weekly` `--daily` `--force` `--no-email`.
+### 스케줄 동작 (2026-07-09 재개편 — 메일 2통 분리)
+- **한국장 메일**: KST **월~금 08:00**(장전, cron UTC `0 23 * * 0-4`) — `--kr`.
+  전날 한국장 마감 기준 코스피200 매수/관찰/매도 + 밤사이 미국 마감 포함 세계표·지수신호(코드 생성).
+  AI 검증은 전날 저녁 PC pregen(`output/pregen_kr.json`) 재사용, 없으면 API 폴백.
+- **미국장 메일**: KST **화~토 16:40 실행 → 17시경 도착**(cron UTC `40 7 * * 2-6`) — `--us`.
+  그날 새벽 마감된 미국장 분석 + S&P500 매수/관찰/매도. 당일 아침 PC pregen(`pregen_us.json`) 재사용.
+- **주간 배분**: KST **일 07:30**(cron UTC `30 22 * * 6`) — `--weekly` (weekly_report).
+- 어느 cron 이 깨웠는지(`github.event.schedule`)로 모드 분기. Actions cron 은 수 분 지연 가능.
+- 휴장일에도 발송은 계속 — 상단 배너로 안내. 중복 가드는 `output/last_sent.json` 의
+  `sent_kr_kst`/`sent_us_kst` 분리 키(발송 성공 시에만 기록).
+- 수동 옵션: `--kr` `--us` `--weekly` `--daily`(둘 다) `--force` `--no-email`.
 
 ### 전략 개편 (2026-07-07 — 근거는 STRATEGY.md 필독)
 - **신규 `market_signals.py`**: 지수·코인 6자산(나스닥100·S&P500·코스피·코스닥·BTC·ETH) 신호 엔진.
@@ -63,11 +66,41 @@
 - **매도 강화**(`holdings.py`): 트레일링 -25%→**-20%**(연구 최적 15~20%), 200일선 -3%는 유지.
 - **주간 리포트 개편**(`weekly_report.py`): 배분을 통념 부합으로 교체(안정형 미30/한10/코인2/채권40/금10/현금8 · 공격형 미50/한15/코인5/채권15/금10/현금5 — 기존 금 25~30%는 과최적화로 폐기). '1주 ±5% 차익실현/저점매수' 폐기 → **리밸런싱 밴드(목표의 1.2/0.8배) + 방어 컷(레짐 OFF+12개월 음수→절반)**.
 
+### AI 검증 레이어 (2026-07-08 추가 — STRATEGY.md §4.5)
+- 규칙이 후보 '풀'을 뽑고(미국 매수7/관찰7, 한국 4/3) → **AI가 웹검색으로 각 후보를 검증**해
+  `매수유지/관찰강등/제외` verdict 부여 → 코드가 최종 확정(미국 5/5, 한국 3/2).
+- AI는 종목 추가 불가(할루시네이션 차단), 줄이는 권한만. 매수 3개 미만이면 강등분 복원.
+- 종목별 근거는 3축 강제: ①추세 ②펀더멘털 ③뉴스/촉매. 제외 종목+사유는 리포트에 표기.
+- 보유목록(`ai_holdings.json`/`kr_holdings.json`)은 AI 검증 통과한 '최종 매수'만 편입.
+- 구 백테스트 스크립트(alloc/allweather/goldencross/models/short)·AI_SETUP.md·run_daily.bat·
+  daily-per-report.yml 은 삭제됨. `backtest_weights.py`만 유지(분기 재검증용). 사용법은 `USAGE.md`.
+
+### 상세화 + 비용 최소화 개편 (2026-07-09)
+회당 ~$0.5 → pregen 있는 날 ~$0.02·없는 날 ~$0.12 목표. 핵심: "일관된 패턴은 하드코딩, 변하는 것만 AI".
+- **신규 `entry_plan.py`(하드코딩, $0)**: 분할매수 계획(1~3차 가격·비율 — 과열 30/30/40, 평시 50/50),
+  손절선(매수가 -20% vs 200일선 -3% 중 높은 쪽), 관찰→매수 전환 조건(구체 가격), 매도 처분 계획
+  (-15% 초과 손실=전량 / 그 외 50% 즉시+50% 20일선 반등 대기)을 지표로 계산. **AI는 이 숫자 못 바꿈**.
+- **`ai_report.py` 2단계 분리**: ①검증=sonnet-5+웹검색(≤4회, 묶음 검색, 출력 초압축 JSON)
+  ②서술=haiku-4.5(검색 없음, '최종 확정 종목만' 대상 → 토큰 대부분 저가 모델). opus는 코드에서 차단.
+  points 4축(추세/펀더멘털/뉴스/촉매)·catalyst 필드·매수계획 표 렌더. 미국 최종 5/5→**4/4**(풀 7→6).
+- **프로필 캐시(`gen_profiles.py`)**: 종목 사업 설명은 매일 안 바뀜 → **Batch API(50% 할인)+haiku**로
+  전 종목 1회 생성(`sp500_profiles.json` detail + `kospi200_profiles.json`), 데일리는 재사용. 분기 1회
+  `python gen_profiles.py --refresh` (로컬, ANTHROPIC_API_KEY 필요, ~$0.1).
+- **사전 검증(`pregen.py` — Pro 구독, $0)**: 로컬 PC 작업 스케줄러 2개(놓치면 다음 부팅 시 실행,
+  StartWhenAvailable) — `StockPregenKR`(매일 19:00, `--kr`: 한국장 마감 확정 데이터 검증 →
+  `pregen_kr.json`, 다음날 08:00 메일용)과 `StockPregenUS`(매일 09:30, `--us`: 새벽 마감된 미국장
+  검증(풀 버퍼 +3) → `pregen_us.json`, 당일 17:00 메일용). 유효 시간 창은 pregen.py 가 스스로 판단
+  (KR: 16시~다음날 8시 / US: 6~16시, 창 밖이면 스킵). Actions 는 for_kst 가 발송일과 일치할 때만
+  사용해 **검증 단계 생략(웹검색 0회)** → haiku 서술만. 시황 문장은 night_notes(배경)를 참고해
+  발송 시점 확정 수치로 haiku 가 작성. 등록: 관리자 PowerShell `.\register_pregen_task.ps1` 1회.
+- 매도 카드에 처분 계획 표기, 한국 매도는 `groups["kr_sells"]`로 합류(report["sells"]에 통합).
+- workflow env: `REPORT_MODEL_VERIFY=claude-sonnet-5`, `REPORT_MODEL_WRITE=claude-haiku-4-5`, `REPORT_WEB_USES=4`.
+
 ### 지금 상태
-S&P500 팩터 가중치(`best_weights.json`)는 기존 워크포워드 검증 결과 유지(러너에 파일 없으면 폴백 모델로 동작 — 가능하면 백테스트 1회 돌려 재생성 권장). 남은 일: GITHUB_SETUP.md 대로 저장소 푸시 + Secrets 4개 등록.
+S&P500 팩터 가중치(`best_weights.json`)는 기존 워크포워드 검증 결과 유지(러너에 파일 없으면 폴백 모델로 동작 — 가능하면 백테스트 1회 돌려 재생성 권장). 남은 일: GITHUB_SETUP.md 대로 저장소 푸시 + Secrets 등록(ANTHROPIC_API_KEY 포함) + `.\register_pregen_task.ps1` 등록 + `python gen_profiles.py` 1회.
 
 ### 내가 앞으로 부탁할 만한 것
-- 매년/분기 백테스트 재검증(팩터 IC는 시간이 지나면 감쇠함).
+- 매년/분기 백테스트 재검증(팩터 IC는 시간이 지나면 감쇠함) + 프로필 캐시 갱신(gen_profiles --refresh).
 - 리포트 디자인·문구 개선, 발송 오류 디버깅.
 - 새 팩터/아이디어 IC 검증 후 채택 여부 판단.
 

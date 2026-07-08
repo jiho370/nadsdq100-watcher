@@ -1,17 +1,19 @@
 #!/usr/bin/env python3
 """
-daily_ai_report.py — 완전 자동(무인) 'AI 종목추천 보고서' 러너.
+daily_ai_report.py — 메일 2통 분리 러너 (2026-07-09 개편).
 
-GitHub Actions(장 마감 직후)에서 이 파일 하나만 실행하면:
-  1) 데이터 수집(sp500_daily_report 계산 재사용)
-  2) 후보/시황 컴팩트화(export_data 재사용)
-  3) Claude API 로 보고서 생성(web_search 로 뉴스·환율·글로벌 반영)  [ai_report]
-  4) 차트 렌더(후보 시세 배열로 matplotlib)
-  5) 이메일 발송 → 아빠(EMAIL_TO)
-보고서 생성 실패/키없음 시 → 기존 규칙기반 메일(daily_main)로 자동 폴백.
+  · 한국장 메일 (--kr) : 월~금 KST 08:00 발송(장전). 전날 한국장 마감 데이터 기준.
+        내용 = 전일 세계시장 요약(밤사이 미국 마감 포함, 코드 생성) + 지수·코인 신호
+               + 코스피200 매수/관찰/매도. AI 검증은 전날 저녁 pregen_kr.json(구독 CLI)
+               이 있으면 재사용(검색 0회), 없으면 API 폴백.
+  · 미국장 메일 (--us) : 화~토 KST 17:00 발송(미국장 개장 전). 그날 새벽 마감 데이터 기준.
+        내용 = 미국 시황 + S&P500 매수/관찰/매도. 당일 아침~오후 pregen_us.json 재사용.
+  · 주간   (--weekly) : 일요일 자산배분 리포트(기존 weekly_report).
 
-실행:  python daily_ai_report.py            # 발송
-       python daily_ai_report.py --no-email # 미리보기만(output/ai_report.html)
+실행:  python daily_ai_report.py --kr [--no-email]
+       python daily_ai_report.py --us [--no-email]
+       (플래그 없으면 KST 시간으로 자동: 일요일=주간, 오전=--kr, 오후=--us)
+AI 실패 시 지표+계획 기반(deterministic)으로 무조건 발송 — 발송 누락 없음.
 """
 from __future__ import annotations
 import os, sys, io, json, argparse
@@ -37,7 +39,6 @@ for _p in (r"C:\Windows\Fonts\malgun.ttf", r"C:\Windows\Fonts\malgunsl.ttf",
             pass
 plt.rcParams["axes.unicode_minus"] = False
 
-# yfinance 소음(상장폐지 경고·HTTP404) 억제 — 화면을 깔끔하게.
 logging.getLogger("yfinance").setLevel(logging.CRITICAL)
 
 import sp500_daily_report as R
@@ -50,7 +51,6 @@ _CLOSE_LABEL = "종가" if _KFONT else "Close"
 
 
 def _ma(arr, w):
-    """단순 이동평균(끝쪽만 유효, 앞은 NaN)."""
     a = np.asarray(arr, dtype=float)
     if len(a) < w:
         return np.full(len(a), np.nan)
@@ -61,12 +61,12 @@ def _ma(arr, w):
 
 
 def _stock_chart_png(closes, ticker, big=False):
-    """종가 + 이동평균선(20/50/200) 차트 PNG. big=True면 고해상도(SPY 등 넓게 보이는 차트)."""
+    """종가 + 이동평균선(20/50/200) 차트 PNG."""
     if not closes or len(closes) < 30:
         return None
     x = range(len(closes))
     figsize = (7.6, 2.7) if big else (4.8, 2.4)
-    dpi = 200 if big else 150            # 흐릿함 개선: 표시 크기 대비 픽셀 충분히
+    dpi = 200 if big else 150
     fig, ax = plt.subplots(figsize=figsize, dpi=dpi)
     ax.plot(x, closes, lw=1.6, color="#111827", label=_CLOSE_LABEL)
     for w, col in [(20, "#f59e0b"), (50, "#3b82f6"), (200, "#ef4444")]:
@@ -86,31 +86,7 @@ def _stock_chart_png(closes, ticker, big=False):
     return b.getvalue()
 
 
-def _charts_and_metrics(candidates: dict, market: dict, report: dict):
-    """추천 종목별 (이동평균 포함) 차트 + SPY 차트 이미지, 그리고 지표칩용 metrics_by_sym."""
-    images = []
-    by_sym = {c["symbol"]: c for c in candidates.get("candidates", [])}
-    # SPY(라인만)
-    spy = market.get("spy_closes") or []
-    if spy:
-        png = _stock_chart_png(spy, "S&P 500 (SPY)", big=True)   # 고해상도
-        if png:
-            images.append(("spy_chart", png))
-    metrics = {}
-    for r in (report.get("buy_now", []) + report.get("watch", [])):
-        sym = r.get("symbol"); c = by_sym.get(sym)
-        if not c:
-            continue
-        png = _stock_chart_png(c.get("closes") or [], sym)
-        if png:
-            images.append((f"chart_{sym}", png))
-        price, ma200, ret = c.get("price"), c.get("ma200"), (c.get("ret") or {})
-        gap200 = ((price / ma200 - 1) * 100) if (price and ma200) else None
-        metrics[sym] = {"price": price, "pe": c.get("pe"), "rsi": c.get("rsi"),
-                        "gap200": gap200, "ret6m": ret.get("6m")}
-    return images, metrics
-
-
+# ------------------------- 공용 헬퍼 -------------------------
 _LAST_SENT = os.path.join("output", "last_sent.json")
 
 
@@ -122,157 +98,267 @@ def _load_last_sent() -> dict:
         return {}
 
 
-def _save_last_sent(d: dict):
+def _save_last_sent(update: dict):
+    """부분 갱신 — KR/US 메일이 서로의 기록을 덮어쓰지 않게 merge."""
+    d = _load_last_sent(); d.update(update)
     os.makedirs("output", exist_ok=True)
     with open(_LAST_SENT, "w", encoding="utf-8") as f:
         json.dump(d, f)
 
 
-def run(no_email: bool = False, force: bool = False):
-    import datetime as _dt
-    R._require_yf()
-    today_kst = _dt.datetime.now(R.KST).date().isoformat()
-    last = _load_last_sent()
+def _load_pregen(name: str, today_kst: str):
+    """output/pregen_{kr|us}.json — 대상일(for_kst)이 오늘이면 반환, 아니면 None."""
+    try:
+        with open(f"output/pregen_{name}.json", encoding="utf-8") as f:
+            pg = json.load(f)
+        if pg.get("for_kst") == today_kst and pg.get("by_sym"):
+            print(f"[pregen:{name}] {pg.get('generated')} 생성본 사용({len(pg['by_sym'])}종목)",
+                  file=sys.stderr)
+            return pg
+        print(f"[pregen:{name}] 대상일 불일치({pg.get('for_kst')} != {today_kst}) → API 검증",
+              file=sys.stderr)
+    except Exception:
+        pass
+    return None
 
-    # 중복 발송 가드: 같은 KST 날짜에 이미 발송했으면 생략(재실행·수동 트리거 대비)
-    if not force and not no_email and last.get("sent_kst") == today_kst:
-        print(f"[중복] 오늘({today_kst}) 이미 발송 → 생략", file=sys.stderr)
-        return
 
-    # ── 1) 지수·코인 신호 + 세계시장 요약 (미국 종목과 독립 — 실패해도 리포트 계속)
+def _gather_signals():
+    """지수·코인 신호 + 세계시장 요약(코드 생성, AI 비용 0). 실패해도 리포트 계속."""
     import market_signals as MS
-    signals = {}
     try:
         signals = MS.gather(R.yf)
         print(f"[신호] 핵심자산 {len(signals.get('core', []))} · 세계 {len(signals.get('world', []))}",
               file=sys.stderr)
+        return MS, signals
     except Exception as e:
         print(f"[경고] 지수·코인 신호 수집 실패({type(e).__name__}: {e}) → 해당 섹션 생략", file=sys.stderr)
+        return MS, {}
 
-    # ── 2) 코스피200 선별 (실패해도 리포트 계속)
+
+def _signal_images(signals):
+    sig_cids, images = {}, []
+    for a in signals.get("core", []):
+        png = _stock_chart_png(a.get("closes") or [], a["name"])
+        if png:
+            cid = f"sig_{a['key']}"
+            images.append((cid, png)); sig_cids[a["key"]] = cid
+    return images, sig_cids
+
+
+def _attach_headlines(cands, suffix=""):
+    """야후 헤드라인(무료)을 후보에 주입 — AI 웹검색 의존 축소. 한국은 '.KS' 접미사."""
+    try:
+        from ai_commentary import fetch_news_headlines
+        ysyms = {c["symbol"]: c["symbol"] + suffix for c in cands}
+        heads = fetch_news_headlines(list(ysyms.values()), getattr(R, "yf", None))
+        for c in cands:
+            c["headlines"] = (heads.get(ysyms[c["symbol"]]) or [])[:4]
+    except Exception as e:
+        print(f"[정보] 뉴스 헤드라인 수집 생략({e})", file=sys.stderr)
+
+
+def _preview_and_send(html, images, subject, out_name, no_email, sent_update):
+    os.makedirs("output", exist_ok=True)
+    import base64
+    prev = html
+    for cid, png in images:
+        prev = prev.replace(f"cid:{cid}", "data:image/png;base64," + base64.b64encode(png).decode())
+    with open(f"output/{out_name}", "w", encoding="utf-8") as f:
+        f.write(prev)
+    print(f"[정보] 미리보기 output/{out_name}", file=sys.stderr)
+    if not no_email:
+        if R.send_email(subject, html, images):
+            _save_last_sent(sent_update)   # 발송 성공 시에만 기록(실패하면 다음 실행 때 재시도)
+
+
+# ------------------------- 한국장 메일 (장전 08:00) -------------------------
+def run_kr(no_email: bool = False, force: bool = False):
+    import datetime as _dt
+    R._require_yf()
+    today_kst = _dt.datetime.now(R.KST).date().isoformat()
+    last = _load_last_sent()
+    if not force and not no_email and last.get("sent_kr_kst") == today_kst:
+        print(f"[중복] 오늘({today_kst}) 한국장 메일 이미 발송 → 생략", file=sys.stderr)
+        return
+
+    MS, signals = _gather_signals()
+
     import kr_stocks as KR
-    kr = {}
-    kr_sells = []
+    kr, kr_sells = {}, []
     try:
         kr = KR.select(R.yf) or {}
         if kr.get("ind_map"):
-            kr_sells = KR.update_holdings([c["symbol"] for c in kr.get("buy", [])],
-                                          kr["ind_map"], today_kst)
+            kr_sells = KR.update_holdings([], kr["ind_map"], today_kst)
     except Exception as e:
-        print(f"[경고] 코스피200 선별 실패({type(e).__name__}: {e}) → 해당 섹션 생략", file=sys.stderr)
+        print(f"[경고] 코스피200 선별 실패({type(e).__name__}: {e})", file=sys.stderr)
 
-    # ── 3) 미국(S&P500) 파이프라인 (기존)
-    data = R.gather_universe_data(with_volume=True)
-    as_of = R._last_data_date(data["hist"])
-
-    # 미국 휴장 안내(발송은 계속 — 한국·코인·세계 시황은 매일 새로움)
     banner = ""
-    if as_of and last.get("us_as_of") == as_of:
-        banner = f"미국 휴장 — 미국 종목 추천은 직전 거래일({as_of}) 종가 기준입니다."
     if kr.get("as_of") and last.get("kr_as_of") == kr.get("as_of"):
-        banner += (" " if banner else "") + "한국 휴장 — 한국 종목은 직전 거래일 기준입니다."
-    # 후보 선정: 백테스트가 찾은 '최적 가중치'(best_weights.json) 우선 → 없으면 최우수모델 → 하이브리드.
-    scored, info, model_used = E.select_pool(data, MAX_CANDIDATES)
-    print(f"[선정] 방식='{model_used}' 로 후보 {len(scored)}종목", file=sys.stderr)
-    candidates = {"as_of": as_of, "model": model_used, "count": min(len(scored), MAX_CANDIDATES),
-                  "candidates": E.build_candidates(data, info, scored, MAX_CANDIDATES)}
-    market = {"as_of": as_of, **E.build_market(data)}
+        banner = f"한국 휴장 — 직전 거래일({kr['as_of']}) 종가 기준입니다."
 
-    # 지금 매수 5 + 관찰(내려오면) 5 로 '점수순 고정' 분할 (AI는 종목을 못 바꿈)
-    buy_now, watch = E.split_by_entry(candidates["candidates"], k=5)
+    kr_cands = (kr.get("buy") or []) + (kr.get("watch") or [])
+    _attach_headlines(kr_cands, suffix=".KS")
 
-    # 추천 이력 자동 추적 → 보유 갱신 + 매도 시그널(느슨/장기보유)
-    import holdings as H
-    hstate = H.load()
-    sells = H.update(hstate, [c["symbol"] for c in buy_now], data["ind_map"], as_of)
-    if sells:                                     # 매도 종목 회사명 보강
-        sinfo = R.get_info_for([s["symbol"] for s in sells])
-        for s in sells:
-            s["name"] = R._company_name(s["symbol"], sinfo.get(s["symbol"], {}))
-    H.save(hstate)
-    print(f"[분할] 지금매수 {len(buy_now)} · 관찰 {len(watch)} · 매도검토 {len(sells)} · 보유 {len(hstate.get('holdings', {}))}",
-          file=sys.stderr)
-    # 뉴스는 야후 헤드라인을 미리 받아 AI에 주입(웹검색 불필요 → 타임아웃 방지)
-    try:
-        from ai_commentary import fetch_news_headlines
-        heads = fetch_news_headlines([c["symbol"] for c in buy_now + watch], getattr(R, "yf", None))
-        for c in buy_now + watch:
-            c["headlines"] = (heads.get(c["symbol"]) or [])[:4]
-    except Exception as _e:
-        print(f"[정보] 뉴스 헤드라인 수집 생략({_e})", file=sys.stderr)
-
-    # 신호·세계시장을 AI 컨텍스트에 주입
+    # 시황 컨텍스트: 신호+세계(밤사이 미국 마감 포함 — 코드 계산이라 비용 0)
+    market = {"as_of": kr.get("as_of")}
     if signals:
         market["signals"] = MS.lean_for_ai(signals)
         market["world"] = [{k: (round(v, 2) if isinstance(v, float) else v)
                             for k, v in w.items()} for w in signals.get("world", [])]
 
-    groups = {"buy_now": buy_now, "watch": watch, "sells": sells,
-              "kr_buy": kr.get("buy") or [], "kr_watch": kr.get("watch") or []}
-    report = AR.build_report(groups, market)
+    groups = {"kr_buy": kr.get("buy") or [], "kr_watch": kr.get("watch") or [],
+              "kr_sells": kr_sells}
+    report = AR.build_report(groups, market, pregen=_load_pregen("kr", today_kst))
     if not report:
-        # AI 실패해도 지표 기반 새 형식으로 무조건 발송(발송 누락 방지). 옛 4섹션 폴백 폐기.
-        print("[정보] AI 생성 실패 → 지표 기반(무AI) 리포트로 발송", file=sys.stderr)
+        print("[정보] AI 실패 → 지표+계획 기반 리포트로 발송", file=sys.stderr)
         report = AR.deterministic_report(groups, market)
 
-    images, metrics = _charts_and_metrics(candidates, market, report)
+    # 최종 매수만 보유목록 편입
+    if kr.get("ind_map"):
+        try:
+            KR.add_holdings([r["symbol"] for r in report.get("kr_buy", [])], kr["ind_map"], today_kst)
+        except Exception as e:
+            print(f"[경고] 한국 보유목록 갱신 실패({e})", file=sys.stderr)
 
-    # 한국 종목 차트·지표칩 + 지수·코인 신호 차트
-    for c in (kr.get("buy") or []) + (kr.get("watch") or []):
+    # 차트·지표칩(최종 종목) + 신호 차트
+    images, metrics = [], {}
+    kr_by_sym = {c["symbol"]: c for c in kr_cands}
+    for r in report.get("kr_buy", []) + report.get("kr_watch", []):
+        c = kr_by_sym.get(r.get("symbol"))
+        if not c:
+            continue
         png = _stock_chart_png(c.get("closes") or [], f'{c["name"]} ({c["symbol"]})')
         if png:
             images.append((f"chart_{c['symbol']}", png))
         gap200 = ((c["price"] / c["ma200"] - 1) * 100) if (c.get("price") and c.get("ma200")) else None
         metrics[c["symbol"]] = {"price": c.get("price"), "pe": c.get("pe"), "rsi": c.get("rsi"),
                                 "gap200": gap200, "ret6m": (c.get("ret") or {}).get("6m"), "krw": True}
-    sig_cids = {}
-    for a in signals.get("core", []):
-        png = _stock_chart_png(a.get("closes") or [], a["name"])
-        if png:
-            cid = f"sig_{a['key']}"
-            images.append((cid, png)); sig_cids[a["key"]] = cid
+    sig_images, sig_cids = _signal_images(signals)
+    images += sig_images
 
     market_html = MS.world_table_html(signals) if signals else ""
     signals_html = MS.signal_cards_html(signals, sig_cids) if signals else ""
-    html = AR.render_report_html(report, as_of, metrics, market_html=market_html,
-                                 signals_html=signals_html, kr_sells=kr_sells, banner=banner)
+    html = AR.render_report_html(report, kr.get("as_of") or "", metrics,
+                                 market_html=market_html, signals_html=signals_html,
+                                 banner=banner, show_spy=False,
+                                 title="🇰🇷 장전 시장 점검 · 코스피200 추천")
+    _preview_and_send(html, images, f"[장전] {today_kst} 한국 시장 점검 · 종목추천",
+                      "kr_report.html", no_email,
+                      {"sent_kr_kst": today_kst, "kr_as_of": kr.get("as_of")})
 
-    os.makedirs("output", exist_ok=True)
-    # 미리보기는 이미지를 data-URI 로 바꿔 파일 단독으로 열리게
-    prev = html
-    import base64
-    for cid, png in images:
-        prev = prev.replace(f"cid:{cid}", "data:image/png;base64," + base64.b64encode(png).decode())
-    with open("output/ai_report.html", "w", encoding="utf-8") as f:
-        f.write(prev)
-    print(f"[정보] 미리보기 output/ai_report.html "
-          f"(지금매수 {len(report.get('buy_now', []))} · 관찰 {len(report.get('watch', []))} · "
-          f"매도 {len(report.get('sells', []))})", file=sys.stderr)
 
-    if not no_email:
-        subject = f"[데일리] {today_kst} 시장 점검 · 종목추천"
-        if R.send_email(subject, html, images):
-            _save_last_sent({"sent_kst": today_kst, "us_as_of": as_of,
-                             "kr_as_of": kr.get("as_of")})   # 발송 성공 시에만 기록(실패하면 다음날 재시도)
+# ------------------------- 미국장 메일 (마감 후 17:00) -------------------------
+def run_us(no_email: bool = False, force: bool = False):
+    import datetime as _dt
+    R._require_yf()
+    today_kst = _dt.datetime.now(R.KST).date().isoformat()
+    last = _load_last_sent()
+    if not force and not no_email and last.get("sent_us_kst") == today_kst:
+        print(f"[중복] 오늘({today_kst}) 미국장 메일 이미 발송 → 생략", file=sys.stderr)
+        return
+
+    MS, signals = _gather_signals()
+
+    data = R.gather_universe_data(with_volume=True)
+    as_of = R._last_data_date(data["hist"])
+    banner = ""
+    if as_of and last.get("us_as_of") == as_of:
+        banner = f"미국 휴장 — 직전 거래일({as_of}) 종가 기준입니다."
+
+    scored, info, model_used = E.select_pool(data, MAX_CANDIDATES)
+    print(f"[선정] 방식='{model_used}' 로 후보 {len(scored)}종목", file=sys.stderr)
+    candidates = {"as_of": as_of, "candidates": E.build_candidates(data, info, scored, MAX_CANDIDATES)}
+    market = {"as_of": as_of, **E.build_market(data)}
+
+    pool_k = int(os.environ.get("REPORT_POOL", "6"))
+    buy_now, watch = E.split_by_entry(candidates["candidates"], k=pool_k)
+
+    import holdings as H
+    hstate = H.load()
+    sells = H.update(hstate, [], data["ind_map"], as_of)
+    if sells:
+        sinfo = R.get_info_for([s["symbol"] for s in sells])
+        for s in sells:
+            s["name"] = R._company_name(s["symbol"], sinfo.get(s["symbol"], {}))
+    print(f"[후보풀] 매수 {len(buy_now)} · 관찰 {len(watch)} · 매도검토 {len(sells)}", file=sys.stderr)
+    _attach_headlines(buy_now + watch)
+
+    if signals:
+        market["signals"] = MS.lean_for_ai(signals)
+        market["world"] = [{k: (round(v, 2) if isinstance(v, float) else v)
+                            for k, v in w.items()} for w in signals.get("world", [])]
+
+    groups = {"buy_now": buy_now, "watch": watch, "sells": sells}
+    report = AR.build_report(groups, market, pregen=_load_pregen("us", today_kst))
+    if not report:
+        print("[정보] AI 실패 → 지표+계획 기반 리포트로 발송", file=sys.stderr)
+        report = AR.deterministic_report(groups, market)
+
+    for sym in [r["symbol"] for r in report.get("buy_now", [])]:
+        if sym not in hstate.setdefault("holdings", {}):
+            p = (data["ind_map"].get(sym) or {}).get("price")
+            hstate["holdings"][sym] = {"since": as_of, "entry_price": p, "peak": p}
+    H.save(hstate)
+
+    # 차트: SPY(큰 차트) + 종목 + 신호
+    images, metrics = [], {}
+    spy_closes = market.get("spy_closes") or []
+    if spy_closes:
+        png = _stock_chart_png(spy_closes, "S&P 500 (SPY)", big=True)
+        if png:
+            images.append(("spy_chart", png))
+    by_sym = {c["symbol"]: c for c in candidates["candidates"]}
+    for r in report.get("buy_now", []) + report.get("watch", []):
+        c = by_sym.get(r.get("symbol"))
+        if not c:
+            continue
+        png = _stock_chart_png(c.get("closes") or [], r["symbol"])
+        if png:
+            images.append((f"chart_{r['symbol']}", png))
+        gap200 = ((c["price"] / c["ma200"] - 1) * 100) if (c.get("price") and c.get("ma200")) else None
+        metrics[r["symbol"]] = {"price": c.get("price"), "pe": c.get("pe"), "rsi": c.get("rsi"),
+                                "gap200": gap200, "ret6m": (c.get("ret") or {}).get("6m")}
+    sig_images, sig_cids = _signal_images(signals)
+    images += sig_images
+
+    market_html = MS.world_table_html(signals) if signals else ""
+    signals_html = MS.signal_cards_html(signals, sig_cids) if signals else ""
+    html = AR.render_report_html(report, as_of, metrics,
+                                 market_html=market_html, signals_html=signals_html,
+                                 banner=banner, show_spy=bool(spy_closes),
+                                 title="🇺🇸 미국장 마감 점검 · S&P500 추천")
+    _preview_and_send(html, images, f"[미국 마감] {today_kst} 시장 점검 · 종목추천",
+                      "us_report.html", no_email,
+                      {"sent_us_kst": today_kst, "us_as_of": as_of})
 
 
 if __name__ == "__main__":
-    ap = argparse.ArgumentParser(description="AI 종목추천 보고서(완전 자동)")
+    ap = argparse.ArgumentParser(description="AI 종목추천 보고서 — 메일 2통(한국 장전/미국 마감)")
+    ap.add_argument("--kr", action="store_true", help="한국장 장전 메일")
+    ap.add_argument("--us", action="store_true", help="미국장 마감 메일")
+    ap.add_argument("--weekly", action="store_true", help="주간 자산배분 리포트")
+    ap.add_argument("--daily", action="store_true", help="(수동) 한국+미국 둘 다 실행")
     ap.add_argument("--no-email", action="store_true")
-    ap.add_argument("--weekly", action="store_true", help="주간 자산배분 리포트 강제 실행")
-    ap.add_argument("--daily", action="store_true", help="요일과 무관하게 일일 리포트 강제 실행")
     ap.add_argument("--force", action="store_true", help="중복 발송 체크 무시")
     args = ap.parse_args()
     import datetime as _dt
-    # 요일은 반드시 KST 기준(깃허브 러너는 UTC — 22:30 UTC 실행 시 KST는 다음날 07:30)
-    _dow = _dt.datetime.now(R.KST).weekday()   # 월=0 … 일=6
-    if args.weekly or (_dow == 6 and not args.daily):
-        # 일요일(KST): 개별 종목 대신 자산군별 주간 리포트
+    now = _dt.datetime.now(R.KST)   # 요일·시각은 반드시 KST 기준(러너는 UTC)
+    if args.weekly:
         import weekly_report
         weekly_report.run(no_email=args.no_email)
-    elif _dow == 0 and not (args.daily or args.no_email):
-        # 월요일(KST): 발송 없음(주말 — 새 거래일 없음). --daily 로 강제 가능.
-        print("[휴무] 월요일은 발송하지 않습니다(화~토 일일, 일 주간). --daily 로 강제 실행 가능.",
-              file=sys.stderr)
+    elif args.kr:
+        run_kr(no_email=args.no_email, force=args.force)
+    elif args.us:
+        run_us(no_email=args.no_email, force=args.force)
+    elif args.daily:
+        run_kr(no_email=args.no_email, force=args.force)
+        run_us(no_email=args.no_email, force=args.force)
     else:
-        run(no_email=args.no_email, force=args.force)
+        # 플래그 없음(수동/구 스케줄 호환): 일요일=주간, 오전=한국장, 오후=미국장
+        if now.weekday() == 6:
+            import weekly_report
+            weekly_report.run(no_email=args.no_email)
+        elif now.hour < 12:
+            run_kr(no_email=args.no_email, force=args.force)
+        else:
+            run_us(no_email=args.no_email, force=args.force)
