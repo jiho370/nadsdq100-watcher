@@ -1,31 +1,33 @@
 #!/usr/bin/env python3
 """
-gen_profiles.py — 종목 '사업 프로필' 캐시를 Batch API + haiku 로 1회 생성 (분기 1회 재실행).
+gen_profiles.py — 종목 '사업 프로필' 캐시를 1회 생성(분기 1회 재실행). 로컬 CLI 우선, $0.
 
 왜 캐시인가:
   "무슨 회사이고 무엇으로 돈 버는지"(②펀더멘털 축)는 매일 바뀌지 않는다.
   이걸 매일 AI에게 다시 쓰게 하는 것이 기존 비용의 큰 부분이었다.
   → 전 종목을 '한 번' 생성해 두고 데일리 리포트는 재사용(ai_report._profiles).
 
-왜 Batch API인가:
-  마감이 없는 대량 작업이라 배치가 정확히 맞는 용도 — 요금 50% 할인(입·출력 모두).
-  20종목씩 묶어 요청 수를 줄이고, 제출 후 폴링해 결과를 파일에 써 넣는다.
+왜 CLI가 기본인가:
+  분기 1회·~900종목(20개씩 묶어 ~45요청)짜리 일회성 로컬 작업이라 배치의 '동시 처리'
+  이점이 꼭 필요하지 않다. 로컬 claude -p(Pro 구독)로 순차 호출해도 몇 분이면 끝나고
+  비용은 $0 — Batch API의 50% 할인(유료)보다 구독 쪽이 항상 더 싸다.
+  claude CLI가 없는 환경(로컬 미설치)에서만 기존 Batch API(ANTHROPIC_API_KEY 필요)로 폴백.
 
 대상:
   · sp500_profiles.json  → tickers[sym].detail 이 빈 종목만 채움 (--refresh 면 전체)
   · kospi200_profiles.json → output/kospi200_cache.json 의 구성종목으로 생성(없으면 생략)
 
-실행(로컬, ANTHROPIC_API_KEY 필요):
+실행(로컬):
   python gen_profiles.py            # 빈 것만
   python gen_profiles.py --refresh  # 전체 재생성 (분기 1회 권장)
-예상 비용: 700종목 × (입력 ~100 + 출력 ~150토큰) × haiku 배치 단가 ≈ $0.1 미만.
+CLI 있으면 $0. 없고 ANTHROPIC_API_KEY만 있으면 Batch API 폴백
+(700종목 × haiku 배치 단가 ≈ $0.1 미만).
 """
 from __future__ import annotations
-import os, sys, json, time, argparse, datetime
-
-import anthropic
+import os, sys, json, time, shutil, argparse, datetime
 
 MODEL = os.environ.get("PROFILE_MODEL", "claude-haiku-4-5")
+CLAUDE_BIN = os.environ.get("CLAUDE_BIN", "claude")
 CHUNK = 20            # 요청당 종목 수 — 출력 JSON 이 안정적으로 파싱되는 크기
 POLL_SEC = 20
 KR_PROFILE_PATH = "kospi200_profiles.json"
@@ -97,6 +99,22 @@ def _build_requests(todo: list, prefix: str) -> list:
     return reqs
 
 
+def _run_cli(reqs: list) -> dict:
+    """로컬 claude -p(Pro 구독, $0)로 순차 실행. 분기 1회 일회성 작업이라 배치의
+    동시 처리 없이 순차로도 충분(요청당 몇 초~수십 초, 전체 몇 분)."""
+    import ai_report as AR
+    out = {}
+    for i, req in enumerate(reqs, 1):
+        cid = req["custom_id"]
+        instr = req["params"]["messages"][0]["content"]
+        _log(f"  CLI 요청 {i}/{len(reqs)}: {cid}")
+        try:
+            out[cid] = AR._call_cli(instr, web=False, system=_SYSTEM)
+        except Exception as e:
+            _log(f"  실패: {cid} ({type(e).__name__}: {e})")
+    return out
+
+
 def _run_batch(client, reqs: list) -> dict:
     """배치 제출 → 폴링 → {custom_id: 응답텍스트}. (마감 없는 작업 = 배치 최적)"""
     if not reqs:
@@ -139,18 +157,41 @@ def _merge(results: dict, prefix: str, tickers: dict) -> int:
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--refresh", action="store_true", help="빈 것만이 아니라 전체 재생성")
+    ap.add_argument("--limit", type=int, default=None,
+                    help="실험용 — 미국/한국 각각 앞 N종목만 처리(전체 실행 전 CLI 동작 확인용)")
+    ap.add_argument("--dry-run", action="store_true",
+                    help="실험용 — 결과를 파일에 저장하지 않고 콘솔에만 출력")
     args = ap.parse_args()
-    if not os.environ.get("ANTHROPIC_API_KEY"):
-        sys.exit("ANTHROPIC_API_KEY 가 필요합니다 (배치는 API 전용 — 1회성·50% 할인)")
-    client = anthropic.Anthropic()
+
+    use_cli = shutil.which(CLAUDE_BIN) is not None or os.path.exists(CLAUDE_BIN)
+    if use_cli:
+        _log(f"로컬 claude CLI 사용({CLAUDE_BIN}, Pro 구독 — $0)")
+    elif os.environ.get("ANTHROPIC_API_KEY"):
+        _log("claude CLI 없음 → API Batch로 폴백(유료 — ANTHROPIC_API_KEY 사용)")
+    else:
+        sys.exit("claude CLI도 ANTHROPIC_API_KEY도 없음 — 프로필 생성 불가")
 
     us_prof, us_todo = _collect_us(args.refresh)
     kr_prof, kr_todo = _collect_kr(args.refresh)
+    if args.limit:
+        us_todo, kr_todo = us_todo[:args.limit], kr_todo[:args.limit]
+        _log(f"--limit {args.limit}: 미국/한국 각각 앞 {args.limit}종목만 처리")
     _log(f"생성 대상: 미국 {len(us_todo)} · 한국 {len(kr_todo)}종목")
     if not (us_todo or kr_todo):
         _log("채울 것이 없음 — 종료 (--refresh 로 전체 재생성 가능)"); return
 
-    results = _run_batch(client, _build_requests(us_todo, "us") + _build_requests(kr_todo, "kr"))
+    reqs = _build_requests(us_todo, "us") + _build_requests(kr_todo, "kr")
+    if use_cli:
+        results = _run_cli(reqs)
+    else:
+        import anthropic
+        results = _run_batch(anthropic.Anthropic(), reqs)
+
+    if args.dry_run:
+        _log("--dry-run: 저장하지 않고 결과만 출력")
+        for cid, text in results.items():
+            _log(f"  [{cid}] {(text or '')[:400]}")
+        return
 
     today = datetime.date.today().isoformat()
     if us_todo:

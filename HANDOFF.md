@@ -83,9 +83,13 @@
 - **`ai_report.py` 2단계 분리**: ①검증=sonnet-5+웹검색(≤4회, 묶음 검색, 출력 초압축 JSON)
   ②서술=haiku-4.5(검색 없음, '최종 확정 종목만' 대상 → 토큰 대부분 저가 모델). opus는 코드에서 차단.
   points 4축(추세/펀더멘털/뉴스/촉매)·catalyst 필드·매수계획 표 렌더. 미국 최종 5/5→**4/4**(풀 7→6).
-- **프로필 캐시(`gen_profiles.py`)**: 종목 사업 설명은 매일 안 바뀜 → **Batch API(50% 할인)+haiku**로
-  전 종목 1회 생성(`sp500_profiles.json` detail + `kospi200_profiles.json`), 데일리는 재사용. 분기 1회
-  `python gen_profiles.py --refresh` (로컬, ANTHROPIC_API_KEY 필요, ~$0.1).
+- **프로필 캐시(`gen_profiles.py`)**: 종목 사업 설명은 매일 안 바뀜 → 전 종목 1회 생성
+  (`sp500_profiles.json` detail + `kospi200_profiles.json`), 데일리는 재사용. 분기 1회
+  `python gen_profiles.py --refresh`. **2026-07-09 개편**: 로컬 claude CLI(Pro 구독)가 있으면
+  순차 호출로 $0(분기 1회·~900종목이라 배치 병렬성 불필요) — CLI 없을 때만 API Batch(50%
+  할인, ANTHROPIC_API_KEY 필요, ~$0.1)로 폴백. 실행 전 실험: `--limit N`(앞 N종목만) +
+  `--dry-run`(파일 저장 없이 콘솔 출력만)으로 소규모 검증 후 전체 실행 권장
+  (예: `python gen_profiles.py --limit 3 --dry-run` → 확인 후 `--refresh`).
 - **사전 검증(`pregen.py` — Pro 구독, $0)**: 로컬 PC 작업 스케줄러 2개(놓치면 다음 부팅 시 실행,
   StartWhenAvailable) — `StockPregenKR`(`--kr`: 한국장 마감 확정 데이터 검증 → `pregen_kr.json`,
   다음날 08:00 메일용)과 `StockPregenUS`(`--us`: 새벽 마감된 미국장 검증(풀 버퍼 +3) →
