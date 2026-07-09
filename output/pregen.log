@@ -83,3 +83,38 @@ python : [KR] pykrx 없음(No module named 'pykrx') → 캐시 폴백
 [KR] 한국 종목 데이터 없음 → 이번 실행은 한국 섹션이 빈 채로 발송됨. 해결: `pip install pykrx` 후 재실행(성공하면 캐시가 자동 생성돼 이후엔 pykrx 없어도 동작)
 [PREGEN] 한국 후보 없음 → 스킵
 2026-07-09 19:10:01 [kr] === pregen ?꾨즺 ===
+2026-07-09 22:00:01 [kr] === pregen ?쒖옉 ===
+git : error: cannot pull with rebase: You have unstaged changes.
+위치 C:\Users\JH\Documents\GitHub\nadsdq100-watcher\run_pregen.ps1:19 문자:1
++ git pull --rebase 2>&1 | Out-File -Append -Encoding utf8 $log
++ ~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (error: cannot p...staged changes.:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+error: Please commit or stash them.
+python : [KR] 펀더멘탈 통과 74/200종목 (EPS>0·ROE≥8%·PER≤40)
+위치 C:\Users\JH\Documents\GitHub\nadsdq100-watcher\run_pregen.ps1:22 문자:1
++ python pregen.py --$Mode 2>&1 | Out-File -Append -Encoding utf8 $log
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: ([KR] 펀더멘탈 통과 74...·ROE≥8%·PER≤40):String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+[KR] 선정: 매수 4 · 관찰 3 (후보 36)
+[PREGEN] 서술 사전생성 5종목
+[PREGEN] 저장: output/pregen_kr.json (대상일 2026-07-10 · 종목 7 · 서술캐시 5건)
+KRX 로그인 시도...
+  로그인 ID: jiho370
+KRX 로그인 완료.
+  로그인 시간: 2026-07-09 22:00:07
+  만료 시간: 2026-07-09 23:00:07
+[main d9e5925] chore: pregen kr [skip ci]
+ 1 file changed, 56 insertions(+), 58 deletions(-)
+git : To https://github.com/jiho370/nadsdq100-watcher.git
+위치 C:\Users\JH\Documents\GitHub\nadsdq100-watcher\run_pregen.ps1:33 문자:5
++     git push 2>&1 | Out-File -Append -Encoding utf8 $log
++     ~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (To https://gith...100-watcher.git:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+   efa8871..d9e5925  main -> main
+2026-07-09 22:05:18 [kr] === pregen ?꾨즺 ===
