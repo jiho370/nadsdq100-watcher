@@ -109,7 +109,7 @@ def _run_cli(reqs: list) -> dict:
         instr = req["params"]["messages"][0]["content"]
         _log(f"  CLI 요청 {i}/{len(reqs)}: {cid}")
         try:
-            out[cid] = AR._call_cli(instr, web=False, system=_SYSTEM)
+            out[cid] = AR._call_cli(instr, web=False, system=_SYSTEM, model=MODEL)
         except Exception as e:
             _log(f"  실패: {cid} ({type(e).__name__}: {e})")
     return out

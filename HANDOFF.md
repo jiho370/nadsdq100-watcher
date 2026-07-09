@@ -124,9 +124,29 @@
   섹션 참고해 재작성).
 - 매도 카드에 처분 계획 표기, 한국 매도는 `groups["kr_sells"]`로 합류(report["sells"]에 통합).
 - workflow env: `REPORT_MODEL_VERIFY=claude-sonnet-5`, `REPORT_MODEL_WRITE=claude-haiku-4-5`, `REPORT_WEB_USES=4`.
+- **버그 수정 — CLI 경로에 `--model` 미전달**: `ai_report._call_cli()`에 `model` 인자 자체가 없어서
+  로컬 `claude -p`(pregen.py·gen_profiles.py·weekly_report.py가 사용) 호출이 전부 CLI 기본 모델로
+  갔다 — sonnet(검증)/haiku(서술) 분리가 **API 경로에만** 적용되고 있었다(구독 한도 소모가 컸던
+  원인). `_call_cli(..., model=...)`로 확장해 verify_stage=`MODEL_VERIFY`, write_stage·
+  write_market_stage·gen_profiles=`MODEL_WRITE`를 `--model` 플래그로 명시 전달하도록 수정.
+  **주의**: `claude` CLI가 실제로 `--model <모델ID>` 형식을 그대로 받는지는 로컬에서 직접 검증
+  필요(`claude -p --model claude-haiku-4-5 --output-format json` 스모크 테스트 권장) — 버전에 따라
+  플래그명·값 포맷(별칭 `haiku`/`sonnet` 등)이 다를 수 있음.
+- **`test_pregen.ps1`(신규, 검토용)**: 실제 로컬 CLI로 pregen+리포트를 돌려 발송 없이 HTML
+  미리보기(`output/kr_report.html`/`us_report.html`)를 만들고 브라우저로 연다. `.\test_pregen.ps1`
+  (kr+us) / `-Mode kr` / `-Mode us`. git 커밋·이메일 발송 없음 — 순수 확인용. BOM 추가해 Windows
+  PowerShell 5.1 콘솔 한글 깨짐도 수정(비-ASCII .ps1은 BOM 없으면 한글이 깨짐).
+- **외부 변경 — KRX가 로그인 필수로 전환(2025-12-27)**: 한국거래소 정보데이터시스템이 회원제
+  'KRX Data Marketplace'로 개편되며 pykrx(코스피200 구성종목·PER·ROE)가 `KRX_ID`/`KRX_PW`
+  환경변수 없이는 작동하지 않는다(무료 가입 필요, data.krx.co.kr, 네이버/카카오 연동 가능).
+  로컬은 세션 변수(`$env:KRX_ID=...`)가 아니라 `[Environment]::SetEnvironmentVariable(...,"User")`로
+  영구 등록해야 스케줄 작업(19:00 등)에도 적용됨. Actions는 Secrets `KRX_ID`/`KRX_PW` 추가 필요
+  (`report.yml`에 이미 배선함, GITHUB_SETUP.md 참고). 없어도 에러 없이 한국 섹션만 빈 채로 발송됨
+  (기존 캐시 폴백 로직 그대로 — 최초 1회 로그인 성공 시 캐시가 생겨 이후엔 미설정 PC에서도 동작).
+  `kr_stocks.select()`가 원인을 로그에 명시하도록 수정함.
 
 ### 지금 상태
-S&P500 팩터 가중치(`best_weights.json`)는 기존 워크포워드 검증 결과 유지(러너에 파일 없으면 폴백 모델로 동작 — 가능하면 백테스트 1회 돌려 재생성 권장). 남은 일: GITHUB_SETUP.md 대로 저장소 푸시 + Secrets 등록(ANTHROPIC_API_KEY 포함) + `.\register_pregen_task.ps1` 등록 + `python gen_profiles.py` 1회.
+S&P500 팩터 가중치(`best_weights.json`)는 기존 워크포워드 검증 결과 유지(러너에 파일 없으면 폴백 모델로 동작 — 가능하면 백테스트 1회 돌려 재생성 권장). 남은 일: GITHUB_SETUP.md 대로 저장소 푸시 + Secrets 등록(ANTHROPIC_API_KEY·KRX_ID·KRX_PW 포함) + `.\register_pregen_task.ps1` 등록 + `python gen_profiles.py` 1회.
 
 ### 내가 앞으로 부탁할 만한 것
 - 매년/분기 백테스트 재검증(팩터 IC는 시간이 지나면 감쇠함) + 프로필 캐시 갱신(gen_profiles --refresh).

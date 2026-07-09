@@ -74,6 +74,10 @@ jobs:
           SMTP_USER: ${{ secrets.SMTP_USER }}
           SMTP_PASS: ${{ secrets.SMTP_PASS }}
           EMAIL_TO:  ${{ secrets.EMAIL_TO }}
+          # ── 한국 종목(pykrx, 2025-12-27부터 KRX Data Marketplace 로그인 필수로 바뀜)
+          # 없으면 코스피200 섹션이 빈 채로 발송됨(에러는 아님). data.krx.co.kr 가입 후 등록.
+          KRX_ID: ${{ secrets.KRX_ID }}
+          KRX_PW: ${{ secrets.KRX_PW }}
           # ── 전략 파라미터 (STRATEGY.md)
           SELL_TRAIL: "0.20"         # 트레일링 스톱 -20%
           SELL_MA_BUFFER: "0.03"     # 200일선 -3% 이탈

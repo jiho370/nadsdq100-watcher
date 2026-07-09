@@ -172,11 +172,11 @@ def verify_stage(groups, market) -> dict:
         f"CONTEXT.stocks = {json.dumps(stocks, ensure_ascii=False)}\n")
     try:
         try:
-            text = (_call_cli(instr, REPORT_WEB, system=_V_SYSTEM) if AI_BACKEND == "cli"
+            text = (_call_cli(instr, REPORT_WEB, system=_V_SYSTEM, model=MODEL_VERIFY) if AI_BACKEND == "cli"
                     else _call_api(instr, REPORT_WEB, system=_V_SYSTEM, model=MODEL_VERIFY, max_tokens=3000))
         except Exception as e1:
             _log(f"검증 1차 실패({type(e1).__name__}) → 웹검색 없이 재시도")
-            text = (_call_cli(instr, False, system=_V_SYSTEM) if AI_BACKEND == "cli"
+            text = (_call_cli(instr, False, system=_V_SYSTEM, model=MODEL_VERIFY) if AI_BACKEND == "cli"
                     else _call_api(instr, False, system=_V_SYSTEM, model=MODEL_VERIFY, max_tokens=3000))
         p = _extract_json(text or "")
         if not isinstance(p, dict):
@@ -255,10 +255,26 @@ def write_stage(final_pairs, sells, market, vmap, need_market: bool) -> dict:
         f"CONTEXT.market = {json.dumps(market, ensure_ascii=False)}\n"
         f"CONTEXT.stocks = {json.dumps(stocks, ensure_ascii=False)}\n"
         f"CONTEXT.sells = {json.dumps(sell_in, ensure_ascii=False)}\n")
-    text = (_call_cli(instr, False, system=_W_SYSTEM) if AI_BACKEND == "cli"
-            else _call_api(instr, False, system=_W_SYSTEM, model=MODEL_WRITE, max_tokens=6000))
-    p = _extract_json(text or "")
-    return p if isinstance(p, dict) else {}
+
+    def _once():
+        return (_call_cli(instr, False, system=_W_SYSTEM, model=MODEL_WRITE) if AI_BACKEND == "cli"
+                else _call_api(instr, False, system=_W_SYSTEM, model=MODEL_WRITE, max_tokens=6000))
+
+    # verify_stage와 동일하게 실패는 조용히 삼키지 않는다 — 이전엔 JSON 파싱 실패 시 아무 로그
+    # 없이 빈 dict만 반환해 원인 파악이 안 됐다(예: 응답이 max_tokens에 잘려 중괄호가 안 닫힘).
+    # 1회 재시도 후에도 실패하면 원문 일부를 로그에 남긴다.
+    text = None
+    for attempt in (1, 2):
+        try:
+            text = _once()
+        except Exception as e:
+            _log(f"서술 호출 실패(시도 {attempt}/2, {type(e).__name__}: {e})")
+            continue
+        p = _extract_json(text or "")
+        if isinstance(p, dict) and p.get("stocks"):
+            return p
+        _log(f"서술 응답 파싱 실패(시도 {attempt}/2) — 원문 앞부분: {(text or '')[:200]!r}")
+    return {}
 
 
 # ------------------------- 2-b: 시황 4문장만(경량, 종목 JSON 없음) -------------------------
@@ -283,7 +299,7 @@ def write_market_stage(market) -> dict:
     instr = (f"아래 수치로 시황 총평을 작성하라. 출력 스키마(JSON 하나만):\n{_M_SCHEMA}\n\n"
              f"CONTEXT.market = {json.dumps(market, ensure_ascii=False)}\n")
     try:
-        text = (_call_cli(instr, False, system=_M_SYSTEM) if AI_BACKEND == "cli"
+        text = (_call_cli(instr, False, system=_M_SYSTEM, model=MODEL_WRITE) if AI_BACKEND == "cli"
                 else _call_api(instr, False, system=_M_SYSTEM, model=MODEL_WRITE, max_tokens=600))
         p = _extract_json(text or "")
         return p if isinstance(p, dict) else {}
@@ -451,10 +467,16 @@ def _call_api(instruction, web=True, system=None, model=None, max_tokens=6000):
     return "".join(b.text for b in msg.content if getattr(b, "type", "") == "text")
 
 
-def _call_cli(instruction, web=True, system=None):
-    """로컬 claude -p (Pro 구독 — API 키·과금 없음). pregen.py 와 weekly_report.py 가 사용."""
+def _call_cli(instruction, web=True, system=None, model=None):
+    """로컬 claude -p (Pro 구독 — API 키·과금 없음). pregen.py 와 weekly_report.py 가 사용.
+    model 지정 시 --model 로 전달한다. 이전엔 이 인자가 아예 없어서 CLI 기본 모델이
+    검증·서술 단계 모두에 쓰였다(sonnet/haiku 분리가 API 경로에만 적용되던 버그) — 구독
+    한도(토큰) 소모가 컸던 원인. 이제 verify_stage=MODEL_VERIFY, write_stage/write_market_stage
+    =MODEL_WRITE 를 CLI 에도 그대로 전달한다."""
     prompt = (system or _V_SYSTEM) + "\n\n" + instruction
     cmd = [CLAUDE_BIN, "-p", "--output-format", "json"]
+    if model:
+        cmd += ["--model", _no_opus(model, "claude-sonnet-5")]
     if web:
         cmd += ["--allowedTools", "WebSearch,WebFetch"]
     to = AI_TIMEOUT if web else min(AI_TIMEOUT, 300)

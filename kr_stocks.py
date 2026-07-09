@@ -80,6 +80,7 @@ def _cached_universe() -> dict | None:
         _log(f"캐시 사용(기준일 {d.get('as_of')})")
         return d.get("data") or None
     except Exception:
+        _log(f"캐시 없음({CACHE}) — pykrx 미설치 시 대체 데이터가 없음")
         return None
 
 
@@ -112,6 +113,10 @@ def select(yf) -> dict:
     """반환: {"as_of":..,"buy":[cand..],"watch":[cand..],"ind_map":{sym:{price,ma200}}}  실패 시 {}"""
     funda = _krx_universe_funda() or _cached_universe()
     if not funda:
+        _log("한국 종목 데이터 없음 → 이번 실행은 한국 섹션이 빈 채로 발송됨. "
+             "가장 흔한 원인(2025-12-27부터): KRX 정보데이터시스템이 로그인 필수로 바뀜 — "
+             "환경변수 KRX_ID/KRX_PW 필요(data.krx.co.kr 무료가입, GITHUB_SETUP.md 참고). "
+             "pykrx 자체가 없다면 `pip install pykrx`. 한 번 성공하면 캐시가 생겨 이후엔 안전망이 됨.")
         return {}
     passed = {t: f for t, f in funda.items()
               if f["eps"] > 0 and f["roe"] >= ROE_MIN and 0 < f["per"] <= PER_MAX}

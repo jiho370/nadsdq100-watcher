@@ -39,7 +39,7 @@ git push -u origin main
 (이미 저장소가 있으면 `git add . && git commit -m "update" && git push` 만.)
 
 ## 2. Secrets 등록 (메일·AI 인증)
-저장소 페이지 → **Settings → Secrets and variables → Actions → New repository secret** 로 4개 등록:
+저장소 페이지 → **Settings → Secrets and variables → Actions → New repository secret** 로 6개 등록:
 
 | 이름 | 값 |
 |---|---|
@@ -47,9 +47,22 @@ git push -u origin main
 | `SMTP_PASS` | Gmail 앱 비밀번호 (기존 값 그대로) |
 | `EMAIL_TO` | 수신자. 여러 명이면 쉼표: `choej7432@gmail.com, rametal.choi@gmail.com` |
 | `ANTHROPIC_API_KEY` | AI 해설용 API 키 — console.anthropic.com 에서 발급. **없어도 발송은 됨**(지표 기반 해설로 폴백) |
+| `KRX_ID` | 코스피200 데이터(pykrx)용 KRX 로그인 ID — data.krx.co.kr(KRX Data Marketplace, 네이버/카카오로 간편가입 가능, 무료) 가입 후 발급. **없어도 발송은 됨**(한국 섹션만 빈 채로) |
+| `KRX_PW` | 위 계정의 비밀번호 |
 
 AI 해설 비용: Sonnet + 웹검색 6회 기준 하루 수십 원, 월 2~5천 원 수준.
 아끼려면 `.github/workflows/report.yml` 에서 `REPORT_WEB: "0"` 으로.
+
+**KRX_ID/KRX_PW가 왜 필요한가(2026-07 추가)**: 한국거래소 정보데이터시스템이 2025-12-27부터
+회원제 'KRX Data Marketplace'로 전환되면서 pykrx(코스피200 구성종목·PER·ROE 조회)가 로그인
+없이는 작동하지 않게 됐다. 로컬 PC에서도 동일하게 필요 — 세션에서만 `$env:KRX_ID=...` 로 설정하면
+스케줄 작업(19:00 등)이 새 프로세스로 뜰 때 사라지니, 반드시 시스템/사용자 환경변수로 영구
+등록해야 한다:
+```powershell
+[Environment]::SetEnvironmentVariable("KRX_ID", "아이디", "User")
+[Environment]::SetEnvironmentVariable("KRX_PW", "비밀번호", "User")
+```
+설정 후 새 터미널(또는 재부팅)부터 적용된다.
 
 ## 3. 워크플로 활성화 확인
 1. 저장소 → **Actions** 탭 → "Daily & Weekly Market Report" 가 보이면 OK.

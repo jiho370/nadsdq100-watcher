@@ -31,3 +31,55 @@ git : To https://github.com/jiho370/nadsdq100-watcher.git
  
    5a07240..3c556f4  main -> main
 2026-07-09 14:56:07 [us] === pregen ?꾨즺 ===
+2026-07-09 14:59:26 [us] === pregen ?쒖옉 ===
+git : error: cannot pull with rebase: You have unstaged changes.
+위치 C:\Users\JH\Documents\GitHub\nadsdq100-watcher\run_pregen.ps1:19 문자:1
++ git pull --rebase 2>&1 | Out-File -Append -Encoding utf8 $log
++ ~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (error: cannot p...staged changes.:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+error: Please commit or stash them.
+python : [정보] SPY 보유종목 503개 로드
+위치 C:\Users\JH\Documents\GitHub\nadsdq100-watcher\run_pregen.ps1:22 문자:1
++ python pregen.py --$Mode 2>&1 | Out-File -Append -Encoding utf8 $log
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: ([정보] SPY 보유종목 503개 로드:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+[섹터] 위키에서 503종목 GICS 섹터 확보 (Sub-Industry 503종목)
+[탐욕지수] 42 (공포)
+[프로필] 503종목 로드 (생성 2026-06-20)
+[PREGEN] 서술 사전생성 8종목
+[PREGEN] 저장: output/pregen_us.json (대상일 2026-07-09 · 종목 18 · 서술캐시 8건)
+[main e224873] chore: pregen us [skip ci]
+ 1 file changed, 124 insertions(+), 124 deletions(-)
+git : To https://github.com/jiho370/nadsdq100-watcher.git
+위치 C:\Users\JH\Documents\GitHub\nadsdq100-watcher\run_pregen.ps1:33 문자:5
++     git push 2>&1 | Out-File -Append -Encoding utf8 $log
++     ~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (To https://gith...100-watcher.git:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+   664a2b3..e224873  main -> main
+2026-07-09 15:07:24 [us] === pregen ?꾨즺 ===
+2026-07-09 19:09:55 [kr] === pregen ?쒖옉 ===
+git : error: cannot pull with rebase: You have unstaged changes.
+위치 C:\Users\JH\Documents\GitHub\nadsdq100-watcher\run_pregen.ps1:19 문자:1
++ git pull --rebase 2>&1 | Out-File -Append -Encoding utf8 $log
++ ~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (error: cannot p...staged changes.:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+error: Please commit or stash them.
+python : [KR] pykrx 없음(No module named 'pykrx') → 캐시 폴백
+위치 C:\Users\JH\Documents\GitHub\nadsdq100-watcher\run_pregen.ps1:22 문자:1
++ python pregen.py --$Mode 2>&1 | Out-File -Append -Encoding utf8 $log
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: ([KR] pykrx 없음(N...pykrx') → 캐시 폴백:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+[KR] 캐시 없음(output/kospi200_cache.json) \u2014 pykrx 미설치 시 대체 데이터가 없음
+[KR] 한국 종목 데이터 없음 → 이번 실행은 한국 섹션이 빈 채로 발송됨. 해결: `pip install pykrx` 후 재실행(성공하면 캐시가 자동 생성돼 이후엔 pykrx 없어도 동작)
+[PREGEN] 한국 후보 없음 → 스킵
+2026-07-09 19:10:01 [kr] === pregen ?꾨즺 ===
