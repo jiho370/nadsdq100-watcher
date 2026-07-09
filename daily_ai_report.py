@@ -135,9 +135,12 @@ def _gather_signals():
         return MS, {}
 
 
-def _signal_images(signals):
+def _signal_images(signals, when=None):
+    """when 지정 시 그 메일에 표시되는 추세신호 자산(코스피/코스닥/금 또는 나스닥100/S&P500/
+    비트코인)만 차트를 만든다 — 안 쓸 이미지를 만들지 않는다."""
     sig_cids, images = {}, []
-    for a in signals.get("core", []):
+    items = [a for a in signals.get("core", []) if not when or a.get("when") == when]
+    for a in items:
         png = _stock_chart_png(a.get("closes") or [], a["name"])
         if png:
             cid = f"sig_{a['key']}"
@@ -199,10 +202,10 @@ def run_kr(no_email: bool = False, force: bool = False):
     kr_cands = (kr.get("buy") or []) + (kr.get("watch") or [])
     _attach_headlines(kr_cands, suffix=".KS")
 
-    # 시황 컨텍스트: 신호+세계(밤사이 미국 마감 포함 — 코드 계산이라 비용 0)
+    # 시황 컨텍스트: 신호(국장 표시분=코스피/코스닥/금만)+세계(밤사이 미국 마감 포함 — 코드 계산이라 비용 0)
     market = {"as_of": kr.get("as_of")}
     if signals:
-        market["signals"] = MS.lean_for_ai(signals)
+        market["signals"] = MS.lean_for_ai(signals, when="kr")
         market["world"] = [{k: (round(v, 2) if isinstance(v, float) else v)
                             for k, v in w.items()} for w in signals.get("world", [])]
 
@@ -227,20 +230,22 @@ def run_kr(no_email: bool = False, force: bool = False):
         c = kr_by_sym.get(r.get("symbol"))
         if not c:
             continue
-        png = _stock_chart_png(c.get("closes") or [], f'{c["name"]} ({c["symbol"]})')
+        png = _stock_chart_png(c.get("closes") or [], c["name"])   # 국장은 차트 제목도 코드 없이 이름만
         if png:
             images.append((f"chart_{c['symbol']}", png))
         gap200 = ((c["price"] / c["ma200"] - 1) * 100) if (c.get("price") and c.get("ma200")) else None
         metrics[c["symbol"]] = {"price": c.get("price"), "pe": c.get("pe"), "rsi": c.get("rsi"),
                                 "gap200": gap200, "ret6m": (c.get("ret") or {}).get("6m"), "krw": True}
-    sig_images, sig_cids = _signal_images(signals)
+    sig_images, sig_cids = _signal_images(signals, when="kr")
     images += sig_images
 
+    # 전일 시장 요약(나스닥·다우존스·닛케이·유럽·글로벌·비트코인·환율)은 국장 메일에만 붙는다
+    # — 밤사이 미국장 등 요약이 필요한 건 이쪽뿐이고, 추세신호(코스피/코스닥/금)와도 안 겹친다.
     market_html = MS.world_table_html(signals) if signals else ""
-    signals_html = MS.signal_cards_html(signals, sig_cids) if signals else ""
+    signals_html = MS.signal_cards_html(signals, sig_cids, when="kr") if signals else ""
     html = AR.render_report_html(report, kr.get("as_of") or "", metrics,
                                  market_html=market_html, signals_html=signals_html,
-                                 banner=banner, show_spy=False,
+                                 banner=banner, show_spy=False, is_kr=True,
                                  title="🇰🇷 장전 시장 점검 · 코스피200 추천")
     _preview_and_send(html, images, f"[장전] {today_kst} 한국 시장 점검 · 종목추천",
                       "kr_report.html", no_email,
@@ -284,9 +289,8 @@ def run_us(no_email: bool = False, force: bool = False):
     _attach_headlines(buy_now + watch)
 
     if signals:
-        market["signals"] = MS.lean_for_ai(signals)
-        market["world"] = [{k: (round(v, 2) if isinstance(v, float) else v)
-                            for k, v in w.items()} for w in signals.get("world", [])]
+        market["signals"] = MS.lean_for_ai(signals, when="us")
+        # 전일 시장 요약(world)은 국장 메일 전용 — 미장 메일 AI 컨텍스트엔 안 넣는다(중복·불필요).
 
     groups = {"buy_now": buy_now, "watch": watch, "sells": sells}
     report = AR.build_report(groups, market, pregen=_load_pregen("us", today_kst))
@@ -318,13 +322,13 @@ def run_us(no_email: bool = False, force: bool = False):
         gap200 = ((c["price"] / c["ma200"] - 1) * 100) if (c.get("price") and c.get("ma200")) else None
         metrics[r["symbol"]] = {"price": c.get("price"), "pe": c.get("pe"), "rsi": c.get("rsi"),
                                 "gap200": gap200, "ret6m": (c.get("ret") or {}).get("6m")}
-    sig_images, sig_cids = _signal_images(signals)
+    sig_images, sig_cids = _signal_images(signals, when="us")
     images += sig_images
 
-    market_html = MS.world_table_html(signals) if signals else ""
-    signals_html = MS.signal_cards_html(signals, sig_cids) if signals else ""
+    # 전일 시장 요약 표는 국장 메일 전용 — 미장 메일엔 안 붙인다(market_html="").
+    signals_html = MS.signal_cards_html(signals, sig_cids, when="us") if signals else ""
     html = AR.render_report_html(report, as_of, metrics,
-                                 market_html=market_html, signals_html=signals_html,
+                                 market_html="", signals_html=signals_html,
                                  banner=banner, show_spy=bool(spy_closes),
                                  title="🇺🇸 미국장 마감 점검 · S&P500 추천")
     _preview_and_send(html, images, f"[미국 마감] {today_kst} 시장 점검 · 종목추천",

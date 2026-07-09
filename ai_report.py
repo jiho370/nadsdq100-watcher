@@ -472,13 +472,19 @@ def _call_cli(instruction, web=True, system=None, model=None):
     model 지정 시 --model 로 전달한다. 이전엔 이 인자가 아예 없어서 CLI 기본 모델이
     검증·서술 단계 모두에 쓰였다(sonnet/haiku 분리가 API 경로에만 적용되던 버그) — 구독
     한도(토큰) 소모가 컸던 원인. 이제 verify_stage=MODEL_VERIFY, write_stage/write_market_stage
-    =MODEL_WRITE 를 CLI 에도 그대로 전달한다."""
+    =MODEL_WRITE 를 CLI 에도 그대로 전달한다.
+
+    --tools(허용 도구 '전체 목록')를 항상 명시한다 — 이전엔 --allowedTools 만 썼는데, 이건
+    '프롬프트 없이 실행되는' 도구를 사전승인할 뿐 다른 도구(Write 등)를 목록에서 빼지 않는다.
+    그 결과 서술 단계(web=False라 이 플래그 자체가 안 붙던 경로)에서 모델이 결과를 파일로
+    저장하려 시도 → 권한 대기 상태로 빠져 JSON 대신 '저장 권한이 필요합니다' 같은 텍스트만
+    반환하는 문제가 실사용에서 확인됐다. --tools 는 '가용한' 도구 자체를 제한하므로(''=전체 비활성)
+    검증 단계도 WebSearch/WebFetch 외엔 아예 못 쓰게 되어 이 문제가 구조적으로 막힌다."""
     prompt = (system or _V_SYSTEM) + "\n\n" + instruction
     cmd = [CLAUDE_BIN, "-p", "--output-format", "json"]
     if model:
         cmd += ["--model", _no_opus(model, "claude-sonnet-5")]
-    if web:
-        cmd += ["--allowedTools", "WebSearch,WebFetch"]
+    cmd += ["--tools", "WebSearch,WebFetch" if web else ""]
     to = AI_TIMEOUT if web else min(AI_TIMEOUT, 300)
     proc = subprocess.run(cmd, input=prompt, capture_output=True, text=True,
                           encoding="utf-8", errors="replace", timeout=to)
@@ -612,7 +618,9 @@ def _plan_table(plan: dict, comment: str = ""):
         f'{note}{cmt}</div>')
 
 
-def _card(i, r, metrics_by_sym, kind):
+def _card(i, r, metrics_by_sym, kind, is_kr=False):
+    """is_kr=True면 헤더에 종목코드 대신 종목명을 쓴다(6자리 코드는 사람이 읽기 어려움 — 미국
+    티커(AAPL 등)는 그 자체로 의미가 있어 그대로 둠)."""
     flag_color = {"호재": "#15803d", "악재": "#b91c1c", "중립": "#6b7280"}
     sym = r.get("symbol"); m = metrics_by_sym.get(sym, {})
     fl = r.get("flag")
@@ -648,12 +656,14 @@ def _card(i, r, metrics_by_sym, kind):
     cata = (f'<div style="color:#7c3aed;font-size:11px;margin-top:3px;line-height:1.5">&#128197; {_esc(r.get("catalyst"))}</div>'
             if r.get("catalyst") else "")
     chart = f'<img src="cid:chart_{sym}" style="width:100%;border-radius:6px">'
+    header = (f'{i}. {_esc(r.get("name"))}' if is_kr else
+              f'{i}. {_esc(sym)} '
+              f'<span style="color:#6b7280;font-size:12px;font-weight:400">{_esc(r.get("name"))}</span>')
     return (
         f'<table role="presentation" width="100%" style="border-collapse:collapse;border:1px solid #e5e7eb;'
         f'border-radius:10px;margin:10px 0;background:#fff;overflow:hidden"><tr>'
         f'<td width="56%" valign="top" style="padding:12px 14px">'
-        f'<div style="font-size:15px;font-weight:700">{i}. {_esc(sym)} '
-        f'<span style="color:#6b7280;font-size:12px;font-weight:400">{_esc(r.get("name"))}</span></div>'
+        f'<div style="font-size:15px;font-weight:700">{header}</div>'
         f'<div style="margin:4px 0 2px">{cat_chip}{hot_chip}{ai_chip}{flag_chip}</div>'
         f'<div style="font-size:13px;color:#111;margin-top:4px;line-height:1.5">{_esc(r.get("summary"))}</div>'
         f'{pts_html}{act}{vr_html}{news}{cata}</td>'
@@ -661,7 +671,7 @@ def _card(i, r, metrics_by_sym, kind):
         f'<div style="margin-top:6px">{_metric_chips(m)}</div></td></tr></table>')
 
 
-def _sell_card(i, s):
+def _sell_card(i, s, is_kr=False):
     ret = s.get("ret_pct")
     ret_chip = (_chip(f'추천이후 {ret:+.0f}%', "#15803d" if (ret or 0) >= 0 else "#b91c1c", True)
                 if ret is not None else "")
@@ -670,19 +680,23 @@ def _sell_card(i, s):
             f'padding:5px 8px;margin-top:5px"><b>처분 계획:</b> {_esc(s.get("plan"))}</div>') if s.get("plan") else ""
     cmt = (f'<div style="font-size:12px;color:#374151;margin-top:4px;line-height:1.5">{_esc(s.get("comment"))}</div>'
            if s.get("comment") else "")
+    header = (f'{i}. {_esc(s.get("name"))}{since}' if is_kr else
+              f'{i}. {_esc(s.get("symbol"))} '
+              f'<span style="color:#6b7280;font-size:12px;font-weight:400">{_esc(s.get("name"))}{since}</span>')
     return (
         f'<div style="border:1px solid #fecaca;border-radius:10px;padding:11px 13px;margin:8px 0;background:#fef2f2">'
-        f'<div style="font-size:14px;font-weight:700">{i}. {_esc(s.get("symbol"))} '
-        f'<span style="color:#6b7280;font-size:12px;font-weight:400">{_esc(s.get("name"))}{since}</span> {ret_chip}</div>'
+        f'<div style="font-size:14px;font-weight:700">{header} {ret_chip}</div>'
         f'<div style="font-size:12px;color:#b91c1c;margin-top:3px">&#9888; {_esc(s.get("reason"))}</div>{plan}{cmt}</div>')
 
 
-def _excluded_html(items):
+def _excluded_html(items, is_kr=False):
     if not items:
         return ""
     rows = "".join(
-        f'<div style="font-size:12px;color:#374151;margin:3px 0">'
-        f'<b>{_esc(x.get("symbol"))}</b> {_esc(x.get("name"))} — {_esc(x.get("reason") or "사유 미기재")}</div>'
+        (f'<div style="font-size:12px;color:#374151;margin:3px 0">'
+         f'<b>{_esc(x.get("name"))}</b> — {_esc(x.get("reason") or "사유 미기재")}</div>' if is_kr else
+         f'<div style="font-size:12px;color:#374151;margin:3px 0">'
+         f'<b>{_esc(x.get("symbol"))}</b> {_esc(x.get("name"))} — {_esc(x.get("reason") or "사유 미기재")}</div>')
         for x in items)
     return (
         '<div style="border:1px solid #e5e7eb;border-radius:10px;padding:10px 13px;margin:10px 0;background:#f8fafc">'
@@ -692,27 +706,29 @@ def _excluded_html(items):
 
 
 def render_report_html(report, as_of="", metrics_by_sym=None, market_html="", signals_html="",
-                       kr_sells=None, banner="", title=None, show_spy=True):
+                       kr_sells=None, banner="", title=None, show_spy=True, is_kr=False):
     """일일 리포트 HTML — 메일 2통 분리 지원.
     title    = 헤더 제목(없으면 기본). KR 장전/US 마감 메일이 각자 지정.
     show_spy = SPY 큰 차트 표시 여부(KR 전용 메일은 SPY 데이터가 없어 False).
+    is_kr    = 국장 메일 여부. True면 sells/ai_excluded 카드에서 종목코드 대신 이름을 쓴다
+               (kr_buy/kr_watch/kr_sells 카드는 국장 소속이 확정이라 항상 이름만 표시).
     미국/한국 섹션은 해당 카드가 있을 때만 그린다."""
     if not report:
         return ""
     metrics_by_sym = metrics_by_sym or {}
-    buy_cards = "".join(_card(i, r, metrics_by_sym, "buy") for i, r in enumerate(report.get("buy_now", []), 1))
-    watch_cards = "".join(_card(i, r, metrics_by_sym, "watch") for i, r in enumerate(report.get("watch", []), 1))
-    kr_buy_cards = "".join(_card(i, r, metrics_by_sym, "buy") for i, r in enumerate(report.get("kr_buy", []), 1))
-    kr_watch_cards = "".join(_card(i, r, metrics_by_sym, "watch") for i, r in enumerate(report.get("kr_watch", []), 1))
+    buy_cards = "".join(_card(i, r, metrics_by_sym, "buy", is_kr=False) for i, r in enumerate(report.get("buy_now", []), 1))
+    watch_cards = "".join(_card(i, r, metrics_by_sym, "watch", is_kr=False) for i, r in enumerate(report.get("watch", []), 1))
+    kr_buy_cards = "".join(_card(i, r, metrics_by_sym, "buy", is_kr=True) for i, r in enumerate(report.get("kr_buy", []), 1))
+    kr_watch_cards = "".join(_card(i, r, metrics_by_sym, "watch", is_kr=True) for i, r in enumerate(report.get("kr_watch", []), 1))
     sells = report.get("sells", [])
     sell_html = ""
     if sells:
-        sell_cards = "".join(_sell_card(i, s) for i, s in enumerate(sells, 1))
+        sell_cards = "".join(_sell_card(i, s, is_kr=is_kr) for i, s in enumerate(sells, 1))
         sell_html = ('<h3 style="margin:18px 0 2px">&#128308; 매도 · 차익실현 검토 <span style="color:#9ca3af;font-size:12px">'
                      '(이전 추천 종목 중 추세 이탈 — 처분 계획 포함)</span></h3>' + sell_cards)
     kr_sell_html = ""
     if kr_sells:
-        kr_sell_cards = "".join(_sell_card(i, s) for i, s in enumerate(kr_sells, 1))
+        kr_sell_cards = "".join(_sell_card(i, s, is_kr=True) for i, s in enumerate(kr_sells, 1))
         kr_sell_html = ('<h3 style="margin:18px 0 2px">&#128308; 한국 매도 · 차익실현 검토 <span style="color:#9ca3af;font-size:12px">'
                         '(이전 추천 종목 중 추세 이탈)</span></h3>' + kr_sell_cards)
     sub = f' <span style="color:#9ca3af;font-size:12px">({_esc(as_of)} 종가 기준)</span>' if as_of else ""
@@ -723,7 +739,7 @@ def render_report_html(report, as_of="", metrics_by_sym=None, market_html="", si
     market_sec = ""
     if market_html:
         market_sec = ('<h3 style="margin:14px 0 6px">&#127760; 전일 시장 요약 <span style="color:#9ca3af;font-size:12px">'
-                      '(미국 · 한국 · 코인 · 세계)</span></h3>' + market_html)
+                      '(나스닥·다우존스·닛케이·유럽·글로벌·비트코인·환율 — 전일 등락)</span></h3>' + market_html)
     signals_sec = ""
     if signals_html:
         note = _esc(report.get("signal_note") or "")
@@ -758,7 +774,7 @@ def render_report_html(report, as_of="", metrics_by_sym=None, market_html="", si
         f'{signals_sec}'
         f'{spy}'
         f'{us_sec}'
-        f'{_excluded_html(report.get("ai_excluded"))}'
+        f'{_excluded_html(report.get("ai_excluded"), is_kr=is_kr)}'
         f'{sell_html}'
         f'{kr_sec}'
         f'{kr_sell_html}'

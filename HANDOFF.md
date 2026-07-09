@@ -40,7 +40,9 @@
 - 문서: `AI_SETUP.md`, `HANDOFF.md`(이 파일).
 
 ### 운영 규칙 / 하드폰 주의점 (중요)
-- Claude CLI 프롬프트는 **argv 아니라 stdin**으로 넘김(Windows 파일명 길이 오류 회피). 출력은 **UTF-8**로 읽기. `--allowedTools "WebSearch,WebFetch"`는 **콤마 한 인자**로.
+- Claude CLI 프롬프트는 **argv 아니라 stdin**으로 넘김(Windows 파일명 길이 오류 회피). 출력은 **UTF-8**로 읽기. `--tools "WebSearch,WebFetch"`(또는 서술 단계는 `""`로 전체 비활성)는 **콤마 한 인자**로.
+  (2026-07-09: `--allowedTools`에서 `--tools`로 교체 — 전자는 '사전승인'일 뿐 Write 등 다른 도구를
+  목록에서 빼지 않아, 서술 단계에서 모델이 파일 저장을 시도하다 권한 대기로 빠지는 문제가 있었음.)
 - 웹검색은 켜두되(REPORT_WEB=1) 타임아웃을 1200초로 크게 잡아 실패 방지.
 - 한자 사용 금지, "MA20" 대신 "20일선" 표기, 중립 종목은 아래에 아무것도 안 씀.
 - PowerShell에 명령 붙일 때 뒤에 한글 설명(괄호) 붙이면 오류남 — 명령어만.
@@ -144,6 +146,29 @@
   (`report.yml`에 이미 배선함, GITHUB_SETUP.md 참고). 없어도 에러 없이 한국 섹션만 빈 채로 발송됨
   (기존 캐시 폴백 로직 그대로 — 최초 1회 로그인 성공 시 캐시가 생겨 이후엔 미설정 PC에서도 동작).
   `kr_stocks.select()`가 원인을 로그에 명시하도록 수정함.
+- **로컬 CLI `--tools` 버그(중요, 2026-07-09)**: `_call_cli`가 `--allowedTools`만 쓰고 있었는데
+  이건 도구를 '사전승인'만 할 뿐 다른 도구(Write 등)를 못 쓰게 막지는 못한다. 그 결과 서술 단계
+  (`web=False`라 이 플래그 자체가 안 붙던 경로)에서 모델이 결과를 파일로 저장하려다 권한 대기
+  상태에 빠져 JSON 대신 "저장 권한이 필요합니다" 같은 텍스트만 반환 — AI 해설이 통째로 누락되는
+  실제 원인이었다. Claude Code 공식 CLI 문서(`--tools` vs `--allowedTools` 항목) 확인 후
+  `--tools "WebSearch,WebFetch"`(검증)/`--tools ""`(서술, 도구 완전 비활성)로 교체. 모의 CLI로
+  실제 호출 인자까지 재검증 완료.
+
+### 메일 2통 콘텐츠 재배치 (2026-07-09 추가)
+- **추세신호(핵심 자산 카드)를 메일별로 분리**: `market_signals.CORE_ASSETS`에 5번째 필드 `when`
+  추가(`"kr"`|`"us"`). 국장 메일 = 코스피·코스닥·금(GLD 신규 추가), 미장 메일 = 나스닥100·
+  S&P500·비트코인. 이더리움은 완전히 제거. `signal_cards_html`/`lean_for_ai`에 `when` 필터
+  추가, `daily_ai_report._signal_images`도 `when`으로 걸러 안 쓰는 차트를 안 만든다.
+- **전일 시장 요약은 국장 메일 전용**: `WORLD_ASSETS`를 나스닥(^IXIC)·다우존스·닛케이·
+  유럽(VGK)·글로벌(ACWI)·비트코인·환율 7개로 재정의(추세신호와 안 겹치는 별도 자산 —
+  유럽/글로벌은 개별국 지수 대신 그 지역 대표 ETF로, 다른 코드가 이미 쓰는 것과 통일).
+  `world_table_html`이 더 이상 core를 병합하지 않고 world만, 컬럼도 전일(1일)만(1주/1개월 제거).
+  미장 메일은 `market_html=""`으로 아예 안 붙임.
+- **국장 카드에서 종목코드 제거**: `_card`/`_sell_card`/`_excluded_html`에 `is_kr` 파라미터 추가
+  — true면 6자리 코드 없이 회사명만 표시(미국 티커는 그 자체로 읽을 만해 그대로 둠). 차트 이미지
+  제목도 `daily_ai_report.run_kr`에서 `f'{name} ({symbol})'` → `name`으로 수정(이미지 안에도
+  코드가 안 보이게).
+- 검증: mock 렌더로 kr/us 추세신호 분리, world 표 7자산, 카드 코드 노출 여부까지 전부 확인.
 
 ### 지금 상태
 S&P500 팩터 가중치(`best_weights.json`)는 기존 워크포워드 검증 결과 유지(러너에 파일 없으면 폴백 모델로 동작 — 가능하면 백테스트 1회 돌려 재생성 권장). 남은 일: GITHUB_SETUP.md 대로 저장소 푸시 + Secrets 등록(ANTHROPIC_API_KEY·KRX_ID·KRX_PW 포함) + `.\register_pregen_task.ps1` 등록 + `python gen_profiles.py` 1회.

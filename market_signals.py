@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-market_signals.py — 지수·코인 6개 핵심 자산의 추세 신호 엔진 + 전일 세계시장 요약.
+market_signals.py — 지수·코인·금 핵심 자산의 추세 신호 엔진 + 전일 세계시장 요약.
 
 규칙(STRATEGY.md §1):
   · 주식 지수: 200일선 ±1% 히스테리시스(3일 확인) 레짐 + 12-1 모멘텀, 눌림선=20일선
@@ -9,28 +9,36 @@ market_signals.py — 지수·코인 6개 핵심 자산의 추세 신호 엔진 
   · 변동성 타깃 노출 W=min(1, 타깃/실현변동성60일) 은 참고 지표로만 표기.
 
 신호는 전부 '종가 시계열만으로' 상태를 복원(stateless)하므로 상태파일이 필요 없다.
+
+메일 2통 분리(2026-07-09) 반영: 핵심 자산 추세신호 카드는 시장별로 나눠 보여준다
+(코스피·코스닥·금 = 국장 장전 메일 / 나스닥100·S&P500·비트코인 = 미장 마감 메일,
+CORE_ASSETS 의 5번째 필드 "when"으로 구분). '전일 시장 요약' 표는 국장 메일에만
+붙고(추세신호와 겹치지 않는 별도 자산 — 나스닥·다우존스·닛케이·유럽·글로벌·비트코인·환율)
+전일(1일) 등락만 보여준다(추세·모멘텀 상태는 추세신호 카드 쪽에만 표기).
 """
 from __future__ import annotations
 import math
 
 # ------------------------- 자산 정의 -------------------------
 CORE_ASSETS = [
-    # key, 이름, 야후 티커, 종류
-    ("NDX",    "나스닥 100", "^NDX",    "equity"),
-    ("SPX",    "S&P 500",    "^GSPC",   "equity"),
-    ("KOSPI",  "코스피",     "^KS11",   "equity"),
-    ("KOSDAQ", "코스닥",     "^KQ11",   "equity"),
-    ("BTC",    "비트코인",   "BTC-USD", "crypto"),
-    ("ETH",    "이더리움",   "ETH-USD", "crypto"),
+    # key, 이름, 야후 티커, 종류, 표시 메일(kr=국장 장전 / us=미장 마감)
+    ("KOSPI",  "코스피",     "^KS11",   "equity", "kr"),
+    ("KOSDAQ", "코스닥",     "^KQ11",   "equity", "kr"),
+    ("GOLD",   "금",         "GLD",     "equity", "kr"),
+    ("NDX",    "나스닥 100", "^NDX",    "equity", "us"),
+    ("SPX",    "S&P 500",    "^GSPC",   "equity", "us"),
+    ("BTC",    "비트코인",   "BTC-USD", "crypto", "us"),
 ]
+# 전일 시장 요약(국장 메일 전용) — 추세신호(CORE_ASSETS)와 겹치지 않는 자산만.
+# 유럽·글로벌은 개별국 지수 대신 그 지역을 대표하는 ETF(다른 코드에서도 이미 쓰는 것과 통일).
 WORLD_ASSETS = [
-    ("DJI",  "다우존스",   "^DJI"),
-    ("N225", "닛케이 225", "^N225"),
-    ("DAX",  "독일 DAX",   "^GDAXI"),
-    ("FTSE", "영국 FTSE",  "^FTSE"),
-    ("HSI",  "홍콩 항셍",  "^HSI"),
-    ("SSE",  "상해종합",   "000001.SS"),
-    ("FX",   "달러-원",    "KRW=X"),
+    ("IXIC",   "나스닥",   "^IXIC"),
+    ("DJI",    "다우존스", "^DJI"),
+    ("N225",   "닛케이",   "^N225"),
+    ("EUROPE", "유럽",     "VGK"),    # 유럽 주식시장 대표 ETF(Vanguard FTSE Europe)
+    ("GLOBAL", "글로벌",   "ACWI"),   # 전세계 주식시장 대표 ETF(iShares MSCI ACWI)
+    ("BTCW",   "비트코인", "BTC-USD"),
+    ("FX",     "환율",     "KRW=X"),
 ]
 
 PARAMS = {
@@ -179,15 +187,15 @@ def fetch_closes(yf, tickers: list[str]) -> dict:
 
 
 def gather(yf) -> dict:
-    """핵심 6자산 신호 + 세계시장 요약 데이터."""
-    tickers = [t for _, _, t, _ in CORE_ASSETS] + [t for _, _, t in WORLD_ASSETS]
+    """핵심 자산 신호(when 태그 포함) + 세계시장 요약 데이터."""
+    tickers = [t for _, _, t, _, _ in CORE_ASSETS] + [t for _, _, t in WORLD_ASSETS]
     raw = fetch_closes(yf, tickers)
     core, world = [], []
-    for key, name, tic, kind in CORE_ASSETS:
+    for key, name, tic, kind, when in CORE_ASSETS:
         d = raw.get(tic)
         if not d:
             continue
-        core.append({"key": key, "name": name, "ticker": tic, "kind": kind,
+        core.append({"key": key, "name": name, "ticker": tic, "kind": kind, "when": when,
                      "as_of": d["dates"][-1], "closes": d["closes"],
                      **analyze(d["closes"], kind)})
     for key, name, tic in WORLD_ASSETS:
@@ -201,10 +209,16 @@ def gather(yf) -> dict:
     return {"core": core, "world": world}
 
 
-def lean_for_ai(sig: dict) -> list:
-    """AI 프롬프트 주입용(시세 배열 제외, 반올림)."""
+def core_for(sig: dict, when: str) -> list:
+    """추세신호 카드 중 해당 메일(when='kr'|'us')에 표시할 것만 필터."""
+    return [a for a in sig.get("core", []) if a.get("when") == when]
+
+
+def lean_for_ai(sig: dict, when: str | None = None) -> list:
+    """AI 프롬프트 주입용(시세 배열 제외, 반올림). when 지정 시 그 메일에 표시되는 자산만."""
     out = []
-    for a in sig.get("core", []):
+    items = core_for(sig, when) if when else sig.get("core", [])
+    for a in items:
         d = {k: (round(v, 2) if isinstance(v, float) else v) for k, v in a.items() if k != "closes"}
         meta = STATE_META.get(a["signal"])
         d["signal_kr"] = meta[1] if meta else a["signal"]
@@ -233,7 +247,7 @@ def _fmt_price(a):
     p = a.get("price")
     if p is None:
         return ""
-    if a.get("key") in ("BTC", "ETH"):
+    if a.get("key") in ("BTC", "BTCW"):
         return f"${p:,.0f}"
     if a.get("key") == "FX":
         return f"{p:,.1f}원"
@@ -241,34 +255,34 @@ def _fmt_price(a):
 
 
 def world_table_html(sig: dict) -> str:
-    """전일 세계시장 요약 표(핵심 6자산 + 세계 지수 + 환율)."""
+    """전일 세계시장 요약 표(국장 메일 전용). 추세신호 카드와 겹치지 않는 자산만
+    — 나스닥·다우존스·닛케이·유럽·글로벌·비트코인·환율(WORLD_ASSETS). 전일(1일) 등락만 표시
+    (추세·모멘텀 상태는 추세신호 카드 쪽 몫)."""
     rows = ""
-    items = list(sig.get("core", [])) + list(sig.get("world", []))
-    for a in items:
-        r1 = a.get("ret_1d"); r5 = a.get("ret_1w"); r21 = a.get("ret_1m")
-        def cell(v):
-            if v is None:
-                return '<td align="right" style="padding:4px 8px;color:#9ca3af">—</td>'
-            col = "#15803d" if v >= 0 else "#b91c1c"
-            return f'<td align="right" style="padding:4px 8px;color:{col};font-weight:600">{v:+.2f}%</td>'
+    for a in sig.get("world", []):
+        r1 = a.get("ret_1d")
+        if r1 is None:
+            cell = '<td align="right" style="padding:4px 8px;color:#9ca3af">—</td>'
+        else:
+            col = "#15803d" if r1 >= 0 else "#b91c1c"
+            cell = f'<td align="right" style="padding:4px 8px;color:{col};font-weight:600">{r1:+.2f}%</td>'
         rows += (f'<tr style="border-bottom:1px solid #f1f5f9">'
                  f'<td style="padding:4px 8px;font-weight:600">{_esc(a["name"])}'
                  f' <span style="color:#9ca3af;font-size:10px">{_esc(a.get("as_of", ""))}</span></td>'
-                 f'<td align="right" style="padding:4px 8px">{_fmt_price(a)}</td>'
-                 f'{cell(r1)}{cell(r5)}{cell(r21)}</tr>')
+                 f'<td align="right" style="padding:4px 8px">{_fmt_price(a)}</td>{cell}</tr>')
     return (
         '<table role="presentation" width="100%" style="border-collapse:collapse;border:1px solid #e5e7eb;'
         'border-radius:10px;background:#fff;font-size:12px;overflow:hidden">'
         '<tr style="background:#f8fafc;color:#6b7280;font-size:11px">'
         '<td style="padding:5px 8px">시장 (기준일)</td><td align="right" style="padding:5px 8px">종가</td>'
-        '<td align="right" style="padding:5px 8px">전일</td><td align="right" style="padding:5px 8px">1주</td>'
-        '<td align="right" style="padding:5px 8px">1개월</td></tr>' + rows + '</table>')
+        '<td align="right" style="padding:5px 8px">전일</td></tr>' + rows + '</table>')
 
 
-def signal_cards_html(sig: dict, chart_cids: dict | None = None) -> str:
-    """핵심 6자산 신호 카드."""
+def signal_cards_html(sig: dict, chart_cids: dict | None = None, when: str | None = None) -> str:
+    """추세신호 카드. when='kr'|'us' 지정 시 그 메일에 표시되는 자산만(CORE_ASSETS 의 when)."""
     cards = ""
-    for a in sig.get("core", []):
+    items = core_for(sig, when) if when else sig.get("core", [])
+    for a in items:
         emoji, label, color, action = STATE_META.get(a["signal"], ("", a["signal"], "#6b7280", ""))
         chips = _pct("전일", a.get("ret_1d"), 2) + _pct("1개월", a.get("ret_1m")) + _pct("6개월", a.get("ret_6m"))
         if a.get("gap_trend") is not None:
