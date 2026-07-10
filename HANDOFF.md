@@ -170,8 +170,38 @@
   코드가 안 보이게).
 - 검증: mock 렌더로 kr/us 추세신호 분리, world 표 7자산, 카드 코드 노출 여부까지 전부 확인.
 
+### 실사용 중 발견된 문제 3건 + API 일시 비활성 (2026-07-10)
+- **로컬 git이 계속 막혀 있었다**: 이 세션 내내 Claude가 저장소 파일을 직접 수정했는데
+  한 번도 커밋을 안 해서, 작업폴더가 계속 '미커밋 상태' → `run_pregen.ps1`의
+  `git pull --rebase`가 매번 실패(`cannot pull with rebase: unstaged changes`). pull이
+  막히면 이후 push도(origin이 앞서가 있으면) 막힐 수 있다. **1회 수동 조치 필요**:
+  저장소 폴더에서 `git add -A; git commit -m sync; git push`.
+- **한국 섹션이 GitHub Actions에서만 비는 문제(진짜 원인)**: `run_pregen.ps1`이
+  `pregen_kr.json`만 push하고 `output/kospi200_cache.json`(로컬이 KRX 로그인으로 받은 코스피200
+  캐시)은 안 올리고 있었다. Actions 쪽은 KRX 접속이 막혔을 가능성이 높은데(2025-12-27 로그인
+  전환이 "AI 봇 차단" 목적이라 클라우드 IP를 걸렀을 수 있음) 이때 대체할 캐시가 GitHub에 없어서
+  코스피200 선정 자체가 빈 채로 실행됐다 → `run_pregen.ps1`이 한국장 성공 시 `kospi200_cache.json`
+  도 함께 커밋·푸시하도록 수정. pull/push 실패 시 로그에 원인 힌트도 추가.
+- **`build_report`가 API 키 없으면 pregen 캐시까지 무시하던 버그**: `_enabled()`(API/CLI 가용
+  여부)만으로 조기 종료했었는데, 이러면 pregen에 완벽한 캐시가 있어도(AI 호출이 필요 없는데도)
+  그냥 폴백해버린다. pregen(`by_sym`)이 있으면 `_enabled()`와 무관하게 진행하도록 수정 —
+  오프라인 테스트로 "API 키 없이도 pregen 캐시만으로 실제 후보가 렌더되는지" 확인 완료.
+- **API 일시 비활성화(사용자 요청)**: `report.yml`의 `ANTHROPIC_API_KEY`/`AI_BACKEND`/모델 관련
+  env 5줄을 주석 처리하고 `AI_ENABLED: "0"`으로 명시. pregen이 있는 날은 영향 없음(위 버그
+  수정 덕분에 캐시만으로 완결). pregen이 없는 날은 API 폴백 대신 `deterministic_report`(지표
+  기반, 후보는 실제로 나옴 — 서술만 간단)로 감. 나중에 되살리려면 주석 해제 + Secrets에
+  `ANTHROPIC_API_KEY` 등록.
+- **국장 시황 총평 범위 축소**: 원래 "밤사이 미국 마감까지 포함"을 노려 국장 pregen(19시)이
+  시황 4문장을 못 채우고 발송 시점(08시) 경량 API 콜 1회로 메꾸는 구조였다(호출당 비용은
+  haiku 기준 $0.001~0.003 수준으로 사실 미미했음). 사용자가 "시황은 전일 국장 기준만"으로
+  범위를 좁히기로 해서, 19시 pregen 시점에 이미 확정된 코스피·코스닥 데이터만으로 시황까지
+  전부 끝내도록 단순화(`need_market=True`) — 발송 시점 경량 콜 자체가 필요 없어짐. 세계지수
+  요약이 필요하면 국장 메일의 '전일 시장 요약' 표(코드 생성, $0)가 이미 보여주고 있음.
+- `market_signals.py` 전일 시장 요약의 "유럽"/"글로벌"에 산출 근거를 괄호로 표기
+  (`유럽(VGK)`/`글로벌(ACWI)`).
+
 ### 지금 상태
-S&P500 팩터 가중치(`best_weights.json`)는 기존 워크포워드 검증 결과 유지(러너에 파일 없으면 폴백 모델로 동작 — 가능하면 백테스트 1회 돌려 재생성 권장). 남은 일: GITHUB_SETUP.md 대로 저장소 푸시 + Secrets 등록(ANTHROPIC_API_KEY·KRX_ID·KRX_PW 포함) + `.\register_pregen_task.ps1` 등록 + `python gen_profiles.py` 1회.
+S&P500 팩터 가중치(`best_weights.json`)는 기존 워크포워드 검증 결과 유지(러너에 파일 없으면 폴백 모델로 동작 — 가능하면 백테스트 1회 돌려 재생성 권장). 남은 일: **저장소에 지금까지의 변경분 커밋·푸시(위 git 문제 참고)** + Secrets 등록(KRX_ID·KRX_PW 필수, ANTHROPIC_API_KEY는 현재 비활성) + `.\register_pregen_task.ps1` 등록 + `python gen_profiles.py` 1회.
 
 ### 내가 앞으로 부탁할 만한 것
 - 매년/분기 백테스트 재검증(팩터 IC는 시간이 지나면 감쇠함) + 프로필 캐시 갱신(gen_profiles --refresh).

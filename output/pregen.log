@@ -150,3 +150,77 @@ git : To https://github.com/jiho370/nadsdq100-watcher.git
  
    84a7631..f10579f  main -> main
 2026-07-10 13:33:24 [us] === pregen ?꾨즺 ===
+2026-07-10 19:00:04 [kr] === pregen 시작 ===
+git : error: cannot pull with rebase: You have unstaged changes.
+위치 C:\Users\JH\Documents\GitHub\nadsdq100-watcher\run_pregen.ps1:26 문자:1
++ git pull --rebase 2>&1 | Out-File -Append -Encoding utf8 $log
++ ~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (error: cannot p...staged changes.:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+error: Please commit or stash them.
+2026-07-10 19:00:04 [kr] [경고] git pull 실패 — 로컬에 커밋 안 된 변경이 있으면 여기서 막힘. 아래 push도 실패할 수 있음.
+2026-07-10 19:00:04 [kr]         해결: 저장소 폴더에서 'git add -A; git commit -m sync; git push' 한 번 수동 실행.
+python : [KR] 펀더멘탈 통과 74/200종목 (EPS>0·ROE≥8%·PER≤40)
+위치 C:\Users\JH\Documents\GitHub\nadsdq100-watcher\run_pregen.ps1:33 문자:1
++ python pregen.py --$Mode 2>&1 | Out-File -Append -Encoding utf8 $log
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: ([KR] 펀더멘탈 통과 74...·ROE≥8%·PER≤40):String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+[KR] 선정: 매수 4 · 관찰 3 (후보 36)
+[PREGEN] 서술 사전생성 5종목
+[PREGEN] 저장: output/pregen_kr.json (대상일 2026-07-11 · 종목 7 · 서술캐시 5건)
+KRX 로그인 시도...
+  로그인 ID: jiho370
+KRX 로그인 완료.
+  로그인 시간: 2026-07-10 19:00:20
+  만료 시간: 2026-07-10 20:00:20
+[main adb10a5] chore: pregen kr [skip ci]
+ 2 files changed, 81 insertions(+), 81 deletions(-)
+git : To https://github.com/jiho370/nadsdq100-watcher.git
+위치 C:\Users\JH\Documents\GitHub\nadsdq100-watcher\run_pregen.ps1:50 문자:5
++     git push 2>&1 | Out-File -Append -Encoding utf8 $log
++     ~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (To https://gith...100-watcher.git:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+   9913d30..adb10a5  main -> main
+2026-07-10 19:43:41 [kr] === pregen 완료 ===
+2026-07-10 22:05:09 [kr] === pregen 시작 ===
+git : error: cannot pull with rebase: You have unstaged changes.
+위치 C:\Users\JH\Documents\GitHub\nadsdq100-watcher\run_pregen.ps1:26 문자:1
++ git pull --rebase 2>&1 | Out-File -Append -Encoding utf8 $log
++ ~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (error: cannot p...staged changes.:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+error: Please commit or stash them.
+2026-07-10 22:05:09 [kr] [경고] git pull 실패 — 로컬에 커밋 안 된 변경이 있으면 여기서 막힘. 아래 push도 실패할 수 있음.
+2026-07-10 22:05:09 [kr]         해결: 저장소 폴더에서 'git add -A; git commit -m sync; git push' 한 번 수동 실행.
+python : [KR] 펀더멘탈 통과 74/200종목 (EPS>0·ROE≥8%·PER≤40)
+위치 C:\Users\JH\Documents\GitHub\nadsdq100-watcher\run_pregen.ps1:33 문자:1
++ python pregen.py --$Mode 2>&1 | Out-File -Append -Encoding utf8 $log
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: ([KR] 펀더멘탈 통과 74...·ROE≥8%·PER≤40):String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+[KR] 선정: 매수 4 · 관찰 3 (후보 36)
+[PREGEN] 서술 사전생성 5종목
+[PREGEN] 저장: output/pregen_kr.json (대상일 2026-07-11 · 종목 7 · 서술캐시 5건)
+KRX 로그인 시도...
+  로그인 ID: jiho370
+KRX 로그인 완료.
+  로그인 시간: 2026-07-10 22:05:23
+  만료 시간: 2026-07-10 23:05:23
+[main 8b2bd1b] chore: pregen kr [skip ci]
+ 1 file changed, 71 insertions(+), 71 deletions(-)
+git : To https://github.com/jiho370/nadsdq100-watcher.git
+위치 C:\Users\JH\Documents\GitHub\nadsdq100-watcher\run_pregen.ps1:50 문자:5
++     git push 2>&1 | Out-File -Append -Encoding utf8 $log
++     ~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (To https://gith...100-watcher.git:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+   adb10a5..8b2bd1b  main -> main
+2026-07-10 23:46:44 [kr] === pregen 완료 ===

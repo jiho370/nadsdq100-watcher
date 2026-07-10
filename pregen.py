@@ -4,16 +4,21 @@ pregen.py — 로컬 PC에서 Pro 구독 CLI(claude -p)로 AI 검증+서술을 '
 
   --kr : 한국장 메일(다음날 08:00)용. 실행 창 = 저녁 16시 이후(장 마감 확정) 또는
          다음날 새벽 08시 이전(부팅 보충). 장중(08~16시)엔 데이터가 애매해 스킵.
-         검증+종목별 서술까지 미리 씀(시황 총평만 예외 — 19시엔 미국장 미개장이라 다음날 확정
-         수치로 발송 시점에 경량 콜 1회). → output/pregen_kr.json (for_kst = 다음 08:00 발송일)
+         검증+종목별 서술+시황 총평까지 전부 미리 씀. 시황 총평은 **전일 한국장 기준만**
+         (코스피·코스닥 등락·추세신호) 다루도록 범위를 좁혀서 — 19시 시점에 이미 확정된
+         데이터라 미국장 마감을 기다릴 필요가 없다(2026-07-10: 이전엔 "밤사이 미국 마감까지
+         포함"을 노려 발송 시점 경량 API 콜 1회가 남아있었으나, 그 정도 내용까지는 필요 없다고
+         판단해 국장 데이터만으로 19시에 전부 끝내도록 단순화함).
+         → output/pregen_kr.json (for_kst = 다음 08:00 발송일)
   --us : 미국장 메일(당일 17:00)용. 실행 창 = 06시(미국장 마감 후)~16시(발송 전).
          이 시점엔 해당 세션이 이미 마감 확정이라 검증+서술+시황 총평까지 전부 미리 씀.
          그 외 시각엔 이미 발송됐거나 데이터 미확정이라 스킵. → output/pregen_us.json (for_kst = 오늘)
 
 아침/오후 GitHub Actions 는 pregen_{kr,us}.json 의 for_kst 가 발송일과 일치하면
 검증 단계(웹검색)를 생략하고, written(사전서술)까지 있으면 서술 단계(haiku)도 생략한다
-→ PC가 켜져 있던 날은 발송 시점 API 호출이 사실상 0회(KR은 시황 4문장만 예외, 경량 콜 1회).
-PC가 꺼져 있어 파일이 없으면 Actions 가 API 검증+서술로 자동 폴백 — 발송엔 지장 없음.
+→ PC가 켜져 있던 날은 발송 시점 API 호출이 완전히 0회(국장·미장 둘 다 시황까지 포함).
+PC가 꺼져 있어 파일이 없으면(또는 2026-07-10부터 AI_ENABLED=0 이라 API 폴백 자체가 꺼져
+있으면) 그 부분은 지표 기반(deterministic_report)으로 조용히 대체 — 발송엔 지장 없음.
 
 작업 스케줄러(register_pregen_task.ps1): KR=19:00+22:00(재시도), US=09:30+12:30(재시도),
 전부 StartWhenAvailable(놓치면 다음 부팅 시 실행 — 시간 창 가드가 유효성 판단, 재시도는
@@ -60,8 +65,8 @@ def _headlines(cands, suffix=""):
 
 def _save(name: str, for_kst: str, ver: dict, now, written=None, sells_written=None, market_written=None):
     """written(종목별 서술)까지 실으면 발송 시점 write_stage 호출도 생략된다(API 0회).
-    market_written 은 US pregen(09:30, 이미 마감 확정)만 채운다 — KR pregen(19:00)은
-    밤사이 미국장이 아직 개장 전이라 시황 총평을 못 쓴다(발송 시점에 경량 콜 1회만 남음)."""
+    market_written 은 KR·US 둘 다 이 시점(19:00/09:30)에 이미 확정된 자기 시장 데이터만
+    다루므로 항상 채워진다(KR 시황은 전일 한국장 기준으로 범위를 좁혀 미국장 마감을 안 기다림)."""
     night_notes = " / ".join(x for x in (ver.get("market_overview"), ver.get("macro"),
                                          ver.get("risks")) if x)
     os.makedirs("output", exist_ok=True)
@@ -123,17 +128,28 @@ def run_kr():
     _headlines((kr.get("buy") or []) + (kr.get("watch") or []), suffix=".KS")
     groups = {"kr_buy": kr.get("buy") or [], "kr_watch": kr.get("watch") or [],
               "sells": _holding_syms("output/kr_holdings.json")}
-    market = {"as_of": kr.get("as_of"), "note": "밤 시점 검증 — 한국장 마감 확정 데이터"}
+    # 시황 컨텍스트는 '전일 한국장' 범위로만 좁힌다(코스피·코스닥 등락+추세신호) — 19시엔
+    # 이미 확정된 데이터라 미국장 마감을 기다릴 필요가 없다. world(해외지수)는 일부러 안 준다:
+    # 밤사이 미국 마감을 다루려던 옛 설계의 흔적이라, 범위를 국장으로 좁힌 지금은 불필요.
+    market = {"as_of": kr.get("as_of"), "note": "전일 한국장 마감 기준(코스피·코스닥)"}
+    try:
+        import market_signals as MS
+        signals = MS.gather(R.yf) or {}
+        if signals:
+            market["signals"] = MS.lean_for_ai(signals, when="kr")
+    except Exception as e:
+        _log(f"지수 신호 수집 생략({e})")
     ver = AR.verify_stage(groups, market)
     if not ver.get("by_sym"):
         _log("검증 실패 — 파일 미생성(아침에 API 폴백)"); sys.exit(1)
-    # 시황 총평(need_market)은 여기서 안 씀 — 19시엔 미국장이 아직 개장 전이라 배경(night_notes)만
-    # 남기고, 발송 시점(08:00)에 그때 확정된 수치로 경량 콜 1회만 쓴다.
-    written, sells_written, _mkt = _write_ahead(
+    # 시황 총평도 지금 다 쓴다(need_market=True) — 전일 국장 데이터만 다루므로 19시에 이미 완결.
+    written, sells_written, market_written = _write_ahead(
         groups, market, ver["by_sym"],
         n_buy=AR.FINAL_BUY, n_watch=AR.FINAL_WATCH,   # groups에 buy_now/watch가 없어 실질 무해
-        kr_n_buy=AR.KR_FINAL_BUY, kr_n_watch=AR.KR_FINAL_WATCH, need_market=False)
-    _save("kr", for_kst, ver, now, written=written, sells_written=sells_written)
+        kr_n_buy=AR.KR_FINAL_BUY, kr_n_watch=AR.KR_FINAL_WATCH,
+        need_market=not bool(ver.get("market_overview")))
+    _save("kr", for_kst, ver, now, written=written, sells_written=sells_written,
+          market_written=market_written)
 
 
 def run_us():
