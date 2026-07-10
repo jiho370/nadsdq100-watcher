@@ -118,3 +118,35 @@ git : To https://github.com/jiho370/nadsdq100-watcher.git
  
    efa8871..d9e5925  main -> main
 2026-07-09 22:05:18 [kr] === pregen ?꾨즺 ===
+2026-07-10 13:26:43 [us] === pregen ?쒖옉 ===
+git : error: cannot pull with rebase: You have unstaged changes.
+위치 C:\Users\JH\Documents\GitHub\nadsdq100-watcher\run_pregen.ps1:19 문자:1
++ git pull --rebase 2>&1 | Out-File -Append -Encoding utf8 $log
++ ~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (error: cannot p...staged changes.:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+error: Please commit or stash them.
+python : [정보] SPY 보유종목 503개 로드
+위치 C:\Users\JH\Documents\GitHub\nadsdq100-watcher\run_pregen.ps1:22 문자:1
++ python pregen.py --$Mode 2>&1 | Out-File -Append -Encoding utf8 $log
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: ([정보] SPY 보유종목 503개 로드:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+[섹터] 위키에서 503종목 GICS 섹터 확보 (Sub-Industry 503종목)
+[탐욕지수] 47 (중립)
+[프로필] 503종목 로드 (생성 2026-06-20)
+[PREGEN] 서술 사전생성 8종목
+[PREGEN] 저장: output/pregen_us.json (대상일 2026-07-10 · 종목 18 · 서술캐시 8건)
+[main f10579f] chore: pregen us [skip ci]
+ 1 file changed, 186 insertions(+), 80 deletions(-)
+git : To https://github.com/jiho370/nadsdq100-watcher.git
+위치 C:\Users\JH\Documents\GitHub\nadsdq100-watcher\run_pregen.ps1:33 문자:5
++     git push 2>&1 | Out-File -Append -Encoding utf8 $log
++     ~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (To https://gith...100-watcher.git:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+   84a7631..f10579f  main -> main
+2026-07-10 13:33:24 [us] === pregen ?꾨즺 ===

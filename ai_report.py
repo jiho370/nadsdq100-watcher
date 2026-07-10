@@ -367,10 +367,16 @@ def build_report(groups: dict, market: dict, pregen: dict | None = None) -> dict
     pregen = pregen.py 가 미리 만든 dict. by_sym 이 있으면 검증 단계 생략(검색 비용 0).
     written(종목별 서술)까지 있으면 서술 단계도 생략(캐시에 없는 심볼만 _auto_fields 무료 대체)
     → pregen 이 완전할 때(PC가 켜져 있던 날)는 발송 시점 AI 호출이 0회가 된다.
-    실패 시 {} 반환(호출부가 deterministic_report 폴백)."""
+    실패 시 {} 반환(호출부가 deterministic_report 폴백).
+
+    주의: _enabled()(CLI 바이너리·API 키 유무)만으로 조기 종료하면 안 된다 — pregen에 이미
+    written(사전서술)까지 있으면 이 함수는 AI를 한 번도 안 부르고 캐시만으로 완성된다. API 키를
+    뺀 상태에서도(로컬 CLI가 없어도) pregen 캐시가 있으면 정상 동작해야 하므로, pregen이 없을 때만
+    _enabled()를 확인한다."""
     attach_plans(groups)          # 계획은 AI 유무와 무관하게 항상 확정
-    if not _enabled():
-        _log("AI 비활성 → 폴백."); return {}
+    have_pregen = bool(pregen and pregen.get("by_sym"))
+    if not _enabled() and not have_pregen:
+        _log("AI 비활성 · pregen 도 없음 → 폴백."); return {}
     buy_pool, watch_pool = groups.get("buy_now") or [], groups.get("watch") or []
     kr_buy_pool, kr_watch_pool = groups.get("kr_buy") or [], groups.get("kr_watch") or []
     sells = (groups.get("sells") or []) + (groups.get("kr_sells") or [])
@@ -379,7 +385,7 @@ def build_report(groups: dict, market: dict, pregen: dict | None = None) -> dict
         return {}
     try:
         # ── 1단계: 검증. pregen 있으면 생략(밤/아침에 구독 CLI로 이미 검증됨 → $0)
-        if pregen and pregen.get("by_sym"):
+        if have_pregen:
             # pregen 은 by_sym(종목 검증) + night_notes(밤 시점 시황 배경) + (있으면)
             # written/market_written(사전서술)을 갖는다.
             ver = {"by_sym": pregen["by_sym"]}

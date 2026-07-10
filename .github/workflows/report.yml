@@ -14,7 +14,10 @@
 #   SMTP_USER          Gmail 주소
 #   SMTP_PASS          Gmail 앱 비밀번호
 #   EMAIL_TO           수신자(쉼표로 여러 명)
-#   ANTHROPIC_API_KEY  AI 해설용(없으면 지표 기반 해설로 자동 폴백 — 발송은 계속됨)
+#   ANTHROPIC_API_KEY  AI 해설용 — 2026-07-10 기준 미사용(아래 env에서 주석 처리, AI_ENABLED=0).
+#                      pregen(로컬 PC, 구독 CLI)이 있으면 그 캐시로, 없으면 지표 기반
+#                      해설(deterministic_report)로 자동 대체 — 발송은 계속됨. 나중에 API를
+#                      다시 쓰려면 아래 env 블록의 주석을 풀고 이 Secret에 키를 등록.
 #
 # 상태 영속화: 러너는 매번 초기화되므로 output/ 의 상태 json(보유목록·발송기록·KRX캐시)을
 #   실행 후 저장소에 commit-back 한다.
@@ -60,16 +63,17 @@ jobs:
 
       - name: Run report and send email
         env:
-          # ── AI 해설: 클라우드에선 API 백엔드(키 없으면 자동으로 지표 기반 폴백)
-          # 2단계 구조(비용 최소화): 검증=sonnet(웹검색 ≤4회, pregen.json 있으면 생략)
-          #                          서술=haiku(검색 없음, 토큰 대부분이 저가 모델)
-          AI_BACKEND: "api"
-          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
-          REPORT_MODEL_VERIFY: "claude-sonnet-5"
-          REPORT_MODEL_WRITE: "claude-haiku-4-5"
-          REPORT_WEB: "1"            # 웹검색으로 뉴스 보강(비용 아끼려면 "0")
-          REPORT_WEB_USES: "4"       # 검색이 최대 비용원 — 묶음 검색 4회로 제한
-          AI_TIMEOUT: "900"
+          # ── AI 해설: 2026-07-10부터 일단 비활성(API 없이 최대한 자동화 — pregen 캐시 +
+          #   deterministic_report만으로 발송). 다시 켜려면 AI_ENABLED 줄 지우고 아래 5줄
+          #   주석 해제 + Secrets에 ANTHROPIC_API_KEY 등록.
+          AI_ENABLED: "0"
+          # AI_BACKEND: "api"
+          # ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          # REPORT_MODEL_VERIFY: "claude-sonnet-5"
+          # REPORT_MODEL_WRITE: "claude-haiku-4-5"
+          # REPORT_WEB: "1"            # 웹검색으로 뉴스 보강(비용 아끼려면 "0")
+          # REPORT_WEB_USES: "4"       # 검색이 최대 비용원 — 묶음 검색 4회로 제한
+          # AI_TIMEOUT: "900"
           # ── 발송
           SMTP_USER: ${{ secrets.SMTP_USER }}
           SMTP_PASS: ${{ secrets.SMTP_PASS }}

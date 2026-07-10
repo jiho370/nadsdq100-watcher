@@ -35,8 +35,8 @@ WORLD_ASSETS = [
     ("IXIC",   "나스닥",   "^IXIC"),
     ("DJI",    "다우존스", "^DJI"),
     ("N225",   "닛케이",   "^N225"),
-    ("EUROPE", "유럽",     "VGK"),    # 유럽 주식시장 대표 ETF(Vanguard FTSE Europe)
-    ("GLOBAL", "글로벌",   "ACWI"),   # 전세계 주식시장 대표 ETF(iShares MSCI ACWI)
+    ("EUROPE", "유럽(VGK)",   "VGK"),    # 유럽 주식시장 대표 ETF(Vanguard FTSE Europe)
+    ("GLOBAL", "글로벌(ACWI)", "ACWI"),  # 전세계 주식시장 대표 ETF(iShares MSCI ACWI)
     ("BTCW",   "비트코인", "BTC-USD"),
     ("FX",     "환율",     "KRW=X"),
 ]
