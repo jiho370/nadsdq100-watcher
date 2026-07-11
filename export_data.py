@@ -38,8 +38,9 @@ def build_candidates(data, info, scored, max_candidates):
     """scored=[(sym,score,reason)] 상위 max_candidates 를 전 지표와 함께 직렬화."""
     ind_map, sector_map, hist = data["ind_map"], data["sector_map"], data["hist"]
     profiles = data.get("profiles") or {}
+    pool = scored[:max_candidates]
     out = []
-    for sym, score, reason in scored[:max_candidates]:
+    for rank, (sym, score, reason) in enumerate(pool, 1):
         ind = ind_map.get(sym, {}); meta = info.get(sym, {})
         out.append({
             "symbol": sym,
@@ -48,6 +49,7 @@ def build_candidates(data, info, scored, max_candidates):
             "industry": meta.get("industry", ""),
             "score": round(float(score), 2),
             "score_reason": reason,
+            "rank": rank, "pool_size": len(pool),
             "entry_label": R.entry_label(ind),
             "price": _round(ind.get("price")),
             "pe": _round(meta.get("pe")),

@@ -41,6 +41,7 @@ except Exception:
         try: return json.loads(t)
         except Exception: return None
 import entry_plan as EP
+import expectancy_report as EXR
 
 AI_BACKEND      = os.environ.get("AI_BACKEND", "cli").strip().lower()
 CLAUDE_BIN      = os.environ.get("CLAUDE_BIN", "claude")
@@ -354,7 +355,8 @@ def _mk_item(c, kind, vmap, wmap, dem=(), rest=()):
             "catalyst": (v.get("catalyst") or "").strip(),
             "comment": (w.get("comment") or "").strip(),
             "verdict_reason": (v.get("verdict_reason") or "").strip(),
-            "plan": c.get("plan") or {}, "hot": bool(c.get("hot"))}
+            "plan": c.get("plan") or {}, "hot": bool(c.get("hot")),
+            "rank": c.get("rank"), "pool_size": c.get("pool_size")}
     if kind == "watch":
         item["trigger"] = c.get("trigger") or ""
     if sym in dem:  item["ai_demoted"] = True
@@ -641,6 +643,10 @@ def _card(i, r, metrics_by_sym, kind, is_kr=False):
     pts = "".join(f'<li style="margin:1px 0">{_esc(p)}</li>' for p in r.get("points", []))
     pts_html = (f'<ul style="margin:6px 0 0;padding-left:16px;font-size:12px;color:#374151;'
                 f'line-height:1.55">{pts}</ul>') if pts else ""
+    # 분기 C-3(NEXT_STEPS_SONNET.md): 순위 사실은 항상 표시, 0~10 점수는
+    # score_calibration.load_calibration()이 None이면(G2 미통과) expectancy_report가 자동 숨김.
+    fact_html = EXR.rank_fact_html(r.get("rank"), r.get("pool_size")) + \
+        EXR.score_line_html(r.get("rank"), r.get("pool_size"))
     if kind == "buy":
         act = _plan_table(r.get("plan"), r.get("comment"))
     else:
@@ -672,7 +678,7 @@ def _card(i, r, metrics_by_sym, kind, is_kr=False):
         f'<div style="font-size:15px;font-weight:700">{header}</div>'
         f'<div style="margin:4px 0 2px">{cat_chip}{hot_chip}{ai_chip}{flag_chip}</div>'
         f'<div style="font-size:13px;color:#111;margin-top:4px;line-height:1.5">{_esc(r.get("summary"))}</div>'
-        f'{pts_html}{act}{vr_html}{news}{cata}</td>'
+        f'{fact_html}{pts_html}{act}{vr_html}{news}{cata}</td>'
         f'<td width="44%" valign="top" style="padding:12px 12px 12px 0">{chart}'
         f'<div style="margin-top:6px">{_metric_chips(m)}</div></td></tr></table>')
 
@@ -742,6 +748,8 @@ def render_report_html(report, as_of="", metrics_by_sym=None, market_html="", si
            if show_spy else "")
     banner_html = (f'<div style="background:#fffbeb;border:1px solid #fcd34d;border-radius:8px;padding:7px 11px;'
                    f'font-size:12px;color:#92400e;margin:8px 0">&#8505;&#65039; {_esc(banner)}</div>') if banner else ""
+    # 분기 C-3: 전략 레벨 기대값 박스(검증된 사실만, G1 실측치 기준) — 미국장 메일 · 주 1회만.
+    expectancy_html = EXR.expectancy_box_html() if not is_kr else ""
     market_sec = ""
     if market_html:
         market_sec = ('<h3 style="margin:14px 0 6px">&#127760; 전일 시장 요약 <span style="color:#9ca3af;font-size:12px">'
@@ -773,6 +781,7 @@ def render_report_html(report, as_of="", metrics_by_sym=None, market_html="", si
         f'max-width:700px;margin:0 auto;color:#111">'
         f'<h2 style="margin:6px 0">{head}{sub}</h2>'
         f'{banner_html}'
+        f'{expectancy_html}'
         f'<div style="background:#f8fafc;border-left:3px solid #6b7280;padding:8px 12px;font-size:13px;'
         f'line-height:1.6;margin:8px 0"><b>&#129517; 시장</b> {_esc(report.get("market_overview"))}<br>'
         f'<b>&#127760; 환율·한국·코인</b> {_esc(report.get("macro"))}</div>'
