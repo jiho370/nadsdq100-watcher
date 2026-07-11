@@ -27,9 +27,12 @@ backtest_costs.py — STRATEGY_UPGRADE_PROPOSAL.md 6장 로드맵 1~2단계.
       output/trial_returns.json         (조합별 이벤트 수익률 행렬 — overfit_stats.py 입력)
 """
 from __future__ import annotations
-import os, sys, json, csv, argparse, bisect
+import os, re, sys, json, csv, time, argparse, bisect, warnings
 import numpy as np
 import pandas as pd
+
+# 상수 컬럼 상관계산에서 나오는 무해한 divide 경고 억제(결과는 NaN 처리로 걸러짐)
+warnings.filterwarnings("ignore", message="invalid value encountered in divide")
 
 import backtest_weights as BW
 
@@ -37,6 +40,20 @@ PIT_CACHE = "output/sp500_pit.csv"
 PIT_API = "https://api.github.com/repos/fja05680/sp500/contents/"
 SEC_FEE = 0.0000278                                  # 매도금액 대비(2026년 기준 0.00278%)
 KR_SELL_TAX = {"kospi": 0.0020, "kosdaq": 0.0020}    # 손실이어도 부과
+
+# 티커 변경(동일 법인 존속·주식 연속) 매핑 — 야후는 새 티커 아래 과거 시세를 이어서 제공.
+# 피인수·합병으로 소멸한 종목(TWTR, CELG, SIVB 등)은 절대 매핑하지 않는다(남의 시세가 섞임).
+TICKER_ALIASES = {
+    "UTX": "RTX", "ANTM": "ELV", "BLL": "BALL", "MYL": "VTRS", "CTL": "LUMN",
+    "HFC": "DINO", "FBHS": "FBIN", "WLTW": "WTW", "TMK": "GL", "JEC": "J",
+    "HRS": "LHX", "ABC": "COR", "FLT": "CPAY", "ARNC": "HWM", "PKI": "RVTY",
+    "SYMC": "GEN", "KORS": "CPRI", "GPS": "GAP", "ADS": "BFH", "RE": "EG",
+    "WYND": "TNL", "BHGE": "BKR", "COG": "CTRA", "DISCA": "WBD",
+    "MMC": "MRSH",   # 2026-01 Marsh 리브랜딩(티커 변경, 동일 법인)
+}
+# fja 데이터셋의 'XXX-YYYYMM' 접미사 = 나중에 티커가 재사용된 과거 회사(예: JCI-201609).
+# 야후에 존재하지 않으므로 다운로드는 건너뛰되, 멤버십(커버리지 분모)에는 남긴다.
+_SUFFIXED = re.compile(r"-\d{6}$")
 
 
 def _log(m): print(m, file=sys.stderr)
@@ -66,7 +83,8 @@ class CostModel:
 
 # ------------------------- PIT 유니버스 -------------------------
 def _norm(t: str) -> str:
-    return t.strip().upper().replace(".", "-")
+    t = t.strip().upper().replace(".", "-")
+    return TICKER_ALIASES.get(t, t)
 
 
 def _download_pit(dest=PIT_CACHE):
@@ -123,16 +141,52 @@ def pit_union(pit, start_iso: str) -> list[str]:
 
 
 # ------------------------- 패널 구축 (PIT 합집합 유니버스) -------------------------
+def _purge_yf_cache():
+    """yfinance는 조회 실패 티커를 로컬 캐시(tkr-tz.db)에 저장해, 첫 실행에서
+    rate-limit로 실패한 멀쩡한 티커(예: MMC, CTRA)를 이후 실행에서 재조회 없이
+    '상장폐지'로 처리한다. 재시도 전에 캐시를 삭제해 재조회를 강제한다(자동 재생성됨)."""
+    import shutil
+    cands = []
+    try:
+        import appdirs
+        cands.append(os.path.join(appdirs.user_cache_dir(), "py-yfinance"))
+    except Exception:
+        pass
+    home = os.path.expanduser("~")
+    cands += [os.path.join(home, ".cache", "py-yfinance"),
+              os.path.join(os.environ.get("LOCALAPPDATA", ""), "py-yfinance")]
+    for d in dict.fromkeys(cands):
+        if d and os.path.isdir(d):
+            try:
+                shutil.rmtree(d)
+                _log(f"[PIT] yfinance 실패-캐시 삭제: {d}")
+            except Exception:
+                pass
+
+
 def build_panel_pit(years, pit):
     import sp500_daily_report as R
     R._require_yf()
     start = (pd.Timestamp.today() - pd.DateOffset(years=int(years))).date().isoformat()
     universe = pit_union(pit, start)
     bad = ("-W", "-WI", "-WS", "-U", "-RT", "-R", ".W", ".U")
-    universe = [s for s in universe if not any(s.endswith(x) for x in bad)]
-    _log(f"[PIT] 구간 내 편입 이력 합집합 {len(universe)}종목 시세 다운로드(상장폐지분은 실패함)…")
+    n_suf = sum(1 for s in universe if _SUFFIXED.search(s))
+    universe = [s for s in universe if not any(s.endswith(x) for x in bad)
+                and not _SUFFIXED.search(s)]
+    _log(f"[PIT] 구간 내 편입 이력 합집합 {len(universe)}종목 시세 다운로드 "
+         f"(재사용-접미사 티커 {n_suf}개 제외 — 야후에 없음)…")
     hist = R.download_histories(universe, period=f"{int(years)}y")
     panel = pd.DataFrame({s: c for s, c in hist.items() if c is not None and len(c)}).sort_index()
+    missing = [s for s in universe if s not in panel.columns]
+    if missing:                                    # 야후 대량요청 rate-limit 오탐 구제(1회 재시도)
+        _purge_yf_cache()                          # 실패가 로컬 캐시에 박제되는 것 방지
+        _log(f"[PIT] 실패 {len(missing)}종목 15초 후 재시도(rate-limit 오탐 구제)…")
+        time.sleep(15)
+        hist2 = R.download_histories(missing, period=f"{int(years)}y")
+        add = {s: c for s, c in (hist2 or {}).items() if c is not None and len(c)}
+        if add:
+            panel = pd.concat([panel, pd.DataFrame(add)], axis=1).sort_index()
+            _log(f"[PIT] 재시도로 {len(add)}종목 추가 확보: {sorted(add)}")
     spy = R.download_histories(["SPY"], period=f"{int(years)}y").get("SPY")
     opens = None
     try:
@@ -269,6 +323,9 @@ def run_scenario(fsnaps, cost, topn, keep, levels, oos_frac=0.0, fixed_weights=N
         oos = {"train": {k: best.get(k) for k in ("excess_6m", "excess_12m", "sharpe_6m")},
                "test": {k: o.get(k) for k in ("excess_6m", "excess_12m", "sharpe_6m")},
                "n_train": len(train), "n_test": len(test)}
+        # 비교표는 세 시나리오 모두 '전체 이벤트' 기준이어야 비교 가능(학습구간만 쓰면
+        # fixed_weights 열과 기간이 달라짐). IS/OOS 수치는 oos 딕셔너리로 따로 보고.
+        best = eval_config(best["weights"], fsnaps, allidx, cost, topn)
     return best, ic_sorted, oos, grid
 
 
@@ -301,6 +358,8 @@ def compare(snaps, pit, args, cost: CostModel):
     os.makedirs("output", exist_ok=True)
     with open("output/trial_returns.json", "w", encoding="utf-8") as f:
         json.dump({"horizon": "6m", "universe": "pit", "cost": cost.describe(),
+                   "rebal_days": args.rebal_days if hasattr(args, "rebal_days") else 63,
+                   "hold_days": BW.TD["6m"],      # overfit_stats의 embargo·T_eff 계산용
                    "dates": [pit_snaps[i]["date"] for i in range(n_ev)],
                    "trials": trials, "excess_returns": [m[:n_ev] for m in matrix]},
                   f, ensure_ascii=False)
@@ -317,7 +376,7 @@ def compare(snaps, pit, args, cost: CostModel):
             ("최악 12M %", lambda r: fmt(r, "worst_12m")),
             ("6M 순샤프", lambda r: fmt(r, "sharpe_6m")),
             ("회전율 %", lambda r: fmt(r, "turnover"))]
-    _log("\n=== 비교: 기존 방식 vs PIT+비용 (동일 패널·동일 이벤트) ===")
+    _log("\n=== 비교: 기존 방식 vs PIT+비용 (세 열 모두 전체 이벤트 기준 · IS/OOS는 아래 별도) ===")
     _log(f"  legacy 가중치     : {BW._wstr(legacy['weights'])}")
     _log(f"  pit 재탐색 가중치 : {BW._wstr(pit_best['weights'])}")
     hdr = f"{'':16s}{'legacy(기존)':>16s}{'pit(기존가중치)':>16s}{'pit(재탐색)':>16s}"

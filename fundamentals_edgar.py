@@ -61,6 +61,11 @@ CONCEPTS = {
     "inv_chg": [("us-gaap", "IncreaseDecreaseInInventories")],
     "ap_chg":  [("us-gaap", "IncreaseDecreaseInAccountsPayable"),
                 ("us-gaap", "IncreaseDecreaseInAccountsPayableTrade")],
+    # 무형자산 투자 — 무형조정 가치·수익성 팩터용 (Eisfeldt et al.; Berkin et al. 2024 JOI:
+    # R&D 전액 + SG&A 30%를 자본화, R&D 상각 15%/년). 캐시에 없으면 증분 수집됨.
+    "rnd":     [("us-gaap", "ResearchAndDevelopmentExpense")],
+    "sga":     [("us-gaap", "SellingGeneralAndAdministrativeExpense"),
+                ("us-gaap", "GeneralAndAdministrativeExpense")],
 }
 
 
@@ -178,7 +183,26 @@ def asof_pair(points: list, date_iso: str):
 FUND_FACTOR_NAMES = ["value", "sales_yield", "roe", "roa", "net_margin", "op_margin",
                      "gross_margin", "gp_assets", "fcf_yield", "ebitda_ev", "fcf_ev",
                      "leverage", "asset_growth", "rev_growth", "ni_growth", "div_yield",
-                     "accruals", "shareholder_yield", "cop"]
+                     "accruals", "shareholder_yield", "cop",
+                     # 2023~2024 문헌 기반 추가(SCORE_MODEL_DESIGN.md 참고):
+                     # droe=이익성장(JKP profit-growth 군집/q5 기대성장 대용),
+                     # debt_issuance=부채발행 억제(JKP debt-issuance 군집),
+                     # rd_mktcap=R&D 집약도, int_gp_assets·int_value=무형조정 수익성·가치
+                     "droe", "debt_issuance", "rd_mktcap", "int_gp_assets", "int_value"]
+
+
+def _intangible_capital(rec: dict, date_iso: str,
+                        rd_delta=0.15, sga_frac=0.30, sga_delta=0.20):
+    """공시된(filed<=t) 연간 R&D·SG&A 흐름을 영구재고법으로 자본화한 무형자본 K_int.
+    R&D 100%(상각 15%/년) + SG&A 30%(상각 20%/년) — Berkin-Dugar-Pozharny(2024) 방식."""
+    k = 0.0; seen = False
+    pts = [p for p in rec.get("rnd") or [] if p["filed"] <= date_iso]
+    for age, p in enumerate(reversed(pts)):
+        k += p["val"] * (1 - rd_delta) ** age; seen = True
+    pts = [p for p in rec.get("sga") or [] if p["filed"] <= date_iso]
+    for age, p in enumerate(reversed(pts)):
+        k += sga_frac * p["val"] * (1 - sga_delta) ** age; seen = True
+    return k if seen else None
 
 
 def factor_values(rec: dict, date_iso: str, price: float) -> dict:
@@ -244,6 +268,25 @@ def factor_values(rec: dict, date_iso: str, price: float) -> dict:
     if mktcap and (divs is not None or buyback is not None or issuance is not None):
         yield_cash = abs(divs or 0) + abs(buyback or 0) - (issuance or 0)
         out["shareholder_yield"] = yield_cash / mktcap
+    # --- 2023~2024 문헌 기반 추가 팩터 (SCORE_MODEL_DESIGN.md) ---
+    # 이익성장(ΔROE): JKP(2023) profit-growth 군집 / q5 기대성장 팩터의 실측 가능한 대용
+    eq_now, eq_prev = asof_pair(rec.get("equity"), date_iso)
+    if (ni_now is not None and eq_now not in (None, 0)
+            and ni_prev is not None and eq_prev not in (None, 0)):
+        out["droe"] = ni_now / eq_now - ni_prev / eq_prev
+    # 부채발행 억제: JKP(2023) debt-issuance 군집 — 순부채증가 적을수록 가점
+    debt_now, debt_prev = asof_pair(rec.get("debt"), date_iso)
+    if debt_now is not None and debt_prev is not None and assets not in (None, 0):
+        out["debt_issuance"] = -((debt_now - debt_prev) / assets)
+    # R&D 집약도 + 무형조정 수익성·가치 (R&D 자본화 문헌, Berkin et al. 2024)
+    rnd = g("rnd")
+    if rnd is not None and mktcap:
+        out["rd_mktcap"] = rnd / mktcap
+    if rnd is not None and gross is not None and assets not in (None, 0):
+        out["int_gp_assets"] = (gross + rnd) / assets   # R&D는 비용처리돼 이익을 깎으므로 가산
+    k_int = _intangible_capital(rec, date_iso)
+    if k_int is not None and eq is not None and mktcap:
+        out["int_value"] = (eq + k_int) / mktcap        # 무형조정 장부가/시총
     return out
 
 

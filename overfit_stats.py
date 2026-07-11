@@ -39,8 +39,10 @@ def _sharpe(x: np.ndarray) -> float:
 
 
 # ------------------------- PBO (CSCV) -------------------------
-def pbo_cscv(M: np.ndarray, n_blocks: int = 12):
-    """M: (N조합 × T이벤트). 반환: dict(pbo, n_combos, λ 요약, 성과저하, OOS손실확률)."""
+def pbo_cscv(M: np.ndarray, n_blocks: int = 12, embargo: int = 0):
+    """M: (N조합 × T이벤트). 반환: dict(pbo, n_combos, λ 요약, 성과저하, OOS손실확률).
+    embargo: 이벤트 수익률 구간이 겹칠 때(보유기간>리밸주기) IS 이벤트와 embargo 이내
+    거리의 OOS 이벤트를 제외(purging) — 중첩 누수로 PBO가 과소추정되는 것을 방지."""
     N, T = M.shape
     S = min(n_blocks, T if T % 2 == 0 else T - 1)
     S = max(S - (S % 2), 4)                       # 짝수, 최소 4
@@ -54,9 +56,16 @@ def pbo_cscv(M: np.ndarray, n_blocks: int = 12):
         return np.where(sd > 0, sub.mean(axis=1) / np.where(sd > 0, sd, 1.0), 0.0)
 
     lambdas, is_best_oos, pairs = [], [], []
+    n_purged = 0
     for combo in itertools.combinations(range(S), S // 2):
         is_idx = np.concatenate([edges[i] for i in combo])
         oos_idx = np.concatenate([edges[i] for i in range(S) if i not in combo])
+        if embargo > 0:                            # purging: IS와 구간이 겹치는 OOS 이벤트 제거
+            keep = np.array([np.abs(is_idx - e).min() > embargo for e in oos_idx])
+            n_purged += int((~keep).sum())
+            oos_idx = oos_idx[keep]
+            if len(oos_idx) < 4:
+                continue
         sr_is = _sharpe_all(is_idx)
         sr_oos = _sharpe_all(oos_idx)
         n_star = int(np.argmax(sr_is))
@@ -71,7 +80,10 @@ def pbo_cscv(M: np.ndarray, n_blocks: int = 12):
     slope = None                                   # IS 최고 조합의 IS→OOS 샤프 저하 기울기
     if a[:, 0].std() > 0:
         slope = float(np.polyfit(a[:, 0], a[:, 1], 1)[0])
+    if not lambdas:
+        raise RuntimeError("purging 후 남은 조합 없음 — embargo/블록 수를 줄이세요")
     return {"pbo": round(float((lam <= 0).mean()), 4),
+            "embargo": embargo, "purged_events_total": n_purged,
             "n_combos": len(lambdas), "n_blocks": S,
             "lambda_mean": round(float(lam.mean()), 4),
             "is_sharpe_mean": round(float(a[:, 0].mean()), 4),
@@ -81,9 +93,12 @@ def pbo_cscv(M: np.ndarray, n_blocks: int = 12):
 
 
 # ------------------------- DSR -------------------------
-def deflated_sharpe(best: np.ndarray, all_sharpes: np.ndarray):
-    """best: 채택 조합의 이벤트 수익률. all_sharpes: 전체 조합의 (비연율화) 샤프."""
+def deflated_sharpe(best: np.ndarray, all_sharpes: np.ndarray, t_eff: int | None = None):
+    """best: 채택 조합의 이벤트 수익률. all_sharpes: 전체 조합의 (비연율화) 샤프.
+    t_eff: 유효 표본 수 — 보유기간이 리밸주기보다 길어 이벤트가 중첩되면
+    독립 정보량은 T×(rebal/hold)뿐이다. 미지정 시 T(비보정, 관대함)."""
     T = len(best)
+    T_stat = int(t_eff) if t_eff else T
     sr = _sharpe(best)
     x = best - best.mean()
     sd = best.std(ddof=1)
@@ -98,25 +113,35 @@ def deflated_sharpe(best: np.ndarray, all_sharpes: np.ndarray):
     else:
         sr0 = 0.0
     denom = 1 - g3 * sr + (g4 - 1) / 4.0 * sr ** 2
-    if denom <= 0 or T < 3:
+    if denom <= 0 or T_stat < 3:
         return {"sr": round(sr, 4), "sr0": round(sr0, 4), "dsr": None,
-                "skew": round(g3, 3), "kurtosis": round(g4, 3), "T": T, "N": N,
-                "note": "분모≤0 또는 표본 부족 — DSR 계산 불가"}
-    z = (sr - sr0) * math.sqrt(T - 1) / math.sqrt(denom)
-    return {"sr": round(sr, 4), "sr0": round(sr0, 4), "dsr": round(ND.cdf(z), 4),
-            "skew": round(g3, 3), "kurtosis": round(g4, 3), "T": T, "N": N}
+                "skew": round(g3, 3), "kurtosis": round(g4, 3), "T": T, "T_eff": T_stat,
+                "N": N, "note": "분모≤0 또는 표본 부족 — DSR 계산 불가"}
+    z = (sr - sr0) * math.sqrt(T_stat - 1) / math.sqrt(denom)
+    z_raw = (sr - sr0) * math.sqrt(T - 1) / math.sqrt(denom)
+    return {"sr": round(sr, 4), "sr0": round(sr0, 4),
+            "dsr": round(ND.cdf(z), 4),                 # 판정용(T_eff 기준)
+            "dsr_uncorrected": round(ND.cdf(z_raw), 4),  # 참고용(중첩 미보정)
+            "skew": round(g3, 3), "kurtosis": round(g4, 3), "T": T, "T_eff": T_stat, "N": N}
 
 
 # ------------------------- 실행 -------------------------
 def analyze(data: dict, n_blocks=12, save=True):
     trials = data["trials"]
     M = np.array(data["excess_returns"], dtype=float)
+    # 중첩 보정: 보유기간 > 리밸주기면 인접 이벤트 수익률이 겹친다 (63d 리밸 × 126d 보유 = 50%)
+    rebal = int(data.get("rebal_days") or 63)
+    hold = int(data.get("hold_days") or 126)
+    overlap = max(math.ceil(hold / rebal) - 1, 0)        # embargo(이벤트 단위)
+    t_eff = max(int(round(M.shape[1] * min(rebal / hold, 1.0))), 3)
     _log(f"[입력] 조합 {M.shape[0]}개 × 이벤트 {M.shape[1]}회 "
          f"(horizon {data.get('horizon')} · {data.get('universe')} · {data.get('cost')})")
-    pbo = pbo_cscv(M, n_blocks)
+    _log(f"[중첩 보정] 리밸 {rebal}d × 보유 {hold}d → embargo {overlap}이벤트 · "
+         f"T_eff {t_eff} (미보정 T {M.shape[1]})")
+    pbo = pbo_cscv(M, n_blocks, embargo=overlap)
     all_sr = np.array([_sharpe(M[i]) for i in range(M.shape[0])])
     best_i = int(np.argmax(all_sr))
-    dsr = deflated_sharpe(M[best_i], all_sr)
+    dsr = deflated_sharpe(M[best_i], all_sr, t_eff=t_eff)
 
     pbo_verdict = ("낮음(과최적화 가능성 작음)" if pbo["pbo"] < 0.2 else
                    "중간(주의)" if pbo["pbo"] < 0.5 else
@@ -130,7 +155,8 @@ def analyze(data: dict, n_blocks=12, save=True):
          f"(저하 기울기 {pbo['degradation_slope']}) · OOS 손실확률 {pbo['prob_oos_loss']:.1%}")
     _log(f"\n=== DSR (최고샤프 조합: {trials[best_i]}) ===")
     _log(f"  SR {dsr['sr']} vs 운으로 기대되는 최대 SR₀ {dsr['sr0']} "
-         f"(시행 {dsr['N']}회 · 표본 {dsr['T']}) → DSR = {dsr.get('dsr')} → {dsr_verdict}")
+         f"(시행 {dsr['N']}회 · 표본 {dsr['T']} → 유효 {dsr.get('T_eff')}) "
+         f"→ DSR = {dsr.get('dsr')} (미보정 {dsr.get('dsr_uncorrected')}) → {dsr_verdict}")
 
     report = {"input": {k: data.get(k) for k in ("horizon", "universe", "cost")},
               "n_trials": M.shape[0], "n_events": M.shape[1],
@@ -166,6 +192,13 @@ def self_test():
             ps_.append(pbo_cscv(M)["pbo"])
             sr = np.array([_sharpe(M[i]) for i in range(N)])
             ds_.append(deflated_sharpe(M[int(np.argmax(sr))], sr).get("dsr") or 0.0)
+    # T_eff 보정·purging이 판정을 보수화하는지 확인
+    sr = np.array([_sharpe(signal[i]) for i in range(N)])
+    bi = int(np.argmax(sr))
+    d_full = deflated_sharpe(signal[bi], sr)["dsr"]
+    d_half = deflated_sharpe(signal[bi], sr, t_eff=T // 2)["dsr"]
+    assert d_half < d_full, f"T_eff 보정 후 DSR({d_half})이 미보정({d_full})보다 커짐"
+    assert pbo_cscv(signal, embargo=1)["purged_events_total"] > 0
     p_n, p_s, d_n, d_s = map(lambda v: float(np.mean(v)), (pn, ps, dn, ds))
     assert p_n > 0.3, f"노이즈 평균 PBO가 너무 낮음({p_n:.2f}) — 0.5 근처여야 정상"
     assert p_s < p_n, f"진짜 알파 PBO({p_s:.2f})가 노이즈({p_n:.2f})보다 낮아야 함"

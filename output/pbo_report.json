@@ -1,4 +1,41 @@
 {
-  "passed": false,
-  "note": "self-test 합성 데이터 출력물이었음 — PC에서 backtest_costs.py → overfit_stats.py 재실행 필요"
+  "input": {
+    "horizon": "6m",
+    "universe": "pit",
+    "cost": "us: 매수 5.0bp + 매도 5.28bp (왕복 10.28bp)"
+  },
+  "n_trials": 665,
+  "n_events": 32,
+  "pbo": {
+    "pbo": 0.1504,
+    "embargo": 1,
+    "purged_events_total": 5544,
+    "n_combos": 924,
+    "n_blocks": 12,
+    "lambda_mean": 1.7645,
+    "is_sharpe_mean": 1.2477,
+    "oos_sharpe_mean": 0.8487,
+    "degradation_slope": -0.8757,
+    "prob_oos_loss": 0.0141
+  },
+  "pbo_verdict": "낮음(과최적화 가능성 작음)",
+  "dsr": {
+    "sr": 1.1376,
+    "sr0": 0.6139,
+    "dsr": 0.9711,
+    "dsr_uncorrected": 0.9968,
+    "skew": 0.408,
+    "kurtosis": 2.875,
+    "T": 32,
+    "T_eff": 16,
+    "N": 665,
+    "best_trial": "int_gp_assets1·rd_mktcap2·shareholder_yield2"
+  },
+  "dsr_verdict": "95% 신뢰수준 통과",
+  "passed": true,
+  "references": [
+    "Bailey et al. 2017 (PBO/CSCV)",
+    "Bailey & López de Prado 2014 (DSR)"
+  ],
+  "note": "조합 간 상관으로 N이 과대계상될 수 있어 DSR은 보수적(실제보다 낮게) 추정됨."
 }

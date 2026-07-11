@@ -1,1 +1,216 @@
-{"note": "self-test 합성 데이터 출력물이었음 — PC에서 backtest_costs.py → overfit_stats.py 재실행 필요"}
+{
+  "as_of": "2026-07-12",
+  "events": {
+    "legacy": 32,
+    "pit": 32
+  },
+  "pit_coverage_pct": {
+    "mean": 87.5,
+    "min": 82.7
+  },
+  "cost_model": {
+    "legacy": "flat 10bp(기존 방식)",
+    "pit": "us: 매수 5.0bp + 매도 5.28bp (왕복 10.28bp)"
+  },
+  "legacy": {
+    "weights": {
+      "mom12_1": 0,
+      "int_gp_assets": 1,
+      "gp_assets": 0,
+      "rd_mktcap": 2,
+      "gross_margin": 0,
+      "shareholder_yield": 2
+    },
+    "turnover": 12.5,
+    "ret_1m_gross": 3.3,
+    "ret_1m": 3.2,
+    "excess_1m": 1.04,
+    "win_1m": 71.9,
+    "worst_1m": -8.6,
+    "sharpe_1m": 1.82,
+    "ret_3m_gross": 6.53,
+    "ret_3m": 6.43,
+    "excess_3m": 2.69,
+    "win_3m": 75.0,
+    "worst_3m": -13.5,
+    "sharpe_3m": 1.54,
+    "ret_6m_gross": 13.22,
+    "ret_6m": 13.12,
+    "excess_6m": 5.57,
+    "win_6m": 87.5,
+    "worst_6m": -20.1,
+    "sharpe_6m": 1.66,
+    "ret_12m_gross": 28.1,
+    "ret_12m": 28.0,
+    "excess_12m": 12.64,
+    "win_12m": 90.6,
+    "worst_12m": -10.4,
+    "sharpe_12m": 1.64
+  },
+  "pit_legacy_weights": {
+    "weights": {
+      "int_gp_assets": 1,
+      "rd_mktcap": 2,
+      "shareholder_yield": 2
+    },
+    "turnover": 12.7,
+    "ret_1m_gross": 3.26,
+    "ret_1m": 3.16,
+    "excess_1m": 1.0,
+    "win_1m": 71.9,
+    "worst_1m": -8.6,
+    "sharpe_1m": 1.74,
+    "ret_3m_gross": 6.48,
+    "ret_3m": 6.37,
+    "excess_3m": 2.64,
+    "win_3m": 75.0,
+    "worst_3m": -13.5,
+    "sharpe_3m": 1.51,
+    "ret_6m_gross": 13.09,
+    "ret_6m": 12.97,
+    "excess_6m": 5.42,
+    "win_6m": 87.5,
+    "worst_6m": -20.1,
+    "sharpe_6m": 1.63,
+    "ret_12m_gross": 27.99,
+    "ret_12m": 27.86,
+    "excess_12m": 12.5,
+    "win_12m": 90.6,
+    "worst_12m": -10.4,
+    "sharpe_12m": 1.64
+  },
+  "pit_best": {
+    "weights": {
+      "mom12_1": 0,
+      "int_gp_assets": 1,
+      "gp_assets": 0,
+      "gross_margin": 0,
+      "rd_mktcap": 2,
+      "shareholder_yield": 2
+    },
+    "turnover": 12.7,
+    "ret_1m_gross": 3.26,
+    "ret_1m": 3.16,
+    "excess_1m": 1.0,
+    "win_1m": 71.9,
+    "worst_1m": -8.6,
+    "sharpe_1m": 1.74,
+    "ret_3m_gross": 6.48,
+    "ret_3m": 6.37,
+    "excess_3m": 2.64,
+    "win_3m": 75.0,
+    "worst_3m": -13.5,
+    "sharpe_3m": 1.51,
+    "ret_6m_gross": 13.09,
+    "ret_6m": 12.97,
+    "excess_6m": 5.42,
+    "win_6m": 87.5,
+    "worst_6m": -20.1,
+    "sharpe_6m": 1.63,
+    "ret_12m_gross": 27.99,
+    "ret_12m": 27.86,
+    "excess_12m": 12.5,
+    "win_12m": 90.6,
+    "worst_12m": -10.4,
+    "sharpe_12m": 1.64
+  },
+  "ic": {
+    "legacy": {
+      "int_gp_assets": 0.1142,
+      "gp_assets": 0.0832,
+      "rd_mktcap": 0.0614,
+      "gross_margin": 0.0579,
+      "shareholder_yield": 0.0537,
+      "mom6": 0.0473,
+      "accruals": 0.0469,
+      "roa": 0.0416,
+      "op_margin": 0.038,
+      "cop": 0.0369,
+      "fcf_ev": 0.0354,
+      "fcf_yield": 0.0345,
+      "roe": 0.0339,
+      "div_yield": 0.0336,
+      "squeeze2060": 0.0246,
+      "asset_growth": 0.0153,
+      "net_margin": 0.015,
+      "ma_align": 0.0122,
+      "rev_growth": 0.0118,
+      "droe": 0.011,
+      "sales_yield": 0.0099,
+      "gc60_200": 0.0055,
+      "int_value": 0.0037,
+      "value": 0.0024,
+      "ebitda_ev": 0.0013,
+      "resid_mom": 0.0003,
+      "ni_growth": -0.0036,
+      "leverage": -0.0075,
+      "debt_issuance": -0.0075,
+      "mom12_1": -0.0209,
+      "overnight_mom": -0.0353
+    },
+    "pit": {
+      "int_gp_assets": 0.1112,
+      "gp_assets": 0.0824,
+      "gross_margin": 0.0618,
+      "rd_mktcap": 0.0586,
+      "shareholder_yield": 0.0556,
+      "accruals": 0.0453,
+      "roa": 0.0433,
+      "mom6": 0.043,
+      "cop": 0.042,
+      "div_yield": 0.0391,
+      "fcf_ev": 0.0388,
+      "fcf_yield": 0.0386,
+      "roe": 0.0355,
+      "op_margin": 0.0344,
+      "squeeze2060": 0.0215,
+      "asset_growth": 0.0192,
+      "net_margin": 0.0132,
+      "sales_yield": 0.0111,
+      "ma_align": 0.0101,
+      "rev_growth": 0.0094,
+      "droe": 0.0084,
+      "value": 0.0075,
+      "gc60_200": 0.0058,
+      "int_value": 0.0043,
+      "ebitda_ev": 0.002,
+      "resid_mom": -0.0004,
+      "debt_issuance": -0.0027,
+      "ni_growth": -0.0035,
+      "leverage": -0.0091,
+      "mom12_1": -0.0235,
+      "overnight_mom": -0.0391
+    }
+  },
+  "oos": {
+    "legacy": {
+      "train": {
+        "excess_6m": 6.92,
+        "excess_12m": 14.03,
+        "sharpe_6m": 2.49
+      },
+      "test": {
+        "excess_6m": 3.6,
+        "excess_12m": 10.61,
+        "sharpe_6m": 0.99
+      },
+      "n_train": 19,
+      "n_test": 13
+    },
+    "pit": {
+      "train": {
+        "excess_6m": 6.68,
+        "excess_12m": 13.81,
+        "sharpe_6m": 2.42
+      },
+      "test": {
+        "excess_6m": 3.58,
+        "excess_12m": 10.58,
+        "sharpe_6m": 0.99
+      },
+      "n_train": 19,
+      "n_test": 13
+    }
+  },
+  "note": "이벤트당 왕복비용 1회 반영(바스켓 h개월 보유 가정). PIT 커버리지 미달분(상장폐지 종목)은 잔존 생존편향으로 남음."
+}
