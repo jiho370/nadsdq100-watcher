@@ -4,35 +4,35 @@
     "universe": "pit",
     "cost": "us: 매수 5.0bp + 매도 5.28bp (왕복 10.28bp)"
   },
-  "n_trials": 6,
+  "n_trials": 21,
   "n_events": 32,
   "pbo": {
-    "pbo": 0.4032,
+    "pbo": 0.0161,
     "embargo": 3,
     "purged_events_total": 11872,
     "n_combos": 310,
     "n_blocks": 12,
-    "lambda_mean": 0.2734,
-    "is_sharpe_mean": 0.695,
-    "oos_sharpe_mean": 0.5982,
-    "degradation_slope": -0.6336,
-    "prob_oos_loss": 0.0871
+    "lambda_mean": 1.8927,
+    "is_sharpe_mean": 1.4587,
+    "oos_sharpe_mean": 1.4693,
+    "degradation_slope": -0.3106,
+    "prob_oos_loss": 0.0
   },
-  "pbo_verdict": "중간(주의)",
+  "pbo_verdict": "낮음(과최적화 가능성 작음)",
   "dsr": {
-    "sr": 0.5858,
-    "sr0": 0.1298,
-    "dsr": 0.9121,
-    "dsr_uncorrected": 0.9978,
-    "skew": 0.628,
-    "kurtosis": 2.897,
+    "sr": 1.3907,
+    "sr0": 0.5671,
+    "dsr": 0.9689,
+    "dsr_uncorrected": 1.0,
+    "skew": 0.886,
+    "kurtosis": 4.304,
     "T": 32,
     "T_eff": 8,
-    "N": 6,
-    "best_trial": "entry2_pullback2__exit1_trail20"
+    "N": 21,
+    "best_trial": "entry3_pullback3__exit_time6m"
   },
-  "dsr_verdict": "통과 실패(다중검정 감안 시 샤프가 유의하지 않음)",
-  "passed": false,
+  "dsr_verdict": "95% 신뢰수준 통과",
+  "passed": true,
   "references": [
     "Bailey et al. 2017 (PBO/CSCV)",
     "Bailey & López de Prado 2014 (DSR)"

@@ -1,0 +1,275 @@
+{
+  "as_of": "2025-04-04",
+  "market": "kr",
+  "topn": 10,
+  "n_events": 27,
+  "gate_definition": "52주고점 대비 -25% 이내(George-Hwang)만 — 200일선은 라이브 필터에 이미 포함",
+  "avg_gate_pass_pct": 100.0,
+  "avg_basket_overlap_pct": 96.7,
+  "result_6m": {
+    "base_excess_pct": 4.89,
+    "gate_excess_pct": 3.82,
+    "diff_pct": -1.06,
+    "n_events_raw": 27,
+    "n_eff": 14,
+    "t_stat": -0.74,
+    "p_value_approx": 0.4597,
+    "significant_at_5pct": false
+  },
+  "result_12m": {
+    "base_excess_pct": 6.69,
+    "gate_excess_pct": 4.93,
+    "diff_pct": -1.76,
+    "n_events_raw": 27,
+    "n_eff": 7,
+    "t_stat": -0.51,
+    "p_value_approx": 0.608,
+    "significant_at_5pct": false
+  },
+  "events": [
+    {
+      "date": "2017-07-24",
+      "gate_pass_pct": 100.0,
+      "basket_overlap_pct": 100.0,
+      "base_excess_6m": 0.0026953415903987477,
+      "gate_excess_6m": 0.0026953415903987477,
+      "base_excess_12m": -0.015133521443943906,
+      "gate_excess_12m": -0.015133521443943906
+    },
+    {
+      "date": "2018-11-05",
+      "gate_pass_pct": 100.0,
+      "basket_overlap_pct": 90.0,
+      "base_excess_6m": -0.004927423869711612,
+      "gate_excess_6m": 0.018110355619134665,
+      "base_excess_12m": -0.11544754342698013,
+      "gate_excess_12m": -0.075569037317527
+    },
+    {
+      "date": "2019-02-08",
+      "gate_pass_pct": 100.0,
+      "basket_overlap_pct": 100.0,
+      "base_excess_6m": 0.001639983425022834,
+      "gate_excess_6m": 0.001639983425022834,
+      "base_excess_12m": -0.12696796966059393,
+      "gate_excess_12m": -0.12696796966059393
+    },
+    {
+      "date": "2019-05-13",
+      "gate_pass_pct": 100.0,
+      "basket_overlap_pct": 100.0,
+      "base_excess_6m": -0.07890895456065442,
+      "gate_excess_6m": -0.07890895456065442,
+      "base_excess_12m": -0.13798451172385998,
+      "gate_excess_12m": -0.13798451172385998
+    },
+    {
+      "date": "2019-08-09",
+      "gate_pass_pct": 100.0,
+      "basket_overlap_pct": 90.0,
+      "base_excess_6m": -0.25458835548716124,
+      "gate_excess_6m": -0.23884503874957433,
+      "base_excess_12m": -0.34196699135673303,
+      "gate_excess_12m": -0.3290097417923077
+    },
+    {
+      "date": "2019-11-13",
+      "gate_pass_pct": 100.0,
+      "basket_overlap_pct": 100.0,
+      "base_excess_6m": 0.024249512063910295,
+      "gate_excess_6m": 0.024249512063910295,
+      "base_excess_12m": 0.012953227787273536,
+      "gate_excess_12m": 0.012953227787273536
+    },
+    {
+      "date": "2020-02-17",
+      "gate_pass_pct": 100.0,
+      "basket_overlap_pct": 100.0,
+      "base_excess_6m": 0.07524941263304422,
+      "gate_excess_6m": 0.07524941263304422,
+      "base_excess_12m": 0.18923933209680344,
+      "gate_excess_12m": 0.18923933209680344
+    },
+    {
+      "date": "2020-05-20",
+      "gate_pass_pct": 100.0,
+      "basket_overlap_pct": 100.0,
+      "base_excess_6m": 0.1290978395971622,
+      "gate_excess_6m": 0.1290978395971622,
+      "base_excess_12m": -0.0425425048422754,
+      "gate_excess_12m": -0.0425425048422754
+    },
+    {
+      "date": "2020-08-18",
+      "gate_pass_pct": 100.0,
+      "basket_overlap_pct": 100.0,
+      "base_excess_6m": -0.0995054880793701,
+      "gate_excess_6m": -0.0995054880793701,
+      "base_excess_12m": -0.13582579169452855,
+      "gate_excess_12m": -0.13582579169452855
+    },
+    {
+      "date": "2020-11-19",
+      "gate_pass_pct": 100.0,
+      "basket_overlap_pct": 100.0,
+      "base_excess_6m": -0.07724719752975567,
+      "gate_excess_6m": -0.07724719752975567,
+      "base_excess_12m": 0.02402288091968771,
+      "gate_excess_12m": 0.02402288091968771
+    },
+    {
+      "date": "2021-02-23",
+      "gate_pass_pct": 100.0,
+      "basket_overlap_pct": 90.0,
+      "base_excess_6m": -0.032019977199235904,
+      "gate_excess_6m": -0.11344185852952365,
+      "base_excess_12m": 0.03389403723101228,
+      "gate_excess_12m": -0.040807919466689435
+    },
+    {
+      "date": "2021-05-26",
+      "gate_pass_pct": 100.0,
+      "basket_overlap_pct": 100.0,
+      "base_excess_6m": -0.0345665331670407,
+      "gate_excess_6m": -0.0345665331670407,
+      "base_excess_12m": 0.1093766017564678,
+      "gate_excess_12m": 0.1093766017564678
+    },
+    {
+      "date": "2021-08-24",
+      "gate_pass_pct": 100.0,
+      "basket_overlap_pct": 100.0,
+      "base_excess_6m": 0.10415161069947489,
+      "gate_excess_6m": 0.10415161069947489,
+      "base_excess_12m": 0.1719011208052415,
+      "gate_excess_12m": 0.1719011208052415
+    },
+    {
+      "date": "2021-11-26",
+      "gate_pass_pct": 100.0,
+      "basket_overlap_pct": 90.0,
+      "base_excess_6m": 0.13637361253217317,
+      "gate_excess_6m": 0.1429395036488811,
+      "base_excess_12m": 0.09340892132362846,
+      "gate_excess_12m": 0.1188987714258153
+    },
+    {
+      "date": "2022-03-03",
+      "gate_pass_pct": 100.0,
+      "basket_overlap_pct": 90.0,
+      "base_excess_6m": 0.09508409506059669,
+      "gate_excess_6m": 0.12082681826960615,
+      "base_excess_12m": 0.16392227965290893,
+      "gate_excess_12m": 0.153935252563692
+    },
+    {
+      "date": "2022-06-07",
+      "gate_pass_pct": 100.0,
+      "basket_overlap_pct": 100.0,
+      "base_excess_6m": -0.0007982231337130274,
+      "gate_excess_6m": -0.0007982231337130274,
+      "base_excess_12m": -0.017389429117704257,
+      "gate_excess_12m": -0.017389429117704257
+    },
+    {
+      "date": "2022-09-05",
+      "gate_pass_pct": 100.0,
+      "basket_overlap_pct": 100.0,
+      "base_excess_6m": -0.08417065616063565,
+      "gate_excess_6m": -0.08417065616063565,
+      "base_excess_12m": -0.14171882973543518,
+      "gate_excess_12m": -0.14171882973543518
+    },
+    {
+      "date": "2022-12-07",
+      "gate_pass_pct": 100.0,
+      "basket_overlap_pct": 100.0,
+      "base_excess_6m": -0.07338215717278959,
+      "gate_excess_6m": -0.07338215717278959,
+      "base_excess_12m": 0.03375353045431137,
+      "gate_excess_12m": 0.03375353045431137
+    },
+    {
+      "date": "2023-03-10",
+      "gate_pass_pct": 100.0,
+      "basket_overlap_pct": 100.0,
+      "base_excess_6m": -0.039548740910303436,
+      "gate_excess_6m": -0.039548740910303436,
+      "base_excess_12m": 0.053671513443662416,
+      "gate_excess_12m": 0.053671513443662416
+    },
+    {
+      "date": "2023-06-13",
+      "gate_pass_pct": 100.0,
+      "basket_overlap_pct": 100.0,
+      "base_excess_6m": 0.009913635405402377,
+      "gate_excess_6m": 0.009913635405402377,
+      "base_excess_12m": 0.21892966574002465,
+      "gate_excess_12m": 0.21892966574002465
+    },
+    {
+      "date": "2023-09-11",
+      "gate_pass_pct": 100.0,
+      "basket_overlap_pct": 100.0,
+      "base_excess_6m": 0.05037312936879301,
+      "gate_excess_6m": 0.05037312936879301,
+      "base_excess_12m": 0.1796895382415659,
+      "gate_excess_12m": 0.1796895382415659
+    },
+    {
+      "date": "2023-12-14",
+      "gate_pass_pct": 100.0,
+      "basket_overlap_pct": 90.0,
+      "base_excess_6m": 0.29400995838150407,
+      "gate_excess_6m": 0.32444690106818475,
+      "base_excess_12m": 0.45553848392671836,
+      "gate_excess_12m": 0.531068484996286
+    },
+    {
+      "date": "2024-03-20",
+      "gate_pass_pct": 100.0,
+      "basket_overlap_pct": 100.0,
+      "base_excess_6m": 0.23629306527885802,
+      "gate_excess_6m": 0.23629306527885802,
+      "base_excess_12m": 0.3086460495177739,
+      "gate_excess_12m": 0.3086460495177739
+    },
+    {
+      "date": "2024-06-24",
+      "gate_pass_pct": 100.0,
+      "basket_overlap_pct": 100.0,
+      "base_excess_6m": 0.17510010904905002,
+      "gate_excess_6m": 0.17510010904905002,
+      "base_excess_12m": 0.6395910304980772,
+      "gate_excess_12m": 0.6395910304980772
+    },
+    {
+      "date": "2024-09-25",
+      "gate_pass_pct": 100.0,
+      "basket_overlap_pct": 90.0,
+      "base_excess_6m": 0.3811388026248585,
+      "gate_excess_6m": 0.3327320634865233,
+      "base_excess_12m": 0.39950735878133203,
+      "gate_excess_12m": 0.30156835609507393
+    },
+    {
+      "date": "2024-12-27",
+      "gate_pass_pct": 100.0,
+      "basket_overlap_pct": 80.0,
+      "base_excess_6m": 0.4712499865861366,
+      "gate_excess_6m": 0.21225515810458329,
+      "base_excess_12m": 0.3225436407700406,
+      "gate_excess_12m": -0.12434061415004871
+    },
+    {
+      "date": "2025-04-04",
+      "gate_pass_pct": 100.0,
+      "basket_overlap_pct": 100.0,
+      "base_excess_6m": -0.08744917365871663,
+      "gate_excess_6m": -0.08744917365871663,
+      "base_excess_12m": -0.5281668074696839,
+      "gate_excess_12m": -0.5281668074696839
+    }
+  ],
+  "note": "국장 라이브 랭킹(mom0.6+hi52 0.4) 고정, hi52 게이트만 on/off한 paired A/B"
+}

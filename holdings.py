@@ -16,8 +16,12 @@ from __future__ import annotations
 import os, json
 
 STATE = os.environ.get("HOLDINGS_FILE", "output/ai_holdings.json")
-TRAIL = float(os.environ.get("SELL_TRAIL", "0.20"))       # 고점 대비 -20% (STRATEGY.md §2 — 연구 최적 15~20%)
+# 2026-07 재검증(backtest_exec.py 21조합·PBO 1.6%·DSR 0.97 통과): 트레일링 -20%가 트레이드의
+# 88%를 중도 손절시키며 순수익을 절반으로 깎는 것으로 확인(+7.7% vs 고정6개월 +14.9%,
+# 200일선only +9.4%) → 기본 비활성(0). 되살리려면 SELL_TRAIL=0.20.
+TRAIL = float(os.environ.get("SELL_TRAIL", "0"))
 MA_BUFFER = float(os.environ.get("SELL_MA_BUFFER", "0.03"))  # 200일선 -3% 아래로 확실히 이탈
+REEVAL_DAYS = int(os.environ.get("SELL_REEVAL_DAYS", "180"))  # ≈6개월(달력일) — 검증된 보유기간
 
 
 def load(path=STATE) -> dict:
@@ -38,8 +42,11 @@ def _isnan(x):
     return x is None or (isinstance(x, float) and x != x)
 
 
-def update(state: dict, buy_now_syms: list, ind_map: dict, today: str):
-    """보유 갱신 + 매도 시그널 산출. 반환: sells[list].  state 는 제자리 수정."""
+def update(state: dict, buy_now_syms: list, ind_map: dict, today: str, pool_syms=None):
+    """보유 갱신 + 매도 시그널 산출. 반환: sells[list].  state 는 제자리 수정.
+    매도 규칙(2026-07 재검증 반영): ①200일선 -3% 이탈(폭락 방어 백업) ②보유 ≈6개월 경과 후
+    현재 후보풀(pool_syms) 밖이면 정기 재평가 매도 ③트레일링은 SELL_TRAIL>0일 때만."""
+    import datetime as _dt
     holdings = state.setdefault("holdings", {})
     sells = []
     for sym in list(holdings):
@@ -50,11 +57,20 @@ def update(state: dict, buy_now_syms: list, ind_map: dict, today: str):
         h = holdings[sym]
         h["peak"] = max(h.get("peak") or price, price)
         reason = None
+        held_days = None
+        try:
+            held_days = (_dt.date.fromisoformat(today) - _dt.date.fromisoformat(h.get("since"))).days
+        except Exception:
+            pass
         if not _isnan(ma200) and price < ma200 * (1 - MA_BUFFER):
             reason = f"200일선 이탈 (종가 {price:,.0f} < 200일선 {ma200:,.0f})"
-        elif h.get("peak") and price <= h["peak"] * (1 - TRAIL):
+        elif TRAIL > 0 and h.get("peak") and price <= h["peak"] * (1 - TRAIL):
             drop = (price / h["peak"] - 1) * 100
             reason = f"고점 대비 {drop:.0f}% 하락 (트레일링 -{int(TRAIL*100)}%)"
+        elif (pool_syms is not None and held_days is not None and held_days >= REEVAL_DAYS
+              and sym not in pool_syms):
+            reason = (f"6개월 정기 재평가 — 보유 {held_days}일 경과, 현재 팩터 후보풀 밖 "
+                      f"(검증된 보유기간 종료 후 순환매)")
         if reason:
             ret = ((price / h["entry_price"] - 1) * 100) if h.get("entry_price") else None
             sells.append({"symbol": sym, "reason": reason, "since": h.get("since"),
