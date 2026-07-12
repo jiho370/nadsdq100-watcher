@@ -290,16 +290,12 @@ def split_by_entry(candidates: list, k: int = 5):
 
     for c in candidates:
         c["hot"] = hot(c)
-    now = [c for c in candidates if entry_ok(c) and not pulling_back(c)]   # 상승 지속(과열 포함)
-    back_ok = [c for c in candidates if entry_ok(c) and pulling_back(c)]   # 필터 통과·조정 중(눌림목)
-    rejected = [c for c in candidates if not entry_ok(c)]                  # 진입 필터 미달 → 관찰만 가능
-    buy = now[:k]
-    if len(buy) < k:   # 부족분은 '필터 통과' 눌림목으로만 보충 — 200일선 아래 종목은 절대 매수에 못 오름
-        buy += [c for c in back_ok if c not in buy][:k - len(buy)]
-    watch = [c for c in back_ok + rejected if c not in buy][:k]
-    if len(watch) < k:
-        watch += [c for c in now if c not in buy and c not in watch][:k - len(watch)]
-    return buy[:k], watch[:k]
+    # 2026-07 재검증(backtest_entry_gate.py): entry_ok(200일선·52주고점)·조정중 분류를 포함한
+    # 기술 게이트 후보 6종 전부가 검증된 팩터 바스켓의 성과를 깎는 것으로 확인
+    # (현행 게이트 6M -3.85%p t=-2.1 유의, 스윕 6종 전부 diff<0) → 게이트 폐지.
+    # 매수 = 팩터 순위 상위 k, 관찰 = 다음 k. hot(과열)은 분할매수 계획 표기용으로만 유지.
+    # entry_ok/pulling_back은 정보 표시용으로 남긴다(카드에 근거 표기 가능).
+    return candidates[:k], candidates[k:2 * k]
 
 
 def select_pool(data: dict, n: int):

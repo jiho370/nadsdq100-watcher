@@ -1,0 +1,125 @@
+{
+  "as_of": "2024-03-19",
+  "weights_used": {
+    "mom6": 1
+  },
+  "topn": 5,
+  "rebal_days": 63,
+  "n_events": 10,
+  "gate_definition": "종가>200일선 & 52주고점 대비 -25% 이내",
+  "avg_gate_pass_pct": 100.0,
+  "avg_basket_overlap_pct": 100.0,
+  "result_6m": {
+    "base_excess_pct": 78.83,
+    "gate_excess_pct": 78.83,
+    "diff_pct": 0.0,
+    "n_events_raw": 10,
+    "n_eff": 5,
+    "t_stat": 0.0,
+    "p_value_approx": 1.0,
+    "significant_at_5pct": false
+  },
+  "result_12m": {
+    "base_excess_pct": 230.86,
+    "gate_excess_pct": 230.86,
+    "diff_pct": 0.0,
+    "n_events_raw": 10,
+    "n_eff": 3,
+    "t_stat": 0.0,
+    "p_value_approx": 1.0,
+    "significant_at_5pct": false
+  },
+  "events": [
+    {
+      "date": "2020-12-18",
+      "gate_pass_pct": 100.0,
+      "basket_overlap_pct": 100.0,
+      "base_excess_6m": 0.7883460051325938,
+      "gate_excess_6m": 0.7883460051325938,
+      "base_excess_12m": 2.30860684720759,
+      "gate_excess_12m": 2.30860684720759
+    },
+    {
+      "date": "2021-03-17",
+      "gate_pass_pct": 100.0,
+      "basket_overlap_pct": 100.0,
+      "base_excess_6m": 0.7883460051325981,
+      "gate_excess_6m": 0.7883460051325981,
+      "base_excess_12m": 2.308606847207618,
+      "gate_excess_12m": 2.308606847207618
+    },
+    {
+      "date": "2021-06-14",
+      "gate_pass_pct": 100.0,
+      "basket_overlap_pct": 100.0,
+      "base_excess_6m": 0.7883460051326132,
+      "gate_excess_6m": 0.7883460051326132,
+      "base_excess_12m": 2.3086068472076455,
+      "gate_excess_12m": 2.3086068472076455
+    },
+    {
+      "date": "2021-09-09",
+      "gate_pass_pct": 100.0,
+      "basket_overlap_pct": 100.0,
+      "base_excess_6m": 0.7883460051326242,
+      "gate_excess_6m": 0.7883460051326242,
+      "base_excess_12m": 2.3086068472076646,
+      "gate_excess_12m": 2.3086068472076646
+    },
+    {
+      "date": "2021-12-07",
+      "gate_pass_pct": 100.0,
+      "basket_overlap_pct": 100.0,
+      "base_excess_6m": 0.7883460051326244,
+      "gate_excess_6m": 0.7883460051326244,
+      "base_excess_12m": 2.308606847207665,
+      "gate_excess_12m": 2.308606847207665
+    },
+    {
+      "date": "2022-03-04",
+      "gate_pass_pct": 100.0,
+      "basket_overlap_pct": 100.0,
+      "base_excess_6m": 0.788346005132624,
+      "gate_excess_6m": 0.788346005132624,
+      "base_excess_12m": 2.3086068472076526,
+      "gate_excess_12m": 2.3086068472076526
+    },
+    {
+      "date": "2022-06-01",
+      "gate_pass_pct": 100.0,
+      "basket_overlap_pct": 100.0,
+      "base_excess_6m": 0.788346005132624,
+      "gate_excess_6m": 0.788346005132624,
+      "base_excess_12m": 2.3086068472076233,
+      "gate_excess_12m": 2.3086068472076233
+    },
+    {
+      "date": "2022-08-29",
+      "gate_pass_pct": 100.0,
+      "basket_overlap_pct": 100.0,
+      "base_excess_6m": 0.7883460051326182,
+      "gate_excess_6m": 0.7883460051326182,
+      "base_excess_12m": 2.308606847207585,
+      "gate_excess_12m": 2.308606847207585
+    },
+    {
+      "date": "2022-11-24",
+      "gate_pass_pct": 100.0,
+      "basket_overlap_pct": 100.0,
+      "base_excess_6m": 0.7883460051326021,
+      "gate_excess_6m": 0.7883460051326021,
+      "base_excess_12m": 2.308606847207548,
+      "gate_excess_12m": 2.308606847207548
+    },
+    {
+      "date": "2023-02-21",
+      "gate_pass_pct": 100.0,
+      "basket_overlap_pct": 100.0,
+      "base_excess_6m": 0.7883460051325875,
+      "gate_excess_6m": 0.7883460051325875,
+      "base_excess_12m": 2.308606847207525,
+      "gate_excess_12m": 2.308606847207525
+    }
+  ],
+  "note": "baseline=현재 검증된 퀄리티 바스켓(게이트 없음) vs gate=동일 바스켓에 라이브의 매수/관찰 분류 필터(200일선·52주고점) 적용. 단일 규칙의 A/B 검증이라 PBO(다중검정 과최적화 검사)는 해당 없음 — 리밸·보유 중첩만 T_eff로 보정한 paired t-test로 판정."
+}

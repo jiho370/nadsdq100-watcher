@@ -203,7 +203,8 @@ def run_kr(no_email: bool = False, force: bool = False):
     _attach_headlines(kr_cands, suffix=".KS")
 
     # 시황 컨텍스트: 신호(국장 표시분=코스피/코스닥/금만)+세계(밤사이 미국 마감 포함 — 코드 계산이라 비용 0)
-    market = {"as_of": kr.get("as_of")}
+    is_monday = _dt.datetime.now(R.KST).weekday() == 0
+    market = {"as_of": kr.get("as_of"), "weekly_recap": is_monday}
     if signals:
         market["signals"] = MS.lean_for_ai(signals, when="kr")
         market["world"] = [{k: (round(v, 2) if isinstance(v, float) else v)
@@ -239,13 +240,14 @@ def run_kr(no_email: bool = False, force: bool = False):
     sig_images, sig_cids = _signal_images(signals, when="kr")
     images += sig_images
 
-    # 전일 시장 요약(나스닥·다우존스·닛케이·유럽·글로벌·비트코인·환율)은 국장 메일에만 붙는다
-    # — 밤사이 미국장 등 요약이 필요한 건 이쪽뿐이고, 추세신호(코스피/코스닥/금)와도 안 겹친다.
-    market_html = MS.world_table_html(signals) if signals else ""
+    # 전일(월요일엔 전주) 시장 요약(나스닥·다우존스·닛케이·유럽·글로벌·비트코인·환율)은 국장 메일에만
+    # 붙는다 — 밤사이 미국장 등 요약이 필요한 건 이쪽뿐이고, 추세신호(코스피/코스닥/금)와도 안 겹친다.
+    market_html = MS.world_table_html(signals, weekly=is_monday) if signals else ""
     signals_html = MS.signal_cards_html(signals, sig_cids, when="kr") if signals else ""
     html = AR.render_report_html(report, kr.get("as_of") or "", metrics,
                                  market_html=market_html, signals_html=signals_html,
                                  banner=banner, show_spy=False, is_kr=True,
+                                 market_label=("전주" if is_monday else "전일"),
                                  title="🇰🇷 장전 시장 점검 · 코스피200 추천")
     _preview_and_send(html, images, f"[장전] {today_kst} 한국 시장 점검 · 종목추천",
                       "kr_report.html", no_email,
@@ -280,7 +282,9 @@ def run_us(no_email: bool = False, force: bool = False):
 
     import holdings as H
     hstate = H.load()
-    sells = H.update(hstate, [], data["ind_map"], as_of)
+    # pool_syms = 오늘 팩터 후보풀(60) — 6개월 경과 보유종목이 풀 밖이면 정기 재평가 매도(2026-07 재검증)
+    sells = H.update(hstate, [], data["ind_map"], as_of,
+                     pool_syms={s for s, _, _ in scored})
     if sells:
         sinfo = R.get_info_for([s["symbol"] for s in sells])
         for s in sells:

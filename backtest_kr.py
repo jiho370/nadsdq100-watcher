@@ -422,33 +422,21 @@ def self_test():
     _log("[self-test] 통과: 스냅샷 · live 필터 · 펀더멘탈/수급 IC 탐지 · exclude_top · 기간분리 OK")
 
 
-def main():
-    ap = argparse.ArgumentParser(description="한국(코스피200) 팩터 백테스트 — 미국과 동일 규율")
-    ap.add_argument("--years", type=int, default=10)
-    ap.add_argument("--topn", type=int, default=10)
-    ap.add_argument("--rebal-days", type=int, default=63)
-    ap.add_argument("--oos", type=float, default=0.4)
-    ap.add_argument("--commission-bps", type=float, default=1.5)
-    ap.add_argument("--slippage-bps", type=float, default=5.0)
-    ap.add_argument("--exclude-top", type=int, default=0,
-                    help="각 시점 시총 상위 N종목 제외(초대형주·반도체 쏠림 진단)")
-    ap.add_argument("--self-test", action="store_true")
-    args = ap.parse_args()
-    if args.self_test:
-        self_test(); return
-
+def prepare_kr_data(years: int, rebal_days: int):
+    """실데이터 준비(다른 스크립트도 재사용 — backtest_exec/entry_gate의 KR 모드).
+    반환: (panel, membership, fundamentals, flows, mktcaps, bench)"""
     from kr_factor_ic import build_kr_panel, kospi200_members
     cache = _load_cache()
     cur = kospi200_members(pd.Timestamp.today().strftime("%Y%m%d")) or \
         kospi200_members((pd.Timestamp.today() - pd.Timedelta(days=3)).strftime("%Y%m%d"))
     if not cur:
-        _log("코스피200 구성종목 조회 실패 — 네트워크 확인"); sys.exit(1)
+        raise RuntimeError("코스피200 구성종목 조회 실패 — 네트워크 확인")
 
     # 리밸 날짜 격자 확정을 위해 임시로 현재 구성 시세부터 받고, PIT 멤버십 합집합으로 보강
     _log(f"코스피200 현재 구성 {len(cur)}종목 — 시세 다운로드(yfinance .KS)…")
-    panel = build_kr_panel(cur, args.years)
+    panel = build_kr_panel(cur, years)
     n = len(panel)
-    ps = list(range(LOOKBACK, n - max(BW.TD.values()) - 1, args.rebal_days))
+    ps = list(range(LOOKBACK, n - max(BW.TD.values()) - 1, rebal_days))
     rebal_dates = [panel.index[p].strftime("%Y%m%d") for p in ps]
     _log(f"리밸 시점 {len(rebal_dates)}개 — PIT 멤버십·펀더멘탈 수집(pykrx, 캐시)…")
     membership = fetch_membership(rebal_dates, cache)
@@ -460,13 +448,13 @@ def main():
     extra = sorted(union - set(panel.columns))
     if extra:
         _log(f"과거 편입 이력 {len(extra)}종목 시세 보강…")
-        panel2 = build_kr_panel(extra, args.years)
+        panel2 = build_kr_panel(extra, years)
         panel = pd.concat([panel, panel2], axis=1).sort_index()
         cov = 100 * len(panel.columns) / len(union)
         _log(f"시세 확보 {len(panel.columns)}/{len(union)}종목 (커버리지 {cov:.1f}%)")
         # concat으로 패널 거래일 인덱스가 바뀌면 리밸 날짜도 바뀐다 → 최종 패널 기준 재계산·재수집
         n = len(panel)
-        ps = list(range(LOOKBACK, n - max(BW.TD.values()) - 1, args.rebal_days))
+        ps = list(range(LOOKBACK, n - max(BW.TD.values()) - 1, rebal_days))
         rebal_dates = [panel.index[p].strftime("%Y%m%d") for p in ps]
         _log(f"최종 패널 기준 리밸 시점 {len(rebal_dates)}개 — 멤버십·펀더멘탈 보강 수집…")
         membership = fetch_membership(rebal_dates, cache)
@@ -477,6 +465,79 @@ def main():
     mktcaps = fetch_mktcap(rebal_dates, cache)
     bench = fetch_bench(panel.index[0].strftime("%Y%m%d"),
                         panel.index[-1].strftime("%Y%m%d"), cache)
+    return panel, membership, fundamentals, flows, mktcaps, bench
+
+
+def run_sr_ic(panel, membership, rebal_days=63, hold="6m"):
+    """S/R 신호 7종(backtest_exec.SR_CANDIDATES)의 국장 횡단면 IC — 스냅샷 단위,
+    중첩 보정 t. 결과: output/kr_sr_ic.json (미장은 score_calibration --candidates sr 담당)."""
+    import backtest_exec as BE
+    from statistics import NormalDist
+    hd = BW.TD[hold]
+    _log(f"S/R 신호 패널 계산({panel.shape[1]}종목 — 수 분 소요)…")
+    sig = BE.sr_signal_panels(panel)
+    n = len(panel)
+    ics = {f: [] for f in BE.SR_CANDIDATES}
+    n_ev = 0
+    for p in range(LOOKBACK, n - hd - 1, rebal_days):
+        d8 = panel.index[p].strftime("%Y%m%d")
+        members = membership.get(d8) or membership.get("_current") or []
+        idx = [s for s in panel.columns.intersection(members)
+               if pd.notna(panel.iloc[p][s]) and pd.notna(panel.iloc[p + hd][s])]
+        if len(idx) < 20:
+            continue
+        fwd_rank = (panel.iloc[p + 1 + hd][idx] / panel.iloc[p + 1][idx] - 1).rank()
+        for f in BE.SR_CANDIDATES:
+            v = sig[f].iloc[p][idx]
+            if v.notna().sum() >= 15:
+                r = v.rank().corr(fwd_rank)
+                if pd.notna(r):
+                    ics[f].append(float(r))
+        n_ev += 1
+    n_eff = max(int(round(n_ev * min(rebal_days / hd, 1.0))), 3)
+    rows = []
+    for f, arr in ics.items():
+        if len(arr) < 4:
+            continue
+        a = np.array(arr)
+        t = float(a.mean() / (a.std(ddof=1) / np.sqrt(n_eff))) if a.std(ddof=1) > 0 else 0.0
+        p_val = 2 * (1 - NormalDist().cdf(abs(t)))
+        rows.append({"factor": f, "ic_mean": round(float(a.mean()), 4),
+                     "t_stat_eff": round(t, 2), "p_value": round(p_val, 4),
+                     "n_snapshots": len(arr), "n_eff": n_eff})
+    rows.sort(key=lambda r: r["ic_mean"], reverse=True)
+    payload = {"as_of": panel.index[-1].date().isoformat(), "horizon": hold,
+               "universe": "KOSPI200(PIT)", "rows": rows,
+               "note": "S/R 신호 국장 횡단면 IC — 채택 기준은 미장과 동일(스냅샷 t≥2, 다중검정 예산 기록)"}
+    os.makedirs("output", exist_ok=True)
+    with open("output/kr_sr_ic.json", "w", encoding="utf-8") as f:
+        json.dump(payload, f, ensure_ascii=False, indent=2)
+    _log("저장: output/kr_sr_ic.json")
+    for r in rows:
+        _log(f"  {r['factor']:16s} IC {r['ic_mean']:+.4f}  t={r['t_stat_eff']}")
+    return payload
+
+
+def main():
+    ap = argparse.ArgumentParser(description="한국(코스피200) 팩터 백테스트 — 미국과 동일 규율")
+    ap.add_argument("--years", type=int, default=10)
+    ap.add_argument("--topn", type=int, default=10)
+    ap.add_argument("--rebal-days", type=int, default=63)
+    ap.add_argument("--oos", type=float, default=0.4)
+    ap.add_argument("--commission-bps", type=float, default=1.5)
+    ap.add_argument("--slippage-bps", type=float, default=5.0)
+    ap.add_argument("--exclude-top", type=int, default=0,
+                    help="각 시점 시총 상위 N종목 제외(초대형주·반도체 쏠림 진단)")
+    ap.add_argument("--sr-ic", action="store_true",
+                    help="S/R 신호 7종의 국장 횡단면 IC만 계산(팩터 백테스트 대신)")
+    ap.add_argument("--self-test", action="store_true")
+    args = ap.parse_args()
+    if args.self_test:
+        self_test(); return
+
+    panel, membership, fundamentals, flows, mktcaps, bench = prepare_kr_data(args.years, args.rebal_days)
+    if args.sr_ic:
+        run_sr_ic(panel, membership, rebal_days=args.rebal_days); return
     cost = BC.CostModel("kospi", args.commission_bps, args.slippage_bps)
     run(panel, bench, membership, fundamentals, cost,
         topn=args.topn, rebal_days=args.rebal_days, oos_frac=args.oos,

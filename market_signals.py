@@ -254,13 +254,15 @@ def _fmt_price(a):
     return f"{p:,.1f}"
 
 
-def world_table_html(sig: dict) -> str:
-    """전일 세계시장 요약 표(국장 메일 전용). 추세신호 카드와 겹치지 않는 자산만
-    — 나스닥·다우존스·닛케이·유럽·글로벌·비트코인·환율(WORLD_ASSETS). 전일(1일) 등락만 표시
-    (추세·모멘텀 상태는 추세신호 카드 쪽 몫)."""
+def world_table_html(sig: dict, weekly: bool = False) -> str:
+    """세계시장 요약 표(국장 메일 전용). 추세신호 카드와 겹치지 않는 자산만
+    — 나스닥·다우존스·닛케이·유럽·글로벌·비트코인·환율(WORLD_ASSETS).
+    weekly=True(월요일)면 전일(1일) 대신 전주(5거래일=금요일 종가 대비) 등락을 표시
+    — 주말 동안의 흐름이 '어제'라는 표현으로 누락되지 않게(추세·모멘텀은 추세신호 카드 쪽 몫)."""
+    key, label = ("ret_1w", "전주") if weekly else ("ret_1d", "전일")
     rows = ""
     for a in sig.get("world", []):
-        r1 = a.get("ret_1d")
+        r1 = a.get(key)
         if r1 is None:
             cell = '<td align="right" style="padding:4px 8px;color:#9ca3af">—</td>'
         else:
@@ -275,7 +277,7 @@ def world_table_html(sig: dict) -> str:
         'border-radius:10px;background:#fff;font-size:12px;overflow:hidden">'
         '<tr style="background:#f8fafc;color:#6b7280;font-size:11px">'
         '<td style="padding:5px 8px">시장 (기준일)</td><td align="right" style="padding:5px 8px">종가</td>'
-        '<td align="right" style="padding:5px 8px">전일</td></tr>' + rows + '</table>')
+        f'<td align="right" style="padding:5px 8px">{label}</td></tr>' + rows + '</table>')
 
 
 def signal_cards_html(sig: dict, chart_cids: dict | None = None, when: str | None = None) -> str:

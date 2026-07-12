@@ -149,6 +149,14 @@ _V_SCHEMA = (
 )
 
 
+def _weekly_note(market: dict) -> str:
+    """market['weekly_recap']=True(월요일)면 '어제' 대신 지난주 전체를 요약하도록 지시.
+    코스피/코스닥은 금요일 이후 휴장이라 '전일'로 쓰면 주말 흐름이 누락된다."""
+    return ("- 오늘은 월요일이다. market_overview·macro·risks는 '어제'가 아니라 지난 금요일 "
+            "종가부터 오늘 아침까지 주말 포함 한 주간의 시장 흐름을 요약할 것(하루치가 아님).\n"
+            if market.get("weekly_recap") else "")
+
+
 def _v_stock(c, kind):
     """검증 입력은 최소 필드만(토큰 절약). 판단에 필요한 것: 정체+최근 급등락+헤드라인."""
     r = c.get("ret") or {}
@@ -168,6 +176,7 @@ def verify_stage(groups, market) -> dict:
                   "reason": s.get("reason")} for s in (groups.get("sells") or []) + (groups.get("kr_sells") or [])])
     instr = (
         "후보 목록을 검증하라. 각 symbol마다 stocks 항목 하나씩 반드시 출력.\n"
+        + _weekly_note(market) +
         f"출력 스키마(JSON 하나만):\n{_V_SCHEMA}\n\n"
         f"CONTEXT.market = {json.dumps(market, ensure_ascii=False)}\n"
         f"CONTEXT.stocks = {json.dumps(stocks, ensure_ascii=False)}\n")
@@ -251,7 +260,8 @@ def write_stage(final_pairs, sells, market, vmap, need_market: bool) -> dict:
     mk = ("- market_overview/macro/signal_note/risks 도 작성하라(market 수치 근거).\n"
           if need_market else "- 시황 필드는 생략(이미 있음). stocks/sells만.\n")
     instr = (
-        "각 종목의 상세 서술을 작성하라. symbol마다 stocks 항목 하나씩 반드시 출력.\n" + mk +
+        "각 종목의 상세 서술을 작성하라. symbol마다 stocks 항목 하나씩 반드시 출력.\n" + mk
+        + _weekly_note(market) +
         f"출력 스키마(JSON 하나만):\n{_W_SCHEMA}\n\n"
         f"CONTEXT.market = {json.dumps(market, ensure_ascii=False)}\n"
         f"CONTEXT.stocks = {json.dumps(stocks, ensure_ascii=False)}\n"
@@ -297,7 +307,8 @@ def write_market_stage(market) -> dict:
     경량 호출. 실패해도 빈 dict(필드가 비게 될 뿐, 발송은 계속됨)."""
     if not _enabled():
         return {}
-    instr = (f"아래 수치로 시황 총평을 작성하라. 출력 스키마(JSON 하나만):\n{_M_SCHEMA}\n\n"
+    instr = (f"아래 수치로 시황 총평을 작성하라.\n" + _weekly_note(market) +
+             f"출력 스키마(JSON 하나만):\n{_M_SCHEMA}\n\n"
              f"CONTEXT.market = {json.dumps(market, ensure_ascii=False)}\n")
     try:
         text = (_call_cli(instr, False, system=_M_SYSTEM, model=MODEL_WRITE) if AI_BACKEND == "cli"
@@ -718,12 +729,14 @@ def _excluded_html(items, is_kr=False):
 
 
 def render_report_html(report, as_of="", metrics_by_sym=None, market_html="", signals_html="",
-                       kr_sells=None, banner="", title=None, show_spy=True, is_kr=False):
+                       kr_sells=None, banner="", title=None, show_spy=True, is_kr=False,
+                       market_label="전일"):
     """일일 리포트 HTML — 메일 2통 분리 지원.
     title    = 헤더 제목(없으면 기본). KR 장전/US 마감 메일이 각자 지정.
     show_spy = SPY 큰 차트 표시 여부(KR 전용 메일은 SPY 데이터가 없어 False).
     is_kr    = 국장 메일 여부. True면 sells/ai_excluded 카드에서 종목코드 대신 이름을 쓴다
                (kr_buy/kr_watch/kr_sells 카드는 국장 소속이 확정이라 항상 이름만 표시).
+    market_label = 세계시장 요약 표의 기준(기본 "전일", 월요일엔 "전주" — 주말분 누락 방지).
     미국/한국 섹션은 해당 카드가 있을 때만 그린다."""
     if not report:
         return ""
@@ -752,8 +765,8 @@ def render_report_html(report, as_of="", metrics_by_sym=None, market_html="", si
     expectancy_html = EXR.expectancy_box_html() if not is_kr else ""
     market_sec = ""
     if market_html:
-        market_sec = ('<h3 style="margin:14px 0 6px">&#127760; 전일 시장 요약 <span style="color:#9ca3af;font-size:12px">'
-                      '(나스닥·다우존스·닛케이·유럽·글로벌·비트코인·환율 — 전일 등락)</span></h3>' + market_html)
+        market_sec = (f'<h3 style="margin:14px 0 6px">&#127760; {market_label} 시장 요약 <span style="color:#9ca3af;font-size:12px">'
+                      f'(나스닥·다우존스·닛케이·유럽·글로벌·비트코인·환율 — {market_label} 등락)</span></h3>' + market_html)
     signals_sec = ""
     if signals_html:
         note = _esc(report.get("signal_note") or "")
