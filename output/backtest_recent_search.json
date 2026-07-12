@@ -1,0 +1,208 @@
+{
+  "as_of": "2026-07-10",
+  "window": {
+    "start": "2024-07-10",
+    "end": "2026-04-10"
+  },
+  "topn_grid": [
+    4,
+    10,
+    20,
+    30
+  ],
+  "rebal_grid_days": [
+    5,
+    10
+  ],
+  "horizons": [
+    "1m",
+    "3m",
+    "6m"
+  ],
+  "n_combos_total": 520,
+  "top10_by_mean_excess_3m": [
+    {
+      "rebal_days": 5,
+      "topn": 4,
+      "weights": {
+        "resid_mom": 0,
+        "overnight_mom": 2,
+        "mom12_1": 0,
+        "rd_mktcap": 1
+      },
+      "label": "rebal5d_top4_overnight_mom2·rd_mktcap1",
+      "mean_excess_1m_pct": 2.7,
+      "mean_excess_3m_pct": 18.94,
+      "mean_excess_6m_pct": 53.53
+    },
+    {
+      "rebal_days": 10,
+      "topn": 4,
+      "weights": {
+        "resid_mom": 0,
+        "overnight_mom": 2,
+        "mom12_1": 0,
+        "rd_mktcap": 1
+      },
+      "label": "rebal10d_top4_overnight_mom2·rd_mktcap1",
+      "mean_excess_1m_pct": 2.35,
+      "mean_excess_3m_pct": 16.33,
+      "mean_excess_6m_pct": 49.74
+    },
+    {
+      "rebal_days": 5,
+      "topn": 4,
+      "weights": {
+        "resid_mom": 0,
+        "overnight_mom": 1,
+        "mom12_1": 0,
+        "rd_mktcap": 0
+      },
+      "label": "rebal5d_top4_overnight_mom1",
+      "mean_excess_1m_pct": 3.13,
+      "mean_excess_3m_pct": 15.05,
+      "mean_excess_6m_pct": 40.69
+    },
+    {
+      "rebal_days": 10,
+      "topn": 4,
+      "weights": {
+        "resid_mom": 0,
+        "overnight_mom": 1,
+        "mom12_1": 0,
+        "rd_mktcap": 0
+      },
+      "label": "rebal10d_top4_overnight_mom1",
+      "mean_excess_1m_pct": 2.0,
+      "mean_excess_3m_pct": 12.98,
+      "mean_excess_6m_pct": 42.63
+    },
+    {
+      "rebal_days": 5,
+      "topn": 4,
+      "weights": {
+        "resid_mom": 0,
+        "overnight_mom": 1,
+        "mom12_1": 0,
+        "rd_mktcap": 1
+      },
+      "label": "rebal5d_top4_overnight_mom1·rd_mktcap1",
+      "mean_excess_1m_pct": 2.89,
+      "mean_excess_3m_pct": 10.65,
+      "mean_excess_6m_pct": 31.44
+    },
+    {
+      "rebal_days": 5,
+      "topn": 10,
+      "weights": {
+        "resid_mom": 0,
+        "overnight_mom": 2,
+        "mom12_1": 0,
+        "rd_mktcap": 1
+      },
+      "label": "rebal5d_top10_overnight_mom2·rd_mktcap1",
+      "mean_excess_1m_pct": 0.7,
+      "mean_excess_3m_pct": 8.19,
+      "mean_excess_6m_pct": 27.23
+    },
+    {
+      "rebal_days": 5,
+      "topn": 10,
+      "weights": {
+        "resid_mom": 0,
+        "overnight_mom": 1,
+        "mom12_1": 0,
+        "rd_mktcap": 0
+      },
+      "label": "rebal5d_top10_overnight_mom1",
+      "mean_excess_1m_pct": 0.81,
+      "mean_excess_3m_pct": 7.9,
+      "mean_excess_6m_pct": 25.06
+    },
+    {
+      "rebal_days": 10,
+      "topn": 4,
+      "weights": {
+        "resid_mom": 0,
+        "overnight_mom": 1,
+        "mom12_1": 0,
+        "rd_mktcap": 1
+      },
+      "label": "rebal10d_top4_overnight_mom1·rd_mktcap1",
+      "mean_excess_1m_pct": 1.45,
+      "mean_excess_3m_pct": 7.38,
+      "mean_excess_6m_pct": 30.77
+    },
+    {
+      "rebal_days": 10,
+      "topn": 4,
+      "weights": {
+        "resid_mom": 0,
+        "overnight_mom": 2,
+        "mom12_1": 1,
+        "rd_mktcap": 1
+      },
+      "label": "rebal10d_top4_overnight_mom2·mom12_11·rd_mktcap1",
+      "mean_excess_1m_pct": 0.82,
+      "mean_excess_3m_pct": 7.25,
+      "mean_excess_6m_pct": 19.83
+    },
+    {
+      "rebal_days": 10,
+      "topn": 4,
+      "weights": {
+        "resid_mom": 1,
+        "overnight_mom": 2,
+        "mom12_1": 0,
+        "rd_mktcap": 1
+      },
+      "label": "rebal10d_top4_resid_mom1·overnight_mom2·rd_mktcap1",
+      "mean_excess_1m_pct": 0.98,
+      "mean_excess_3m_pct": 7.25,
+      "mean_excess_6m_pct": 20.5
+    }
+  ],
+  "group_pbo_dsr": {
+    "rebal5d_1m": {
+      "n_trials": 260,
+      "n_events": 50,
+      "pbo": 0.4044,
+      "pbo_verdict": "중간(주의)",
+      "dsr": 0.1664,
+      "dsr_verdict": "통과 실패(다중검정 감안 시 샤프가 유의하지 않음)",
+      "passed": false,
+      "best_trial": "rebal5d_top4_overnight_mom1·rd_mktcap1"
+    },
+    "rebal5d_3m": {
+      "n_trials": 260,
+      "n_events": 50,
+      "pbo": 0.5,
+      "pbo_verdict": "높음(IS 1등이 운일 확률 높음 — 채택 보류 권장)",
+      "dsr": 0.359,
+      "dsr_verdict": "통과 실패(다중검정 감안 시 샤프가 유의하지 않음)",
+      "passed": false,
+      "best_trial": "rebal5d_top4_overnight_mom2·mom12_11·rd_mktcap1"
+    },
+    "rebal10d_1m": {
+      "n_trials": 260,
+      "n_events": 25,
+      "pbo": 0.4346,
+      "pbo_verdict": "중간(주의)",
+      "dsr": 0.2383,
+      "dsr_verdict": "통과 실패(다중검정 감안 시 샤프가 유의하지 않음)",
+      "passed": false,
+      "best_trial": "rebal10d_top4_resid_mom1·overnight_mom2"
+    },
+    "rebal10d_3m": {
+      "n_trials": 260,
+      "n_events": 25,
+      "pbo": 0.4286,
+      "pbo_verdict": "중간(주의)",
+      "dsr": 0.3476,
+      "dsr_verdict": "통과 실패(다중검정 감안 시 샤프가 유의하지 않음)",
+      "passed": false,
+      "best_trial": "rebal10d_top4_resid_mom1·overnight_mom2"
+    }
+  },
+  "warning": "탐색 조합 수가 많고 표본 기간이 짧아 다중검정 과최적화 위험이 큼 — group_pbo_dsr의 passed=false면 표에서 1등처럼 보이는 조합을 신뢰하지 말 것(SCORE_MODEL_DESIGN.md D4). 그룹(리밸×보유기간)마다 별도 검정이며, 그룹 간 비교 자체도 추가 다중검정이라 완전히 보정되진 않음."
+}

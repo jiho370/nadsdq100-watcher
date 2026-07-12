@@ -71,15 +71,20 @@ def score_from_percentile(pct: float) -> int:
 
 # ------------------------- 워크포워드 IR-가중 군집 점수 -------------------------
 def build_pool(panel, spy, funds, pit, rebal_days=21, horizon="6m",
-               candidates=CLUSTER_CANDIDATES, min_history=MIN_HISTORY):
+               candidates=CLUSTER_CANDIDATES, min_history=MIN_HISTORY, extra_cross=None):
     """스냅샷마다: (1) 과거 완결 스냅샷들의 IC로 IR-가중 산출 → (2) 군집 점수 백분위
-    → (3) forward 수익률과 함께 수집. 반환: (pct, ret, date, rho_t 리스트, 사용 가중치 로그)"""
+    → (3) forward 수익률과 함께 수집. 반환: (pct, ret, date, rho_t 리스트, 사용 가중치 로그)
+    extra_cross: 부록 A2-(a) SR_CANDIDATES 등 추가 팩터 패널(dict[name->DataFrame])을
+    tech_factors 크로스오버 패널에 병합 — 기본 실행(candidates=CLUSTER_CANDIDATES)에는
+    영향 없음(예산 분리, NEXT_STEPS_SONNET.md 트랙 C)."""
     import tech_factors as T
     hd = BW.TD[horizon]
     use_fund = bool(funds)
     spy = spy.reindex(panel.index).ffill()
     n = len(panel)
     cross = T.build_panels(panel)
+    if extra_cross:
+        cross = {**cross, **extra_cross}
     ps = list(range(BW.LOOKBACK, n - hd - 1, rebal_days))
 
     # 1패스: 스냅샷별 원팩터·forward수익 준비 + 스냅샷 IC 기록
@@ -210,7 +215,7 @@ def calibrate(pool_pct, pool_ret, pool_date, rhos, horizon, alpha=0.05,
                      "검증 실패 — 점수를 리포트에 노출하지 말 것(SCORE_MODEL_DESIGN.md §2.5)")}
 
 
-def report(cal, save=True):
+def report(cal, save=True, path=CALIB_PATH):
     _log(f"\n=== v2 점수 캘리브레이션 (horizon {cal['horizon']} · 표본 {cal['n_samples']}) ===")
     for tag, tbl in (("전체", cal["deciles"]), (f"최근5년(≥{cal['recent_5y_cutoff']})",
                                                cal["recent_5y_deciles"])):
@@ -227,14 +232,14 @@ def report(cal, save=True):
         os.makedirs("output", exist_ok=True)
         prev_attempts = []
         try:
-            with open(CALIB_PATH, encoding="utf-8") as f:
+            with open(path, encoding="utf-8") as f:
                 prev_attempts = json.load(f).get("attempted_horizons", [])
         except Exception:
             pass
         cal["attempted_horizons"] = sorted(set(prev_attempts + [cal["horizon"]]))
-        with open(CALIB_PATH, "w", encoding="utf-8") as f:
+        with open(path, "w", encoding="utf-8") as f:
             json.dump(cal, f, ensure_ascii=False, indent=2)
-        _log(f"\n>>> 저장: {CALIB_PATH} (시도한 호라이즌: {cal['attempted_horizons']} — 다중검정 예산 기록)")
+        _log(f"\n>>> 저장: {path} (시도한 호라이즌: {cal['attempted_horizons']} — 다중검정 예산 기록)")
 
 
 def _gate(force=False) -> bool:
@@ -317,6 +322,9 @@ def main():
     ap.add_argument("--rebal-days", type=int, default=21)
     ap.add_argument("--pit-file", default=None)
     ap.add_argument("--force", action="store_true", help="PBO/DSR 게이트 무시(연구용)")
+    ap.add_argument("--candidates", default="cluster", choices=["cluster", "sr"],
+                    help="cluster=기본 퀄리티·주주환원 군집 / "
+                         "sr=지지·저항 A1 신호(부록 A2-a, 연구용·예산 분리, 별도 파일에 저장)")
     ap.add_argument("--self-test", action="store_true")
     args = ap.parse_args()
     if args.self_test:
@@ -328,14 +336,21 @@ def main():
     funds = BW.load_funds()
     if not funds:
         _log("펀더멘탈 캐시 없음 — 먼저 python fundamentals_edgar.py"); sys.exit(1)
-    pct, ret, dts, rhos, wlog = build_pool(panel, spy, funds, pit,
-                                           args.rebal_days, args.horizon)
+    if args.candidates == "sr":
+        import backtest_exec as BE
+        candidates, extra_cross, save_path = BE.SR_CANDIDATES, BE.sr_signal_panels(panel), BE.SR_CALIB_PATH
+        _log(f"[예산분리] --candidates sr — SR_CANDIDATES {len(candidates)}종, "
+             f"결과는 {save_path}에 저장(기본 게이트에 영향 없음)")
+    else:
+        candidates, extra_cross, save_path = CLUSTER_CANDIDATES, None, CALIB_PATH
+    pct, ret, dts, rhos, wlog = build_pool(panel, spy, funds, pit, args.rebal_days, args.horizon,
+                                           candidates=candidates, extra_cross=extra_cross)
     _log(f"[풀] 표본 {len(ret)}건 · 점수산출 스냅샷 {len(rhos)}개 · "
          f"최근 가중치 {wlog[-1]['weights'] if wlog else '-'}")
     cal = calibrate(pct, ret, dts, rhos, args.horizon, rebal_days=args.rebal_days)
     cal["as_of"] = pd.Timestamp.today().date().isoformat()
     cal["latest_weights"] = wlog[-1]["weights"] if wlog else None
-    report(cal)
+    report(cal, path=save_path)
 
 
 if __name__ == "__main__":

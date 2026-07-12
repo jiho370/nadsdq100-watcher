@@ -75,13 +75,13 @@ def pbo_cscv(M: np.ndarray, n_blocks: int = 12, embargo: int = 0):
         lambdas.append(math.log(omega / (1 - omega)))
         is_best_oos.append(float(M[n_star, oos_idx].mean()))
         pairs.append((float(sr_is[n_star]), float(sr_oos[n_star])))
+    if not lambdas:
+        raise RuntimeError("purging 후 남은 조합 없음 — embargo/블록 수를 줄이세요")
     lam = np.array(lambdas)
     a = np.array(pairs)
     slope = None                                   # IS 최고 조합의 IS→OOS 샤프 저하 기울기
     if a[:, 0].std() > 0:
         slope = float(np.polyfit(a[:, 0], a[:, 1], 1)[0])
-    if not lambdas:
-        raise RuntimeError("purging 후 남은 조합 없음 — embargo/블록 수를 줄이세요")
     return {"pbo": round(float((lam <= 0).mean()), 4),
             "embargo": embargo, "purged_events_total": n_purged,
             "n_combos": len(lambdas), "n_blocks": S,

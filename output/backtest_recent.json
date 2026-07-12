@@ -1,0 +1,1701 @@
+{
+  "as_of": "2026-07-10",
+  "weights_used": {
+    "int_gp_assets": 1,
+    "rd_mktcap": 2,
+    "shareholder_yield": 2
+  },
+  "window": {
+    "start": "2024-07-10",
+    "end": "2026-04-10"
+  },
+  "rebal_days": 5,
+  "hold_days": 63,
+  "topn": 10,
+  "n_events_raw": 88,
+  "n_eff": 7,
+  "turnover_pct": 3.8,
+  "mean_net_pct": 10.03,
+  "mean_excess_pct": 5.47,
+  "std_excess_pct": 7.0,
+  "win_rate_pct": 83.0,
+  "worst_net_pct": -16.2,
+  "t_stat_eff": 2.07,
+  "p_value_approx": 0.0386,
+  "significant_at_5pct": true,
+  "events": [
+    {
+      "date": "2024-07-11",
+      "basket": [
+        "LRCX",
+        "BMY",
+        "F",
+        "BKNG",
+        "GM",
+        "KLAC",
+        "INCY",
+        "GILD",
+        "AVGO",
+        "INTC"
+      ],
+      "gross_pct": -1.51,
+      "net_pct": -1.62,
+      "excess_pct": -4.81,
+      "bench_pct": 3.2
+    },
+    {
+      "date": "2024-07-18",
+      "basket": [
+        "LRCX",
+        "BMY",
+        "F",
+        "BKNG",
+        "KLAC",
+        "GM",
+        "AVGO",
+        "INCY",
+        "GILD",
+        "MRK"
+      ],
+      "gross_pct": 1.35,
+      "net_pct": 1.24,
+      "excess_pct": -5.16,
+      "bench_pct": 6.4
+    },
+    {
+      "date": "2024-07-25",
+      "basket": [
+        "LRCX",
+        "F",
+        "BKNG",
+        "KLAC",
+        "GM",
+        "BMY",
+        "AVGO",
+        "INTC",
+        "INCY",
+        "GILD"
+      ],
+      "gross_pct": 1.25,
+      "net_pct": 1.15,
+      "excess_pct": -5.57,
+      "bench_pct": 6.72
+    },
+    {
+      "date": "2024-08-01",
+      "basket": [
+        "LRCX",
+        "F",
+        "BKNG",
+        "KLAC",
+        "GM",
+        "INTC",
+        "AVGO",
+        "BMY",
+        "MRK",
+        "INCY"
+      ],
+      "gross_pct": 10.15,
+      "net_pct": 10.04,
+      "excess_pct": 3.0,
+      "bench_pct": 7.03
+    },
+    {
+      "date": "2024-08-08",
+      "basket": [
+        "LRCX",
+        "F",
+        "BKNG",
+        "KLAC",
+        "GM",
+        "INTC",
+        "BMY",
+        "AVGO",
+        "INCY",
+        "MRK"
+      ],
+      "gross_pct": 17.09,
+      "net_pct": 16.97,
+      "excess_pct": 4.88,
+      "bench_pct": 12.09
+    },
+    {
+      "date": "2024-08-15",
+      "basket": [
+        "LRCX",
+        "F",
+        "BKNG",
+        "GM",
+        "INTC",
+        "KLAC",
+        "BMY",
+        "INCY",
+        "MRK",
+        "AVGO"
+      ],
+      "gross_pct": 9.18,
+      "net_pct": 9.07,
+      "excess_pct": 1.7,
+      "bench_pct": 7.37
+    },
+    {
+      "date": "2024-08-22",
+      "basket": [
+        "LRCX",
+        "F",
+        "BKNG",
+        "KLAC",
+        "INTC",
+        "GM",
+        "BMY",
+        "INCY",
+        "AVGO",
+        "MRK"
+      ],
+      "gross_pct": 4.88,
+      "net_pct": 4.77,
+      "excess_pct": -1.16,
+      "bench_pct": 5.93
+    },
+    {
+      "date": "2024-08-29",
+      "basket": [
+        "LRCX",
+        "F",
+        "BKNG",
+        "KLAC",
+        "INTC",
+        "GM",
+        "BMY",
+        "AVGO",
+        "MRK",
+        "INCY"
+      ],
+      "gross_pct": 4.44,
+      "net_pct": 4.34,
+      "excess_pct": -2.89,
+      "bench_pct": 7.22
+    },
+    {
+      "date": "2024-09-06",
+      "basket": [
+        "LRCX",
+        "F",
+        "BKNG",
+        "KLAC",
+        "INTC",
+        "AVGO",
+        "GM",
+        "BMY",
+        "INCY",
+        "HPE"
+      ],
+      "gross_pct": 16.91,
+      "net_pct": 16.79,
+      "excess_pct": 5.21,
+      "bench_pct": 11.58
+    },
+    {
+      "date": "2024-09-13",
+      "basket": [
+        "LRCX",
+        "F",
+        "BKNG",
+        "KLAC",
+        "INTC",
+        "GM",
+        "BMY",
+        "HPE",
+        "INCY",
+        "MRK"
+      ],
+      "gross_pct": 5.9,
+      "net_pct": 5.79,
+      "excess_pct": -1.89,
+      "bench_pct": 7.68
+    },
+    {
+      "date": "2024-09-20",
+      "basket": [
+        "LRCX",
+        "F",
+        "BKNG",
+        "KLAC",
+        "INTC",
+        "GM",
+        "BMY",
+        "MRK",
+        "INCY",
+        "AVGO"
+      ],
+      "gross_pct": 2.1,
+      "net_pct": 2.0,
+      "excess_pct": -2.12,
+      "bench_pct": 4.12
+    },
+    {
+      "date": "2024-09-27",
+      "basket": [
+        "LRCX",
+        "F",
+        "BKNG",
+        "KLAC",
+        "GM",
+        "INTC",
+        "BMY",
+        "MRK",
+        "INCY",
+        "AVGO"
+      ],
+      "gross_pct": 2.6,
+      "net_pct": 2.49,
+      "excess_pct": -0.37,
+      "bench_pct": 2.87
+    },
+    {
+      "date": "2024-10-04",
+      "basket": [
+        "LRCX",
+        "F",
+        "BKNG",
+        "KLAC",
+        "GM",
+        "INTC",
+        "MRK",
+        "BMY",
+        "INCY",
+        "AVGO"
+      ],
+      "gross_pct": 4.12,
+      "net_pct": 4.02,
+      "excess_pct": -0.0,
+      "bench_pct": 4.02
+    },
+    {
+      "date": "2024-10-11",
+      "basket": [
+        "LRCX",
+        "F",
+        "BKNG",
+        "KLAC",
+        "INTC",
+        "GM",
+        "MRK",
+        "BMY",
+        "INCY",
+        "AVGO"
+      ],
+      "gross_pct": 0.67,
+      "net_pct": 0.57,
+      "excess_pct": -1.22,
+      "bench_pct": 1.79
+    },
+    {
+      "date": "2024-10-18",
+      "basket": [
+        "LRCX",
+        "KLAC",
+        "F",
+        "BKNG",
+        "INTC",
+        "GM",
+        "MRK",
+        "BMY",
+        "INCY",
+        "AVGO"
+      ],
+      "gross_pct": 8.72,
+      "net_pct": 8.61,
+      "excess_pct": 3.78,
+      "bench_pct": 4.83
+    },
+    {
+      "date": "2024-10-25",
+      "basket": [
+        "LRCX",
+        "KLAC",
+        "F",
+        "BKNG",
+        "INTC",
+        "MRK",
+        "GM",
+        "BMY",
+        "INCY",
+        "AVGO"
+      ],
+      "gross_pct": 4.7,
+      "net_pct": 4.59,
+      "excess_pct": 0.07,
+      "bench_pct": 4.52
+    },
+    {
+      "date": "2024-11-01",
+      "basket": [
+        "LRCX",
+        "KLAC",
+        "F",
+        "BKNG",
+        "INTC",
+        "MRK",
+        "GM",
+        "AVGO",
+        "BMY",
+        "HPE"
+      ],
+      "gross_pct": 3.37,
+      "net_pct": 3.26,
+      "excess_pct": -3.5,
+      "bench_pct": 6.77
+    },
+    {
+      "date": "2024-11-08",
+      "basket": [
+        "LRCX",
+        "KLAC",
+        "F",
+        "BKNG",
+        "INTC",
+        "MRK",
+        "BMY",
+        "GM",
+        "AVGO",
+        "HPE"
+      ],
+      "gross_pct": -0.49,
+      "net_pct": -0.59,
+      "excess_pct": -2.77,
+      "bench_pct": 2.17
+    },
+    {
+      "date": "2024-11-15",
+      "basket": [
+        "LRCX",
+        "KLAC",
+        "F",
+        "BKNG",
+        "INTC",
+        "MRK",
+        "AVGO",
+        "BMY",
+        "GM",
+        "INCY"
+      ],
+      "gross_pct": 3.04,
+      "net_pct": 2.94,
+      "excess_pct": 0.59,
+      "bench_pct": 2.35
+    },
+    {
+      "date": "2024-11-22",
+      "basket": [
+        "LRCX",
+        "KLAC",
+        "F",
+        "BKNG",
+        "INTC",
+        "MRK",
+        "AVGO",
+        "GM",
+        "BMY",
+        "INCY"
+      ],
+      "gross_pct": -0.75,
+      "net_pct": -0.86,
+      "excess_pct": -0.63,
+      "bench_pct": -0.23
+    },
+    {
+      "date": "2024-12-02",
+      "basket": [
+        "LRCX",
+        "KLAC",
+        "F",
+        "BKNG",
+        "INTC",
+        "MRK",
+        "AVGO",
+        "GM",
+        "BMY",
+        "INCY"
+      ],
+      "gross_pct": -1.29,
+      "net_pct": -1.39,
+      "excess_pct": 2.93,
+      "bench_pct": -4.31
+    },
+    {
+      "date": "2024-12-09",
+      "basket": [
+        "LRCX",
+        "KLAC",
+        "F",
+        "BKNG",
+        "INTC",
+        "MRK",
+        "GM",
+        "AVGO",
+        "BMY",
+        "INCY"
+      ],
+      "gross_pct": 1.41,
+      "net_pct": 1.31,
+      "excess_pct": 7.63,
+      "bench_pct": -6.32
+    },
+    {
+      "date": "2024-12-16",
+      "basket": [
+        "LRCX",
+        "KLAC",
+        "F",
+        "BKNG",
+        "INTC",
+        "MRK",
+        "GM",
+        "BMY",
+        "INCY",
+        "HPE"
+      ],
+      "gross_pct": -1.87,
+      "net_pct": -1.97,
+      "excess_pct": 4.1,
+      "bench_pct": -6.07
+    },
+    {
+      "date": "2024-12-23",
+      "basket": [
+        "LRCX",
+        "KLAC",
+        "F",
+        "BKNG",
+        "INTC",
+        "MRK",
+        "GM",
+        "BMY",
+        "INCY",
+        "NVDA"
+      ],
+      "gross_pct": -4.75,
+      "net_pct": -4.85,
+      "excess_pct": 2.46,
+      "bench_pct": -7.31
+    },
+    {
+      "date": "2024-12-31",
+      "basket": [
+        "LRCX",
+        "KLAC",
+        "F",
+        "BKNG",
+        "INTC",
+        "MRK",
+        "GM",
+        "BMY",
+        "INCY",
+        "NVDA"
+      ],
+      "gross_pct": -11.56,
+      "net_pct": -11.66,
+      "excess_pct": 1.66,
+      "bench_pct": -13.31
+    },
+    {
+      "date": "2025-01-08",
+      "basket": [
+        "LRCX",
+        "KLAC",
+        "F",
+        "BKNG",
+        "INTC",
+        "MRK",
+        "GM",
+        "BMY",
+        "INCY",
+        "GILD"
+      ],
+      "gross_pct": -5.43,
+      "net_pct": -5.53,
+      "excess_pct": 2.21,
+      "bench_pct": -7.74
+    },
+    {
+      "date": "2025-01-16",
+      "basket": [
+        "LRCX",
+        "F",
+        "BKNG",
+        "KLAC",
+        "INTC",
+        "MRK",
+        "GM",
+        "BMY",
+        "INCY",
+        "NVDA"
+      ],
+      "gross_pct": -16.12,
+      "net_pct": -16.21,
+      "excess_pct": -2.46,
+      "bench_pct": -13.75
+    },
+    {
+      "date": "2025-01-24",
+      "basket": [
+        "LRCX",
+        "F",
+        "BKNG",
+        "KLAC",
+        "MRK",
+        "INTC",
+        "GM",
+        "BMY",
+        "INCY",
+        "NVDA"
+      ],
+      "gross_pct": -7.41,
+      "net_pct": -7.5,
+      "excess_pct": 0.32,
+      "bench_pct": -7.82
+    },
+    {
+      "date": "2025-01-31",
+      "basket": [
+        "LRCX",
+        "GM",
+        "F",
+        "BKNG",
+        "KLAC",
+        "INTC",
+        "MRK",
+        "BMY",
+        "INCY",
+        "NVDA"
+      ],
+      "gross_pct": -4.71,
+      "net_pct": -4.81,
+      "excess_pct": 0.64,
+      "bench_pct": -5.45
+    },
+    {
+      "date": "2025-02-07",
+      "basket": [
+        "LRCX",
+        "GM",
+        "F",
+        "BKNG",
+        "MRK",
+        "KLAC",
+        "INTC",
+        "BMY",
+        "INCY",
+        "NVDA"
+      ],
+      "gross_pct": 0.73,
+      "net_pct": 0.63,
+      "excess_pct": 3.95,
+      "bench_pct": -3.32
+    },
+    {
+      "date": "2025-02-14",
+      "basket": [
+        "LRCX",
+        "GM",
+        "F",
+        "INCY",
+        "BKNG",
+        "MRK",
+        "KLAC",
+        "INTC",
+        "BMY",
+        "CMI"
+      ],
+      "gross_pct": -3.42,
+      "net_pct": -3.52,
+      "excess_pct": -1.09,
+      "bench_pct": -2.43
+    },
+    {
+      "date": "2025-02-24",
+      "basket": [
+        "LRCX",
+        "GM",
+        "F",
+        "INCY",
+        "BKNG",
+        "KLAC",
+        "MRK",
+        "INTC",
+        "BMY",
+        "CMI"
+      ],
+      "gross_pct": -2.6,
+      "net_pct": -2.7,
+      "excess_pct": -2.48,
+      "bench_pct": -0.22
+    },
+    {
+      "date": "2025-03-03",
+      "basket": [
+        "LRCX",
+        "KLAC",
+        "GM",
+        "F",
+        "INCY",
+        "BKNG",
+        "INTC",
+        "CMI",
+        "BMY",
+        "HPE"
+      ],
+      "gross_pct": 1.7,
+      "net_pct": 1.59,
+      "excess_pct": -2.05,
+      "bench_pct": 3.64
+    },
+    {
+      "date": "2025-03-10",
+      "basket": [
+        "LRCX",
+        "KLAC",
+        "GM",
+        "F",
+        "INCY",
+        "BKNG",
+        "CMI",
+        "INTC",
+        "HPE",
+        "BMY"
+      ],
+      "gross_pct": 10.93,
+      "net_pct": 10.82,
+      "excess_pct": 2.01,
+      "bench_pct": 8.81
+    },
+    {
+      "date": "2025-03-17",
+      "basket": [
+        "LRCX",
+        "GM",
+        "KLAC",
+        "INCY",
+        "F",
+        "BKNG",
+        "CMI",
+        "INTC",
+        "BMY",
+        "HPE"
+      ],
+      "gross_pct": 5.64,
+      "net_pct": 5.54,
+      "excess_pct": -1.29,
+      "bench_pct": 6.83
+    },
+    {
+      "date": "2025-03-24",
+      "basket": [
+        "LRCX",
+        "GM",
+        "KLAC",
+        "INCY",
+        "F",
+        "BKNG",
+        "CMI",
+        "INTC",
+        "BMY",
+        "HPE"
+      ],
+      "gross_pct": 4.8,
+      "net_pct": 4.7,
+      "excess_pct": -1.12,
+      "bench_pct": 5.81
+    },
+    {
+      "date": "2025-03-31",
+      "basket": [
+        "LRCX",
+        "KLAC",
+        "GM",
+        "INCY",
+        "F",
+        "BKNG",
+        "CMI",
+        "INTC",
+        "BMY",
+        "HPE"
+      ],
+      "gross_pct": 16.04,
+      "net_pct": 15.92,
+      "excess_pct": 4.99,
+      "bench_pct": 10.93
+    },
+    {
+      "date": "2025-04-07",
+      "basket": [
+        "LRCX",
+        "KLAC",
+        "GM",
+        "INCY",
+        "F",
+        "BKNG",
+        "CMI",
+        "INTC",
+        "HPE",
+        "BMY"
+      ],
+      "gross_pct": 37.25,
+      "net_pct": 37.11,
+      "excess_pct": 10.68,
+      "bench_pct": 26.42
+    },
+    {
+      "date": "2025-04-14",
+      "basket": [
+        "LRCX",
+        "GM",
+        "INCY",
+        "F",
+        "KLAC",
+        "BKNG",
+        "CMI",
+        "INTC",
+        "BMY",
+        "HPE"
+      ],
+      "gross_pct": 24.14,
+      "net_pct": 24.01,
+      "excess_pct": 6.84,
+      "bench_pct": 17.17
+    },
+    {
+      "date": "2025-04-22",
+      "basket": [
+        "LRCX",
+        "GM",
+        "KLAC",
+        "INCY",
+        "F",
+        "BKNG",
+        "CMI",
+        "INTC",
+        "BMY",
+        "HPE"
+      ],
+      "gross_pct": 23.35,
+      "net_pct": 23.23,
+      "excess_pct": 4.38,
+      "bench_pct": 18.84
+    },
+    {
+      "date": "2025-04-29",
+      "basket": [
+        "LRCX",
+        "GM",
+        "KLAC",
+        "INCY",
+        "F",
+        "BKNG",
+        "CMI",
+        "BMY",
+        "INTC",
+        "HPE"
+      ],
+      "gross_pct": 15.64,
+      "net_pct": 15.52,
+      "excess_pct": 1.2,
+      "bench_pct": 14.32
+    },
+    {
+      "date": "2025-05-06",
+      "basket": [
+        "LRCX",
+        "GM",
+        "KLAC",
+        "INCY",
+        "F",
+        "BKNG",
+        "CMI",
+        "BMY",
+        "INTC",
+        "HPE"
+      ],
+      "gross_pct": 17.6,
+      "net_pct": 17.48,
+      "excess_pct": 4.48,
+      "bench_pct": 13.0
+    },
+    {
+      "date": "2025-05-13",
+      "basket": [
+        "LRCX",
+        "GM",
+        "BMY",
+        "INCY",
+        "F",
+        "BKNG",
+        "KLAC",
+        "CMI",
+        "INTC",
+        "MRK"
+      ],
+      "gross_pct": 17.0,
+      "net_pct": 16.88,
+      "excess_pct": 6.79,
+      "bench_pct": 10.09
+    },
+    {
+      "date": "2025-05-20",
+      "basket": [
+        "LRCX",
+        "GM",
+        "BMY",
+        "INCY",
+        "F",
+        "BKNG",
+        "KLAC",
+        "CMI",
+        "INTC",
+        "HPE"
+      ],
+      "gross_pct": 16.34,
+      "net_pct": 16.22,
+      "excess_pct": 6.86,
+      "bench_pct": 9.36
+    },
+    {
+      "date": "2025-05-28",
+      "basket": [
+        "LRCX",
+        "GM",
+        "INCY",
+        "F",
+        "BKNG",
+        "MCHP",
+        "INTC",
+        "BMY",
+        "KLAC",
+        "CMI"
+      ],
+      "gross_pct": 16.61,
+      "net_pct": 16.49,
+      "excess_pct": 6.18,
+      "bench_pct": 10.3
+    },
+    {
+      "date": "2025-06-04",
+      "basket": [
+        "LRCX",
+        "GM",
+        "INCY",
+        "F",
+        "BKNG",
+        "MCHP",
+        "INTC",
+        "BMY",
+        "KLAC",
+        "CMI"
+      ],
+      "gross_pct": 15.58,
+      "net_pct": 15.46,
+      "excess_pct": 6.0,
+      "bench_pct": 9.46
+    },
+    {
+      "date": "2025-06-11",
+      "basket": [
+        "LRCX",
+        "GM",
+        "INCY",
+        "F",
+        "BKNG",
+        "MCHP",
+        "INTC",
+        "BMY",
+        "CMI",
+        "KLAC"
+      ],
+      "gross_pct": 12.11,
+      "net_pct": 12.0,
+      "excess_pct": 2.79,
+      "bench_pct": 9.21
+    },
+    {
+      "date": "2025-06-18",
+      "basket": [
+        "LRCX",
+        "GM",
+        "INCY",
+        "F",
+        "BKNG",
+        "BMY",
+        "MCHP",
+        "INTC",
+        "CMI",
+        "KLAC"
+      ],
+      "gross_pct": 19.48,
+      "net_pct": 19.36,
+      "excess_pct": 7.37,
+      "bench_pct": 11.99
+    },
+    {
+      "date": "2025-06-26",
+      "basket": [
+        "LRCX",
+        "GM",
+        "INCY",
+        "F",
+        "BKNG",
+        "BMY",
+        "MCHP",
+        "INTC",
+        "CMI",
+        "KLAC"
+      ],
+      "gross_pct": 18.09,
+      "net_pct": 17.97,
+      "excess_pct": 10.04,
+      "bench_pct": 7.93
+    },
+    {
+      "date": "2025-07-03",
+      "basket": [
+        "LRCX",
+        "GM",
+        "INCY",
+        "F",
+        "BKNG",
+        "BMY",
+        "MCHP",
+        "INTC",
+        "CMI",
+        "KLAC"
+      ],
+      "gross_pct": 21.23,
+      "net_pct": 21.11,
+      "excess_pct": 12.99,
+      "bench_pct": 8.12
+    },
+    {
+      "date": "2025-07-11",
+      "basket": [
+        "LRCX",
+        "GM",
+        "INCY",
+        "F",
+        "BKNG",
+        "BMY",
+        "MCHP",
+        "INTC",
+        "CMI",
+        "KLAC"
+      ],
+      "gross_pct": 10.42,
+      "net_pct": 10.31,
+      "excess_pct": 5.51,
+      "bench_pct": 4.8
+    },
+    {
+      "date": "2025-07-18",
+      "basket": [
+        "LRCX",
+        "GM",
+        "INCY",
+        "F",
+        "BKNG",
+        "BMY",
+        "MCHP",
+        "INTC",
+        "CMI",
+        "KLAC"
+      ],
+      "gross_pct": 15.66,
+      "net_pct": 15.55,
+      "excess_pct": 9.59,
+      "bench_pct": 5.96
+    },
+    {
+      "date": "2025-07-25",
+      "basket": [
+        "LRCX",
+        "GM",
+        "INCY",
+        "F",
+        "BKNG",
+        "BMY",
+        "MCHP",
+        "INTC",
+        "KLAC",
+        "CMI"
+      ],
+      "gross_pct": 24.15,
+      "net_pct": 24.02,
+      "excess_pct": 17.4,
+      "bench_pct": 6.62
+    },
+    {
+      "date": "2025-08-01",
+      "basket": [
+        "LRCX",
+        "GM",
+        "F",
+        "INCY",
+        "BKNG",
+        "BMY",
+        "MCHP",
+        "INTC",
+        "KLAC",
+        "CMI"
+      ],
+      "gross_pct": 28.21,
+      "net_pct": 28.08,
+      "excess_pct": 19.71,
+      "bench_pct": 8.36
+    },
+    {
+      "date": "2025-08-08",
+      "basket": [
+        "LRCX",
+        "F",
+        "INCY",
+        "BKNG",
+        "GM",
+        "BMY",
+        "MCHP",
+        "INTC",
+        "KLAC",
+        "CMI"
+      ],
+      "gross_pct": 26.85,
+      "net_pct": 26.72,
+      "excess_pct": 20.92,
+      "bench_pct": 5.8
+    },
+    {
+      "date": "2025-08-15",
+      "basket": [
+        "GM",
+        "F",
+        "BKNG",
+        "INCY",
+        "BMY",
+        "KLAC",
+        "MCHP",
+        "INTC",
+        "CMI",
+        "MRK"
+      ],
+      "gross_pct": 14.21,
+      "net_pct": 14.09,
+      "excess_pct": 9.35,
+      "bench_pct": 4.74
+    },
+    {
+      "date": "2025-08-22",
+      "basket": [
+        "GM",
+        "F",
+        "INCY",
+        "BKNG",
+        "BMY",
+        "KLAC",
+        "MCHP",
+        "INTC",
+        "CMI",
+        "MRK"
+      ],
+      "gross_pct": 10.97,
+      "net_pct": 10.85,
+      "excess_pct": 7.99,
+      "bench_pct": 2.86
+    },
+    {
+      "date": "2025-08-29",
+      "basket": [
+        "F",
+        "INCY",
+        "BKNG",
+        "GM",
+        "BMY",
+        "KLAC",
+        "MCHP",
+        "INTC",
+        "CMI",
+        "MRK"
+      ],
+      "gross_pct": 18.48,
+      "net_pct": 18.35,
+      "excess_pct": 11.81,
+      "bench_pct": 6.54
+    },
+    {
+      "date": "2025-09-08",
+      "basket": [
+        "GM",
+        "F",
+        "BMY",
+        "INCY",
+        "BKNG",
+        "MCHP",
+        "KLAC",
+        "INTC",
+        "CMI",
+        "MRK"
+      ],
+      "gross_pct": 21.42,
+      "net_pct": 21.29,
+      "excess_pct": 15.88,
+      "bench_pct": 5.41
+    },
+    {
+      "date": "2025-09-15",
+      "basket": [
+        "F",
+        "INCY",
+        "BKNG",
+        "BMY",
+        "GM",
+        "MCHP",
+        "INTC",
+        "KLAC",
+        "CMI",
+        "MRK"
+      ],
+      "gross_pct": 22.29,
+      "net_pct": 22.16,
+      "excess_pct": 18.74,
+      "bench_pct": 3.43
+    },
+    {
+      "date": "2025-09-22",
+      "basket": [
+        "BMY",
+        "GM",
+        "F",
+        "INCY",
+        "BKNG",
+        "MCHP",
+        "INTC",
+        "KLAC",
+        "CMI",
+        "MRK"
+      ],
+      "gross_pct": 19.96,
+      "net_pct": 19.83,
+      "excess_pct": 16.27,
+      "bench_pct": 3.57
+    },
+    {
+      "date": "2025-09-29",
+      "basket": [
+        "BMY",
+        "F",
+        "INCY",
+        "BKNG",
+        "GM",
+        "MCHP",
+        "KLAC",
+        "CMI",
+        "INTC",
+        "MRK"
+      ],
+      "gross_pct": 16.43,
+      "net_pct": 16.31,
+      "excess_pct": 12.87,
+      "bench_pct": 3.43
+    },
+    {
+      "date": "2025-10-06",
+      "basket": [
+        "BMY",
+        "GM",
+        "F",
+        "INCY",
+        "BKNG",
+        "MCHP",
+        "KLAC",
+        "CMI",
+        "INTC",
+        "MRK"
+      ],
+      "gross_pct": 22.42,
+      "net_pct": 22.29,
+      "excess_pct": 18.93,
+      "bench_pct": 3.36
+    },
+    {
+      "date": "2025-10-13",
+      "basket": [
+        "BMY",
+        "GM",
+        "F",
+        "INCY",
+        "BKNG",
+        "MCHP",
+        "KLAC",
+        "CMI",
+        "INTC",
+        "BALL"
+      ],
+      "gross_pct": 26.39,
+      "net_pct": 26.26,
+      "excess_pct": 21.71,
+      "bench_pct": 4.56
+    },
+    {
+      "date": "2025-10-20",
+      "basket": [
+        "BMY",
+        "GM",
+        "F",
+        "BKNG",
+        "INCY",
+        "MCHP",
+        "CMI",
+        "KLAC",
+        "INTC",
+        "MRK"
+      ],
+      "gross_pct": 22.72,
+      "net_pct": 22.6,
+      "excess_pct": 19.66,
+      "bench_pct": 2.94
+    },
+    {
+      "date": "2025-10-27",
+      "basket": [
+        "BMY",
+        "BKNG",
+        "F",
+        "INCY",
+        "MCHP",
+        "GM",
+        "CMI",
+        "KLAC",
+        "INTC",
+        "MRK"
+      ],
+      "gross_pct": 22.02,
+      "net_pct": 21.89,
+      "excess_pct": 20.58,
+      "bench_pct": 1.31
+    },
+    {
+      "date": "2025-11-03",
+      "basket": [
+        "BMY",
+        "BKNG",
+        "F",
+        "MCHP",
+        "INCY",
+        "GM",
+        "CMI",
+        "KLAC",
+        "MRK",
+        "INTC"
+      ],
+      "gross_pct": 19.94,
+      "net_pct": 19.82,
+      "excess_pct": 19.17,
+      "bench_pct": 0.65
+    },
+    {
+      "date": "2025-11-10",
+      "basket": [
+        "BKNG",
+        "F",
+        "BMY",
+        "MCHP",
+        "INCY",
+        "GM",
+        "KLAC",
+        "INTC",
+        "CMI",
+        "MRK"
+      ],
+      "gross_pct": 16.44,
+      "net_pct": 16.32,
+      "excess_pct": 16.28,
+      "bench_pct": 0.04
+    },
+    {
+      "date": "2025-11-17",
+      "basket": [
+        "BKNG",
+        "F",
+        "BMY",
+        "MCHP",
+        "GM",
+        "INCY",
+        "KLAC",
+        "INTC",
+        "CMI",
+        "SWKS"
+      ],
+      "gross_pct": 18.33,
+      "net_pct": 18.21,
+      "excess_pct": 13.46,
+      "bench_pct": 4.76
+    },
+    {
+      "date": "2025-11-24",
+      "basket": [
+        "BKNG",
+        "F",
+        "BMY",
+        "MCHP",
+        "INCY",
+        "GM",
+        "KLAC",
+        "INTC",
+        "SWKS",
+        "CMI"
+      ],
+      "gross_pct": 14.64,
+      "net_pct": 14.52,
+      "excess_pct": 12.59,
+      "bench_pct": 1.93
+    },
+    {
+      "date": "2025-12-02",
+      "basket": [
+        "BKNG",
+        "F",
+        "BMY",
+        "MCHP",
+        "INCY",
+        "GM",
+        "KLAC",
+        "CMI",
+        "SWKS",
+        "BALL"
+      ],
+      "gross_pct": 2.83,
+      "net_pct": 2.73,
+      "excess_pct": 4.12,
+      "bench_pct": -1.39
+    },
+    {
+      "date": "2025-12-09",
+      "basket": [
+        "BKNG",
+        "BMY",
+        "F",
+        "INCY",
+        "MCHP",
+        "GM",
+        "KLAC",
+        "CMI",
+        "INTC",
+        "BALL"
+      ],
+      "gross_pct": 2.4,
+      "net_pct": 2.29,
+      "excess_pct": 5.69,
+      "bench_pct": -3.39
+    },
+    {
+      "date": "2025-12-16",
+      "basket": [
+        "BKNG",
+        "F",
+        "INCY",
+        "BMY",
+        "MCHP",
+        "GM",
+        "KLAC",
+        "INTC",
+        "SWKS",
+        "CMI"
+      ],
+      "gross_pct": 0.2,
+      "net_pct": 0.09,
+      "excess_pct": 2.94,
+      "bench_pct": -2.85
+    },
+    {
+      "date": "2025-12-23",
+      "basket": [
+        "BKNG",
+        "F",
+        "INCY",
+        "BMY",
+        "MCHP",
+        "GM",
+        "INTC",
+        "KLAC",
+        "SWKS",
+        "CMI"
+      ],
+      "gross_pct": -3.93,
+      "net_pct": -4.03,
+      "excess_pct": 3.87,
+      "bench_pct": -7.9
+    },
+    {
+      "date": "2025-12-31",
+      "basket": [
+        "BKNG",
+        "F",
+        "INCY",
+        "BMY",
+        "MCHP",
+        "GM",
+        "KLAC",
+        "INTC",
+        "SWKS",
+        "HPQ"
+      ],
+      "gross_pct": -0.37,
+      "net_pct": -0.47,
+      "excess_pct": 2.82,
+      "bench_pct": -3.28
+    },
+    {
+      "date": "2026-01-08",
+      "basket": [
+        "BKNG",
+        "F",
+        "INCY",
+        "BMY",
+        "MCHP",
+        "GM",
+        "SWKS",
+        "HPQ",
+        "KLAC",
+        "INTC"
+      ],
+      "gross_pct": 0.88,
+      "net_pct": 0.77,
+      "excess_pct": 1.65,
+      "bench_pct": -0.88
+    },
+    {
+      "date": "2026-01-15",
+      "basket": [
+        "BKNG",
+        "F",
+        "INCY",
+        "BMY",
+        "MCHP",
+        "GM",
+        "SWKS",
+        "HPQ",
+        "KLAC",
+        "CMI"
+      ],
+      "gross_pct": 2.47,
+      "net_pct": 2.37,
+      "excess_pct": -0.38,
+      "bench_pct": 2.75
+    },
+    {
+      "date": "2026-01-23",
+      "basket": [
+        "BKNG",
+        "F",
+        "INCY",
+        "BMY",
+        "MCHP",
+        "GM",
+        "SWKS",
+        "HPQ",
+        "KLAC",
+        "CMI"
+      ],
+      "gross_pct": 4.44,
+      "net_pct": 4.34,
+      "excess_pct": 0.82,
+      "bench_pct": 3.52
+    },
+    {
+      "date": "2026-01-30",
+      "basket": [
+        "BKNG",
+        "F",
+        "INCY",
+        "BMY",
+        "GM",
+        "MCHP",
+        "SWKS",
+        "HPQ",
+        "KLAC",
+        "NTAP"
+      ],
+      "gross_pct": 4.17,
+      "net_pct": 4.06,
+      "excess_pct": 0.53,
+      "bench_pct": 3.53
+    },
+    {
+      "date": "2026-02-06",
+      "basket": [
+        "BKNG",
+        "F",
+        "INCY",
+        "GM",
+        "MCHP",
+        "BMY",
+        "HPQ",
+        "SWKS",
+        "KLAC",
+        "CMI"
+      ],
+      "gross_pct": 6.91,
+      "net_pct": 6.8,
+      "excess_pct": -0.03,
+      "bench_pct": 6.83
+    },
+    {
+      "date": "2026-02-13",
+      "basket": [
+        "BKNG",
+        "MCHP",
+        "GM",
+        "INCY",
+        "BMY",
+        "HPQ",
+        "SWKS",
+        "KLAC",
+        "NTAP",
+        "REGN"
+      ],
+      "gross_pct": 4.08,
+      "net_pct": 3.98,
+      "excess_pct": -4.49,
+      "bench_pct": 8.47
+    },
+    {
+      "date": "2026-02-23",
+      "basket": [
+        "BKNG",
+        "MCHP",
+        "GM",
+        "INCY",
+        "HPQ",
+        "BMY",
+        "SWKS",
+        "KLAC",
+        "NTAP",
+        "REGN"
+      ],
+      "gross_pct": 15.27,
+      "net_pct": 15.15,
+      "excess_pct": 5.65,
+      "bench_pct": 9.5
+    },
+    {
+      "date": "2026-03-02",
+      "basket": [
+        "BKNG",
+        "MCHP",
+        "GM",
+        "INCY",
+        "HPQ",
+        "BMY",
+        "SWKS",
+        "NTAP",
+        "KLAC",
+        "REGN"
+      ],
+      "gross_pct": 21.0,
+      "net_pct": 20.87,
+      "excess_pct": 8.92,
+      "bench_pct": 11.95
+    },
+    {
+      "date": "2026-03-09",
+      "basket": [
+        "BKNG",
+        "MCHP",
+        "GM",
+        "INCY",
+        "SWKS",
+        "BMY",
+        "HPQ",
+        "KLAC",
+        "NTAP",
+        "ADSK"
+      ],
+      "gross_pct": 22.6,
+      "net_pct": 22.47,
+      "excess_pct": 13.33,
+      "bench_pct": 9.14
+    },
+    {
+      "date": "2026-03-16",
+      "basket": [
+        "BKNG",
+        "MCHP",
+        "GM",
+        "INCY",
+        "BMY",
+        "SWKS",
+        "HPQ",
+        "KLAC",
+        "NTAP",
+        "ADSK"
+      ],
+      "gross_pct": 22.44,
+      "net_pct": 22.32,
+      "excess_pct": 10.15,
+      "bench_pct": 12.16
+    },
+    {
+      "date": "2026-03-23",
+      "basket": [
+        "BKNG",
+        "MCHP",
+        "GM",
+        "INCY",
+        "BMY",
+        "SWKS",
+        "HPQ",
+        "NTAP",
+        "KLAC",
+        "REGN"
+      ],
+      "gross_pct": 21.0,
+      "net_pct": 20.88,
+      "excess_pct": 8.33,
+      "bench_pct": 12.55
+    },
+    {
+      "date": "2026-03-30",
+      "basket": [
+        "BKNG",
+        "MCHP",
+        "GM",
+        "INCY",
+        "SWKS",
+        "BMY",
+        "HPQ",
+        "KLAC",
+        "NTAP",
+        "ADSK"
+      ],
+      "gross_pct": 22.14,
+      "net_pct": 22.01,
+      "excess_pct": 7.05,
+      "bench_pct": 14.97
+    },
+    {
+      "date": "2026-04-07",
+      "basket": [
+        "BKNG",
+        "MCHP",
+        "GM",
+        "INCY",
+        "BMY",
+        "SWKS",
+        "HPQ",
+        "NTAP",
+        "ADSK",
+        "KLAC"
+      ],
+      "gross_pct": 17.83,
+      "net_pct": 17.71,
+      "excess_pct": 6.22,
+      "bench_pct": 11.48
+    }
+  ],
+  "note": "이미 채택된 가중치(재탐색 없음)를 최근 구간에 재적용한 표본외 재현성 확인 — 다중검정 과최적화 검사(PBO)는 여기선 해당 없음(탐색 자체가 없으므로). 리밸·보유 중첩으로 n_eff(유효표본)가 n_events_raw보다 훨씬 작음에 유의(SCORE_MODEL_DESIGN.md D3와 동일한 함정)."
+}

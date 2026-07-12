@@ -1,0 +1,75 @@
+{
+  "as_of": "2026-07-10",
+  "weights_used": {
+    "int_gp_assets": 1,
+    "rd_mktcap": 2,
+    "shareholder_yield": 2
+  },
+  "topn": 15,
+  "rebal_days": 63,
+  "turnover_pct": 12.9,
+  "n_combos": 6,
+  "rows": [
+    {
+      "entry": "entry1_full",
+      "exit": "exit1_trail20",
+      "net_pct": 3.87,
+      "stop_rate_pct": 88.3,
+      "mdd_pct": -4.5,
+      "unfilled_pct": 0.0,
+      "n_events": 32
+    },
+    {
+      "entry": "entry1_full",
+      "exit": "exit2_atr2stage",
+      "net_pct": 0.93,
+      "stop_rate_pct": 100.0,
+      "mdd_pct": -2.0,
+      "unfilled_pct": 0.0,
+      "n_events": 32
+    },
+    {
+      "entry": "entry1_full",
+      "exit": "exit3_support2stage",
+      "net_pct": 5.82,
+      "stop_rate_pct": 67.7,
+      "mdd_pct": -7.6,
+      "unfilled_pct": 0.0,
+      "n_events": 32
+    },
+    {
+      "entry": "entry2_pullback2",
+      "exit": "exit1_trail20",
+      "net_pct": 4.46,
+      "stop_rate_pct": 88.3,
+      "mdd_pct": -4.0,
+      "unfilled_pct": 32.8,
+      "n_events": 32
+    },
+    {
+      "entry": "entry2_pullback2",
+      "exit": "exit2_atr2stage",
+      "net_pct": 1.52,
+      "stop_rate_pct": 100.0,
+      "mdd_pct": -1.6,
+      "unfilled_pct": 32.8,
+      "n_events": 32
+    },
+    {
+      "entry": "entry2_pullback2",
+      "exit": "exit3_support2stage",
+      "net_pct": 6.51,
+      "stop_rate_pct": 66.0,
+      "mdd_pct": -7.3,
+      "unfilled_pct": 32.8,
+      "n_events": 32
+    }
+  ],
+  "baseline": "entry1_full__exit1_trail20 (현행 시스템과 동일 규칙)",
+  "adoption_criteria": "청산 규칙은 baseline 대비 net 개선 & 손절빈도 감소가 T_eff 보정 후에도 유지될 때만 채택 제안(SCORE_MODEL_DESIGN.md 부록 A3)",
+  "limitations": [
+    "ATR은 종가 기반 근사(고가/저가 데이터 미사용)",
+    "지지선은 진입 시점 1회 계산 후 보유기간 동안 고정(매일 재계산 아님)",
+    "vol_poc_dist(A1)는 실제 거래량 히스토그램 최빈가 대신 252일 거래량가중평균가(VWAP)로 근사"
+  ]
+}
