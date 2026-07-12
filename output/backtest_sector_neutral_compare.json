@@ -1,0 +1,83 @@
+{
+  "as_of": "2026-07-10",
+  "method": "섹터중립 z-score + IC상위9(강제포함 없음) 그리드",
+  "n_sector_mapped": 389,
+  "pit_coverage_pct": {
+    "mean": 87.7,
+    "min": 82.9
+  },
+  "candidate_factors": [
+    "int_gp_assets",
+    "gp_assets",
+    "gross_margin",
+    "rd_mktcap",
+    "shareholder_yield",
+    "accruals",
+    "roa",
+    "mom6",
+    "cop"
+  ],
+  "n_trials": 19171,
+  "n_events": 32,
+  "best": {
+    "weights": {
+      "int_gp_assets": 2,
+      "gp_assets": 2,
+      "gross_margin": 0,
+      "rd_mktcap": 0,
+      "shareholder_yield": 2,
+      "accruals": 1,
+      "roa": 0,
+      "mom6": 0,
+      "cop": 0
+    },
+    "turnover": 17.0,
+    "ret_1m_gross": 2.84,
+    "ret_1m": 2.73,
+    "excess_1m": 0.58,
+    "win_1m": 68.8,
+    "worst_1m": -7.0,
+    "sharpe_1m": 0.94,
+    "ret_3m_gross": 5.45,
+    "ret_3m": 5.34,
+    "excess_3m": 1.6,
+    "win_3m": 71.9,
+    "worst_3m": -12.0,
+    "sharpe_3m": 0.89,
+    "ret_6m_gross": 10.99,
+    "ret_6m": 10.87,
+    "excess_6m": 3.32,
+    "win_6m": 87.5,
+    "worst_6m": -15.2,
+    "sharpe_6m": 0.86,
+    "ret_12m_gross": 21.92,
+    "ret_12m": 21.79,
+    "excess_12m": 6.43,
+    "win_12m": 90.6,
+    "worst_12m": -11.1,
+    "sharpe_12m": 0.74
+  },
+  "oos": {
+    "train": {
+      "excess_6m": 5.92,
+      "excess_12m": 11.14,
+      "sharpe_6m": 1.75
+    },
+    "test": {
+      "excess_6m": -0.49,
+      "excess_12m": -0.45,
+      "sharpe_6m": -0.17
+    },
+    "n_train": 19,
+    "n_test": 13
+  },
+  "pbo": 0.237,
+  "pbo_verdict": "중간(주의)",
+  "dsr": 0.5623,
+  "dsr_verdict": "통과 실패(다중검정 감안 시 샤프가 유의하지 않음)",
+  "passed": false,
+  "limitations": [
+    "섹터(GICS) 분류는 현재 위키피디아 스냅샷 1회를 10년 전체에 동일 적용(비PIT) — 과거 시점 실제 섹터와 다를 수 있음",
+    "섹터 표본이 10종목 미만이면 전체(글로벌) z로 폴백"
+  ]
+}

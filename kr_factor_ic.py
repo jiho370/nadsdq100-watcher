@@ -71,24 +71,21 @@ def _corp_map(key: str) -> dict:
 
 
 def _parse_report(js: dict) -> dict:
-    """fnlttSinglAcntAll 응답 → {키: 값}. 연결(CFS) 우선."""
+    """fnlttSinglAcntAll 응답 → {키: 값}.
+    주의: fs_div(CFS/OFS)는 '요청 파라미터'이며 응답 행에는 없다(실측 2026-07 — 행의
+    fs_div는 None). 행 필터 없이 전부 파싱한다(어느 재무제표인지는 호출부가 결정)."""
     rows = js.get("list") or []
     got = {}
-    for fs in ("CFS", "OFS"):
-        for row in rows:
-            if row.get("fs_div") != fs:
+    for row in rows:
+        aid, anm = row.get("account_id", ""), (row.get("account_nm") or "").strip()
+        for k, (ids, nms) in ACCOUNTS.items():
+            if k in got:
                 continue
-            aid, anm = row.get("account_id", ""), (row.get("account_nm") or "").strip()
-            for k, (ids, nms) in ACCOUNTS.items():
-                if k in got:
-                    continue
-                if aid in ids or any(anm == n for n in nms):
-                    try:
-                        got[k] = float(str(row.get("thstrm_amount", "")).replace(",", ""))
-                    except ValueError:
-                        pass
-        if got:
-            break
+            if aid in ids or any(anm == n for n in nms):
+                try:
+                    got[k] = float(str(row.get("thstrm_amount", "")).replace(",", ""))
+                except ValueError:
+                    pass
     if "gross" not in got and "revenue" in got and "cogs" in got:
         got["gross"] = got["revenue"] - got["cogs"]
     got.pop("cogs", None)
@@ -118,13 +115,27 @@ def collect(tickers: list[str], years: int, reports=("11011",), sleep_s=0.15):
                 tag = f"{y}-{rc}"
                 if tag in done:
                     continue
-                try:
-                    js = requests.get(DART_URL, timeout=30, params={
-                        "crtfc_key": key, "corp_code": corp, "bsns_year": str(y),
-                        "reprt_code": rc, "fs_div": "CFS"}).json()
-                    n_req += 1
-                except Exception as e:
-                    _log(f"{t} {tag} 요청 실패({e}) — 다음 실행 시 재개"); continue
+                js = None
+                # 연결(CFS) 우선, 무자료(013)면 별도(OFS) 폴백 — 비연결 기업 대응
+                for fs in ("CFS", "OFS"):
+                    try:
+                        js = requests.get(DART_URL, timeout=30, params={
+                            "crtfc_key": key, "corp_code": corp, "bsns_year": str(y),
+                            "reprt_code": rc, "fs_div": fs}).json()
+                        n_req += 1
+                    except Exception as e:
+                        _log(f"{t} {tag} 요청 실패({e}) — 다음 실행 시 재개"); js = None; break
+                    if js.get("status") == "020":     # 사용한도 초과 — 중단(내일 재개)
+                        _log("DART 사용한도 초과(status 020) — 수집 중단, 내일 재실행 시 재개")
+                        os.makedirs("output", exist_ok=True)
+                        with open(DART_CACHE, "w", encoding="utf-8") as f:
+                            json.dump(cache, f, ensure_ascii=False)
+                        return cache
+                    if js.get("status") == "000" and js.get("list"):
+                        break
+                    time.sleep(sleep_s)
+                if js is None:
+                    continue                           # 네트워크 오류 — done 표시 안 함(재개 대상)
                 if js.get("status") == "000" and js.get("list"):
                     vals = _parse_report(js)
                     rcept = str(js["list"][0].get("rcept_no", ""))[:8]
