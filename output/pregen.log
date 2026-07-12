@@ -332,3 +332,28 @@ git : To https://github.com/jiho370/nadsdq100-watcher.git
  
    6a30b20..61a0051  main -> main
 2026-07-11 22:04:14 [kr] === pregen 완료 ===
+2026-07-12 13:50:21 [us] === pregen 시작 ===
+git : error: cannot pull with rebase: You have unstaged changes.
+위치 C:\Users\JH\Documents\GitHub\nadsdq100-watcher\run_pregen.ps1:26 문자:1
++ git pull --rebase 2>&1 | Out-File -Append -Encoding utf8 $log
++ ~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (error: cannot p...staged changes.:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+error: Please commit or stash them.
+2026-07-12 13:50:21 [us] [경고] git pull 실패 — 로컬에 커밋 안 된 변경이 있으면 여기서 막힘. 아래 push도 실패할 수 있음.
+2026-07-12 13:50:21 [us]         해결: 저장소 폴더에서 'git add -A; git commit -m sync; git push' 한 번 수동 실행.
+python : [정보] SPY 보유종목 503개 로드
+위치 C:\Users\JH\Documents\GitHub\nadsdq100-watcher\run_pregen.ps1:33 문자:1
++ python pregen.py --$Mode 2>&1 | Out-File -Append -Encoding utf8 $log
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: ([정보] SPY 보유종목 503개 로드:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+[섹터] 위키에서 503종목 GICS 섹터 확보 (Sub-Industry 503종목)
+[탐욕지수] 49 (중립)
+[프로필] 503종목 로드 (생성 2026-06-20)
+[REPORT] 검증 1차 실패(RuntimeError) → 웹검색 없이 재시도
+[REPORT] 검증 실패(RuntimeError: claude CLI rc=1: API Error: Unable to connect to API (ConnectionRefused))
+[PREGEN] 검증 실패 \u2014 파일 미생성(오후에 API 폴백)
+2026-07-12 14:01:25 [us] pregen.py 실패(rc=1) — Actions 가 API 폴백. 종료.

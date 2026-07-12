@@ -404,6 +404,40 @@ def compare(snaps, pit, args, cost: CostModel):
     return payload
 
 
+# ------------------------- 가중치 발행 (라이브 선정 연결) -------------------------
+def publish_weights():
+    """PBO/DSR 게이트 통과 시에만 pit_best 가중치를 output/best_weights.json 으로 발행.
+    export_data.select_pool 이 이 파일을 읽어 일일 종목 선정에 사용한다(없으면 모멘텀 폴백).
+    검증 안 된 가중치가 라이브로 새는 것을 코드로 차단하는 것이 목적."""
+    with open("output/backtest_costs_compare.json", encoding="utf-8") as f:
+        cmp_ = json.load(f)
+    try:
+        with open("output/pbo_report.json", encoding="utf-8") as f:
+            rep = json.load(f)
+    except Exception:
+        rep = {}
+    if not rep.get("passed"):
+        _log("[발행 거부] pbo_report.json passed=true 아님 — 검증 통과 전 가중치는 발행 불가")
+        sys.exit(1)
+    best = cmp_.get("pit_best") or {}
+    w = {k: v for k, v in (best.get("weights") or {}).items() if v}
+    if not w:
+        _log("[발행 거부] pit_best 가중치 없음 — 먼저 backtest_costs.py 본 실행"); sys.exit(1)
+    payload = {"weights": w,
+               "metrics": {k: v for k, v in best.items() if k != "weights"},
+               "selected_factors": list(w),
+               "recommended_hold": "6m",
+               "self_test": False,
+               "published_from": "backtest_costs(pit_best) — overfit_stats passed 게이트 통과분",
+               "published_at": pd.Timestamp.today().date().isoformat(),
+               "gate": {"pbo": rep["pbo"]["pbo"], "dsr_teff": rep["dsr"].get("dsr")},
+               "criteria": "PIT 유니버스+거래비용 재탐색 최적 · PBO/DSR(T_eff) 통과 시에만 발행"}
+    with open("output/best_weights.json", "w", encoding="utf-8") as f:
+        json.dump(payload, f, ensure_ascii=False, indent=2)
+    _log(f"[발행] output/best_weights.json ← {BW._wstr(w)} "
+         f"(PBO {rep['pbo']['pbo']:.1%} · DSR {rep['dsr'].get('dsr')}) — 다음 리포트부터 라이브 반영")
+
+
 # ------------------------- self-test -------------------------
 def _synthetic_pit(panel, seed=7):
     """합성 PIT: 6개월마다 90종목 중 ~78%가 멤버(무작위 교체) + 마지막 멤버십."""
@@ -455,10 +489,14 @@ def main():
     ap.add_argument("--pit-file", default=None, help="PIT CSV 직접 지정(date,tickers)")
     ap.add_argument("--export-universe", action="store_true",
                     help="PIT 합집합 티커만 출력(fundamentals_edgar --tickers 용)")
+    ap.add_argument("--publish-weights", action="store_true",
+                    help="검증(PBO/DSR) 통과 가중치를 best_weights.json 으로 발행(라이브 반영)")
     ap.add_argument("--self-test", action="store_true")
     args = ap.parse_args()
     if args.self_test:
         self_test(); return
+    if args.publish_weights:
+        publish_weights(); return
     pit = load_pit(args.pit_file)
     if args.export_universe:
         start = (pd.Timestamp.today() - pd.DateOffset(years=int(args.years))).date().isoformat()

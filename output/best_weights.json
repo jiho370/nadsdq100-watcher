@@ -1,0 +1,48 @@
+{
+  "weights": {
+    "int_gp_assets": 1,
+    "rd_mktcap": 2,
+    "shareholder_yield": 2
+  },
+  "metrics": {
+    "turnover": 12.7,
+    "ret_1m_gross": 3.26,
+    "ret_1m": 3.16,
+    "excess_1m": 1.0,
+    "win_1m": 71.9,
+    "worst_1m": -8.6,
+    "sharpe_1m": 1.74,
+    "ret_3m_gross": 6.48,
+    "ret_3m": 6.37,
+    "excess_3m": 2.64,
+    "win_3m": 75.0,
+    "worst_3m": -13.5,
+    "sharpe_3m": 1.51,
+    "ret_6m_gross": 13.09,
+    "ret_6m": 12.97,
+    "excess_6m": 5.42,
+    "win_6m": 87.5,
+    "worst_6m": -20.1,
+    "sharpe_6m": 1.63,
+    "ret_12m_gross": 27.99,
+    "ret_12m": 27.86,
+    "excess_12m": 12.5,
+    "win_12m": 90.6,
+    "worst_12m": -10.4,
+    "sharpe_12m": 1.64
+  },
+  "selected_factors": [
+    "int_gp_assets",
+    "rd_mktcap",
+    "shareholder_yield"
+  ],
+  "recommended_hold": "6m",
+  "self_test": false,
+  "published_from": "backtest_costs(pit_best) — overfit_stats passed 게이트 통과분",
+  "published_at": "2026-07-12",
+  "gate": {
+    "pbo": 0.1504,
+    "dsr_teff": 0.9711
+  },
+  "criteria": "PIT 유니버스+거래비용 재탐색 최적 · PBO/DSR(T_eff) 통과 시에만 발행"
+}

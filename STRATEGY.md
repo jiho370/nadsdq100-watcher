@@ -65,9 +65,14 @@
 
 ## 2. 미국 개별주 (S&P500)
 
-**선정(변경 없음)** — 자체 워크포워드 검증을 통과한 기존 가중치 유지:
-`gross_margin×2 + accruals×2 + mom6×2 + mom12_1×1 + shareholder_yield×1`
-(학습 6M +9.73%p → 표본외 +9.88%p, 승률 89.5%, 샤프 1.6 — output/best_weights.json)
+**선정** — 2026-07 v2 재검증(PBO 15.0%·DSR(T_eff=16) 0.9711 통과, 워크포워드 OOS +3.58%p)으로
+채택된 가중치: `int_gp_assets×1 + rd_mktcap×2 + shareholder_yield×2`
+(전기간·비용반영·PIT 실측: 6M 순초과 +5.4%p·승률 87.5%, 12M 순초과 +12.5%p·승률 90.6%
+— `output/backtest_costs_compare.json:pit_best`, `output/pbo_report.json`. 각주: 2026-07 재검증,
+이전 표기 "+9.73%p/+9.88%p·승률 89.5%"·`gross_margin×2+accruals×2+mom6×2+mom12_1×1+shareholder_yield×1`
+는 재현되지 않아 폐기 — mom12_1 IC가 이 표본에서 음수로 확인됨, `SCORE_MODEL_DESIGN.md` §1 D1·D5 참고)
+⚠ 이 가중치는 아직 `output/best_weights.json`으로 반영되지 않았다 — 그 파일이 없으면
+`export_data.load_best_weights()`가 자동으로 momentum_12_1 모델로 폴백한다(현재 실제 발송 상태).
 
 **진입 필터(신규, 근거 반영)** — '지금 매수'에 오르려면 추가로:
 1. 종가 > 200일선 (레짐 필터 — 하락 추세 종목 제외)
