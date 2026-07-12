@@ -357,3 +357,177 @@ python : [정보] SPY 보유종목 503개 로드
 [REPORT] 검증 실패(RuntimeError: claude CLI rc=1: API Error: Unable to connect to API (ConnectionRefused))
 [PREGEN] 검증 실패 \u2014 파일 미생성(오후에 API 폴백)
 2026-07-12 14:01:25 [us] pregen.py 실패(rc=1) — Actions 가 API 폴백. 종료.
+2026-07-12 19:00:04 [kr] === pregen 시작 ===
+git : error: cannot pull with rebase: You have unstaged changes.
+위치 C:\Users\JH\Documents\GitHub\nadsdq100-watcher\run_pregen.ps1:26 문자:1
++ git pull --rebase 2>&1 | Out-File -Append -Encoding utf8 $log
++ ~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (error: cannot p...staged changes.:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+error: Please commit or stash them.
+2026-07-12 19:00:05 [kr] [경고] git pull 실패 — 로컬에 커밋 안 된 변경이 있으면 여기서 막힘. 아래 push도 실패할 수 있음.
+2026-07-12 19:00:05 [kr]         해결: 저장소 폴더에서 'git add -A; git commit -m sync; git push' 한 번 수동 실행.
+python : [KR] pykrx 없음(HTTPSConnectionPool(host='data.krx.co.kr', port=443): Max retries exceeded with url: /contents/M
+DC/COMS/client/MDCCOMS001.cmd (Caused by NameResolutionError("HTTPSConnection(host='data.krx.co.kr', port=443): Failed 
+to resolve 'data.krx.co.kr' ([Errno 11001] getaddrinfo failed)"))) → 캐시 폴백
+위치 C:\Users\JH\Documents\GitHub\nadsdq100-watcher\run_pregen.ps1:33 문자:1
++ python pregen.py --$Mode 2>&1 | Out-File -Append -Encoding utf8 $log
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: ([KR] pykrx 없음(H...ed)"))) → 캐시 폴백:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+[KR] 캐시 사용(기준일 20260710)
+[KR] 펀더멘탈 통과 74/200종목 (EPS>0·ROE≥8%·PER≤40)
+$086280.KS: possibly delisted; no price data found  (period=2y)
+$002840.KS: possibly delisted; no price data found  (period=2y)
+$271560.KS: possibly delisted; no price data found  (period=2y)
+$000100.KS: possibly delisted; no price data found  (period=2y)
+$005830.KS: possibly delisted; no price data found  (period=2y)
+$069620.KS: possibly delisted; no price data found  (period=2y)
+$030000.KS: possibly delisted; no price data found  (period=2y)
+$086790.KS: possibly delisted; no price data found  (period=2y)
+$014680.KS: possibly delisted; no price data found  (period=2y)
+$007340.KS: possibly delisted; no price data found  (period=2y)
+$051600.KS: possibly delisted; no price data found  (period=2y)
+$033780.KS: possibly delisted; no price data found  (period=2y)
+$326030.KS: possibly delisted; no price data found  (period=2y)
+$012450.KS: possibly delisted; no price data found  (period=2y)
+$039490.KS: possibly delisted; no price data found  (period=2y)
+$009540.KS: possibly delisted; no price data found  (period=2y)
+$082740.KS: possibly delisted; no price data found  (period=2y)
+$003230.KS: possibly delisted; no price data found  (period=2y)
+$128940.KS: possibly delisted; no price data found  (period=2y)
+$073240.KS: possibly delisted; no price data found  (period=2y)
+$047050.KS: possibly delisted; no price data found  (period=2y)
+$111770.KS: possibly delisted; no price data found  (period=2y)
+$192080.KS: possibly delisted; no price data found  (period=2y)
+$064350.KS: possibly delisted; no price data found  (period=2y)
+$005940.KS: possibly delisted; no price data found  (period=2y)
+$071050.KS: possibly delisted; no price data found  (period=2y)
+$483650.KS: possibly delisted; no price data found  (period=2y)
+$268280.KS: possibly delisted; no price data found  (period=2y)
+$036570.KS: possibly delisted; no price data found  (period=2y)
+$021240.KS: possibly delisted; no price data found  (period=2y)
+$105560.KS: possibly delisted; no price data found  (period=2y)
+$383220.KS: possibly delisted; no price data found  (period=2y)
+$003090.KS: possibly delisted; no price data found  (period=2y)
+$062040.KS: possibly delisted; no price data found  (period=2y)
+$026960.KS: possibly delisted; no price data found  (period=2y)
+$000990.KS: possibly delisted; no price data found  (period=2y)
+$006800.KS: possibly delisted; no price data found  (period=2y)
+$005380.KS: possibly delisted; no price data found  (period=2y)
+$030200.KS: possibly delisted; no price data found  (period=2y)
+$016360.KS: possibly delisted; no price data found  (period=2y)
+$002380.KS: possibly delisted; no price data found  (period=2y)
+$017800.KS: possibly delisted; no price data found  (period=2y)
+$009970.KS: possibly delisted; no price data found  (period=2y)
+$028050.KS: possibly delisted; no price data found  (period=2y)
+$000810.KS: possibly delisted; no price data found  (period=2y)
+$064400.KS: possibly delisted; no price data found  (period=2y)
+$329180.KS: possibly delisted; no price data found  (period=2y)
+$161890.KS: possibly delisted; no price data found  (period=2y)
+$071970.KS: possibly delisted; no price data found  (period=2y)
+$316140.KS: possibly delisted; no price data found  (period=2y)
+$259960.KS: possibly delisted; no price data found  (period=2y)
+$008930.KS: possibly delisted; no price data found  (period=2y)
+$282330.KS: possibly delisted; no price data found  (period=2y)
+$161390.KS: possibly delisted; no price data found  (period=2y)
+$443060.KS: possibly delisted; no price data found  (period=2y)
+$015760.KS: possibly delisted; no price data found  (period=2y)
+$000270.KS: possibly delisted; no price data found  (period=2y)
+$138040.KS: possibly delisted; no price data found  (period=2y)
+$001450.KS: possibly delisted; no price data found  (period=2y)
+$081660.KS: possibly delisted; no price data found  (period=2y)
+$071320.KS: possibly delisted; no price data found  (period=2y)
+$042660.KS: possibly delisted; no price data found  (period=2y)
+$192820.KS: possibly delisted; no price data found  (period=2y)
+$005850.KS: possibly delisted; no price data found  (period=2y)
+$006040.KS: possibly delisted; no price data found  (period=2y)
+$017960.KS: possibly delisted; no price data found  (period=2y)
+$000660.KS: possibly delisted; no price data found  (period=2y)
+$402340.KS: possibly delisted; no price data found  (period=2y)
+$010140.KS: possibly delisted; no price data found  (period=2y)
+$175330.KS: possibly delisted; no price data found  (period=2y)
+$009240.KS: possibly delisted; no price data found  (period=2y)
+$267250.KS: possibly delisted; no price data found  (period=2y)
+$055550.KS: possibly delisted; no price data found  (period=2y)
+$012750.KS: possibly delisted; no price data found  (period=2y)
+
+74 Failed downloads:
+['086280.KS', '002840.KS', '271560.KS', '000100.KS', '005830.KS', '069620.KS', '030000.KS', '086790.KS', '014680.KS', '
+007340.KS', '051600.KS', '033780.KS', '326030.KS', '012450.KS', '039490.KS', '009540.KS', '082740.KS', '003230.KS', '12
+8940.KS', '073240.KS', '047050.KS', '111770.KS', '192080.KS', '064350.KS', '005940.KS', '071050.KS', '483650.KS', '2682
+80.KS', '036570.KS', '021240.KS', '105560.KS', '383220.KS', '003090.KS', '062040.KS', '026960.KS', '000990.KS', '006800
+.KS', '005380.KS', '030200.KS', '016360.KS', '002380.KS', '017800.KS', '009970.KS', '028050.KS', '000810.KS', '064400.K
+S', '329180.KS', '161890.KS', '071970.KS', '316140.KS', '259960.KS', '008930.KS', '282330.KS', '161390.KS', '443060.KS'
+, '015760.KS', '000270.KS', '138040.KS', '001450.KS', '081660.KS', '071320.KS', '042660.KS', '192820.KS', '005850.KS', 
+'006040.KS', '017960.KS', '000660.KS', '402340.KS', '010140.KS', '175330.KS', '009240.KS', '267250.KS', '055550.KS', '0
+12750.KS']: possibly delisted; no price data found  (period=2y)
+[KR] 추세 조건(200일선 위) 통과 종목 없음
+[PREGEN] 한국 후보 없음 → 스킵
+KRX 로그인 시도...
+  로그인 ID: jiho370
+On branch main
+Your branch is up to date with 'origin/main'.
+
+Changes not staged for commit:
+  (use "git add <file>..." to update what will be committed)
+  (use "git restore <file>..." to discard changes in working directory)
+	modified:   output/pregen.log
+	modified:   score_calibration.py
+
+Untracked files:
+  (use "git add <file>..." to include in what will be committed)
+	backtest_exec.py
+	output/backtest_exec_compare.json
+	output/pbo_report_exec.json
+	output/trial_returns_exec.json
+
+no changes added to commit (use "git add" and/or "git commit -a")
+git : fatal: unable to access 'https://github.com/jiho370/nadsdq100-watcher.git/': Could not resolve host: github.com
+위치 C:\Users\JH\Documents\GitHub\nadsdq100-watcher\run_pregen.ps1:50 문자:5
++     git push 2>&1 | Out-File -Append -Encoding utf8 $log
++     ~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (fatal: unable t...ost: github.com:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+2026-07-12 19:00:23 [kr] [경고] git push 실패 — 보통 로컬이 origin보다 뒤처져 있을 때 발생. 위 pull 경고 참고.
+2026-07-12 19:00:23 [kr] === pregen 완료 ===
+2026-07-12 22:00:03 [kr] === pregen 시작 ===
+git : error: cannot pull with rebase: You have unstaged changes.
+위치 C:\Users\JH\Documents\GitHub\nadsdq100-watcher\run_pregen.ps1:26 문자:1
++ git pull --rebase 2>&1 | Out-File -Append -Encoding utf8 $log
++ ~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (error: cannot p...staged changes.:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+error: Please commit or stash them.
+2026-07-12 22:00:03 [kr] [경고] git pull 실패 — 로컬에 커밋 안 된 변경이 있으면 여기서 막힘. 아래 push도 실패할 수 있음.
+2026-07-12 22:00:03 [kr]         해결: 저장소 폴더에서 'git add -A; git commit -m sync; git push' 한 번 수동 실행.
+python : [KR] 펀더멘탈 통과 74/200종목 (EPS>0·ROE≥8%·PER≤40)
+위치 C:\Users\JH\Documents\GitHub\nadsdq100-watcher\run_pregen.ps1:33 문자:1
++ python pregen.py --$Mode 2>&1 | Out-File -Append -Encoding utf8 $log
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: ([KR] 펀더멘탈 통과 74...·ROE≥8%·PER≤40):String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+[KR] 선정: 매수 4 · 관찰 3 (후보 36)
+[PREGEN] 서술 사전생성 5종목
+[PREGEN] 저장: output/pregen_kr.json (대상일 2026-07-13 · 종목 7 · 서술캐시 5건)
+KRX 로그인 시도...
+  로그인 ID: jiho370
+KRX 로그인 완료.
+  로그인 시간: 2026-07-12 22:00:09
+  만료 시간: 2026-07-12 23:00:09
+[feat/track-c-exec-and-recent-research 36d2551] chore: pregen kr [skip ci]
+ 1 file changed, 64 insertions(+), 58 deletions(-)
+git : To https://github.com/jiho370/nadsdq100-watcher.git
+위치 C:\Users\JH\Documents\GitHub\nadsdq100-watcher\run_pregen.ps1:50 문자:5
++     git push 2>&1 | Out-File -Append -Encoding utf8 $log
++     ~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (To https://gith...100-watcher.git:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+   361542b..36d2551  feat/track-c-exec-and-recent-research -> feat/track-c-exec-and-recent-research
+2026-07-12 22:04:56 [kr] === pregen 완료 ===
