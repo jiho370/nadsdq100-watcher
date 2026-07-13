@@ -1,15 +1,18 @@
 #!/usr/bin/env python3
 """
-kr_stocks.py — 코스피200 개별 종목 선별 (STRATEGY.md §3).
+kr_stocks.py — 코스피200 개별 종목 선별 (STRATEGY.md §3, 2026-07-14 valuediv로 교체).
 
-규칙:
-  · 유니버스: 코스피200 (한국 모멘텀은 이 유니버스에서만 통계적으로 유의 — universe shrinkage 연구)
-  · 펀더멘탈 필터(KRX 공식, pykrx): EPS>0(흑자) · ROE(EPS/BPS)≥8% · 0<PER≤40
-  · 추세: 종가>200일선 필수, 점수 = z(12-1 모멘텀)×0.6 + z(52주 고점 근접도)×0.4
-  · 매수 후보 풀 6(순위순) — 관찰 폐지(2026-07-13), AI 검증 후 최종 5 확정. 보유 상한 6
-  · 매도: 트레일링 -20% 또는 200일선 -3% 이탈 (output/kr_holdings.json 자동 추적)
+규칙(KR_STRATEGY_OPTIONS.md §8 검증 반영 — backtest_kr_strategies.py Phase 3):
+  · 유니버스: 코스피200
+  · 펀더멘탈 필터(KRX 공식, pykrx): EPS>0(흑자) · ROE(EPS/BPS)>0 — 예전 ROE≥8%·PER≤40·
+    200일선 위 필터는 밸류 전략의 성과를 깎는 것으로 확인돼 폐기(추세필터 강제 시 진짜
+    저평가 구간을 걸러버림 — 미국 진입게이트 폐지와 동일 취지).
+  · 점수(교체, 옛 mom12_1×0.6+hi52×0.4 폐기) = z(1/PER) + z(1/PBR) + z(배당수익률)
+    — "밸류×주주환원" 계열. 코어-새틀라이트 구조(§2-F, STRATEGY.md §3)의 새틀라이트 역할.
+  · 매수 후보 풀 6(순위순) — AI 검증 후 최종 5 확정. 보유 상한 6
+  · 매도: 6개월 정기 재평가(후보풀 이탈) + 200일선 -3% 이탈 (output/kr_holdings.json 자동 추적)
 
-데이터: 구성종목·펀더멘탈 = pykrx(KRX), 시세 = yfinance(.KS 배치 1회).
+데이터: 구성종목·펀더멘탈(PER/PBR/EPS/BPS/DIV) = pykrx(KRX), 시세 = yfinance(.KS 배치 1회).
 pykrx 실패 시 output/kospi200_cache.json 캐시로 폴백(성공 시마다 갱신).
 """
 from __future__ import annotations
@@ -19,8 +22,6 @@ import market_signals as MS
 
 CACHE = "output/kospi200_cache.json"
 KR_HOLDINGS = "output/kr_holdings.json"
-ROE_MIN = float(os.environ.get("KR_ROE_MIN", "0.08"))
-PER_MAX = float(os.environ.get("KR_PER_MAX", "40"))
 # 후보 '풀' 크기 — AI 검증(강등/제외) 후 최종 채택은 ai_report가 KR_FINAL_BUY(5)로 확정.
 # 관찰 폐지(2026-07-13): 풀 전체가 매수 후보, N_WATCH 기본 0.
 N_BUY = int(os.environ.get("KR_POOL_BUY", "6"))
@@ -64,6 +65,7 @@ def _krx_universe_funda() -> dict | None:
                 try:
                     row = df.loc[t]
                     per, eps, bps = float(row["PER"]), float(row["EPS"]), float(row["BPS"])
+                    pbr, div = float(row["PBR"]), float(row["DIV"])
                 except Exception:
                     continue
                 if per != per or eps != eps or bps != bps:   # NaN — 그날 재무데이터 미발행
@@ -74,7 +76,8 @@ def _krx_universe_funda() -> dict | None:
                     name = K.get_market_ticker_name(t)
                 except Exception:
                     pass
-                cand[t] = {"name": name, "per": per, "eps": eps, "bps": bps, "roe": round(roe, 4)}
+                cand[t] = {"name": name, "per": per, "eps": eps, "bps": bps, "roe": round(roe, 4),
+                          "pbr": pbr, "div_yield": div if div == div else 0.0}
             if len(cand) >= len(members) * 0.5:   # 절반 이상 유효해야 그 날짜를 채택
                 out = cand
                 break
@@ -127,13 +130,16 @@ def select(yf) -> dict:
              "환경변수 KRX_ID/KRX_PW 필요(data.krx.co.kr 무료가입, GITHUB_SETUP.md 참고). "
              "pykrx 자체가 없다면 `pip install pykrx`. 한 번 성공하면 캐시가 생겨 이후엔 안전망이 됨.")
         return {}
-    passed = {t: f for t, f in funda.items()
-              if f["eps"] > 0 and f["roe"] >= ROE_MIN and 0 < f["per"] <= PER_MAX}
-    _log(f"펀더멘탈 통과 {len(passed)}/{len(funda)}종목 (EPS>0·ROE≥{ROE_MIN:.0%}·PER≤{PER_MAX:.0f})")
+    # 2026-07-14: 옛 EPS>0·ROE≥8%·PER≤40 필터를 EPS>0·ROE>0로 완화(backtest_kr_strategies.py
+    # Phase 3 검증값 그대로 재현 — 밸류 전략에 ROE 8% 문턱·PER 상한을 추가로 걸면 저평가
+    # 구간을 스스로 걸러내는 모순이 생김. value(1/PER)·pbr_inv(1/PBR) 자체가 극단 고평가를
+    # 이미 낮은 점수로 벌점 처리한다).
+    passed = {t: f for t, f in funda.items() if f["eps"] > 0 and f["roe"] > 0}
+    _log(f"펀더멘탈 통과 {len(passed)}/{len(funda)}종목 (EPS>0·ROE>0)")
     if not passed:
         return {}
     raw = MS.fetch_closes(yf, [f"{t}.KS" for t in passed])
-    cands, mom_v, prox_v, ind_map = {}, {}, {}, {}
+    cands, value_v, pbrinv_v, div_v, ind_map = {}, {}, {}, {}, {}
     as_of = None
     for t, f in passed.items():
         d = raw.get(f"{t}.KS")
@@ -144,33 +150,32 @@ def select(yf) -> dict:
         ma200 = MS._sma(c, 200); ma50 = MS._sma(c, 50); ma20 = MS._sma(c, 20)
         ind_map[t] = {"price": price, "ma200": ma200,
                       "closes": c[-252:], "dates": d["dates"][-252:]}
-        if not ma200 or price <= ma200:      # 200일선 위 필수
-            continue
-        mom = MS._mom_12_1(c)
-        hi52 = max(c[-252:])
-        prox = (price / hi52 - 1) * 100 if hi52 else None
-        mom_v[t], prox_v[t] = mom, prox
+        # 2026-07-14: 200일선 진입 필터 폐지(§8 검증 — 추세필터 강제 시 밸류 전략 성과 훼손,
+        # 미국 진입게이트 폐지와 동일 결론). 매도 측 200일선 -3% 백업은 holdings.py에 그대로.
+        pbr, div = f.get("pbr"), f.get("div_yield")
+        value = (1.0 / f["per"]) if f["per"] > 0 else None
+        pbr_inv = (1.0 / pbr) if pbr and pbr > 0 else None
+        value_v[t], pbrinv_v[t], div_v[t] = value, pbr_inv, div
         as_of = as_of or d["dates"][-1]
         cands[t] = {
             "symbol": t, "yf_symbol": f"{t}.KS", "name": f.get("name") or t,
             "sector": "", "price": round(price, 0),
-            "pe": round(f["per"], 1), "roe": f["roe"],
+            "pe": round(f["per"], 1), "roe": f["roe"], "pbr": pbr, "div_yield": div,
             "rsi": MS._rsi(c), "ma20": ma20, "ma50": ma50, "ma200": ma200,
-            "high_52w": hi52, "prox52": round(prox, 1) if prox is not None else None,
-            "above_ma200": True,
+            "high_52w": max(c[-252:]), "above_ma200": bool(ma200 and price > ma200),
             "ret": {"1w": MS._ret(c, 5), "1m": MS._ret(c, 21), "3m": MS._ret(c, 63),
                     "6m": MS._ret(c, 126), "1y": MS._ret(c, 252)},
-            "mom12_1": round(mom, 1) if mom is not None else None,
             "closes": [round(v, 0) for v in c[-252:]],
         }
     if not cands:
-        _log("추세 조건(200일선 위) 통과 종목 없음")
+        _log("펀더멘탈 통과 종목 중 시세 확보된 종목 없음")
         return {"as_of": as_of, "buy": [], "watch": [], "ind_map": ind_map}
-    zm, zp = _z(mom_v), _z(prox_v)
+    zv, zp, zd = _z(value_v), _z(pbrinv_v), _z(div_v)
     for t, c in cands.items():
-        c["score"] = round(0.6 * zm.get(t, 0.0) + 0.4 * zp.get(t, 0.0), 3)
-        c["score_reason"] = (f"12-1 모멘텀 {c['mom12_1']:+.1f}%"
-                             + (f" · 52주고점 {c['prox52']:+.1f}%" if c.get("prox52") is not None else ""))
+        c["score"] = round(zv.get(t, 0.0) + zp.get(t, 0.0) + zd.get(t, 0.0), 3)
+        c["score_reason"] = (f"PER {c['pe']:.1f}"
+                             + (f" · PBR {c['pbr']:.2f}" if c.get("pbr") else "")
+                             + (f" · 배당수익률 {c['div_yield']:.1f}%" if c.get("div_yield") else ""))
         c["hot"] = _hot(c)
     ranked = sorted(cands.values(), key=lambda x: x["score"], reverse=True)
     # 관찰 폐지(2026-07-13): 눌림/상승지속 구분 없이 팩터 순위 그대로 매수 후보

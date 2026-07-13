@@ -5,4 +5,5 @@ __pycache__/
 *.pyc
 output/*.html
 output/*.png
+output/*.pkl
 data/

@@ -1,0 +1,86 @@
+{
+  "as_of": "2026-07-10",
+  "topn": 6,
+  "pool": 30,
+  "budget": "사전 등록 6트라이얼 — 추가·수정·부활 금지(KR_STRATEGY_OPTIONS §6)",
+  "judgment": "B2(동일가중) 대비 샤프·PBO/DSR — B1 대비는 참고(§1 판정 규칙)",
+  "rows": [
+    {
+      "trial": "live",
+      "n_decisions": 23,
+      "cagr_pct": 21.88,
+      "vol_pct": 27.2,
+      "sharpe": 0.87,
+      "mdd_pct": -48.4,
+      "excess_vs_B1": -3.76,
+      "excess_vs_B2": 6.99,
+      "bench_B1_cagr": 25.63,
+      "bench_B2_cagr": 14.88
+    },
+    {
+      "trial": "valuediv",
+      "n_decisions": 23,
+      "cagr_pct": 12.6,
+      "vol_pct": 14.9,
+      "sharpe": 0.87,
+      "mdd_pct": -20.5,
+      "excess_vs_B1": -13.03,
+      "excess_vs_B2": -2.29,
+      "bench_B1_cagr": 25.63,
+      "bench_B2_cagr": 14.88
+    },
+    {
+      "trial": "valuediv_lowvol",
+      "n_decisions": 23,
+      "cagr_pct": 12.14,
+      "vol_pct": 15.3,
+      "sharpe": 0.82,
+      "mdd_pct": -20.4,
+      "excess_vs_B1": -13.5,
+      "excess_vs_B2": -2.75,
+      "bench_B1_cagr": 25.63,
+      "bench_B2_cagr": 14.88
+    },
+    {
+      "trial": "valuediv_flow",
+      "n_decisions": 23,
+      "cagr_pct": 15.88,
+      "vol_pct": 16.1,
+      "sharpe": 1.0,
+      "mdd_pct": -22.1,
+      "excess_vs_B1": -9.75,
+      "excess_vs_B2": 1.0,
+      "bench_B1_cagr": 25.63,
+      "bench_B2_cagr": 14.88
+    },
+    {
+      "trial": "flow",
+      "n_decisions": 23,
+      "cagr_pct": 9.78,
+      "vol_pct": 24.2,
+      "sharpe": 0.51,
+      "mdd_pct": -40.9,
+      "excess_vs_B1": -15.85,
+      "excess_vs_B2": -5.11,
+      "bench_B1_cagr": 25.63,
+      "bench_B2_cagr": 14.88
+    },
+    {
+      "trial": "valuediv_regime",
+      "n_decisions": 16,
+      "cagr_pct": 15.82,
+      "vol_pct": 16.1,
+      "sharpe": 1.0,
+      "mdd_pct": -20.5,
+      "excess_vs_B1": -9.95,
+      "excess_vs_B2": 0.85,
+      "bench_B1_cagr": 25.77,
+      "bench_B2_cagr": 14.97
+    }
+  ],
+  "pbo": 0.7781,
+  "pbo_verdict": "높음(IS 1등이 운일 확률 높음 — 채택 보류 권장)",
+  "dsr": 0.6358,
+  "dsr_verdict": "통과 실패(다중검정 감안 시 샤프가 유의하지 않음)",
+  "passed": false
+}
