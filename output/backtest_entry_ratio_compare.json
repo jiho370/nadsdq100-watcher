@@ -1,0 +1,70 @@
+{
+  "as_of": "2026-07-10",
+  "weights_used": {
+    "int_gp_assets": 1,
+    "rd_mktcap": 2,
+    "shareholder_yield": 2
+  },
+  "topn": 15,
+  "rebal_days": 63,
+  "n_combos": 6,
+  "rows": [
+    {
+      "entry": "entry2_5050",
+      "exit": "exit_time6m",
+      "net_pct": 15.58,
+      "stop_rate_pct": 0.0,
+      "mdd_pct": -11.6,
+      "unfilled_pct": 30.3,
+      "n_events": 32
+    },
+    {
+      "entry": "entry2_3070",
+      "exit": "exit_time6m",
+      "net_pct": 15.89,
+      "stop_rate_pct": 0.0,
+      "mdd_pct": -11.4,
+      "unfilled_pct": 42.4,
+      "n_events": 32
+    },
+    {
+      "entry": "entry2_7030",
+      "exit": "exit_time6m",
+      "net_pct": 15.29,
+      "stop_rate_pct": 0.0,
+      "mdd_pct": -11.9,
+      "unfilled_pct": 18.2,
+      "n_events": 32
+    },
+    {
+      "entry": "entry3_303040",
+      "exit": "exit_time6m",
+      "net_pct": 16.45,
+      "stop_rate_pct": 0.0,
+      "mdd_pct": -11.0,
+      "unfilled_pct": 45.4,
+      "n_events": 32
+    },
+    {
+      "entry": "entry3_502525",
+      "exit": "exit_time6m",
+      "net_pct": 15.89,
+      "stop_rate_pct": 0.0,
+      "mdd_pct": -11.4,
+      "unfilled_pct": 32.2,
+      "n_events": 32
+    },
+    {
+      "entry": "entry3_204040",
+      "exit": "exit_time6m",
+      "net_pct": 16.71,
+      "stop_rate_pct": 0.0,
+      "mdd_pct": -10.8,
+      "unfilled_pct": 51.5,
+      "n_events": 32
+    }
+  ],
+  "baseline": "entry2_5050(현행 평시 50/50) · entry3_303040(현행 과열 30/30/40)",
+  "note": "청산 exit_time6m 고정 — 진입 '비율'만 순수 비교(진입×청산 교차 스윕 아님)",
+  "adoption_criteria": "현행 비율(entry2_5050/entry3_303040) 대비 net 개선이 T_eff 보정 후에도 유지될 때만 비율 변경 제안"
+}
