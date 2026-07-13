@@ -837,20 +837,31 @@ def render_report_html(report, as_of="", metrics_by_sym=None, market_html="", si
                      if note else "")
         signals_sec = ('<h3 style="margin:18px 0 4px">&#129517; 지수·코인 추세 신호 <span style="color:#9ca3af;font-size:12px">'
                        '(규칙 기반 — STRATEGY.md)</span></h3>' + note_html + signals_html)
+    kr_note = (
+        '<div style="font-size:12px;color:#374151;background:#f8fafc;border-radius:6px;'
+        'padding:6px 9px;margin:2px 0 8px;line-height:1.5">저PER(저평가)·저PBR(저평가)·고배당'
+        ' 상위 종목 — 지수를 그대로 담는 핵심자산(코어)을 보완하는 위성자산(새틀라이트) '
+        '전략입니다. 요즘 코스피는 삼전·하이닉스 쏠림으로 지수 자체가 오르는 장이라 개별종목'
+        '만으로 지수를 이기긴 어려워, 위험 대비 수익(샤프지수) 기준 코어65:새틀35 비중이 '
+        '가장 안정적이었습니다(8년 백테스트 — 근거는 주간 배분 리포트 참고).</div>')
     kr_sec = ""
     if kr_buy_cards or kr_watch_cards:
         kr_sec = (
-            '<h3 style="margin:18px 0 2px">&#127472;&#127479; 코스피200 매수 후보 <span style="color:#9ca3af;font-size:12px">'
-            '(저평가·배당주 상위(PER·PBR·배당수익률) · AI 검증 통과 — 지수 대신 개별종목 '
-            '보완용 새틀라이트, 주간 배분 리포트 참고)</span></h3>'
+            '<h3 style="margin:18px 0 2px">&#127472;&#127479; 코스피200 매수 후보</h3>'
+            + kr_note
             + (kr_buy_cards or '<div style="font-size:12px;color:#6b7280">해당 없음</div>')
             + ('<h3 style="margin:18px 0 2px">&#127472;&#127479; 코스피200 관찰 · 내려오면 매수</h3>' + kr_watch_cards if kr_watch_cards else ""))
     # 미국 섹션도 (한국처럼) 카드가 있을 때만 — KR 전용 메일에서 빈 헤더 방지
+    us_note = (
+        '<div style="font-size:12px;color:#374151;background:#f8fafc;border-radius:6px;'
+        'padding:6px 9px;margin:2px 0 8px;line-height:1.5">퀄리티·주주환원 팩터(자산 대비 '
+        '수익성·연구개발 집약도·자사주매입 등 계량 지표) 점수 상위 종목입니다. 과최적화 '
+        '위험(PBO)과 통계적 유의성(DSR) 검증을 통과한 가중치로 순위를 매기고, 최신 뉴스·'
+        '리스크는 AI가 추가로 확인합니다.</div>')
     us_sec = ""
     if buy_cards or watch_cards:
         us_sec = (
-            f'<h3 style="margin:16px 0 2px">&#11088; 미국(S&amp;P500) 매수 후보 <span style="color:#9ca3af;font-size:12px">'
-            f'(규칙 선별 · AI 검증 통과)</span></h3>{buy_cards}'
+            f'<h3 style="margin:16px 0 2px">&#11088; 미국(S&amp;P500) 매수 후보</h3>{us_note}{buy_cards}'
             + (f'<h3 style="margin:18px 0 2px">&#128064; 미국 관찰 · 내려오면 매수 <span style="color:#9ca3af;font-size:12px">'
                f'(좋은 종목이나 지금은 조정 중 · AI 강등 포함)</span></h3>{watch_cards}' if watch_cards else ""))
     head = _esc(title) if title else "&#128200; 데일리 시장 점검 · 매수·매도 후보"
