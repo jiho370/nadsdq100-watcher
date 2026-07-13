@@ -1,0 +1,77 @@
+{
+  "as_of": "2026-07-13",
+  "market": "us",
+  "topn": 10,
+  "n_combos": 6,
+  "rows": [
+    {
+      "rerank": "base",
+      "cagr_pct": 28.88,
+      "excess_cagr_pct": 13.85,
+      "vol_pct": 20.6,
+      "sharpe": 1.34,
+      "mdd_pct": -24.1,
+      "bench_cagr_pct": 15.03,
+      "bench_mdd_pct": -33.7,
+      "years": 9.0
+    },
+    {
+      "rerank": "mom12_1",
+      "cagr_pct": 17.41,
+      "excess_cagr_pct": 2.38,
+      "vol_pct": 23.8,
+      "sharpe": 0.79,
+      "mdd_pct": -29.3,
+      "bench_cagr_pct": 15.03,
+      "bench_mdd_pct": -33.7,
+      "years": 9.0
+    },
+    {
+      "rerank": "mom6",
+      "cagr_pct": 18.6,
+      "excess_cagr_pct": 3.57,
+      "vol_pct": 24.4,
+      "sharpe": 0.82,
+      "mdd_pct": -28.6,
+      "bench_cagr_pct": 15.03,
+      "bench_mdd_pct": -33.7,
+      "years": 9.0
+    },
+    {
+      "rerank": "hi52",
+      "cagr_pct": 14.93,
+      "excess_cagr_pct": -0.1,
+      "vol_pct": 18.5,
+      "sharpe": 0.85,
+      "mdd_pct": -26.9,
+      "bench_cagr_pct": 15.03,
+      "bench_mdd_pct": -33.7,
+      "years": 9.0
+    },
+    {
+      "rerank": "lowvol",
+      "cagr_pct": 7.27,
+      "excess_cagr_pct": -7.76,
+      "vol_pct": 10.8,
+      "sharpe": 0.7,
+      "mdd_pct": -19.8,
+      "bench_cagr_pct": 15.03,
+      "bench_mdd_pct": -33.7,
+      "years": 9.0
+    },
+    {
+      "rerank": "value",
+      "cagr_pct": 21.84,
+      "excess_cagr_pct": 6.81,
+      "vol_pct": 18.4,
+      "sharpe": 1.17,
+      "mdd_pct": -25.5,
+      "bench_cagr_pct": 15.03,
+      "bench_mdd_pct": -33.7,
+      "years": 9.0
+    }
+  ],
+  "baseline": "base(현행 — 풀 선별과 동일 점수 상위)",
+  "note": "1단계 풀(60) 고정, 2단계(상위 10 선별) 랭킹만 교체",
+  "adoption_criteria": "base 대비 샤프 개선이 PBO/DSR 판정을 통과할 때만 교체 제안"
+}
