@@ -18,8 +18,10 @@ entry_plan.py — 매수/매도 '실행 계획'을 규칙으로 확정하는 모
             기본 비활성(SELL_TRAIL=0, holdings.py와 동일 env) — 켜져 있으면 참고선으로 병기.
   · 관찰 → 매수 전환: 20일선 위(-2% 초과 이탈 상태면 회복), RSI<70, 1주 수익률 > -2% 회복.
                       전환 시 계획은 '과열 아님' 2분할과 동일.
-  · 매도(트레일링/200일선 트리거): 50% 즉시 + 50%는 반등 시 20일선 부근 정리.
-                                   손실 -15% 초과 상태면 전량 즉시(추가 하락 방어).
+  · 매도(2026-07-13 단순화): 확정된 매도 시그널은 **전량 즉시 정리**. backtest_exec.py
+    --disposal-sweep 검증 결과 분할+반등대기(기존 방식)와 즉시전량이 net 차이 0.36%p
+    이내로 통계적으로 구분 안 됨(PBO 47.7%, 매수 비율 스윕의 6.1%와 달리 신뢰 게이트
+    미통과) — 구분이 안 되면 더 단순한 쪽을 쓴다는 판단(지호 님 확인)으로 분할 폐기.
 
 가격 단위: 미국 달러(krw=False)는 소수 2자리, 한국 원화(krw=True)는 정수.
 반환 구조는 ai_report.py 렌더러(_plan_table)가 그대로 표로 그린다.
@@ -128,18 +130,18 @@ def _support_note(s: dict, krw: bool = False) -> str:
 
 
 def sell_plan(s: dict, krw: bool = False) -> str:
-    """매도 후보(holdings.update 반환 형식)의 처분 계획.
-    큰 손실 상태면 전량, 아니면 절반 즉시 + 절반은 반등 대기."""
+    """매도 후보(holdings.update 반환 형식)의 처분 계획 — 전량 즉시 정리(2026-07-13 단순화,
+    분할+반등대기와 통계적으로 구분 안 됨 확인, backtest_exec.py --disposal-sweep 참고)."""
     ret = s.get("ret_pct")
     price = s.get("price")
     note = _support_note(s, krw)
-    if ret is not None and ret <= -15:
-        return (f"전량 정리 — 매수가 대비 {ret:.0f}%로 손절 기준(-15%) 초과. "
-                f"반등 기대로 미루면 손실이 커지는 구간{note}")
-    half = f"현재가({_fmt(price, krw)}) 부근에서 50% 즉시 정리"
-    rest = "나머지 50%는 반등 시 20일선 부근에서 정리 (2주 내 반등 없으면 전량)"
-    tail = f" · 매수 후 수익 {ret:+.0f}% 확보 차원" if (ret is not None and ret > 0) else ""
-    return f"{half}, {rest}{tail}{note}"
+    if ret is not None and ret > 0:
+        tail = f" · 매수 후 수익 {ret:+.0f}% 확보 차원"
+    elif ret is not None:
+        tail = f" · 매수가 대비 {ret:+.0f}%"
+    else:
+        tail = ""
+    return f"현재가({_fmt(price, krw)}) 부근에서 전량 즉시 정리{tail}{note}"
 
 
 def plan_text(plan: dict) -> str:

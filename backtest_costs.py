@@ -88,14 +88,27 @@ def _norm(t: str) -> str:
 
 
 def _download_pit(dest=PIT_CACHE):
-    """fja05680/sp500 저장소에서 'S&P 500 Historical Components ...csv' 자동 탐색·다운로드."""
+    """fja05680/sp500 저장소에서 'S&P 500 Historical Components ...csv' 자동 탐색·다운로드.
+
+    2026-07-13 버그 수정: 이 저장소엔 두 후보가 있다 —
+      "...Changes (Updated).csv"(계속 최신화되는 파일, 2026년까지 데이터 있음)
+      "...Changes.csv"(2019-01-11에서 멈춘 옛 파일).
+    기존 코드는 `sorted(cand, key=name)[-1]`로 '알파벳상 마지막'을 골랐는데, 공백(0x20)이
+    마침표(0x2E)보다 아스키값이 작아 " (Updated).csv" < ".csv"로 정렬되어 옛 파일이 뽑히고
+    있었다 — 그 결과 PIT 유니버스가 7년째 2019년에 멈춰 있었고(DELL·VRT 등 이후 편입 종목이
+    전부 누락), 최근 구간을 다루는 모든 백테스트(backtest_exec 등)가 이 영향을 받았다.
+    이제 "(Updated)"가 포함된 파일을 명시적으로 우선한다."""
     import requests
     _log("[PIT] fja05680/sp500 구성종목 이력 다운로드 중…")
     items = requests.get(PIT_API, timeout=30).json()
     cand = [i for i in items if i.get("name", "").startswith("S&P 500 Historical Components")]
     if not cand:
         raise RuntimeError("PIT CSV를 저장소에서 찾지 못함 — --pit-file 로 직접 지정하세요.")
-    url = sorted(cand, key=lambda i: i["name"])[-1]["download_url"]
+    updated = [i for i in cand if "(Updated)" in i.get("name", "")]
+    chosen = (sorted(updated, key=lambda i: i["name"])[-1] if updated
+              else sorted(cand, key=lambda i: i["name"])[-1])
+    _log(f"[PIT] 선택: {chosen['name']}")
+    url = chosen["download_url"]
     text = requests.get(url, timeout=60).text
     os.makedirs("output", exist_ok=True)
     with open(dest, "w", encoding="utf-8", newline="") as f:
