@@ -1,0 +1,65 @@
+{
+  "as_of": "2026-07-10",
+  "market": "kr",
+  "n_combos": 5,
+  "rows": [
+    {
+      "topn": 3,
+      "cagr_pct": 25.39,
+      "excess_cagr_pct": -0.24,
+      "vol_pct": 34.3,
+      "sharpe": 0.83,
+      "mdd_pct": -64.9,
+      "bench_cagr_pct": 25.63,
+      "bench_mdd_pct": -36.1,
+      "years": 6.7
+    },
+    {
+      "topn": 4,
+      "cagr_pct": 26.4,
+      "excess_cagr_pct": 0.77,
+      "vol_pct": 29.8,
+      "sharpe": 0.94,
+      "mdd_pct": -49.2,
+      "bench_cagr_pct": 25.63,
+      "bench_mdd_pct": -36.1,
+      "years": 6.7
+    },
+    {
+      "topn": 6,
+      "cagr_pct": 22.1,
+      "excess_cagr_pct": -3.53,
+      "vol_pct": 27.2,
+      "sharpe": 0.87,
+      "mdd_pct": -47.8,
+      "bench_cagr_pct": 25.63,
+      "bench_mdd_pct": -36.1,
+      "years": 6.7
+    },
+    {
+      "topn": 8,
+      "cagr_pct": 19.0,
+      "excess_cagr_pct": -6.63,
+      "vol_pct": 23.9,
+      "sharpe": 0.85,
+      "mdd_pct": -42.9,
+      "bench_cagr_pct": 25.63,
+      "bench_mdd_pct": -36.1,
+      "years": 6.7
+    },
+    {
+      "topn": 10,
+      "cagr_pct": 15.63,
+      "excess_cagr_pct": -10.0,
+      "vol_pct": 22.0,
+      "sharpe": 0.77,
+      "mdd_pct": -37.0,
+      "bench_cagr_pct": 25.63,
+      "bench_mdd_pct": -36.1,
+      "years": 6.7
+    }
+  ],
+  "baseline": "topn6(현행 보유 상한)",
+  "note": "포트폴리오 일별 NAV 시뮬레이션(동일비중 진입·6개월 재평가+200일선 매도·슬롯 충원) — 분산투자 효과가 변동성·MDD에 직접 반영됨",
+  "adoption_criteria": "현행 대비 샤프·MDD 개선이 PBO/DSR(월간 초과수익) 판정을 통과할 때만 보유상한 변경 제안"
+}

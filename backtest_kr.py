@@ -427,8 +427,13 @@ def prepare_kr_data(years: int, rebal_days: int):
     반환: (panel, membership, fundamentals, flows, mktcaps, bench)"""
     from kr_factor_ic import build_kr_panel, kospi200_members
     cache = _load_cache()
-    cur = kospi200_members(pd.Timestamp.today().strftime("%Y%m%d")) or \
-        kospi200_members((pd.Timestamp.today() - pd.Timedelta(days=3)).strftime("%Y%m%d"))
+    # 최근 영업일 탐색(최대 7일 소급) — 기존 '오늘/3일 전' 2회 시도는 새벽 실행(당일 데이터
+    # 미발행)+주말이 겹치면 실패했다(kr_stocks._krx_universe_funda와 동일 관행으로 통일)
+    cur = None
+    for back in range(8):
+        cur = kospi200_members((pd.Timestamp.today() - pd.Timedelta(days=back)).strftime("%Y%m%d"))
+        if cur:
+            break
     if not cur:
         raise RuntimeError("코스피200 구성종목 조회 실패 — 네트워크 확인")
 

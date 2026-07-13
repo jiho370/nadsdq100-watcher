@@ -245,7 +245,8 @@ def run_kr(no_email: bool = False, force: bool = False):
     try:
         kr = KR.select(R.yf) or {}
         if kr.get("ind_map"):
-            kr_sells = KR.update_holdings([], kr["ind_map"], today_kst)
+            kr_sells = KR.update_holdings([], kr["ind_map"], today_kst,
+                                          pool_syms=kr.get("pool"))
             for s in kr_sells:
                 cl = (kr["ind_map"].get(s["symbol"]) or {}).get("closes")
                 if cl:

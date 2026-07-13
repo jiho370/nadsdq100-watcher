@@ -178,15 +178,19 @@ def select(yf) -> dict:
     buy = ranked[:N_BUY]
     watch = ranked[N_BUY:N_BUY + N_WATCH]
     _log(f"선정: 매수 {len(buy)} · 관찰 {len(watch)} (후보 {len(ranked)})")
-    return {"as_of": as_of, "buy": buy, "watch": watch, "ind_map": ind_map}
+    return {"as_of": as_of, "buy": buy, "watch": watch, "ind_map": ind_map,
+            "pool": [c["symbol"] for c in ranked]}   # 6개월 재평가용 후보풀(필터+추세 통과 전체)
 
 
 # ------------------------- 보유 추적(매도 시그널) -------------------------
-def update_holdings(buy_syms: list, ind_map: dict, today: str) -> list:
-    """holdings.py 와 동일 규칙(-20% 트레일링/200일선 -3%)을 한국 종목에 적용."""
+def update_holdings(buy_syms: list, ind_map: dict, today: str, pool_syms=None) -> list:
+    """holdings.py 와 동일 규칙(6개월 재평가/200일선 -3%)을 한국 종목에 적용.
+    2026-07-14 수정: pool_syms를 안 넘겨서 6개월 정기 재평가가 한국에서는 한 번도 발동하지
+    않고 있었다(STRATEGY.md '미국과 동일' 명시와 불일치) — select()의 pool을 받도록 확장."""
     import holdings as H
     state = H.load(KR_HOLDINGS)
-    sells = H.update(state, buy_syms, ind_map, today)
+    sells = H.update(state, buy_syms, ind_map, today,
+                     pool_syms=set(pool_syms) if pool_syms else None)
     H.save(state, KR_HOLDINGS)
     return sells
 
