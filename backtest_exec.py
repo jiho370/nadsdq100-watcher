@@ -56,6 +56,16 @@ ENTRY_RULES = ["entry1_full", "entry2_pullback2", "entry3_pullback3"]
 EXIT_RULES = ["exit_trail15", "exit_trail20", "exit_trail25", "exit_ma200only",
               "exit_time6m", "exit_atr2stage", "exit_support2stage"]
 BASELINE = "entry1_full__exit_trail20"
+
+# 2026-07-13 확장(지호 님 질문 — "분할매수 비율도 백테스트 근거 있나"): 위 21조합은
+# entry1_full(전량)과의 '분할 vs 전량' 비교만 했을 뿐, 정확한 비율(50/50·30/30/40)
+# 자체는 스윕한 적이 없었다. entry2_<w1w2>·entry3_<w1w2w3> 형식(각 2자리%, 합 100)의
+# 이름은 _parse_entry_ratio가 파싱해 비율만 다르게 시뮬레이션한다 — 트리거 기준선
+# (20일선-3%/50일선-8%)은 라이브와 동일하게 고정, 비율만 변수.
+ENTRY_RATIO_2 = {"entry2_5050": (0.50, 0.50), "entry2_3070": (0.30, 0.70), "entry2_7030": (0.70, 0.30)}
+ENTRY_RATIO_3 = {"entry3_303040": (0.30, 0.30, 0.40), "entry3_502525": (0.50, 0.25, 0.25),
+                 "entry3_204040": (0.20, 0.40, 0.40)}
+ENTRY_RATIO_SWEEP = list(ENTRY_RATIO_2) + list(ENTRY_RATIO_3)
 PULLBACK_WINDOW = 10     # 2차 트랜치 눌림 대기 거래일
 ATR_WINDOW = 60
 MAX_HOLD = 252           # 강제청산 상한(12m) — STRATEGY.md 장기보유 취지상 이 이상은 안 봄
@@ -257,7 +267,7 @@ def _simulate_trade(panel, ma20, ma50, ma200, atr, sym, entry_day, entry_rule, e
             entry_price, filled_frac, entry_ref_day = 0.5 * p1 + 0.5 * fill2, 1.0, day2
         else:
             entry_price, filled_frac, entry_ref_day = p1, 0.5, entry_day
-    else:  # entry3_pullback3 — 라이브 과열 규칙: 30% 즉시 / 30% 20일선-3% / 40% 50일선-8%
+    elif entry_rule == "entry3_pullback3":  # 라이브 과열 규칙: 30% 즉시 / 30% 20일선-3% / 40% 50일선-8%
         ma20v = ma20[sym].to_numpy(dtype=float)
         ma50v = ma50[sym].to_numpy(dtype=float)
         t2 = min(ma20v[entry_day] * 0.97 if np.isfinite(ma20v[entry_day]) else p1 * 0.97, p1)
@@ -272,6 +282,33 @@ def _simulate_trade(panel, ma20, ma50, ma200, atr, sym, entry_day, entry_rule, e
         filled_frac = sum(w for w, _, _ in fills)
         entry_price = sum(w * px for w, px, _ in fills) / filled_frac
         entry_ref_day = max(d for _, _, d in fills)
+    elif entry_rule in ENTRY_RATIO_2:   # 2분할 비율 스윕 — 트리거는 entry2_pullback2와 동일(20일선-3%)
+        w1, w2 = ENTRY_RATIO_2[entry_rule]
+        ma20v = ma20[sym].to_numpy(dtype=float)
+        base = ma20v[entry_day] * 0.97 if np.isfinite(ma20v[entry_day]) else p1 * 0.97
+        fill2, day2 = _wait_fill(min(base, p1), PULLBACK_WINDOW)
+        if fill2 is not None:
+            entry_price, filled_frac, entry_ref_day = w1 * p1 + w2 * fill2, 1.0, day2
+        else:
+            entry_price, filled_frac, entry_ref_day = p1, w1, entry_day
+    elif entry_rule in ENTRY_RATIO_3:   # 3분할 비율 스윕 — 트리거는 entry3_pullback3와 동일
+        w1, w2, w3 = ENTRY_RATIO_3[entry_rule]
+        ma20v = ma20[sym].to_numpy(dtype=float)
+        ma50v = ma50[sym].to_numpy(dtype=float)
+        t2 = min(ma20v[entry_day] * 0.97 if np.isfinite(ma20v[entry_day]) else p1 * 0.97, p1)
+        t3 = min(ma50v[entry_day] * 0.92 if np.isfinite(ma50v[entry_day]) else p1 * 0.92, p1)
+        f2, d2 = _wait_fill(t2, PULLBACK_WINDOW)
+        f3, d3 = _wait_fill(t3, PULLBACK_WINDOW * 2)
+        fills = [(w1, p1, entry_day)]
+        if f2 is not None:
+            fills.append((w2, f2, d2))
+        if f3 is not None:
+            fills.append((w3, f3, d3))
+        filled_frac = sum(w for w, _, _ in fills)
+        entry_price = sum(w * px for w, px, _ in fills) / filled_frac
+        entry_ref_day = max(d for _, _, d in fills)
+    else:
+        raise ValueError(f"알 수 없는 entry_rule: {entry_rule}")
 
     # ---- 청산 ----
     peak = entry_price
@@ -456,6 +493,97 @@ def run_exec(panel, spy, funds, pit, rebal_days=63, topn=15, cost=None,
     return payload, report
 
 
+def run_entry_ratio_sweep(panel, spy, funds, pit, rebal_days=63, topn=15, cost=None, lookback=None):
+    """분할매수 '비율' 자체를 스윕(트리거 기준선 20일선-3%/50일선-8%는 라이브와 동일하게 고정,
+    비율만 변수) — 청산은 채택된 exit_time6m 1종 고정(entry×exit 교차 아님, entry만 순수 비교).
+
+    배경: run_exec의 21조합은 entry1_full(전량) vs entry2/3_pullback(분할)만 비교했다 —
+    분할이 이긴다는 결론은 있지만, '왜 50/50과 30/30/40이라는 정확한 비율인가'는 검증된
+    적이 없었다(다른 비율은 시도조차 안 함). 이 함수가 그 공백을 메운다."""
+    cost = cost or BC.CostModel("us", commission_bps=0.0, slippage_bps=5.0)
+    weights = _load_exec_weights()
+    import tech_factors as T
+    cross = T.build_panels(panel)
+    select_fn = lambda p: _select_basket(panel, p, funds, cross, pit, weights, topn)
+    ma20, ma50, ma200, atr = _ma(panel, 20), _ma(panel, 50), _ma(panel, 200), _atr_close(panel)
+    spy = spy.reindex(panel.index).ffill() if spy is not None else None
+    n = len(panel)
+    ps = list(range(lookback or BW.LOOKBACK, n - MAX_HOLD - 1, rebal_days))
+    if not ps:
+        raise RuntimeError("기간이 짧아 리밸런싱 시점 없음.")
+
+    exit_rule = "exit_time6m"
+    entries = ENTRY_RATIO_SWEEP
+    per_combo = {e: {"excess": [], "dates": []} for e in entries}
+    stats = {e: {"stop": [], "mdd": [], "unfilled": [], "net": []} for e in entries}
+
+    for p in ps:
+        basket = select_fn(p)
+        if not basket:
+            continue
+        date = panel.index[p].date().isoformat()
+        entry_day = p + 1
+        for e in entries:
+            evs = []
+            for sym in basket:
+                r = _simulate_trade(panel, ma20, ma50, ma200, atr, sym, entry_day, e, exit_rule)
+                if r is None:
+                    continue
+                net = cost.net(r["exit_price"] / r["entry_price"] - 1)
+                spy_ret = 0.0
+                if spy is not None and np.isfinite(spy.iloc[r["exit_day"]]) and np.isfinite(spy.iloc[entry_day]):
+                    spy_ret = float(spy.iloc[r["exit_day"]] / spy.iloc[entry_day] - 1)
+                evs.append({"net": net, "excess": net - spy_ret, "stop": r["stop"],
+                           "mdd": r["mdd"], "unfilled": 1 - r["filled_frac"]})
+            if not evs:
+                continue
+            per_combo[e]["excess"].append(round(float(np.mean([x["excess"] for x in evs])), 6))
+            per_combo[e]["dates"].append(date)
+            stats[e]["stop"].append(float(np.mean([x["stop"] for x in evs])))
+            stats[e]["mdd"].append(float(np.mean([x["mdd"] for x in evs])))
+            stats[e]["unfilled"].append(float(np.mean([x["unfilled"] for x in evs])))
+            stats[e]["net"].append(float(np.mean([x["net"] for x in evs])))
+
+    n_ev = min((len(v["excess"]) for v in per_combo.values()), default=0)
+    if n_ev < 4:
+        raise RuntimeError(f"이벤트 수 부족(n_ev={n_ev}) — 기간을 늘리세요.")
+    trials = list(entries)
+    matrix = [per_combo[e]["excess"][:n_ev] for e in entries]
+    dates0 = per_combo[entries[0]]["dates"][:n_ev]
+
+    rows = [{"entry": e, "exit": exit_rule,
+            "net_pct": round(100 * float(np.mean(stats[e]["net"])), 2),
+            "stop_rate_pct": round(100 * float(np.mean(stats[e]["stop"])), 1),
+            "mdd_pct": round(100 * float(np.mean(stats[e]["mdd"])), 1),
+            "unfilled_pct": round(100 * float(np.mean(stats[e]["unfilled"])), 1),
+            "n_events": len(stats[e]["net"])}
+            for e in entries]
+
+    payload = {"as_of": panel.index[-1].date().isoformat(), "weights_used": weights,
+              "topn": topn, "rebal_days": rebal_days, "n_combos": len(entries), "rows": rows,
+              "baseline": "entry2_5050(현행 평시 50/50) · entry3_303040(현행 과열 30/30/40)",
+              "note": "청산 exit_time6m 고정 — 진입 '비율'만 순수 비교(진입×청산 교차 스윕 아님)",
+              "adoption_criteria": "현행 비율(entry2_5050/entry3_303040) 대비 net 개선이 "
+                                   "T_eff 보정 후에도 유지될 때만 비율 변경 제안"}
+
+    os.makedirs("output", exist_ok=True)
+    compare_path = "output/backtest_entry_ratio_compare.json"
+    trial_path = "output/trial_returns_entry_ratio.json"
+    report_path = "output/pbo_report_entry_ratio.json"
+    with open(compare_path, "w", encoding="utf-8") as f:
+        json.dump(payload, f, ensure_ascii=False, indent=2)
+    trial_data = {"horizon": "entry_ratio", "universe": "pit", "cost": cost.describe(),
+                 "rebal_days": rebal_days, "hold_days": MAX_HOLD,
+                 "dates": dates0, "trials": trials, "excess_returns": matrix}
+    with open(trial_path, "w", encoding="utf-8") as f:
+        json.dump(trial_data, f, ensure_ascii=False)
+    report = OS.analyze(trial_data, save=False)
+    with open(report_path, "w", encoding="utf-8") as f:
+        json.dump(report, f, ensure_ascii=False, indent=2)
+    _log(f"저장: {compare_path} · {trial_path} · {report_path} (진입비율 {len(entries)}종 × 이벤트 {n_ev}회)")
+    return payload, report
+
+
 # ------------------------- self-test -------------------------
 def self_test():
     _log("[self-test] ① 합성 데이터 규칙비교 엔진 ② 트레일링 스톱 발동 ③ 미체결 추적 ④ A1 신호 shape")
@@ -483,6 +611,22 @@ def self_test():
     p3 = _simulate_trade(p2, ma20, ma50, ma200, atr, "FLAT", 210, "entry3_pullback3", "exit_trail20")
     assert abs(p3["filled_frac"] - 0.3) < 1e-9, f"횡보인데 2·3차 체결됨: {p3}"
 
+    # 비율 스윕 엔트리(entry2_*/entry3_*) — 되돌림 없을 때 filled_frac이 정확히 1차 비율과 같아야
+    r2_7030 = _simulate_trade(p2, ma20, ma50, ma200, atr, "FLAT", 210, "entry2_7030", "exit_trail20")
+    assert abs(r2_7030["filled_frac"] - 0.7) < 1e-9, f"entry2_7030 1차 비율 불일치: {r2_7030}"
+    r3_502525 = _simulate_trade(p2, ma20, ma50, ma200, atr, "FLAT", 210, "entry3_502525", "exit_trail20")
+    assert abs(r3_502525["filled_frac"] - 0.5) < 1e-9, f"entry3_502525 1차 비율 불일치: {r3_502525}"
+    # entry2_5050/entry3_303040은 기존 entry2_pullback2/entry3_pullback3과 동일 비율이어야 함
+    r2_5050 = _simulate_trade(p2, ma20, ma50, ma200, atr, "FLAT", 210, "entry2_5050", "exit_trail20")
+    assert abs(r2_5050["filled_frac"] - flat_r["filled_frac"]) < 1e-9, (r2_5050, flat_r)
+    r3_303040 = _simulate_trade(p2, ma20, ma50, ma200, atr, "FLAT", 210, "entry3_303040", "exit_trail20")
+    assert abs(r3_303040["filled_frac"] - p3["filled_frac"]) < 1e-9, (r3_303040, p3)
+    try:
+        _simulate_trade(p2, ma20, ma50, ma200, atr, "FLAT", 210, "entry9_bogus", "exit_trail20")
+        assert False, "알 수 없는 entry_rule인데 예외 미발생"
+    except ValueError:
+        pass
+
     small = panel.iloc[:400, :6]
     sig = sr_signal_panels(small)
     assert set(sig) == set(SR_CANDIDATES), set(sig)
@@ -504,9 +648,18 @@ def main():
     ap.add_argument("--slippage-bps", type=float, default=5.0)
     ap.add_argument("--pit-file", default=None)
     ap.add_argument("--self-test", action="store_true")
+    ap.add_argument("--entry-ratio-sweep", action="store_true",
+                    help="분할매수 '비율'만 스윕(청산 exit_time6m 고정) — 미국만 지원")
     args = ap.parse_args()
     if args.self_test:
         self_test(); return
+    if args.entry_ratio_sweep:
+        pit = BC.load_pit(args.pit_file)
+        panel, spy, _ = BC.build_panel_pit(args.years, pit)
+        funds = BW.load_funds()
+        cost = BC.CostModel("us", args.commission_bps, args.slippage_bps)
+        run_entry_ratio_sweep(panel, spy, funds, pit, rebal_days=args.rebal_days, topn=args.topn, cost=cost)
+        return
     if args.market == "us":
         pit = BC.load_pit(args.pit_file)
         panel, spy, _ = BC.build_panel_pit(args.years, pit)

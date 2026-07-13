@@ -12,8 +12,10 @@ entry_plan.py — 매수/매도 '실행 계획'을 규칙으로 확정하는 모
   · 매수(과열 hot): 3분할 — 30% 현재가 / 30% 20일선 부근 / 40% 50일선 부근.
                     과열 판정은 export_data.split_by_entry(RSI≥72 또는 50일선 +15% 이상)가 확정.
   · 하한선: 분할 가격이 200일선 아래로 내려가면 200일선까지로 올림(추세 이탈 구간 매수 금지).
-  · 손절선: max(1차 매수가 × (1-SELL_TRAIL), 200일선 × (1-SELL_MA_BUFFER)) — 보유 후엔
-            holdings.py 트레일링이 이어받는다. 여기 값은 '진입 직후' 기준선.
+  · 손절선(2026-07-13 정정): 기본은 200일선 × (1-SELL_MA_BUFFER)만 표시 — 실제 매도 규칙이
+            "6개월 정기 재평가 + 200일선 백업"으로 바뀐 뒤에도(holdings.py) 여기 SELL_TRAIL
+            기본값이 옛 -20%로 남아 있어 손절선이 실제 규칙과 안 맞는 문제가 있었다. 트레일링은
+            기본 비활성(SELL_TRAIL=0, holdings.py와 동일 env) — 켜져 있으면 참고선으로 병기.
   · 관찰 → 매수 전환: 20일선 위(-2% 초과 이탈 상태면 회복), RSI<70, 1주 수익률 > -2% 회복.
                       전환 시 계획은 '과열 아님' 2분할과 동일.
   · 매도(트레일링/200일선 트리거): 50% 즉시 + 50%는 반등 시 20일선 부근 정리.
@@ -31,7 +33,7 @@ try:
 except Exception:
     support_level_asof = None
 
-TRAIL = float(os.environ.get("SELL_TRAIL", "0.20"))          # 트레일링 -20% (holdings.py와 동일 env)
+TRAIL = float(os.environ.get("SELL_TRAIL", "0"))              # 기본 비활성(holdings.py와 동일 env)
 MA_BUFFER = float(os.environ.get("SELL_MA_BUFFER", "0.03"))  # 200일선 -3% 이탈
 
 
@@ -80,16 +82,19 @@ def buy_plan(c: dict, krw: bool = False) -> dict:
             {"label": "2차", "price": p2, "pct": 50, "basis": b2},
         ]
         note = "2분할 — 1차 후 조정 오면 2차, 안 오면 1차분만 보유"
-    # 손절선: 진입 직후 기준. 이후는 holdings.py 트레일링(-20%)이 고점 따라 올라간다.
-    stops = [price * (1 - TRAIL)]
+    # 손절선(진입 직후 참고): 기본은 200일선 백업만. TRAIL>0(SELL_TRAIL env)일 때만
+    # 트레일링 참고선도 후보에 넣는다 — 둘 중 높은(더 가까운) 쪽을 표시.
+    candidates = []
+    if TRAIL > 0:
+        candidates.append((price * (1 - TRAIL), f"1차 매수가 -{int(TRAIL*100)}%"))
     if _valid(ma200):
-        stops.append(ma200 * (1 - MA_BUFFER))
-    stop_p = round(max(stops), 0 if krw else 2)
-    stop_basis = ("1차 매수가 -20%" if stop_p == round(stops[0], 0 if krw else 2)
-                  else f"200일선 -{int(MA_BUFFER*100)}%")
-    return {"tranches": tranches,
-            "stop": {"price": stop_p, "basis": stop_basis},
-            "note": note, "krw": krw}
+        candidates.append((ma200 * (1 - MA_BUFFER), f"200일선 -{int(MA_BUFFER*100)}%"))
+    if candidates:
+        stop_val, stop_basis = max(candidates, key=lambda x: x[0])
+        stop = {"price": round(stop_val, 0 if krw else 2), "basis": stop_basis}
+    else:
+        stop = {"price": None, "basis": "6개월 후 정기 재평가 시 판단"}
+    return {"tranches": tranches, "stop": stop, "note": note, "krw": krw}
 
 
 def watch_trigger(c: dict, krw: bool = False) -> str:
