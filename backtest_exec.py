@@ -32,7 +32,7 @@ A2-(b). 실행 규칙 비교("진입·청산 타이밍이 순수익을 개선하
       output/pbo_report_exec.json       (PBO/DSR 판정 — 채택 기준은 SCORE_MODEL_DESIGN.md 부록 A3)
 """
 from __future__ import annotations
-import os, sys, json, math, argparse
+import os, sys, re, json, math, argparse
 import numpy as np
 import pandas as pd
 
@@ -66,6 +66,22 @@ ENTRY_RATIO_2 = {"entry2_5050": (0.50, 0.50), "entry2_3070": (0.30, 0.70), "entr
 ENTRY_RATIO_3 = {"entry3_303040": (0.30, 0.30, 0.40), "entry3_502525": (0.50, 0.25, 0.25),
                  "entry3_204040": (0.20, 0.40, 0.40)}
 ENTRY_RATIO_SWEEP = list(ENTRY_RATIO_2) + list(ENTRY_RATIO_3)
+
+# 2026-07-13 확장(지호 님 질문 — "매도도 매수 분할이랑 맞춰봐야 하지 않나"): 위 EXIT_RULES는
+# '언제 매도를 결정하는가'(트레일링/200일선/6개월/ATR/지지선)만 검정했다. entry_plan.sell_plan()의
+# 실제 라이브 처분 방식("50% 즉시 + 50% 반등(20일선) 대기, 2주 내 미반등 시 전량, 단 -15%
+# 초과손실이면 즉시 전량")은 '결정된 매도를 어떻게 집행하는가'라는 별개 질문인데 한 번도
+# 검증된 적이 없었다 — exit_time6m(전량 즉시)을 대조군으로, 채택된 6개월 트리거 시점 이후의
+# 처분 비율/대기기간만 스윕한다. 이름 규칙: exit_time6m_<w1w2>w<대기거래일수>.
+DISPOSAL_SWEEP = {
+    "exit_time6m": None,                          # 대조군 — 트리거 즉시 전량(현행 exit_time6m)
+    "exit_time6m_5050w10": ((0.50, 0.50), 10),     # 라이브 현행: 50%즉시+50%반등대기(2주=10거래일)
+    "exit_time6m_3070w10": ((0.30, 0.70), 10),
+    "exit_time6m_7030w10": ((0.70, 0.30), 10),
+    "exit_time6m_5050w5":  ((0.50, 0.50), 5),      # 대기기간 민감도(1주)
+    "exit_time6m_5050w20": ((0.50, 0.50), 20),     # 대기기간 민감도(4주)
+}
+DISPOSAL_LOSS_OVERRIDE = -0.15   # entry_plan.sell_plan()과 동일 — 초과 손실이면 대기 없이 즉시 전량
 PULLBACK_WINDOW = 10     # 2차 트랜치 눌림 대기 거래일
 ATR_WINDOW = 60
 MAX_HOLD = 252           # 강제청산 상한(12m) — STRATEGY.md 장기보유 취지상 이 이상은 안 봄
@@ -342,6 +358,35 @@ def _simulate_trade(panel, ma20, ma50, ma200, atr, sym, entry_day, entry_rule, e
             exit_day -= 1
         exit_price = vals[exit_day]
 
+    elif exit_rule in DISPOSAL_SWEEP and DISPOSAL_SWEEP[exit_rule] is not None:
+        # 6개월 트리거는 exit_time6m과 동일하게 확정하되, 그 이후 '처분'만 라이브 sell_plan()
+        # 방식(분할+반등대기, 손실 -15% 초과 시 즉시 전량)으로 시뮬레이션.
+        (w1, w2), window = DISPOSAL_SWEEP[exit_rule]
+        trig_day = min(entry_day + 126, cap)
+        while trig_day > entry_day and not np.isfinite(vals[trig_day]):
+            trig_day -= 1
+        trig_ret = vals[trig_day] / entry_price - 1
+        if trig_ret <= DISPOSAL_LOSS_OVERRIDE:
+            exit_price, exit_day, stop_triggered = vals[trig_day], trig_day, True
+        else:
+            d1 = min(trig_day + 1, cap)
+            while d1 > trig_day and not np.isfinite(vals[d1]):
+                d1 -= 1
+            p1_exit = vals[d1] if np.isfinite(vals[d1]) else vals[trig_day]
+            ma20v = ma20[sym].to_numpy(dtype=float)
+            target = ma20v[d1] if np.isfinite(ma20v[d1]) else p1_exit
+            p2_exit, p2_day = None, None
+            for dd in range(d1 + 1, min(d1 + 1 + window, cap + 1)):
+                if np.isfinite(vals[dd]) and vals[dd] >= target:
+                    p2_exit, p2_day = vals[dd], dd
+                    break
+            if p2_exit is None:
+                p2_day = min(d1 + window, cap)
+                while p2_day > d1 and not np.isfinite(vals[p2_day]):
+                    p2_day -= 1
+                p2_exit = vals[p2_day]
+            exit_price, exit_day = w1 * p1_exit + w2 * p2_exit, p2_day
+
     elif exit_rule == "exit_atr2stage":
         atrv = atr[sym].to_numpy(dtype=float)
         half_done, half_price = False, None
@@ -584,6 +629,93 @@ def run_entry_ratio_sweep(panel, spy, funds, pit, rebal_days=63, topn=15, cost=N
     return payload, report
 
 
+def run_disposal_sweep(panel, spy, funds, pit, rebal_days=63, topn=15, cost=None, lookback=None):
+    """매도 '처분' 방식 스윕 — 트리거(6개월 시점)는 고정, 그 이후 전량즉시 vs 분할+반등대기를
+    비교한다. 진입은 entry1_full로 고정(처분 효과만 순수 비교, 진입 방식과 섞지 않음)."""
+    cost = cost or BC.CostModel("us", commission_bps=0.0, slippage_bps=5.0)
+    weights = _load_exec_weights()
+    import tech_factors as T
+    cross = T.build_panels(panel)
+    select_fn = lambda p: _select_basket(panel, p, funds, cross, pit, weights, topn)
+    ma20, ma50, ma200, atr = _ma(panel, 20), _ma(panel, 50), _ma(panel, 200), _atr_close(panel)
+    spy = spy.reindex(panel.index).ffill() if spy is not None else None
+    n = len(panel)
+    ps = list(range(lookback or BW.LOOKBACK, n - MAX_HOLD - 1, rebal_days))
+    if not ps:
+        raise RuntimeError("기간이 짧아 리밸런싱 시점 없음.")
+
+    entry_rule = "entry1_full"
+    exits = list(DISPOSAL_SWEEP)
+    per_combo = {e: {"excess": [], "dates": []} for e in exits}
+    stats = {e: {"stop": [], "mdd": [], "unfilled": [], "net": []} for e in exits}
+
+    for p in ps:
+        basket = select_fn(p)
+        if not basket:
+            continue
+        date = panel.index[p].date().isoformat()
+        entry_day = p + 1
+        for e in exits:
+            evs = []
+            for sym in basket:
+                r = _simulate_trade(panel, ma20, ma50, ma200, atr, sym, entry_day, entry_rule, e)
+                if r is None:
+                    continue
+                net = cost.net(r["exit_price"] / r["entry_price"] - 1)
+                spy_ret = 0.0
+                if spy is not None and np.isfinite(spy.iloc[r["exit_day"]]) and np.isfinite(spy.iloc[entry_day]):
+                    spy_ret = float(spy.iloc[r["exit_day"]] / spy.iloc[entry_day] - 1)
+                evs.append({"net": net, "excess": net - spy_ret, "stop": r["stop"],
+                           "mdd": r["mdd"], "unfilled": 1 - r["filled_frac"]})
+            if not evs:
+                continue
+            per_combo[e]["excess"].append(round(float(np.mean([x["excess"] for x in evs])), 6))
+            per_combo[e]["dates"].append(date)
+            stats[e]["stop"].append(float(np.mean([x["stop"] for x in evs])))
+            stats[e]["mdd"].append(float(np.mean([x["mdd"] for x in evs])))
+            stats[e]["unfilled"].append(float(np.mean([x["unfilled"] for x in evs])))
+            stats[e]["net"].append(float(np.mean([x["net"] for x in evs])))
+
+    n_ev = min((len(v["excess"]) for v in per_combo.values()), default=0)
+    if n_ev < 4:
+        raise RuntimeError(f"이벤트 수 부족(n_ev={n_ev}) — 기간을 늘리세요.")
+    trials = list(exits)
+    matrix = [per_combo[e]["excess"][:n_ev] for e in exits]
+    dates0 = per_combo[exits[0]]["dates"][:n_ev]
+
+    rows = [{"entry": entry_rule, "exit": e,
+            "net_pct": round(100 * float(np.mean(stats[e]["net"])), 2),
+            "stop_rate_pct": round(100 * float(np.mean(stats[e]["stop"])), 1),
+            "mdd_pct": round(100 * float(np.mean(stats[e]["mdd"])), 1),
+            "unfilled_pct": round(100 * float(np.mean(stats[e]["unfilled"])), 1),
+            "n_events": len(stats[e]["net"])}
+            for e in exits]
+
+    payload = {"as_of": panel.index[-1].date().isoformat(), "weights_used": weights,
+              "topn": topn, "rebal_days": rebal_days, "n_combos": len(exits), "rows": rows,
+              "baseline": "exit_time6m(트리거 즉시 전량) · exit_time6m_5050w10(현행 라이브 처분)",
+              "note": "진입 entry1_full 고정 — 트리거(6개월) 이후 '처분 방식'만 순수 비교",
+              "adoption_criteria": "현행 처분(exit_time6m_5050w10) 대비 net 개선이 "
+                                   "T_eff 보정 후에도 유지될 때만 처분 방식 변경 제안"}
+
+    os.makedirs("output", exist_ok=True)
+    compare_path = "output/backtest_disposal_compare.json"
+    trial_path = "output/trial_returns_disposal.json"
+    report_path = "output/pbo_report_disposal.json"
+    with open(compare_path, "w", encoding="utf-8") as f:
+        json.dump(payload, f, ensure_ascii=False, indent=2)
+    trial_data = {"horizon": "disposal", "universe": "pit", "cost": cost.describe(),
+                 "rebal_days": rebal_days, "hold_days": MAX_HOLD,
+                 "dates": dates0, "trials": trials, "excess_returns": matrix}
+    with open(trial_path, "w", encoding="utf-8") as f:
+        json.dump(trial_data, f, ensure_ascii=False)
+    report = OS.analyze(trial_data, save=False)
+    with open(report_path, "w", encoding="utf-8") as f:
+        json.dump(report, f, ensure_ascii=False, indent=2)
+    _log(f"저장: {compare_path} · {trial_path} · {report_path} (처분방식 {len(exits)}종 × 이벤트 {n_ev}회)")
+    return payload, report
+
+
 # ------------------------- self-test -------------------------
 def self_test():
     _log("[self-test] ① 합성 데이터 규칙비교 엔진 ② 트레일링 스톱 발동 ③ 미체결 추적 ④ A1 신호 shape")
@@ -597,7 +729,10 @@ def self_test():
     n = 400
     idx = pd.bdate_range("2020-01-01", periods=n)
     crash = np.concatenate([100 * np.ones(200), 100 * (1 - 0.004) ** np.arange(200)])
-    p2 = pd.DataFrame({"CRASH": crash, "FLAT": np.full(n, 100.0)}, index=idx)
+    norebound = np.full(n, 100.0); norebound[337:] = 90.0            # 트리거 다음날 급락 후 미반등
+    rebound = np.full(n, 100.0); rebound[337:341] = 90.0; rebound[341:] = 100.0  # 급락 후 곧 반등
+    p2 = pd.DataFrame({"CRASH": crash, "FLAT": np.full(n, 100.0),
+                       "NOREBOUND": norebound, "REBOUND": rebound}, index=idx)
     ma20, ma50, ma200, atr = _ma(p2, 20), _ma(p2, 50), _ma(p2, 200), _atr_close(p2)
 
     r = _simulate_trade(p2, ma20, ma50, ma200, atr, "CRASH", 210, "entry1_full", "exit_trail20")
@@ -627,6 +762,16 @@ def self_test():
     except ValueError:
         pass
 
+    # 처분(disposal) 스윕 — 트리거(entry_day+126=336) 이후 처분 방식 검증
+    dcrash = _simulate_trade(p2, ma20, ma50, ma200, atr, "CRASH", 210, "entry1_full", "exit_time6m_5050w10")
+    assert dcrash["stop"] and dcrash["exit_day"] == 336, f"손실 -15% 초과인데 즉시전량 미발동: {dcrash}"
+    dnoreb = _simulate_trade(p2, ma20, ma50, ma200, atr, "NOREBOUND", 210, "entry1_full", "exit_time6m_5050w10")
+    assert not dnoreb["stop"] and dnoreb["exit_day"] == 347, f"미반등인데 강제청산(10거래일) 시점 오류: {dnoreb}"
+    assert abs(dnoreb["exit_price"] - 90.0) < 1e-6, f"미반등 처분가 계산 오류: {dnoreb}"
+    dreb = _simulate_trade(p2, ma20, ma50, ma200, atr, "REBOUND", 210, "entry1_full", "exit_time6m_5050w10")
+    assert dreb["exit_day"] < 347, f"반등했는데 강제청산 시점까지 대기: {dreb}"
+    assert abs(dreb["exit_price"] - 95.0) < 1e-6, f"반등 처분가 블렌딩 오류: {dreb}"
+
     small = panel.iloc[:400, :6]
     sig = sr_signal_panels(small)
     assert set(sig) == set(SR_CANDIDATES), set(sig)
@@ -650,6 +795,8 @@ def main():
     ap.add_argument("--self-test", action="store_true")
     ap.add_argument("--entry-ratio-sweep", action="store_true",
                     help="분할매수 '비율'만 스윕(청산 exit_time6m 고정) — 미국만 지원")
+    ap.add_argument("--disposal-sweep", action="store_true",
+                    help="매도 '처분 방식'만 스윕(6개월 트리거 고정, 진입 entry1_full) — 미국만 지원")
     args = ap.parse_args()
     if args.self_test:
         self_test(); return
@@ -659,6 +806,13 @@ def main():
         funds = BW.load_funds()
         cost = BC.CostModel("us", args.commission_bps, args.slippage_bps)
         run_entry_ratio_sweep(panel, spy, funds, pit, rebal_days=args.rebal_days, topn=args.topn, cost=cost)
+        return
+    if args.disposal_sweep:
+        pit = BC.load_pit(args.pit_file)
+        panel, spy, _ = BC.build_panel_pit(args.years, pit)
+        funds = BW.load_funds()
+        cost = BC.CostModel("us", args.commission_bps, args.slippage_bps)
+        run_disposal_sweep(panel, spy, funds, pit, rebal_days=args.rebal_days, topn=args.topn, cost=cost)
         return
     if args.market == "us":
         pit = BC.load_pit(args.pit_file)

@@ -1,0 +1,70 @@
+{
+  "as_of": "2026-07-10",
+  "weights_used": {
+    "int_gp_assets": 1,
+    "rd_mktcap": 2,
+    "shareholder_yield": 2
+  },
+  "topn": 15,
+  "rebal_days": 63,
+  "n_combos": 6,
+  "rows": [
+    {
+      "entry": "entry1_full",
+      "exit": "exit_time6m",
+      "net_pct": 14.86,
+      "stop_rate_pct": 0.0,
+      "mdd_pct": -12.2,
+      "unfilled_pct": 0.0,
+      "n_events": 32
+    },
+    {
+      "entry": "entry1_full",
+      "exit": "exit_time6m_5050w10",
+      "net_pct": 14.96,
+      "stop_rate_pct": 12.7,
+      "mdd_pct": -12.4,
+      "unfilled_pct": 0.0,
+      "n_events": 32
+    },
+    {
+      "entry": "entry1_full",
+      "exit": "exit_time6m_3070w10",
+      "net_pct": 15.0,
+      "stop_rate_pct": 12.7,
+      "mdd_pct": -12.4,
+      "unfilled_pct": 0.0,
+      "n_events": 32
+    },
+    {
+      "entry": "entry1_full",
+      "exit": "exit_time6m_7030w10",
+      "net_pct": 14.91,
+      "stop_rate_pct": 12.7,
+      "mdd_pct": -12.4,
+      "unfilled_pct": 0.0,
+      "n_events": 32
+    },
+    {
+      "entry": "entry1_full",
+      "exit": "exit_time6m_5050w5",
+      "net_pct": 15.08,
+      "stop_rate_pct": 12.7,
+      "mdd_pct": -12.2,
+      "unfilled_pct": 0.0,
+      "n_events": 32
+    },
+    {
+      "entry": "entry1_full",
+      "exit": "exit_time6m_5050w20",
+      "net_pct": 15.22,
+      "stop_rate_pct": 12.7,
+      "mdd_pct": -12.5,
+      "unfilled_pct": 0.0,
+      "n_events": 32
+    }
+  ],
+  "baseline": "exit_time6m(트리거 즉시 전량) · exit_time6m_5050w10(현행 라이브 처분)",
+  "note": "진입 entry1_full 고정 — 트리거(6개월) 이후 '처분 방식'만 순수 비교",
+  "adoption_criteria": "현행 처분(exit_time6m_5050w10) 대비 net 개선이 T_eff 보정 후에도 유지될 때만 처분 방식 변경 제안"
+}
