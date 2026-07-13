@@ -84,3 +84,59 @@ def update(state: dict, buy_now_syms: list, ind_map: dict, today: str, pool_syms
             holdings[sym] = {"since": today, "entry_price": p, "peak": p}
     state["last_run"] = today
     return sells
+
+
+# ------------------------- 라이브 트래킹(보유현황) -------------------------
+def live_summary(state: dict, ind_map: dict) -> list:
+    """보유 종목별 현재 상태: 매수일·진입가·현재가·수익률·고점대비·보유일수.
+    반환은 수익률 내림차순. 종가 조회가 안 되는 종목은 건너뜀."""
+    import datetime as _dt
+    today = _dt.date.today()
+    rows = []
+    for sym, h in (state.get("holdings") or {}).items():
+        ind = ind_map.get(sym) or {}
+        price = ind.get("price")
+        entry = h.get("entry_price")
+        if _isnan(price) or _isnan(entry) or not entry:
+            continue
+        held_days = None
+        try:
+            held_days = (today - _dt.date.fromisoformat(h.get("since"))).days
+        except Exception:
+            pass
+        rows.append({"symbol": sym, "since": h.get("since"), "entry": entry, "price": price,
+                     "ret_pct": (price / entry - 1) * 100, "peak": h.get("peak"),
+                     "held_days": held_days})
+    rows.sort(key=lambda r: r["ret_pct"], reverse=True)
+    return rows
+
+
+def benchmark_compare(summary: list, bench_dates: list, bench_closes: list) -> dict:
+    """live_summary() 결과의 각 종목 진입일을 기준으로 '동일 기간' 지수 수익률과 비교.
+    bench_dates/bench_closes는 오름차순 정렬된 종가 시계열(날짜는 ISO 문자열).
+    반환: {} (비교 불가) 또는 {"avg_strategy","avg_bench","rows":[{symbol,strategy_ret,bench_ret}]}"""
+    if not summary or not bench_dates or not bench_closes or len(bench_dates) != len(bench_closes):
+        return {}
+    bench_now = bench_closes[-1]
+
+    def _bench_at(date_str):
+        idx = None
+        for i, d in enumerate(bench_dates):
+            if d <= date_str:
+                idx = i
+            else:
+                break
+        return bench_closes[idx] if idx is not None else None
+
+    rows = []
+    for r in summary:
+        since = r.get("since")
+        b0 = _bench_at(since) if since else None
+        if b0:
+            rows.append({"symbol": r["symbol"], "strategy_ret": r["ret_pct"],
+                        "bench_ret": (bench_now / b0 - 1) * 100})
+    if not rows:
+        return {}
+    return {"avg_strategy": sum(x["strategy_ret"] for x in rows) / len(rows),
+            "avg_bench": sum(x["bench_ret"] for x in rows) / len(rows),
+            "rows": rows}

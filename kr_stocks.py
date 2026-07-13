@@ -133,7 +133,7 @@ def select(yf) -> dict:
         c = d["closes"]
         price = c[-1]
         ma200 = MS._sma(c, 200); ma50 = MS._sma(c, 50); ma20 = MS._sma(c, 20)
-        ind_map[t] = {"price": price, "ma200": ma200}
+        ind_map[t] = {"price": price, "ma200": ma200, "closes": c[-252:]}
         if not ma200 or price <= ma200:      # 200일선 위 필수
             continue
         mom = MS._mom_12_1(c)

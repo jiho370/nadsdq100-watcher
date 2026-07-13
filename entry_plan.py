@@ -24,6 +24,12 @@ entry_plan.py — 매수/매도 '실행 계획'을 규칙으로 확정하는 모
 """
 from __future__ import annotations
 import os
+import numpy as np
+
+try:
+    from backtest_exec import support_level_asof  # 트랙 C 산출물 재사용(청산 "규칙"이 아니라 참고 표시용)
+except Exception:
+    support_level_asof = None
 
 TRAIL = float(os.environ.get("SELL_TRAIL", "0.20"))          # 트레일링 -20% (holdings.py와 동일 env)
 MA_BUFFER = float(os.environ.get("SELL_MA_BUFFER", "0.03"))  # 200일선 -3% 이탈
@@ -103,18 +109,32 @@ def watch_trigger(c: dict, krw: bool = False) -> str:
     return " · ".join(conds) if conds else "20일선 회복 확인 후 2분할 매수"
 
 
+def _support_note(s: dict, krw: bool = False) -> str:
+    """참고용 최근 지지선(backtest_exec.support_level_asof 재사용) — 청산 '기준'이 아니라
+    현재가 판단에 참고할 정보만 병기(STRATEGY.md 매도 기준은 6개월 재평가/200일선 그대로)."""
+    closes = s.get("closes")
+    if not closes or not support_level_asof or len(closes) < 11:
+        return ""
+    vals = np.asarray(closes, dtype=float)
+    lvl = support_level_asof(vals, len(vals) - 1)
+    if not lvl:
+        return ""
+    return f" · 참고 지지선 {_fmt(lvl, krw)} 부근(매도 기준 아님, 참고용)"
+
+
 def sell_plan(s: dict, krw: bool = False) -> str:
-    """매도 시그널 종목(holdings.update 반환 형식)의 처분 계획.
+    """매도 후보(holdings.update 반환 형식)의 처분 계획.
     큰 손실 상태면 전량, 아니면 절반 즉시 + 절반은 반등 대기."""
     ret = s.get("ret_pct")
     price = s.get("price")
+    note = _support_note(s, krw)
     if ret is not None and ret <= -15:
-        return (f"전량 정리 — 추천가 대비 {ret:.0f}%로 손절 기준(-15%) 초과. "
-                f"반등 기대로 미루면 손실이 커지는 구간")
+        return (f"전량 정리 — 매수가 대비 {ret:.0f}%로 손절 기준(-15%) 초과. "
+                f"반등 기대로 미루면 손실이 커지는 구간{note}")
     half = f"현재가({_fmt(price, krw)}) 부근에서 50% 즉시 정리"
     rest = "나머지 50%는 반등 시 20일선 부근에서 정리 (2주 내 반등 없으면 전량)"
-    tail = f" · 추천 후 수익 {ret:+.0f}% 확보 차원" if (ret is not None and ret > 0) else ""
-    return f"{half}, {rest}{tail}"
+    tail = f" · 매수 후 수익 {ret:+.0f}% 확보 차원" if (ret is not None and ret > 0) else ""
+    return f"{half}, {rest}{tail}{note}"
 
 
 def plan_text(plan: dict) -> str:
@@ -137,9 +157,14 @@ if __name__ == "__main__":   # 스모크 테스트: python entry_plan.py
     kr_c = {"price": 73000, "ma20": 71500.0, "ma50": 69000.0, "ma200": 61000.0, "hot": False}
     sell_win = {"price": 430.0, "ret_pct": 38.2}
     sell_lose = {"price": 90.0, "ret_pct": -18.0}
+    import numpy as _np
+    _rng = _np.random.default_rng(0)
+    sell_with_support = {"price": 430.0, "ret_pct": 12.0,
+                          "closes": list(100 + _np.cumsum(_rng.normal(0, 1.5, 260)))}
     print("HOT :", plan_text(buy_plan(hot_c)))
     print("COLD:", plan_text(buy_plan(cold_c)))
     print("WATCH:", watch_trigger(watch_c))
     print("KR  :", plan_text(buy_plan(kr_c, krw=True)))
     print("SELL+:", sell_plan(sell_win))
     print("SELL-:", sell_plan(sell_lose))
+    print("SELL(지지선):", sell_plan(sell_with_support))
