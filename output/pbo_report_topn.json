@@ -1,0 +1,41 @@
+{
+  "input": {
+    "horizon": "topn",
+    "universe": "pit",
+    "cost": "us: 매수 5.0bp + 매도 5.28bp (왕복 10.28bp)"
+  },
+  "n_trials": 6,
+  "n_events": 32,
+  "pbo": {
+    "pbo": 0.771,
+    "embargo": 3,
+    "purged_events_total": 11872,
+    "n_combos": 310,
+    "n_blocks": 12,
+    "lambda_mean": -0.5267,
+    "is_sharpe_mean": 1.128,
+    "oos_sharpe_mean": 1.2344,
+    "degradation_slope": -0.9377,
+    "prob_oos_loss": 0.0194
+  },
+  "pbo_verdict": "높음(IS 1등이 운일 확률 높음 — 채택 보류 권장)",
+  "dsr": {
+    "sr": 0.9877,
+    "sr0": 0.0913,
+    "dsr": 0.9843,
+    "dsr_uncorrected": 1.0,
+    "skew": 0.518,
+    "kurtosis": 3.975,
+    "T": 32,
+    "T_eff": 8,
+    "N": 6,
+    "best_trial": "topn10"
+  },
+  "dsr_verdict": "95% 신뢰수준 통과",
+  "passed": false,
+  "references": [
+    "Bailey et al. 2017 (PBO/CSCV)",
+    "Bailey & López de Prado 2014 (DSR)"
+  ],
+  "note": "조합 간 상관으로 N이 과대계상될 수 있어 DSR은 보수적(실제보다 낮게) 추정됨."
+}

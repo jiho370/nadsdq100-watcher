@@ -1,0 +1,68 @@
+{
+  "as_of": "2026-07-13",
+  "weights_used": {
+    "int_gp_assets": 1,
+    "rd_mktcap": 2,
+    "shareholder_yield": 2
+  },
+  "entry": "entry1_full",
+  "exit": "exit_time6m",
+  "rebal_days": 63,
+  "n_combos": 6,
+  "rows": [
+    {
+      "topn": 5,
+      "net_pct": 16.28,
+      "stop_rate_pct": 0.0,
+      "mdd_pct": -12.2,
+      "turnover_pct": 16.8,
+      "n_events": 32
+    },
+    {
+      "topn": 8,
+      "net_pct": 16.2,
+      "stop_rate_pct": 0.0,
+      "mdd_pct": -12.4,
+      "turnover_pct": 14.9,
+      "n_events": 32
+    },
+    {
+      "topn": 10,
+      "net_pct": 15.84,
+      "stop_rate_pct": 0.0,
+      "mdd_pct": -12.4,
+      "turnover_pct": 15.2,
+      "n_events": 32
+    },
+    {
+      "topn": 12,
+      "net_pct": 15.51,
+      "stop_rate_pct": 0.0,
+      "mdd_pct": -12.4,
+      "turnover_pct": 18.0,
+      "n_events": 32
+    },
+    {
+      "topn": 15,
+      "net_pct": 14.81,
+      "stop_rate_pct": 0.0,
+      "mdd_pct": -12.8,
+      "turnover_pct": 16.3,
+      "n_events": 32
+    },
+    {
+      "topn": 20,
+      "net_pct": 14.12,
+      "stop_rate_pct": 0.0,
+      "mdd_pct": -12.7,
+      "turnover_pct": 16.0,
+      "n_events": 32
+    }
+  ],
+  "baseline": "topn10(현행 미국 보유 상한)",
+  "note": "진입 entry1_full·청산 exit_time6m 고정 — 보유종목 수(topn)만 순수 비교",
+  "adoption_criteria": "현행(topn=10) 대비 net 개선 & MDD 축소가 T_eff 보정 후에도 유지될 때만 보유상한 변경 제안",
+  "limitations": [
+    "MDD·net은 트레이드별 평균(포트폴리오 전체를 하나의 자산으로 본 일별 equity curve 낙폭이 아님) — 분산투자 효과(topn이 커질수록 개별 종목 리스크가 상쇄되는 정도)는 이 지표로 완전히 포착 안 됨"
+  ]
+}

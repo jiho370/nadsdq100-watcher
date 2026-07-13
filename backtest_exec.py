@@ -82,6 +82,13 @@ DISPOSAL_SWEEP = {
     "exit_time6m_5050w20": ((0.50, 0.50), 20),     # 대기기간 민감도(4주)
 }
 DISPOSAL_LOSS_OVERRIDE = -0.15   # entry_plan.sell_plan()과 동일 — 초과 손실이면 대기 없이 즉시 전량
+
+# 2026-07-14 확장(지호 님 질문 — "몇 종목을 보유할지도 백테스트 근거가 있나"): 지금까지의
+# 스윕은 전부 '고른 종목을 어떻게 사고 파는가'만 봤다. '몇 종목을 고르는가'(topn, 현재 미국10·
+# 한국6은 순수 제품 판단)는 다른 문제 — 매 리밸런싱 시점의 팩터 상위 N을 그대로 바꿔가며
+# 비교한다. 진입 entry1_full·청산 exit_time6m 고정(topn 효과만 순수 비교).
+TOPN_SWEEP = [5, 8, 10, 12, 15, 20]
+
 PULLBACK_WINDOW = 10     # 2차 트랜치 눌림 대기 거래일
 ATR_WINDOW = 60
 MAX_HOLD = 252           # 강제청산 상한(12m) — STRATEGY.md 장기보유 취지상 이 이상은 안 봄
@@ -716,6 +723,101 @@ def run_disposal_sweep(panel, spy, funds, pit, rebal_days=63, topn=15, cost=None
     return payload, report
 
 
+def run_topn_sweep(panel, spy, funds, pit, rebal_days=63, topn_list=None, cost=None, lookback=None):
+    """보유종목 수(topn) 자체를 스윕 — 매 리밸런싱 시점의 팩터 상위 N을 바꿔가며 비교.
+    진입 entry1_full·청산 exit_time6m 고정(topn 효과만 순수 비교, 어떻게 사고 파는지는 안 건드림)."""
+    cost = cost or BC.CostModel("us", commission_bps=0.0, slippage_bps=5.0)
+    weights = _load_exec_weights()
+    topn_list = topn_list or TOPN_SWEEP
+    import tech_factors as T
+    cross = T.build_panels(panel)
+    ma20, ma50, ma200, atr = _ma(panel, 20), _ma(panel, 50), _ma(panel, 200), _atr_close(panel)
+    spy = spy.reindex(panel.index).ffill() if spy is not None else None
+    n = len(panel)
+    ps = list(range(lookback or BW.LOOKBACK, n - MAX_HOLD - 1, rebal_days))
+    if not ps:
+        raise RuntimeError("기간이 짧아 리밸런싱 시점 없음.")
+
+    entry_rule, exit_rule = "entry1_full", "exit_time6m"
+    per_combo = {tn: {"excess": [], "dates": []} for tn in topn_list}
+    stats = {tn: {"stop": [], "mdd": [], "unfilled": [], "net": []} for tn in topn_list}
+    turns = {tn: [] for tn in topn_list}
+    prev_basket = {tn: None for tn in topn_list}
+
+    for p in ps:
+        date = panel.index[p].date().isoformat()
+        entry_day = p + 1
+        for tn in topn_list:
+            basket = _select_basket(panel, p, funds, cross, pit, weights, tn)
+            if not basket:
+                continue
+            if prev_basket[tn] is not None:
+                turns[tn].append(1 - len(set(basket) & prev_basket[tn]) / max(len(basket), 1))
+            prev_basket[tn] = set(basket)
+            evs = []
+            for sym in basket:
+                r = _simulate_trade(panel, ma20, ma50, ma200, atr, sym, entry_day, entry_rule, exit_rule)
+                if r is None:
+                    continue
+                net = cost.net(r["exit_price"] / r["entry_price"] - 1)
+                spy_ret = 0.0
+                if spy is not None and np.isfinite(spy.iloc[r["exit_day"]]) and np.isfinite(spy.iloc[entry_day]):
+                    spy_ret = float(spy.iloc[r["exit_day"]] / spy.iloc[entry_day] - 1)
+                evs.append({"net": net, "excess": net - spy_ret, "stop": r["stop"],
+                           "mdd": r["mdd"], "unfilled": 1 - r["filled_frac"]})
+            if not evs:
+                continue
+            per_combo[tn]["excess"].append(round(float(np.mean([x["excess"] for x in evs])), 6))
+            per_combo[tn]["dates"].append(date)
+            stats[tn]["stop"].append(float(np.mean([x["stop"] for x in evs])))
+            stats[tn]["mdd"].append(float(np.mean([x["mdd"] for x in evs])))
+            stats[tn]["unfilled"].append(float(np.mean([x["unfilled"] for x in evs])))
+            stats[tn]["net"].append(float(np.mean([x["net"] for x in evs])))
+
+    n_ev = min((len(v["excess"]) for v in per_combo.values()), default=0)
+    if n_ev < 4:
+        raise RuntimeError(f"이벤트 수 부족(n_ev={n_ev}) — 기간을 늘리세요.")
+    trials = [f"topn{tn}" for tn in topn_list]
+    matrix = [per_combo[tn]["excess"][:n_ev] for tn in topn_list]
+    dates0 = per_combo[topn_list[0]]["dates"][:n_ev]
+
+    rows = [{"topn": tn,
+            "net_pct": round(100 * float(np.mean(stats[tn]["net"])), 2),
+            "stop_rate_pct": round(100 * float(np.mean(stats[tn]["stop"])), 1),
+            "mdd_pct": round(100 * float(np.mean(stats[tn]["mdd"])), 1),
+            "turnover_pct": round(100 * float(np.mean(turns[tn])), 1) if turns[tn] else None,
+            "n_events": len(stats[tn]["net"])}
+            for tn in topn_list]
+
+    payload = {"as_of": panel.index[-1].date().isoformat(), "weights_used": weights,
+              "entry": entry_rule, "exit": exit_rule, "rebal_days": rebal_days,
+              "n_combos": len(topn_list), "rows": rows,
+              "baseline": "topn10(현행 미국 보유 상한)",
+              "note": "진입 entry1_full·청산 exit_time6m 고정 — 보유종목 수(topn)만 순수 비교",
+              "adoption_criteria": "현행(topn=10) 대비 net 개선 & MDD 축소가 T_eff 보정 후에도 "
+                                   "유지될 때만 보유상한 변경 제안",
+              "limitations": ["MDD·net은 트레이드별 평균(포트폴리오 전체를 하나의 자산으로 본 "
+                              "일별 equity curve 낙폭이 아님) — 분산투자 효과(topn이 커질수록 "
+                              "개별 종목 리스크가 상쇄되는 정도)는 이 지표로 완전히 포착 안 됨"]}
+
+    os.makedirs("output", exist_ok=True)
+    compare_path = "output/backtest_topn_compare.json"
+    trial_path = "output/trial_returns_topn.json"
+    report_path = "output/pbo_report_topn.json"
+    with open(compare_path, "w", encoding="utf-8") as f:
+        json.dump(payload, f, ensure_ascii=False, indent=2)
+    trial_data = {"horizon": "topn", "universe": "pit", "cost": cost.describe(),
+                 "rebal_days": rebal_days, "hold_days": MAX_HOLD,
+                 "dates": dates0, "trials": trials, "excess_returns": matrix}
+    with open(trial_path, "w", encoding="utf-8") as f:
+        json.dump(trial_data, f, ensure_ascii=False)
+    report = OS.analyze(trial_data, save=False)
+    with open(report_path, "w", encoding="utf-8") as f:
+        json.dump(report, f, ensure_ascii=False, indent=2)
+    _log(f"저장: {compare_path} · {trial_path} · {report_path} (topn {len(topn_list)}종 × 이벤트 {n_ev}회)")
+    return payload, report
+
+
 # ------------------------- self-test -------------------------
 def self_test():
     _log("[self-test] ① 합성 데이터 규칙비교 엔진 ② 트레일링 스톱 발동 ③ 미체결 추적 ④ A1 신호 shape")
@@ -725,6 +827,11 @@ def self_test():
     payload, report = run_exec(panel, spy, funds, pit, rebal_days=63, topn=8, cost=cost)
     assert payload["rows"] and all(r["n_events"] > 0 for r in payload["rows"]), payload["rows"]
     assert "pbo" in report and "dsr" in report
+
+    tn_payload, tn_report = run_topn_sweep(panel, spy, funds, pit, rebal_days=63,
+                                           topn_list=[5, 8, 12], cost=cost)
+    assert tn_payload["rows"] and all(r["n_events"] > 0 for r in tn_payload["rows"]), tn_payload["rows"]
+    assert "pbo" in tn_report and "dsr" in tn_report
 
     n = 400
     idx = pd.bdate_range("2020-01-01", periods=n)
@@ -797,6 +904,8 @@ def main():
                     help="분할매수 '비율'만 스윕(청산 exit_time6m 고정) — 미국만 지원")
     ap.add_argument("--disposal-sweep", action="store_true",
                     help="매도 '처분 방식'만 스윕(6개월 트리거 고정, 진입 entry1_full) — 미국만 지원")
+    ap.add_argument("--topn-sweep", action="store_true",
+                    help="보유종목 수(topn)만 스윕(진입 entry1_full·청산 exit_time6m 고정) — 미국만 지원")
     args = ap.parse_args()
     if args.self_test:
         self_test(); return
@@ -813,6 +922,13 @@ def main():
         funds = BW.load_funds()
         cost = BC.CostModel("us", args.commission_bps, args.slippage_bps)
         run_disposal_sweep(panel, spy, funds, pit, rebal_days=args.rebal_days, topn=args.topn, cost=cost)
+        return
+    if args.topn_sweep:
+        pit = BC.load_pit(args.pit_file)
+        panel, spy, _ = BC.build_panel_pit(args.years, pit)
+        funds = BW.load_funds()
+        cost = BC.CostModel("us", args.commission_bps, args.slippage_bps)
+        run_topn_sweep(panel, spy, funds, pit, rebal_days=args.rebal_days, cost=cost)
         return
     if args.market == "us":
         pit = BC.load_pit(args.pit_file)
