@@ -1,5 +1,5 @@
 {
-  "as_of": "2026-07-10",
+  "as_of": "2026-07-13",
   "weights_used": {
     "int_gp_assets": 1,
     "rd_mktcap": 2,
@@ -12,54 +12,54 @@
     {
       "entry": "entry1_full",
       "exit": "exit_time6m",
-      "net_pct": 14.86,
+      "net_pct": 14.81,
       "stop_rate_pct": 0.0,
-      "mdd_pct": -12.2,
+      "mdd_pct": -12.8,
       "unfilled_pct": 0.0,
       "n_events": 32
     },
     {
       "entry": "entry1_full",
       "exit": "exit_time6m_5050w10",
-      "net_pct": 14.96,
-      "stop_rate_pct": 12.7,
-      "mdd_pct": -12.4,
+      "net_pct": 14.64,
+      "stop_rate_pct": 13.5,
+      "mdd_pct": -13.0,
       "unfilled_pct": 0.0,
       "n_events": 32
     },
     {
       "entry": "entry1_full",
       "exit": "exit_time6m_3070w10",
-      "net_pct": 15.0,
-      "stop_rate_pct": 12.7,
-      "mdd_pct": -12.4,
+      "net_pct": 14.58,
+      "stop_rate_pct": 13.5,
+      "mdd_pct": -13.0,
       "unfilled_pct": 0.0,
       "n_events": 32
     },
     {
       "entry": "entry1_full",
       "exit": "exit_time6m_7030w10",
-      "net_pct": 14.91,
-      "stop_rate_pct": 12.7,
-      "mdd_pct": -12.4,
+      "net_pct": 14.69,
+      "stop_rate_pct": 13.5,
+      "mdd_pct": -13.0,
       "unfilled_pct": 0.0,
       "n_events": 32
     },
     {
       "entry": "entry1_full",
       "exit": "exit_time6m_5050w5",
-      "net_pct": 15.08,
-      "stop_rate_pct": 12.7,
-      "mdd_pct": -12.2,
+      "net_pct": 14.8,
+      "stop_rate_pct": 13.5,
+      "mdd_pct": -12.9,
       "unfilled_pct": 0.0,
       "n_events": 32
     },
     {
       "entry": "entry1_full",
       "exit": "exit_time6m_5050w20",
-      "net_pct": 15.22,
-      "stop_rate_pct": 12.7,
-      "mdd_pct": -12.5,
+      "net_pct": 14.94,
+      "stop_rate_pct": 13.5,
+      "mdd_pct": -13.1,
       "unfilled_pct": 0.0,
       "n_events": 32
     }

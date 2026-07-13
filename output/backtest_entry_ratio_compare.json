@@ -12,54 +12,54 @@
     {
       "entry": "entry2_5050",
       "exit": "exit_time6m",
-      "net_pct": 15.58,
+      "net_pct": 15.45,
       "stop_rate_pct": 0.0,
-      "mdd_pct": -11.6,
-      "unfilled_pct": 30.3,
+      "mdd_pct": -12.0,
+      "unfilled_pct": 30.4,
       "n_events": 32
     },
     {
       "entry": "entry2_3070",
       "exit": "exit_time6m",
-      "net_pct": 15.89,
+      "net_pct": 15.75,
       "stop_rate_pct": 0.0,
-      "mdd_pct": -11.4,
-      "unfilled_pct": 42.4,
+      "mdd_pct": -11.8,
+      "unfilled_pct": 42.6,
       "n_events": 32
     },
     {
       "entry": "entry2_7030",
       "exit": "exit_time6m",
-      "net_pct": 15.29,
+      "net_pct": 15.17,
       "stop_rate_pct": 0.0,
-      "mdd_pct": -11.9,
+      "mdd_pct": -12.2,
       "unfilled_pct": 18.2,
       "n_events": 32
     },
     {
       "entry": "entry3_303040",
       "exit": "exit_time6m",
-      "net_pct": 16.45,
+      "net_pct": 16.32,
       "stop_rate_pct": 0.0,
-      "mdd_pct": -11.0,
+      "mdd_pct": -11.3,
       "unfilled_pct": 45.4,
       "n_events": 32
     },
     {
       "entry": "entry3_502525",
       "exit": "exit_time6m",
-      "net_pct": 15.89,
+      "net_pct": 15.76,
       "stop_rate_pct": 0.0,
-      "mdd_pct": -11.4,
+      "mdd_pct": -11.8,
       "unfilled_pct": 32.2,
       "n_events": 32
     },
     {
       "entry": "entry3_204040",
       "exit": "exit_time6m",
-      "net_pct": 16.71,
+      "net_pct": 16.57,
       "stop_rate_pct": 0.0,
-      "mdd_pct": -10.8,
+      "mdd_pct": -11.1,
       "unfilled_pct": 51.5,
       "n_events": 32
     }
