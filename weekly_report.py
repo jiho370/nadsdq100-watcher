@@ -103,6 +103,52 @@ def _fetch_closes(tickers: list[str]) -> dict[str, list[float]]:
     return out
 
 
+def _verdict_price_lookup_batch(entries: list[dict]) -> dict:
+    """AI verdict 로그에 있는 모든 종목의 현재가를 한 번에 조회 — {(symbol,market): price}.
+    한국(market='kr')은 6자리 코드에 .KS 접미사를 붙여 조회."""
+    tickers, key_map = [], {}
+    for e in entries:
+        sym, mkt = e.get("symbol"), e.get("market", "us")
+        if not sym:
+            continue
+        t = f"{sym}.KS" if mkt == "kr" else sym
+        tickers.append(t)
+        key_map[t] = (sym, mkt)
+    if not tickers:
+        return {}
+    closes = _fetch_closes(sorted(set(tickers)))
+    return {key_map[t]: c[-1] for t, c in closes.items() if c}
+
+
+def _verdict_summary_html() -> str:
+    """AI 검증(매수유지 vs 관찰강등·제외) 사후추적 — 표본(그룹당 MIN_N) 부족하면 빈 문자열
+    (섹션 자체 생략, score_calibration.py 게이트와 동일 철학: 표본 쌓이면 자동으로 켜짐)."""
+    try:
+        import ai_verdict_log as AVL
+        entries = AVL.load()
+        if not entries:
+            return ""
+        price_map = _verdict_price_lookup_batch(entries)
+        summary = AVL.forward_return_summary(lambda s, m: price_map.get((s, m)))
+        if not summary:
+            return ""
+        rows = "".join(
+            f'<tr><td style="padding:3px 8px">{_esc(g)}</td>'
+            f'<td style="padding:3px 8px;font-weight:700;color:{"#15803d" if v["avg_ret_pct"] >= 0 else "#b91c1c"}">'
+            f'{v["avg_ret_pct"]:+.1f}%</td><td style="padding:3px 8px;color:#6b7280">{v["n"]}건</td></tr>'
+            for g, v in summary.items())
+        return (
+            '<h3 style="margin:18px 0 6px">🔍 AI 검증 사후추적 <span style="color:#9ca3af;font-size:12px">'
+            '(매수유지 vs 관찰강등·제외 — 판정 후 4주+ 경과분 평균 수익률)</span></h3>'
+            '<table role="presentation" style="border-collapse:collapse;font-size:12px;width:100%;max-width:500px">'
+            '<tr style="color:#6b7280;text-align:left"><th style="padding:3px 8px">판정</th>'
+            '<th style="padding:3px 8px">평균 수익률</th><th style="padding:3px 8px">표본</th></tr>'
+            + rows + '</table>')
+    except Exception as e:
+        _log(f"AI verdict 사후추적 집계 생략({type(e).__name__}: {e})")
+        return ""
+
+
 def _ret(closes, days):
     if len(closes) <= days:
         return None
@@ -531,7 +577,7 @@ def _rule_desc(ctx) -> str:
     return f'안정형({stable}) / 공격형({aggressive})'
 
 
-def render_html(ctx, d):
+def render_html(ctx, d, verdict_html=""):
     dmap = {a.get("key"): a for a in (d.get("assets") or []) if isinstance(a, dict)}
     cards = "".join(_asset_card(a, dmap.get(k, {})) for k, a in ctx["assets"].items())
     fx = ctx.get("fx") or {}
@@ -560,6 +606,7 @@ def render_html(ctx, d):
         f'(유럽·일본·중국 — 매수 신호 시 표시)</span></h3>'
         f'{_global_rows(ctx, d.get("global_notes"))}'
         f'{fx_line}'
+        f'{verdict_html}'
         f'<div style="font-size:11px;color:#9ca3af;margin-top:14px;line-height:1.5">'
         f'⚠️ {_esc(d.get("risks"))}<br>규칙 기반 참고용 자료이며 투자 권유가 아닙니다. '
         f'판단·책임은 본인에게 있습니다.</div></div>')
@@ -597,7 +644,7 @@ def run(no_email: bool = False):
         png = _chart_png(a["closes"], f'{a["name"]} ({a["ticker"]})')
         if png:
             images.append((f"wchart_{k}", png))
-    html = render_html(ctx, d)
+    html = render_html(ctx, d, verdict_html=_verdict_summary_html())
 
     os.makedirs("output", exist_ok=True)
     import base64

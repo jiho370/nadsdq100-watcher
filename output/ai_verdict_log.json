@@ -1,0 +1,94 @@
+{
+  "entries": [
+    {
+      "date": "2026-07-13",
+      "market": "us",
+      "symbol": "GM",
+      "name": "General Motors Company",
+      "verdict": "매수유지",
+      "reason": "",
+      "price": 76.65
+    },
+    {
+      "date": "2026-07-13",
+      "market": "us",
+      "symbol": "BKNG",
+      "name": "Booking Holdings Inc.",
+      "verdict": "관찰유지",
+      "reason": "200일선 이탈로 관찰 전환, 다만 확인된 악재는 없음",
+      "price": 176.65
+    },
+    {
+      "date": "2026-07-13",
+      "market": "us",
+      "symbol": "MRNA",
+      "name": "Moderna, Inc.",
+      "verdict": "관찰강등",
+      "reason": "JPMorgan 매도의견 재확인(7/10) 이후 바이오섹터 전반 조정(XBI -4%)에 동반 급락, 기업고유 악재는 미확인이나 FDA 결정 대기로 단기 변동성 큼",
+      "price": 67.69
+    },
+    {
+      "date": "2026-07-13",
+      "market": "us",
+      "symbol": "BMY",
+      "name": "Bristol-Myers Squibb Company",
+      "verdict": "매수유지",
+      "reason": "",
+      "price": 58.95
+    },
+    {
+      "date": "2026-07-13",
+      "market": "us",
+      "symbol": "SWKS",
+      "name": "Skyworks Solutions, Inc.",
+      "verdict": "관찰강등",
+      "reason": "고객 집중도·매출 둔화 우려로 밸류에이션 부담 지속, 반도체 섹터 전반 약세 동반(1개월 -16.7%)",
+      "price": 58.57
+    },
+    {
+      "date": "2026-07-13",
+      "market": "us",
+      "symbol": "INCY",
+      "name": "Incyte Corporation",
+      "verdict": "매수유지",
+      "reason": "",
+      "price": 114.55
+    },
+    {
+      "date": "2026-07-13",
+      "market": "us",
+      "symbol": "REGN",
+      "name": "Regeneron Pharmaceuticals, Inc.",
+      "verdict": "제외",
+      "reason": "흑색종 3상에서 Keytruda 대비 통계적 유의성 미달(p=0.0627)로 12%대 급락, Citi 매수→중립 하향 등 다수 애널리스트 목표가 하향, 200일선도 이탈",
+      "price": 660.93
+    },
+    {
+      "date": "2026-07-13",
+      "market": "us",
+      "symbol": "APTV",
+      "name": "Aptiv PLC",
+      "verdict": "관찰유지",
+      "reason": "200일선 이탈로 관찰 전환, 다만 확인된 기업고유 악재는 없음",
+      "price": 59.5
+    },
+    {
+      "date": "2026-07-13",
+      "market": "us",
+      "symbol": "HPQ",
+      "name": "HP Inc.",
+      "verdict": "매수유지",
+      "reason": "",
+      "price": 24.26
+    },
+    {
+      "date": "2026-07-13",
+      "market": "us",
+      "symbol": "WDAY",
+      "name": "Workday, Inc.",
+      "verdict": "관찰유지",
+      "reason": "200일선 이탈로 관찰 전환, Salesforce Agentforce 실망감에 SaaS 섹터 전반 약세 동반됐으나 WDAY 자체 주가는 최근 1주 +5.9%로 견조",
+      "price": 146.13
+    }
+  ]
+}

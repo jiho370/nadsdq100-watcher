@@ -320,6 +320,29 @@ def write_market_stage(market) -> dict:
         _log(f"시황 서술 실패({type(e).__name__}: {e})"); return {}
 
 
+# ------------------------- verdict 사후추적 로그(2026-07-14) -------------------------
+def _log_verdicts(buy_pool, kr_buy_pool, vmap, market):
+    """검증 후보 전원(최종 채택 여부 무관)의 verdict+당일가를 ai_verdict_log.py에 기록.
+    AI 검증이 실제로 이후 수익률과 상관 있는지 사후검증하기 위한 데이터 축적 —
+    실패해도 리포트 파이프라인엔 영향 없게 무조건 흡수."""
+    try:
+        import ai_verdict_log as AVL
+        date = str(market.get("as_of") or "").strip()
+        if not date:
+            return
+        entries = []
+        for pool, mkt in ((buy_pool, "us"), (kr_buy_pool, "kr")):
+            for c in pool:
+                sym = str(c.get("symbol"))
+                v = vmap.get(sym) or {}
+                entries.append({"date": date, "market": mkt, "symbol": sym,
+                                "name": c.get("name", ""), "verdict": v.get("verdict") or "매수유지",
+                                "reason": v.get("verdict_reason", ""), "price": c.get("price")})
+        AVL.log(entries)
+    except Exception as e:
+        _log(f"verdict 로그 기록 생략({type(e).__name__}: {e})")
+
+
 # ------------------------- verdict 적용(기존 로직 유지) -------------------------
 def _apply_verdicts(buy_pool, watch_pool, vmap, n_buy, n_watch):
     """1단계 verdict 반영해 최종 목록 확정. AI가 없으면 전원 '유지'로 동작."""
@@ -414,6 +437,7 @@ def build_report(groups: dict, market: dict, pregen: dict | None = None) -> dict
             if not ver:
                 _log("검증 실패 → 전원 유지로 서술만 진행"); ver = {"by_sym": {}}
         vmap = ver.get("by_sym") or {}
+        _log_verdicts(buy_pool, kr_buy_pool, vmap, market)
 
         # ── 코드가 최종 목록 확정
         fb, fw, fx, dem, rest = _apply_verdicts(buy_pool, watch_pool, vmap, FINAL_BUY, FINAL_WATCH)
