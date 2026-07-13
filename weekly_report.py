@@ -59,7 +59,9 @@ def _log(m): print(f"[주간] {m}", file=sys.stderr)
 ASSETS = [
     # key, 이름, 야후 티커(None=시세 없음), 접근 방법(국내 투자자용 예시)
     ("US_STOCK", "미국 주식",   "SPY",     "S&P500 — 예: SPY, KODEX 미국S&P500"),
-    ("KR_STOCK", "한국 주식",   "^KS11",   "코스피 — 예: KODEX 200, TIGER 200"),
+    ("KR_STOCK", "한국 주식",   "^KS11",
+     "코어-새틀라이트 권장(STRATEGY.md §3, 2026-07-14): 코어 65% KODEX 200 등 + "
+     "새틀라이트 35% 코스피200 개별종목(국장 메일 추천 — valuediv 밸류×배당 팩터)"),
     ("COIN",     "코인",        "BTC-USD", "비트코인 — 예: BTC, 현물 ETF(IBIT 등)"),
     ("BOND",     "채권",        "IEF",     "미국채 7-10년 — 예: IEF, TIGER 미국채10년"),
     ("GOLD",     "금",          "GLD",     "금 현물 — 예: GLD, ACE KRX금현물"),

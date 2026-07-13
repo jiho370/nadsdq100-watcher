@@ -1,0 +1,97 @@
+{
+  "as_of": "2026-07-10",
+  "satellite": "valuediv_flow",
+  "core_weight": 0.65,
+  "regime_off_days_pct": 37.2,
+  "rows": {
+    "P1_B1_hold": {
+      "full": {
+        "cagr_pct": 19.56,
+        "sharpe": 0.83,
+        "mdd_pct": -36.1
+      },
+      "2018-2021": {
+        "cagr_pct": 8.51,
+        "sharpe": 0.5,
+        "mdd_pct": -34.9
+      },
+      "2022-2023": {
+        "cagr_pct": -4.99,
+        "sharpe": -0.2,
+        "mdd_pct": -28.8
+      },
+      "2024+": {
+        "cagr_pct": 63.75,
+        "sharpe": 1.59,
+        "mdd_pct": -23.6
+      }
+    },
+    "P2_core_timed": {
+      "full": {
+        "cagr_pct": 18.61,
+        "sharpe": 0.91,
+        "mdd_pct": -21.6
+      },
+      "2018-2021": {
+        "cagr_pct": 5.54,
+        "sharpe": 0.44,
+        "mdd_pct": -21.5
+      },
+      "2022-2023": {
+        "cagr_pct": 0.96,
+        "sharpe": 0.15,
+        "mdd_pct": -10.3
+      },
+      "2024+": {
+        "cagr_pct": 58.29,
+        "sharpe": 1.56,
+        "mdd_pct": -21.6
+      }
+    },
+    "P3_core65_sat35": {
+      "full": {
+        "cagr_pct": 21.68,
+        "sharpe": 1.22,
+        "mdd_pct": -17.1
+      },
+      "2018-2021": {
+        "cagr_pct": 17.17,
+        "sharpe": 1.25,
+        "mdd_pct": -12.0
+      },
+      "2022-2023": {
+        "cagr_pct": -0.23,
+        "sharpe": 0.01,
+        "mdd_pct": -9.9
+      },
+      "2024+": {
+        "cagr_pct": 47.73,
+        "sharpe": 1.7,
+        "mdd_pct": -17.1
+      }
+    },
+    "P4_satellite": {
+      "full": {
+        "cagr_pct": 15.89,
+        "sharpe": 1.0,
+        "mdd_pct": -22.1
+      },
+      "2018-2021": {
+        "cagr_pct": 23.64,
+        "sharpe": 1.31,
+        "mdd_pct": -11.4
+      },
+      "2022-2023": {
+        "cagr_pct": -2.88,
+        "sharpe": -0.24,
+        "mdd_pct": -22.1
+      },
+      "2024+": {
+        "cagr_pct": 25.62,
+        "sharpe": 1.33,
+        "mdd_pct": -17.5
+      }
+    }
+  },
+  "note": "§2-F 설계 비교(팩터 탐색 아님). P3가 B1 대비 샤프·MDD를 개선하면 'B1을 이기는 책임'을 합산 구조가 감당한다는 §1 논리의 실증. 코어 OFF 시 현금 0% 가정(보수적 — CMA 금리 미반영)."
+}

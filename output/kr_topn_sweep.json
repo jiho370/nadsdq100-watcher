@@ -1,0 +1,67 @@
+{
+  "as_of": "2026-07-10",
+  "pool": 30,
+  "factor": "valuediv",
+  "judgment": "B2(동일가중) 대비 월간초과수익 PBO/DSR",
+  "rows": [
+    {
+      "topn": 3,
+      "cagr_pct": 11.0,
+      "vol_pct": 14.7,
+      "sharpe": 0.78,
+      "mdd_pct": -19.8,
+      "excess_vs_B1": -14.63,
+      "excess_vs_B2": -3.88
+    },
+    {
+      "topn": 4,
+      "cagr_pct": 14.19,
+      "vol_pct": 15.3,
+      "sharpe": 0.94,
+      "mdd_pct": -18.9,
+      "excess_vs_B1": -11.44,
+      "excess_vs_B2": -0.7
+    },
+    {
+      "topn": 6,
+      "cagr_pct": 12.6,
+      "vol_pct": 14.9,
+      "sharpe": 0.87,
+      "mdd_pct": -20.5,
+      "excess_vs_B1": -13.03,
+      "excess_vs_B2": -2.29
+    },
+    {
+      "topn": 8,
+      "cagr_pct": 13.07,
+      "vol_pct": 15.1,
+      "sharpe": 0.89,
+      "mdd_pct": -22.8,
+      "excess_vs_B1": -12.57,
+      "excess_vs_B2": -1.82
+    },
+    {
+      "topn": 10,
+      "cagr_pct": 11.89,
+      "vol_pct": 13.8,
+      "sharpe": 0.89,
+      "mdd_pct": -20.6,
+      "excess_vs_B1": -13.74,
+      "excess_vs_B2": -2.99
+    },
+    {
+      "topn": 15,
+      "cagr_pct": 13.18,
+      "vol_pct": 12.9,
+      "sharpe": 1.03,
+      "mdd_pct": -18.0,
+      "excess_vs_B1": -12.45,
+      "excess_vs_B2": -1.7
+    }
+  ],
+  "pbo": 0.5628,
+  "pbo_verdict": "높음(IS 1등이 운일 확률 높음 — 채택 보류 권장)",
+  "dsr": 0.2901,
+  "dsr_verdict": "통과 실패(다중검정 감안 시 샤프가 유의하지 않음)",
+  "passed": false
+}

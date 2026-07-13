@@ -1,0 +1,183 @@
+{
+  "as_of": "2026-07-10",
+  "core_weight": 0.65,
+  "satellite": "valuediv",
+  "judgment": "코어65:새틀35 고정, 새틀라이트 topn만 변수 — B1(매수후보유) 대비",
+  "rows": [
+    {
+      "topn": 3,
+      "cagr_pct": 19.94,
+      "sharpe": 1.17,
+      "mdd_pct": -16.0
+    },
+    {
+      "topn": 4,
+      "cagr_pct": 21.09,
+      "sharpe": 1.19,
+      "mdd_pct": -17.2
+    },
+    {
+      "topn": 6,
+      "cagr_pct": 20.42,
+      "sharpe": 1.16,
+      "mdd_pct": -17.6
+    },
+    {
+      "topn": 8,
+      "cagr_pct": 20.63,
+      "sharpe": 1.17,
+      "mdd_pct": -17.2
+    },
+    {
+      "topn": 10,
+      "cagr_pct": 20.14,
+      "sharpe": 1.16,
+      "mdd_pct": -16.9
+    },
+    {
+      "topn": 15,
+      "cagr_pct": 20.61,
+      "sharpe": 1.19,
+      "mdd_pct": -16.6
+    }
+  ],
+  "subperiods": {
+    "3": {
+      "full": {
+        "cagr_pct": 19.94,
+        "sharpe": 1.17,
+        "mdd_pct": -16.0
+      },
+      "2018-2021": {
+        "cagr_pct": 14.63,
+        "sharpe": 1.16,
+        "mdd_pct": -11.2
+      },
+      "2022-2023": {
+        "cagr_pct": 0.14,
+        "sharpe": 0.06,
+        "mdd_pct": -9.8
+      },
+      "2024+": {
+        "cagr_pct": 44.35,
+        "sharpe": 1.65,
+        "mdd_pct": -16.0
+      }
+    },
+    "4": {
+      "full": {
+        "cagr_pct": 21.09,
+        "sharpe": 1.19,
+        "mdd_pct": -17.2
+      },
+      "2018-2021": {
+        "cagr_pct": 15.09,
+        "sharpe": 1.2,
+        "mdd_pct": -11.9
+      },
+      "2022-2023": {
+        "cagr_pct": 0.06,
+        "sharpe": 0.05,
+        "mdd_pct": -9.3
+      },
+      "2024+": {
+        "cagr_pct": 47.85,
+        "sharpe": 1.68,
+        "mdd_pct": -17.2
+      }
+    },
+    "6": {
+      "full": {
+        "cagr_pct": 20.42,
+        "sharpe": 1.16,
+        "mdd_pct": -17.6
+      },
+      "2018-2021": {
+        "cagr_pct": 12.91,
+        "sharpe": 1.02,
+        "mdd_pct": -12.3
+      },
+      "2022-2023": {
+        "cagr_pct": 0.37,
+        "sharpe": 0.09,
+        "mdd_pct": -7.9
+      },
+      "2024+": {
+        "cagr_pct": 47.97,
+        "sharpe": 1.68,
+        "mdd_pct": -17.6
+      }
+    },
+    "8": {
+      "full": {
+        "cagr_pct": 20.63,
+        "sharpe": 1.17,
+        "mdd_pct": -17.2
+      },
+      "2018-2021": {
+        "cagr_pct": 12.78,
+        "sharpe": 1.02,
+        "mdd_pct": -11.9
+      },
+      "2022-2023": {
+        "cagr_pct": 0.65,
+        "sharpe": 0.13,
+        "mdd_pct": -7.6
+      },
+      "2024+": {
+        "cagr_pct": 48.66,
+        "sharpe": 1.69,
+        "mdd_pct": -17.2
+      }
+    },
+    "10": {
+      "full": {
+        "cagr_pct": 20.14,
+        "sharpe": 1.16,
+        "mdd_pct": -16.9
+      },
+      "2018-2021": {
+        "cagr_pct": 12.77,
+        "sharpe": 1.01,
+        "mdd_pct": -11.5
+      },
+      "2022-2023": {
+        "cagr_pct": 0.66,
+        "sharpe": 0.13,
+        "mdd_pct": -7.4
+      },
+      "2024+": {
+        "cagr_pct": 46.96,
+        "sharpe": 1.67,
+        "mdd_pct": -16.9
+      }
+    },
+    "15": {
+      "full": {
+        "cagr_pct": 20.61,
+        "sharpe": 1.19,
+        "mdd_pct": -16.6
+      },
+      "2018-2021": {
+        "cagr_pct": 15.76,
+        "sharpe": 1.2,
+        "mdd_pct": -11.4
+      },
+      "2022-2023": {
+        "cagr_pct": -0.27,
+        "sharpe": -0.01,
+        "mdd_pct": -7.7
+      },
+      "2024+": {
+        "cagr_pct": 45.8,
+        "sharpe": 1.66,
+        "mdd_pct": -16.6
+      }
+    }
+  },
+  "pbo": 0.5952,
+  "pbo_verdict": "높음(IS 1등이 운일 확률 높음 — 채택 보류 권장)",
+  "dsr": 0.1251,
+  "dsr_verdict": "통과 실패(다중검정 감안 시 샤프가 유의하지 않음)",
+  "passed": false
+}
