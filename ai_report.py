@@ -841,8 +841,8 @@ def render_report_html(report, as_of="", metrics_by_sym=None, market_html="", si
     if kr_buy_cards or kr_watch_cards:
         kr_sec = (
             '<h3 style="margin:18px 0 2px">&#127472;&#127479; 코스피200 매수 후보 <span style="color:#9ca3af;font-size:12px">'
-            '(저평가·배당주 상위(PER·PBR·배당수익률) · AI 검증 통과 — 지수 대신 개별종목 '
-            '보완용 새틀라이트, 주간 배분 리포트 참고)</span></h3>'
+            '(저PER·저PBR·고배당 상위 · AI 검증 통과 — 지수(코어)를 보완하는 위성자산'
+            '(새틀라이트) 전략, 비중 근거는 주간 배분 리포트 참고)</span></h3>'
             + (kr_buy_cards or '<div style="font-size:12px;color:#6b7280">해당 없음</div>')
             + ('<h3 style="margin:18px 0 2px">&#127472;&#127479; 코스피200 관찰 · 내려오면 매수</h3>' + kr_watch_cards if kr_watch_cards else ""))
     # 미국 섹션도 (한국처럼) 카드가 있을 때만 — KR 전용 메일에서 빈 헤더 방지
