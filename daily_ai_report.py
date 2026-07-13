@@ -86,6 +86,60 @@ def _stock_chart_png(closes, ticker, big=False):
     return b.getvalue()
 
 
+def _holdings_compare_chart_png(series: dict, index_name: str):
+    """포트폴리오(각 종목 진입일에 동일 금액 투입 가정) 누적수익률 vs 같은 날짜에 같은 금액을
+    지수에 넣었을 때의 누적수익률 — 시계열 라인 비교."""
+    dates = series.get("dates") or []
+    if not dates:
+        return None
+    port = [v if v is not None else np.nan for v in series["portfolio"]]
+    bench = [v if v is not None else np.nan for v in series["bench"]]
+    x = np.arange(len(dates))
+    fig, ax = plt.subplots(figsize=(7.6, 3.0), dpi=150)
+    ax.plot(x, port, lw=1.8, color="#2563eb", label="보유 포트폴리오")
+    ax.plot(x, bench, lw=1.4, color="#9ca3af", label=f"{index_name} (동일시점·동일금액)")
+    ax.axhline(0, color="#111827", lw=0.8)
+    ticks = np.linspace(0, len(dates) - 1, min(6, len(dates))).astype(int)
+    ax.set_xticks(ticks); ax.set_xticklabels([dates[i][5:] for i in ticks], fontsize=8)
+    ax.set_ylabel("누적수익률(%)", fontsize=9)
+    ax.legend(fontsize=8, frameon=False, loc="upper left")
+    ax.grid(True, axis="y", alpha=0.15, lw=0.5)
+    for sp in ax.spines.values():
+        sp.set_visible(False)
+    ax.tick_params(labelsize=8, length=0)
+    b = io.BytesIO()
+    fig.savefig(b, format="png", bbox_inches="tight"); plt.close(fig)
+    return b.getvalue()
+
+
+def _bench_series(signals, key):
+    """지수·코인 신호(market_signals.gather 결과)에서 key(예: 'KOSPI')의 날짜·종가 시계열을 뽑는다."""
+    for a in (signals or {}).get("core", []):
+        if a.get("key") == key:
+            return a.get("dates") or [], a.get("closes") or []
+    return [], []
+
+
+def _holdings_section(hstate, ind_map, price_map, bench_dates, bench_closes, index_name, krw=False):
+    """holdings.py 보유현황 표+포트폴리오 비교차트를 조립. (html, images) — 데이터 없으면 ("", [])."""
+    import holdings as H
+    summary = H.live_summary(hstate, ind_map)
+    if not summary:
+        return "", []
+    series = H.portfolio_series(summary, price_map, bench_dates, bench_closes)
+    images, chart_cid, totals = [], None, None
+    if series:
+        png = _holdings_compare_chart_png(series, index_name)
+        if png:
+            chart_cid = "holdings_cmp"
+            images.append((chart_cid, png))
+        lp = [v for v in series["portfolio"] if v is not None]
+        lb = [v for v in series["bench"] if v is not None]
+        if lp and lb:
+            totals = {"strategy": lp[-1], "bench": lb[-1], "index_name": index_name}
+    return AR.holdings_table_html(summary, krw=krw, chart_cid=chart_cid, totals=totals), images
+
+
 # ------------------------- 공용 헬퍼 -------------------------
 _LAST_SENT = os.path.join("output", "last_sent.json")
 
@@ -192,6 +246,10 @@ def run_kr(no_email: bool = False, force: bool = False):
         kr = KR.select(R.yf) or {}
         if kr.get("ind_map"):
             kr_sells = KR.update_holdings([], kr["ind_map"], today_kst)
+            for s in kr_sells:
+                cl = (kr["ind_map"].get(s["symbol"]) or {}).get("closes")
+                if cl:
+                    s["closes"] = cl
     except Exception as e:
         print(f"[경고] 코스피200 선별 실패({type(e).__name__}: {e})", file=sys.stderr)
 
@@ -218,14 +276,24 @@ def run_kr(no_email: bool = False, force: bool = False):
         report = AR.deterministic_report(groups, market)
 
     # 최종 매수만 보유목록 편입
+    holdings_html = ""
+    holdings_images = []
     if kr.get("ind_map"):
         try:
             KR.add_holdings([r["symbol"] for r in report.get("kr_buy", [])], kr["ind_map"], today_kst)
+            import holdings as H
+            kr_state = H.load(KR.KR_HOLDINGS)
+            bench_dates, bench_closes = _bench_series(signals, "KOSPI")
+            price_map = {sym: {"dates": (kr["ind_map"].get(sym) or {}).get("dates") or [],
+                               "closes": (kr["ind_map"].get(sym) or {}).get("closes") or []}
+                         for sym in kr_state.get("holdings", {})}
+            holdings_html, holdings_images = _holdings_section(
+                kr_state, kr["ind_map"], price_map, bench_dates, bench_closes, "코스피", krw=True)
         except Exception as e:
             print(f"[경고] 한국 보유목록 갱신 실패({e})", file=sys.stderr)
 
     # 차트·지표칩(최종 종목) + 신호 차트
-    images, metrics = [], {}
+    images, metrics = list(holdings_images), {}
     kr_by_sym = {c["symbol"]: c for c in kr_cands}
     for r in report.get("kr_buy", []) + report.get("kr_watch", []):
         c = kr_by_sym.get(r.get("symbol"))
@@ -248,8 +316,9 @@ def run_kr(no_email: bool = False, force: bool = False):
                                  market_html=market_html, signals_html=signals_html,
                                  banner=banner, show_spy=False, is_kr=True,
                                  market_label=("전주" if is_monday else "전일"),
-                                 title="🇰🇷 장전 시장 점검 · 코스피200 추천")
-    _preview_and_send(html, images, f"[장전] {today_kst} 한국 시장 점검 · 종목추천",
+                                 title="🇰🇷 장전 시장 점검 · 코스피200 매수·매도 후보",
+                                 holdings_html=holdings_html)
+    _preview_and_send(html, images, f"[장전] {today_kst} 한국 시장 점검 · 매수·매도 후보",
                       "kr_report.html", no_email,
                       {"sent_kr_kst": today_kst, "kr_as_of": kr.get("as_of")})
 
@@ -277,8 +346,10 @@ def run_us(no_email: bool = False, force: bool = False):
     candidates = {"as_of": as_of, "candidates": E.build_candidates(data, info, scored, MAX_CANDIDATES)}
     market = {"as_of": as_of, **E.build_market(data)}
 
-    pool_k = int(os.environ.get("REPORT_POOL", "6"))
-    buy_now, watch = E.split_by_entry(candidates["candidates"], k=pool_k)
+    # 관찰 폐지(2026-07-13): 풀 전체를 매수 후보로 — split_by_entry는 hot 태그 부여용으로만 호출
+    pool_k = int(os.environ.get("REPORT_POOL", "10"))
+    buy_now, _ = E.split_by_entry(candidates["candidates"], k=pool_k)
+    watch = []
 
     import holdings as H
     hstate = H.load()
@@ -289,6 +360,9 @@ def run_us(no_email: bool = False, force: bool = False):
         sinfo = R.get_info_for([s["symbol"] for s in sells])
         for s in sells:
             s["name"] = R._company_name(s["symbol"], sinfo.get(s["symbol"], {}))
+            hist_s = data["hist"].get(s["symbol"])
+            if hist_s is not None:
+                s["closes"] = [round(float(v), 2) for v in hist_s.dropna().tail(252).tolist()]
     print(f"[후보풀] 매수 {len(buy_now)} · 관찰 {len(watch)} · 매도검토 {len(sells)}", file=sys.stderr)
     _attach_headlines(buy_now + watch)
 
@@ -302,14 +376,30 @@ def run_us(no_email: bool = False, force: bool = False):
         print("[정보] AI 실패 → 지표+계획 기반 리포트로 발송", file=sys.stderr)
         report = AR.deterministic_report(groups, market)
 
-    for sym in [r["symbol"] for r in report.get("buy_now", [])]:
-        if sym not in hstate.setdefault("holdings", {}):
-            p = (data["ind_map"].get(sym) or {}).get("price")
-            hstate["holdings"][sym] = {"since": as_of, "entry_price": p, "peak": p}
+    # 편입: 보유 상한 10 + 동일 회사 복수 클래스(GOOG/GOOGL 등) 중복 배제 — 팔아야 산다
+    H.add(hstate, [r["symbol"] for r in report.get("buy_now", [])], data["ind_map"], as_of,
+          max_n=int(os.environ.get("US_MAX_HOLD", "10")))
     H.save(hstate)
 
+    # 보유현황(라이브 트래킹): 전체 투입자산 기준 누적수익률 vs SPY(동일시점·동일금액) 시계열
+    spy_series = data.get("spy")
+    bench_dates, bench_closes = [], []
+    if spy_series is not None and not spy_series.empty:
+        s = spy_series.dropna()
+        bench_dates = [d.date().isoformat() for d in s.index]
+        bench_closes = [float(v) for v in s.tolist()]
+    price_map = {}
+    for sym in hstate.get("holdings", {}):
+        hs = data["hist"].get(sym)
+        if hs is not None and len(hs):
+            hs = hs.dropna()
+            price_map[sym] = {"dates": [d.date().isoformat() for d in hs.index],
+                              "closes": [float(v) for v in hs.tolist()]}
+    holdings_html, holdings_images = _holdings_section(
+        hstate, data["ind_map"], price_map, bench_dates, bench_closes, "S&P500")
+
     # 차트: SPY(큰 차트) + 종목 + 신호
-    images, metrics = [], {}
+    images, metrics = list(holdings_images), {}
     spy_closes = market.get("spy_closes") or []
     if spy_closes:
         png = _stock_chart_png(spy_closes, "S&P 500 (SPY)", big=True)
@@ -334,8 +424,9 @@ def run_us(no_email: bool = False, force: bool = False):
     html = AR.render_report_html(report, as_of, metrics,
                                  market_html="", signals_html=signals_html,
                                  banner=banner, show_spy=bool(spy_closes),
-                                 title="🇺🇸 미국장 마감 점검 · S&P500 추천")
-    _preview_and_send(html, images, f"[미국 마감] {today_kst} 시장 점검 · 종목추천",
+                                 title="🇺🇸 미국장 마감 점검 · S&P500 매수·매도 후보",
+                                 holdings_html=holdings_html)
+    _preview_and_send(html, images, f"[미국 마감] {today_kst} 시장 점검 · 매수·매도 후보",
                       "us_report.html", no_email,
                       {"sent_us_kst": today_kst, "us_as_of": as_of})
 

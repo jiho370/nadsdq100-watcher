@@ -161,10 +161,11 @@ def run_us():
     data = R.gather_universe_data(with_volume=True)
     scored, info, _m = E.select_pool(data, int(os.environ.get("REPORT_MAX_CANDIDATES", "60")))
     cands = E.build_candidates(data, info, scored, 60)
-    pool_k = int(os.environ.get("REPORT_POOL", "6")) + POOL_BUFFER
-    buy, watch = E.split_by_entry(cands, k=pool_k)
-    _headlines(buy + watch)
-    groups = {"buy_now": buy, "watch": watch,
+    # 관찰 폐지(2026-07-13, daily_ai_report.run_us와 동일): 풀 전체가 매수 후보
+    pool_k = int(os.environ.get("REPORT_POOL", "10")) + POOL_BUFFER
+    buy, _ = E.split_by_entry(cands, k=pool_k)
+    _headlines(buy)
+    groups = {"buy_now": buy, "watch": [],
               "sells": _holding_syms("output/ai_holdings.json")}
     market = {"as_of": R._last_data_date(data["hist"]), **E.build_market(data)}
     ver = AR.verify_stage(groups, market)

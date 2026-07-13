@@ -196,7 +196,7 @@ def gather(yf) -> dict:
         if not d:
             continue
         core.append({"key": key, "name": name, "ticker": tic, "kind": kind, "when": when,
-                     "as_of": d["dates"][-1], "closes": d["closes"],
+                     "as_of": d["dates"][-1], "closes": d["closes"], "dates": d["dates"],
                      **analyze(d["closes"], kind)})
     for key, name, tic in WORLD_ASSETS:
         d = raw.get(tic)
@@ -219,7 +219,7 @@ def lean_for_ai(sig: dict, when: str | None = None) -> list:
     out = []
     items = core_for(sig, when) if when else sig.get("core", [])
     for a in items:
-        d = {k: (round(v, 2) if isinstance(v, float) else v) for k, v in a.items() if k != "closes"}
+        d = {k: (round(v, 2) if isinstance(v, float) else v) for k, v in a.items() if k not in ("closes", "dates")}
         meta = STATE_META.get(a["signal"])
         d["signal_kr"] = meta[1] if meta else a["signal"]
         d["action"] = meta[3] if meta else ""

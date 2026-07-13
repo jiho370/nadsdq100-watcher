@@ -58,11 +58,12 @@ MODEL_VERIFY = _no_opus(os.environ.get("REPORT_MODEL_VERIFY",
                         os.environ.get("REPORT_MODEL", "claude-sonnet-5")), "claude-sonnet-5")
 MODEL_WRITE  = _no_opus(os.environ.get("REPORT_MODEL_WRITE", "claude-haiku-4-5"), "claude-haiku-4-5")
 
-# 최종 채택 수(코드가 확정) — 상세 카드가 길어져 미국 5→4로 축소(env로 조절)
-FINAL_BUY      = int(os.environ.get("REPORT_FINAL_BUY", "4"))
-FINAL_WATCH    = int(os.environ.get("REPORT_FINAL_WATCH", "4"))
-KR_FINAL_BUY   = int(os.environ.get("KR_FINAL_BUY", "3"))
-KR_FINAL_WATCH = int(os.environ.get("KR_FINAL_WATCH", "2"))
+# 최종 채택 수(코드가 확정) — 관찰 폐지(2026-07-13): 관찰 슬롯을 매수 후보로 전환.
+# 미국 4+4 → 매수 8, 한국 3+2 → 매수 5. AI 강등분은 관찰 대신 '제외된 후보' 박스에 사유 표기.
+FINAL_BUY      = int(os.environ.get("REPORT_FINAL_BUY", "8"))
+FINAL_WATCH    = int(os.environ.get("REPORT_FINAL_WATCH", "0"))
+KR_FINAL_BUY   = int(os.environ.get("KR_FINAL_BUY", "5"))
+KR_FINAL_WATCH = int(os.environ.get("KR_FINAL_WATCH", "0"))
 MIN_BUY        = 3
 
 
@@ -345,6 +346,9 @@ def _apply_verdicts(buy_pool, watch_pool, vmap, n_buy, n_watch):
         final_buy += restored
     used = {c["symbol"] for c in final_buy}
     final_watch = [c for c in demoted + watch_keep if c["symbol"] not in used][:n_watch]
+    # 관찰 슬롯이 없으면(n_watch=0) 강등분이 어디에도 안 보이게 됨 → '제외' 박스에 사유와 함께 표기
+    shown = used | {c["symbol"] for c in final_watch}
+    excluded += [c for c in demoted if c["symbol"] not in shown]
     return (final_buy, final_watch, excluded,
             {c["symbol"] for c in demoted}, {c["symbol"] for c in restored})
 
@@ -696,9 +700,9 @@ def _card(i, r, metrics_by_sym, kind, is_kr=False):
 
 def _sell_card(i, s, is_kr=False):
     ret = s.get("ret_pct")
-    ret_chip = (_chip(f'추천이후 {ret:+.0f}%', "#15803d" if (ret or 0) >= 0 else "#b91c1c", True)
+    ret_chip = (_chip(f'편입 후 {ret:+.0f}%', "#15803d" if (ret or 0) >= 0 else "#b91c1c", True)
                 if ret is not None else "")
-    since = f' · {_esc(s.get("since"))} 추천' if s.get("since") else ""
+    since = f' · {_esc(s.get("since"))} 편입' if s.get("since") else ""
     plan = (f'<div style="font-size:12px;color:#7f1d1d;background:#fff1f2;border-radius:6px;'
             f'padding:5px 8px;margin-top:5px"><b>처분 계획:</b> {_esc(s.get("plan"))}</div>') if s.get("plan") else ""
     cmt = (f'<div style="font-size:12px;color:#374151;margin-top:4px;line-height:1.5">{_esc(s.get("comment"))}</div>'
@@ -728,9 +732,44 @@ def _excluded_html(items, is_kr=False):
         + rows + '</div>')
 
 
+def holdings_table_html(summary: list, krw: bool = False, chart_cid: str | None = None,
+                        totals: dict | None = None) -> str:
+    """holdings.live_summary() 결과를 보유현황 표로. summary 없으면 빈 문자열(섹션 자체 생략).
+    totals={"strategy","bench","index_name"} — 전체 투입자산 기준 누적수익률 vs 지수(있으면 표기)."""
+    if not summary:
+        return ""
+    rows = "".join(
+        f'<tr><td style="padding:3px 8px">{_esc(r["symbol"])}</td>'
+        f'<td style="padding:3px 8px;color:#6b7280">{_esc(r.get("since"))}</td>'
+        f'<td style="padding:3px 8px">{EP._fmt(r.get("entry"), krw)}</td>'
+        f'<td style="padding:3px 8px">{EP._fmt(r.get("price"), krw)}</td>'
+        f'<td style="padding:3px 8px;font-weight:700;color:{"#15803d" if r["ret_pct"] >= 0 else "#b91c1c"}">'
+        f'{r["ret_pct"]:+.1f}%</td>'
+        f'<td style="padding:3px 8px;color:#6b7280">{r.get("held_days") if r.get("held_days") is not None else "-"}일</td></tr>'
+        for r in summary)
+    chart = (f'<img src="cid:{chart_cid}" style="width:100%;max-width:640px;border-radius:8px;margin:8px 0">'
+             if chart_cid else "")
+    totals_html = ""
+    if totals:
+        sc = "#15803d" if totals["strategy"] >= 0 else "#b91c1c"
+        bc = "#15803d" if totals["bench"] >= 0 else "#b91c1c"
+        totals_html = (
+            f'<div style="font-size:13px;margin:2px 0 6px">전체 투입자산 기준 '
+            f'<b style="color:{sc}">{totals["strategy"]:+.1f}%</b>'
+            f' <span style="color:#9ca3af">vs</span> {_esc(totals["index_name"])}(동일시점·동일금액) '
+            f'<b style="color:{bc}">{totals["bench"]:+.1f}%</b></div>')
+    return (
+        '<h3 style="margin:18px 0 4px">&#128202; 보유현황</h3>' + totals_html +
+        '<table role="presentation" style="border-collapse:collapse;font-size:12px;width:100%;max-width:640px">'
+        '<tr style="color:#6b7280;text-align:left"><th style="padding:3px 8px">종목</th>'
+        '<th style="padding:3px 8px">매수일</th><th style="padding:3px 8px">진입가</th>'
+        '<th style="padding:3px 8px">현재가</th><th style="padding:3px 8px">수익률</th>'
+        '<th style="padding:3px 8px">보유일</th></tr>' + rows + '</table>' + chart)
+
+
 def render_report_html(report, as_of="", metrics_by_sym=None, market_html="", signals_html="",
                        kr_sells=None, banner="", title=None, show_spy=True, is_kr=False,
-                       market_label="전일"):
+                       market_label="전일", holdings_html=""):
     """일일 리포트 HTML — 메일 2통 분리 지원.
     title    = 헤더 제목(없으면 기본). KR 장전/US 마감 메일이 각자 지정.
     show_spy = SPY 큰 차트 표시 여부(KR 전용 메일은 SPY 데이터가 없어 False).
@@ -749,13 +788,13 @@ def render_report_html(report, as_of="", metrics_by_sym=None, market_html="", si
     sell_html = ""
     if sells:
         sell_cards = "".join(_sell_card(i, s, is_kr=is_kr) for i, s in enumerate(sells, 1))
-        sell_html = ('<h3 style="margin:18px 0 2px">&#128308; 매도 · 차익실현 검토 <span style="color:#9ca3af;font-size:12px">'
-                     '(이전 추천 종목 중 추세 이탈 — 처분 계획 포함)</span></h3>' + sell_cards)
+        sell_html = ('<h3 style="margin:18px 0 2px">&#128308; 매도 후보 · 차익실현 <span style="color:#9ca3af;font-size:12px">'
+                     '(보유 종목 중 추세 이탈 — 처분 계획 포함)</span></h3>' + sell_cards)
     kr_sell_html = ""
     if kr_sells:
         kr_sell_cards = "".join(_sell_card(i, s, is_kr=True) for i, s in enumerate(kr_sells, 1))
-        kr_sell_html = ('<h3 style="margin:18px 0 2px">&#128308; 한국 매도 · 차익실현 검토 <span style="color:#9ca3af;font-size:12px">'
-                        '(이전 추천 종목 중 추세 이탈)</span></h3>' + kr_sell_cards)
+        kr_sell_html = ('<h3 style="margin:18px 0 2px">&#128308; 한국 매도 후보 · 차익실현 <span style="color:#9ca3af;font-size:12px">'
+                        '(보유 종목 중 추세 이탈)</span></h3>' + kr_sell_cards)
     sub = f' <span style="color:#9ca3af;font-size:12px">({_esc(as_of)} 종가 기준)</span>' if as_of else ""
     spy = ('<img src="cid:spy_chart" style="width:100%;max-width:640px;border-radius:8px;margin:8px 0">'
            if show_spy else "")
@@ -777,18 +816,18 @@ def render_report_html(report, as_of="", metrics_by_sym=None, market_html="", si
     kr_sec = ""
     if kr_buy_cards or kr_watch_cards:
         kr_sec = (
-            '<h3 style="margin:18px 0 2px">&#127472;&#127479; 코스피200 지금 매수 검토 <span style="color:#9ca3af;font-size:12px">'
+            '<h3 style="margin:18px 0 2px">&#127472;&#127479; 코스피200 매수 후보 <span style="color:#9ca3af;font-size:12px">'
             '(펀더멘탈 필터 + 추세 상위 · AI 검증 통과)</span></h3>' + (kr_buy_cards or '<div style="font-size:12px;color:#6b7280">해당 없음</div>')
             + ('<h3 style="margin:18px 0 2px">&#127472;&#127479; 코스피200 관찰 · 내려오면 매수</h3>' + kr_watch_cards if kr_watch_cards else ""))
     # 미국 섹션도 (한국처럼) 카드가 있을 때만 — KR 전용 메일에서 빈 헤더 방지
     us_sec = ""
     if buy_cards or watch_cards:
         us_sec = (
-            f'<h3 style="margin:16px 0 2px">&#11088; 미국(S&amp;P500) 지금 매수 검토 <span style="color:#9ca3af;font-size:12px">'
+            f'<h3 style="margin:16px 0 2px">&#11088; 미국(S&amp;P500) 매수 후보 <span style="color:#9ca3af;font-size:12px">'
             f'(규칙 선별 · AI 검증 통과)</span></h3>{buy_cards}'
             + (f'<h3 style="margin:18px 0 2px">&#128064; 미국 관찰 · 내려오면 매수 <span style="color:#9ca3af;font-size:12px">'
                f'(좋은 종목이나 지금은 조정 중 · AI 강등 포함)</span></h3>{watch_cards}' if watch_cards else ""))
-    head = _esc(title) if title else "&#128200; 데일리 시장 점검 · 종목추천"
+    head = _esc(title) if title else "&#128200; 데일리 시장 점검 · 매수·매도 후보"
     return (
         f'<div style="font-family:-apple-system,BlinkMacSystemFont,\'Segoe UI\',\'Malgun Gothic\',sans-serif;'
         f'max-width:700px;margin:0 auto;color:#111">'
@@ -806,7 +845,8 @@ def render_report_html(report, as_of="", metrics_by_sym=None, market_html="", si
         f'{sell_html}'
         f'{kr_sec}'
         f'{kr_sell_html}'
+        f'{holdings_html}'
         f'<div style="font-size:11px;color:#9ca3af;margin-top:14px;line-height:1.5">'
         f'&#9888;&#65039; {_esc(report.get("risks"))}<br>정보 제공용이며 투자 권유가 아닙니다. 판단·책임은 본인에게 있습니다.<br>'
-        f'매도 규칙: 트레일링 -20% 또는 200일선 -3% 이탈 (미국·한국 공통). 전략 근거: STRATEGY.md</div>'
+        f'매도 규칙: 6개월 정기 재평가 또는 200일선 -3% 이탈 (미국·한국 공통). 전략 근거: STRATEGY.md</div>'
         f'</div>')

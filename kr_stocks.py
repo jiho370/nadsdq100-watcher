@@ -6,7 +6,7 @@ kr_stocks.py — 코스피200 개별 종목 선별 (STRATEGY.md §3).
   · 유니버스: 코스피200 (한국 모멘텀은 이 유니버스에서만 통계적으로 유의 — universe shrinkage 연구)
   · 펀더멘탈 필터(KRX 공식, pykrx): EPS>0(흑자) · ROE(EPS/BPS)≥8% · 0<PER≤40
   · 추세: 종가>200일선 필수, 점수 = z(12-1 모멘텀)×0.6 + z(52주 고점 근접도)×0.4
-  · 지금매수 3 + 관찰(눌림) 2 — 눌림 = 20일선 -2% 아래 또는 1주 -2%
+  · 매수 후보 풀 6(순위순) — 관찰 폐지(2026-07-13), AI 검증 후 최종 5 확정. 보유 상한 6
   · 매도: 트레일링 -20% 또는 200일선 -3% 이탈 (output/kr_holdings.json 자동 추적)
 
 데이터: 구성종목·펀더멘탈 = pykrx(KRX), 시세 = yfinance(.KS 배치 1회).
@@ -21,9 +21,11 @@ CACHE = "output/kospi200_cache.json"
 KR_HOLDINGS = "output/kr_holdings.json"
 ROE_MIN = float(os.environ.get("KR_ROE_MIN", "0.08"))
 PER_MAX = float(os.environ.get("KR_PER_MAX", "40"))
-# 후보 '풀' 크기 — AI 검증(강등/제외) 후 최종 채택은 ai_report가 3/2로 확정
-N_BUY = int(os.environ.get("KR_POOL_BUY", "4"))
-N_WATCH = int(os.environ.get("KR_POOL_WATCH", "3"))
+# 후보 '풀' 크기 — AI 검증(강등/제외) 후 최종 채택은 ai_report가 KR_FINAL_BUY(5)로 확정.
+# 관찰 폐지(2026-07-13): 풀 전체가 매수 후보, N_WATCH 기본 0.
+N_BUY = int(os.environ.get("KR_POOL_BUY", "6"))
+N_WATCH = int(os.environ.get("KR_POOL_WATCH", "0"))
+MAX_HOLD = int(os.environ.get("KR_MAX_HOLD", "6"))   # 보유 상한(팔아야 산다)
 
 
 def _log(m): print(f"[KR] {m}", file=sys.stderr)
@@ -38,37 +40,51 @@ def _krx_universe_funda() -> dict | None:
         _log(f"pykrx 없음({e}) → 캐시 폴백"); return None
     try:
         day = dt.datetime.now(dt.timezone(dt.timedelta(hours=9)))
-        # 최근 영업일 탐색(주말·휴장 대비 최대 7일 소급)
+        # 최근 영업일 탐색(주말·휴장 대비 최대 7일 소급). 구성종목과 재무데이터는 반드시
+        # '같은 날짜'에서 함께 유효해야 한다 — 장 시작 전(예: KST 08시 국장 메일) 조회 시
+        # 그날 날짜로는 구성종목은 나오지만 재무데이터(PER/EPS/BPS)가 아직 미발행이라
+        # 전부 NaN으로 채워지는 경우가 실사용 중 확인됨(2026-07-13). float(nan)은 예외를
+        # 던지지 않아 이걸 '성공'으로 오인하면 캐시 폴백(_cached_universe)이 아예 발동하지
+        # 않고 0/200 통과라는 빈 결과가 그대로 나간다 — 반드시 NaN을 걸러야 한다.
+        out, d = {}, None
         for back in range(8):
             d = (day - dt.timedelta(days=back)).strftime("%Y%m%d")
             try:
                 members = list(K.get_index_portfolio_deposit_file("1028", d))
             except Exception:
                 members = []
-            if members:
-                break
-        if not members:
-            _log("코스피200 구성종목 조회 실패"); return None
-        df = K.get_market_fundamental(d, market="KOSPI")
-        out = {}
-        for t in members:
+            if not members:
+                continue
             try:
-                row = df.loc[t]
-                per, eps, bps = float(row["PER"]), float(row["EPS"]), float(row["BPS"])
+                df = K.get_market_fundamental(d, market="KOSPI")
             except Exception:
                 continue
-            roe = (eps / bps) if bps else 0.0
-            name = ""
-            try:
-                name = K.get_market_ticker_name(t)
-            except Exception:
-                pass
-            out[t] = {"name": name, "per": per, "eps": eps, "bps": bps, "roe": round(roe, 4)}
-        if out:
-            os.makedirs("output", exist_ok=True)
-            with open(CACHE, "w", encoding="utf-8") as f:
-                json.dump({"as_of": d, "data": out}, f, ensure_ascii=False)
-        return out or None
+            cand = {}
+            for t in members:
+                try:
+                    row = df.loc[t]
+                    per, eps, bps = float(row["PER"]), float(row["EPS"]), float(row["BPS"])
+                except Exception:
+                    continue
+                if per != per or eps != eps or bps != bps:   # NaN — 그날 재무데이터 미발행
+                    continue
+                roe = (eps / bps) if bps else 0.0
+                name = ""
+                try:
+                    name = K.get_market_ticker_name(t)
+                except Exception:
+                    pass
+                cand[t] = {"name": name, "per": per, "eps": eps, "bps": bps, "roe": round(roe, 4)}
+            if len(cand) >= len(members) * 0.5:   # 절반 이상 유효해야 그 날짜를 채택
+                out = cand
+                break
+            _log(f"{d} 재무데이터 대부분 미발행({len(cand)}/{len(members)}) → 하루 더 소급")
+        if not out:
+            _log("코스피200 구성종목/재무데이터 조회 실패"); return None
+        os.makedirs("output", exist_ok=True)
+        with open(CACHE, "w", encoding="utf-8") as f:
+            json.dump({"as_of": d, "data": out}, f, ensure_ascii=False)
+        return out
     except Exception as e:
         _log(f"KRX 조회 실패({type(e).__name__}: {e}) → 캐시 폴백"); return None
 
@@ -94,13 +110,6 @@ def _z(values: dict) -> dict:
     if not sd:
         return {k: 0.0 for k in values}
     return {k: max(-3.0, min(3.0, (v - m) / sd)) if v is not None else 0.0 for k, v in values.items()}
-
-
-def _pulling_back(c) -> bool:
-    w = (c.get("ret") or {}).get("1w")
-    price, ma20 = c.get("price"), c.get("ma20")
-    below20 = (price is not None and ma20 and price < ma20 * 0.98)
-    return bool(below20 or (w is not None and w < -2))
 
 
 def _hot(c) -> bool:
@@ -133,7 +142,8 @@ def select(yf) -> dict:
         c = d["closes"]
         price = c[-1]
         ma200 = MS._sma(c, 200); ma50 = MS._sma(c, 50); ma20 = MS._sma(c, 20)
-        ind_map[t] = {"price": price, "ma200": ma200}
+        ind_map[t] = {"price": price, "ma200": ma200,
+                      "closes": c[-252:], "dates": d["dates"][-252:]}
         if not ma200 or price <= ma200:      # 200일선 위 필수
             continue
         mom = MS._mom_12_1(c)
@@ -163,14 +173,10 @@ def select(yf) -> dict:
                              + (f" · 52주고점 {c['prox52']:+.1f}%" if c.get("prox52") is not None else ""))
         c["hot"] = _hot(c)
     ranked = sorted(cands.values(), key=lambda x: x["score"], reverse=True)
-    now = [c for c in ranked if not _pulling_back(c)]
-    back = [c for c in ranked if _pulling_back(c)]
-    buy = now[:N_BUY]
-    if len(buy) < N_BUY:
-        buy += [c for c in back if c not in buy][:N_BUY - len(buy)]
-    watch = [c for c in back if c not in buy][:N_WATCH]
-    if len(watch) < N_WATCH:
-        watch += [c for c in now if c not in buy and c not in watch][:N_WATCH - len(watch)]
+    # 관찰 폐지(2026-07-13): 눌림/상승지속 구분 없이 팩터 순위 그대로 매수 후보
+    # (미국 backtest_entry_gate와 동일 취지 — 기술 게이트가 성과를 깎음. hot 태그는 분할계획용 유지)
+    buy = ranked[:N_BUY]
+    watch = ranked[N_BUY:N_BUY + N_WATCH]
     _log(f"선정: 매수 {len(buy)} · 관찰 {len(watch)} (후보 {len(ranked)})")
     return {"as_of": as_of, "buy": buy, "watch": watch, "ind_map": ind_map}
 
@@ -186,12 +192,8 @@ def update_holdings(buy_syms: list, ind_map: dict, today: str) -> list:
 
 
 def add_holdings(buy_syms: list, ind_map: dict, today: str):
-    """AI 검증 후 '최종 매수'로 확정된 종목만 보유목록에 편입."""
+    """AI 검증 후 '최종 매수'로 확정된 종목만 보유목록에 편입(상한 MAX_HOLD — 팔아야 산다)."""
     import holdings as H
     state = H.load(KR_HOLDINGS)
-    holdings = state.setdefault("holdings", {})
-    for sym in buy_syms:
-        if sym not in holdings:
-            p = (ind_map.get(sym) or {}).get("price")
-            holdings[sym] = {"since": today, "entry_price": p, "peak": p}
+    H.add(state, buy_syms, ind_map, today, max_n=MAX_HOLD)
     H.save(state, KR_HOLDINGS)
