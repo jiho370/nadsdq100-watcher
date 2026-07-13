@@ -40,37 +40,51 @@ def _krx_universe_funda() -> dict | None:
         _log(f"pykrx 없음({e}) → 캐시 폴백"); return None
     try:
         day = dt.datetime.now(dt.timezone(dt.timedelta(hours=9)))
-        # 최근 영업일 탐색(주말·휴장 대비 최대 7일 소급)
+        # 최근 영업일 탐색(주말·휴장 대비 최대 7일 소급). 구성종목과 재무데이터는 반드시
+        # '같은 날짜'에서 함께 유효해야 한다 — 장 시작 전(예: KST 08시 국장 메일) 조회 시
+        # 그날 날짜로는 구성종목은 나오지만 재무데이터(PER/EPS/BPS)가 아직 미발행이라
+        # 전부 NaN으로 채워지는 경우가 실사용 중 확인됨(2026-07-13). float(nan)은 예외를
+        # 던지지 않아 이걸 '성공'으로 오인하면 캐시 폴백(_cached_universe)이 아예 발동하지
+        # 않고 0/200 통과라는 빈 결과가 그대로 나간다 — 반드시 NaN을 걸러야 한다.
+        out, d = {}, None
         for back in range(8):
             d = (day - dt.timedelta(days=back)).strftime("%Y%m%d")
             try:
                 members = list(K.get_index_portfolio_deposit_file("1028", d))
             except Exception:
                 members = []
-            if members:
-                break
-        if not members:
-            _log("코스피200 구성종목 조회 실패"); return None
-        df = K.get_market_fundamental(d, market="KOSPI")
-        out = {}
-        for t in members:
+            if not members:
+                continue
             try:
-                row = df.loc[t]
-                per, eps, bps = float(row["PER"]), float(row["EPS"]), float(row["BPS"])
+                df = K.get_market_fundamental(d, market="KOSPI")
             except Exception:
                 continue
-            roe = (eps / bps) if bps else 0.0
-            name = ""
-            try:
-                name = K.get_market_ticker_name(t)
-            except Exception:
-                pass
-            out[t] = {"name": name, "per": per, "eps": eps, "bps": bps, "roe": round(roe, 4)}
-        if out:
-            os.makedirs("output", exist_ok=True)
-            with open(CACHE, "w", encoding="utf-8") as f:
-                json.dump({"as_of": d, "data": out}, f, ensure_ascii=False)
-        return out or None
+            cand = {}
+            for t in members:
+                try:
+                    row = df.loc[t]
+                    per, eps, bps = float(row["PER"]), float(row["EPS"]), float(row["BPS"])
+                except Exception:
+                    continue
+                if per != per or eps != eps or bps != bps:   # NaN — 그날 재무데이터 미발행
+                    continue
+                roe = (eps / bps) if bps else 0.0
+                name = ""
+                try:
+                    name = K.get_market_ticker_name(t)
+                except Exception:
+                    pass
+                cand[t] = {"name": name, "per": per, "eps": eps, "bps": bps, "roe": round(roe, 4)}
+            if len(cand) >= len(members) * 0.5:   # 절반 이상 유효해야 그 날짜를 채택
+                out = cand
+                break
+            _log(f"{d} 재무데이터 대부분 미발행({len(cand)}/{len(members)}) → 하루 더 소급")
+        if not out:
+            _log("코스피200 구성종목/재무데이터 조회 실패"); return None
+        os.makedirs("output", exist_ok=True)
+        with open(CACHE, "w", encoding="utf-8") as f:
+            json.dump({"as_of": d, "data": out}, f, ensure_ascii=False)
+        return out
     except Exception as e:
         _log(f"KRX 조회 실패({type(e).__name__}: {e}) → 캐시 폴백"); return None
 
