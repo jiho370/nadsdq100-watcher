@@ -36,6 +36,14 @@ MONTH = 21               # 판정용 비중첩 수익률 구간(거래일)
 TOPN_US = [5, 8, 10, 12, 15, 20]
 TOPN_KR = [3, 4, 6, 8, 10]
 
+# 2026-07-14 확장(지호 님 질문 — "풀 60은 그 팩터로 뽑되, 그중 10개는 다른 팩터로 골라도
+# 되지 않나"): 2단계 선별 구조 검증. 1단계(풀 60 = 검증된 가중치 점수 상위)는 고정하고,
+# 2단계(풀 안에서 상위 topn 선별)의 랭킹만 교체해 비교한다. 후보는 근거 있는 것만 제한
+# (다중검정 예산): base=현행(동일 점수), mom12_1/mom6=모멘텀 문헌(단 이 표본에서 mom12_1
+# IC 음수 확인됨 — SCORE_MODEL_DESIGN D1), hi52=52주고점 근접(George-Hwang), lowvol=
+# 저변동성 이상현상, value=퀄리티 풀 내 저평가 우선.
+US_RERANKS = ["base", "mom12_1", "mom6", "hi52", "lowvol", "value"]
+
 
 def _log(m): print(f"[포트폴리오] {m}", file=sys.stderr)
 
@@ -183,6 +191,83 @@ def us_decisions(panel, funds, pit, step=MONTH):
     return out
 
 
+def _rerank_pool(panel, p, raw, pool: list, method: str) -> list:
+    """풀(순위순)을 2단계 랭킹으로 재정렬. 점수 결측 종목은 뒤로(원래 순서 유지)."""
+    if method == "base":
+        return pool
+    if method in ("mom12_1", "mom6", "value"):
+        s = raw[method].reindex(pool) if method in raw.columns else pd.Series(np.nan, index=pool)
+    else:
+        lo = max(0, p - 251)
+        win = panel.iloc[lo:p + 1][pool]
+        if method == "hi52":
+            s = win.iloc[-1] / win.max() - 1
+        else:                                    # lowvol — 최근 1년 일별 변동성 낮은 순
+            s = -win.pct_change().std()
+    order = {sym: i for i, sym in enumerate(pool)}          # 결측 tie-break용 원 순위
+    return sorted(pool, key=lambda t: (not np.isfinite(s.get(t, np.nan)),
+                                       -(s.get(t) if np.isfinite(s.get(t, np.nan)) else 0),
+                                       order[t]))
+
+
+def us_rerank_decisions(panel, funds, pit, step=MONTH) -> dict:
+    """{method: decisions} — 풀(60)은 동일하게 뽑고 2단계 랭킹만 교체."""
+    import tech_factors as T
+    import backtest_exec as BE
+    cross = T.build_panels(panel)
+    weights = BE._load_exec_weights()
+    out = {m: [] for m in US_RERANKS}
+    for p in range(BW.LOOKBACK, len(panel) - 1, step):
+        raw = BW._raw_frame(panel, p, funds, bool(funds), cross)
+        if raw is None or raw.empty:
+            continue
+        pool = BE._select_basket(panel, p, funds, cross, pit, weights, POOL_SIZE)
+        if not pool:
+            continue
+        for m in US_RERANKS:
+            out[m].append((p, _rerank_pool(panel, p, raw, pool, m)))
+    _log(f"미장 재랭킹 결정 시점 {len(out['base'])}개 × 방법 {len(US_RERANKS)}종")
+    return out
+
+
+def run_rerank_sweep(panel, ma200, bench, dec_by_method: dict, topn: int, cost):
+    """2단계 재랭킹 방법 비교 — topn 고정, 방법만 교체."""
+    rows, matrix, dates0 = [], [], None
+    for m, decisions in dec_by_method.items():
+        nav = simulate(panel, ma200, decisions, topn, cost)
+        if nav is None:
+            _log(f"rerank={m}: NAV 산출 실패"); continue
+        mt = metrics(nav, bench)
+        d, r = monthly_excess(nav, bench)
+        if dates0 is None:
+            dates0 = d
+        matrix.append(r[:len(dates0)])
+        rows.append({"rerank": m, **mt})
+        _log(f"rerank={m}: CAGR {mt['cagr_pct']}% (초과 {mt['excess_cagr_pct']}%p) · "
+             f"변동성 {mt['vol_pct']}% · 샤프 {mt['sharpe']} · MDD {mt['mdd_pct']}%")
+    n_ev = min(len(r) for r in matrix)
+    matrix = [r[:n_ev] for r in matrix]
+    payload = {"as_of": panel.index[-1].date().isoformat(), "market": "us", "topn": topn,
+              "n_combos": len(rows), "rows": rows,
+              "baseline": "base(현행 — 풀 선별과 동일 점수 상위)",
+              "note": f"1단계 풀({POOL_SIZE}) 고정, 2단계(상위 {topn} 선별) 랭킹만 교체",
+              "adoption_criteria": "base 대비 샤프 개선이 PBO/DSR 판정을 통과할 때만 교체 제안"}
+    trial_data = {"horizon": "rerank_us", "universe": "pit", "cost": cost.describe(),
+                 "rebal_days": MONTH, "hold_days": MONTH,
+                 "dates": dates0[:n_ev], "trials": [r["rerank"] for r in rows],
+                 "excess_returns": matrix}
+    os.makedirs("output", exist_ok=True)
+    with open("output/backtest_rerank_us.json", "w", encoding="utf-8") as f:
+        json.dump(payload, f, ensure_ascii=False, indent=2)
+    with open("output/trial_returns_rerank_us.json", "w", encoding="utf-8") as f:
+        json.dump(trial_data, f, ensure_ascii=False)
+    report = OS.analyze(trial_data, save=False)
+    with open("output/pbo_report_rerank_us.json", "w", encoding="utf-8") as f:
+        json.dump(report, f, ensure_ascii=False, indent=2)
+    _log("저장: output/backtest_rerank_us.json · output/pbo_report_rerank_us.json")
+    return payload, report
+
+
 def kr_decisions(panel, snaps):
     """국장: backtest_kr 스냅샷의 라이브 규칙(필터+z(mom12_1)0.6+z(hi52)0.4) 랭킹."""
     pos_by_date = {d.date().isoformat(): i for i, d in enumerate(panel.index)}
@@ -233,6 +318,9 @@ def main():
     ap.add_argument("--market", default="us", choices=["us", "kr"])
     ap.add_argument("--years", type=float, default=10)
     ap.add_argument("--rebal-days", type=int, default=63, help="KR 스냅 간격(캐시 재사용을 위해 63 권장)")
+    ap.add_argument("--rerank-sweep", action="store_true",
+                    help="2단계 재랭킹 스윕(풀 60 고정, 상위 topn 선별 팩터만 교체) — 미국만")
+    ap.add_argument("--topn", type=int, default=10)
     ap.add_argument("--self-test", action="store_true")
     args = ap.parse_args()
     if args.self_test:
@@ -243,6 +331,10 @@ def main():
         funds = BW.load_funds()
         cost = BC.CostModel("us", commission_bps=0.0, slippage_bps=5.0)
         ma200 = panel.rolling(200, min_periods=200).mean()
+        if args.rerank_sweep:
+            dec_by_method = us_rerank_decisions(panel, funds, pit)
+            run_rerank_sweep(panel, ma200, spy, dec_by_method, args.topn, cost)
+            return
         decisions = us_decisions(panel, funds, pit)
         run_sweep(panel, ma200, spy, decisions, TOPN_US, cost, "us")
     else:
