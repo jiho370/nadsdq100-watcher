@@ -150,6 +150,62 @@ def run_ratio_stage(topn: int, save=True):
     return payload
 
 
+def run_mixed_topn_stage(core_weight=0.65, save=True):
+    """Stage 3 — 코어비중 고정(현행 0.65), 그 안에서 새틀라이트 topn만 스윕.
+    Stage 1(새틀라이트 단독 vs B2)과 다른 질문: '65:35로 섞을 때 새틀라이트 몇 종목이 나은가'."""
+    panel, snaps, navs_bm, ma200, cost = _load()
+    b1 = navs_bm["B1_kospi200"].dropna()
+    decisions = KS.build_decisions(panel, snaps, "valuediv")
+    reg = CS.regime_series(b1.reindex(panel.index).ffill())
+    core = CS.timed_nav(b1.reindex(panel.index).ffill(), reg)
+
+    rows, matrix, dates0 = [], [], None
+    subs_out = {}
+    for tn in TOPN_LIST:
+        sat_nav = BP.simulate(panel, ma200, decisions, tn, cost)
+        if sat_nav is None:
+            _log(f"topn={tn}: 새틀라이트 NAV 산출 실패"); continue
+        sat = sat_nav / sat_nav.iloc[0]
+        mixed = CS.mix_nav(core, sat, core_weight)
+        subs = {tag: CS.stats(mixed, a, b) for tag, a, b in CS.SUBS}
+        subs_out[tn] = subs
+        f = subs["full"]
+        if f is None:
+            continue
+        rows.append({"topn": tn, **f})
+        d, r = BP.monthly_excess(mixed, b1.reindex(mixed.index).ffill())
+        if dates0 is None:
+            dates0 = d
+        matrix.append(r[:len(dates0)])
+        _log(f"topn={tn:2d} (코어{core_weight:.2f}): CAGR {f['cagr_pct']:6.2f}% 샤프 {f['sharpe']:5.2f} "
+             f"MDD {f['mdd_pct']:6.1f}% · 서브기간 샤프 "
+             f"{subs['2018-2021'] and subs['2018-2021']['sharpe']}/"
+             f"{subs['2022-2023'] and subs['2022-2023']['sharpe']}/{subs['2024+'] and subs['2024+']['sharpe']}")
+    if len(rows) < 2:
+        raise RuntimeError("mixed-topn 결과 부족")
+    n_ev = min(len(r) for r in matrix)
+    trial_data = {"horizon": "kr_mixed_topn", "universe": "kospi200_pit", "cost": cost.describe(),
+                 "rebal_days": BP.MONTH, "hold_days": BP.MONTH,
+                 "dates": dates0[:n_ev], "trials": [f"topn{r['topn']}" for r in rows],
+                 "excess_returns": [m[:n_ev] for m in matrix]}
+    rpt = OS.analyze(trial_data, save=False)
+    payload = {"as_of": panel.index[-1].date().isoformat(), "core_weight": core_weight,
+              "satellite": "valuediv",
+              "judgment": "코어65:새틀35 고정, 새틀라이트 topn만 변수 — B1(매수후보유) 대비",
+              "rows": rows, "subperiods": {str(tn): s for tn, s in subs_out.items()},
+              "pbo": rpt.get("pbo", {}).get("pbo"), "pbo_verdict": rpt.get("pbo_verdict"),
+              "dsr": rpt.get("dsr", {}).get("dsr"), "dsr_verdict": rpt.get("dsr_verdict"),
+              "passed": rpt.get("passed", False)}
+    if save:
+        os.makedirs("output", exist_ok=True)
+        with open("output/kr_mixed_topn_sweep.json", "w", encoding="utf-8") as f:
+            json.dump(payload, f, ensure_ascii=False, indent=2)
+        with open("output/pbo_report_kr_mixed_topn.json", "w", encoding="utf-8") as f:
+            json.dump(rpt, f, ensure_ascii=False, indent=2)
+        _log(f"저장: output/kr_mixed_topn_sweep.json · PBO {payload['pbo']} · DSR {payload['dsr']}")
+    return payload
+
+
 # ------------------------- self-test -------------------------
 def self_test():
     _log("[self-test] Stage1/2 배선 검증 — build_decisions·simulate·mix_nav 인터페이스만 확인"
@@ -173,16 +229,19 @@ def self_test():
 
 def main():
     ap = argparse.ArgumentParser(description="KR valuediv topN·코어비율 스윕")
-    ap.add_argument("--stage", choices=["topn", "ratio"], default="topn")
+    ap.add_argument("--stage", choices=["topn", "ratio", "mixed-topn"], default="topn")
     ap.add_argument("--topn", type=int, default=6, help="ratio 단계에서 쓸 새틀라이트 topn")
+    ap.add_argument("--core-weight", type=float, default=0.65, help="mixed-topn 단계의 고정 코어비중")
     ap.add_argument("--self-test", action="store_true")
     args = ap.parse_args()
     if args.self_test:
         self_test(); return
     if args.stage == "topn":
         run_topn_stage()
-    else:
+    elif args.stage == "ratio":
         run_ratio_stage(args.topn)
+    else:
+        run_mixed_topn_stage(args.core_weight)
 
 
 if __name__ == "__main__":
