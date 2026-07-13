@@ -78,12 +78,32 @@ def update(state: dict, buy_now_syms: list, ind_map: dict, today: str, pool_syms
                           "peak": h.get("peak")})
             del holdings[sym]
     # 신규 매수 종목 자동 편입(이미 보유면 유지)
-    for sym in buy_now_syms:
-        if sym not in holdings:
-            p = (ind_map.get(sym) or {}).get("price")
-            holdings[sym] = {"since": today, "entry_price": p, "peak": p}
+    add(state, buy_now_syms, ind_map, today)
     state["last_run"] = today
     return sells
+
+
+# 동일 회사 복수 클래스(의결권 차이만) — 둘 다 담으면 사실상 같은 종목 2배 보유
+_CLASS_ALIAS = {"GOOGL": "GOOG", "FOXA": "FOX", "NWSA": "NWS"}
+
+
+def _canon(sym: str) -> str:
+    return _CLASS_ALIAS.get(sym, sym)
+
+
+def add(state: dict, buy_syms: list, ind_map: dict, today: str, max_n: int | None = None):
+    """신규 매수 편입. 동일 회사 중복(GOOG/GOOGL 등) 배제 + 보유 상한(max_n).
+    상한 초과 시 추가하지 않는다 — 기존 보유는 매도 시그널로만 빠진다(팔아야 산다)."""
+    holdings = state.setdefault("holdings", {})
+    held_canon = {_canon(s) for s in holdings}
+    for sym in buy_syms:
+        if sym in holdings or _canon(sym) in held_canon:
+            continue
+        if max_n is not None and len(holdings) >= max_n:
+            break
+        p = (ind_map.get(sym) or {}).get("price")
+        holdings[sym] = {"since": today, "entry_price": p, "peak": p}
+        held_canon.add(_canon(sym))
 
 
 # ------------------------- 라이브 트래킹(보유현황) -------------------------
@@ -111,32 +131,47 @@ def live_summary(state: dict, ind_map: dict) -> list:
     return rows
 
 
-def benchmark_compare(summary: list, bench_dates: list, bench_closes: list) -> dict:
-    """live_summary() 결과의 각 종목 진입일을 기준으로 '동일 기간' 지수 수익률과 비교.
-    bench_dates/bench_closes는 오름차순 정렬된 종가 시계열(날짜는 ISO 문자열).
-    반환: {} (비교 불가) 또는 {"avg_strategy","avg_bench","rows":[{symbol,strategy_ret,bench_ret}]}"""
-    if not summary or not bench_dates or not bench_closes or len(bench_dates) != len(bench_closes):
+def portfolio_series(summary: list, price_map: dict, bench_dates: list, bench_closes: list) -> dict:
+    """'각 보유종목을 진입일에 동일 금액씩 샀다' 가정의 포트폴리오 누적수익률(%) 시계열과,
+    같은 날짜들에 같은 금액을 지수에 넣었을 때의 시계열(라이브 트래킹 그래프용).
+    price_map: {sym: {"dates":[...], "closes":[...]}} — 종목별 일별 종가(오름차순).
+    지수 달력(bench_dates)을 마스터로 쓰고, 종목 종가가 빠진 날은 직전가를 유지한다.
+    반환: {"dates","portfolio","bench"} 또는 {} (비교 불가)."""
+    import bisect
+    entries = [r for r in summary if r.get("since") and r.get("entry")]
+    if not entries or not bench_dates or len(bench_dates) != len(bench_closes):
         return {}
-    bench_now = bench_closes[-1]
-
-    def _bench_at(date_str):
-        idx = None
-        for i, d in enumerate(bench_dates):
-            if d <= date_str:
-                idx = i
-            else:
-                break
-        return bench_closes[idx] if idx is not None else None
-
-    rows = []
-    for r in summary:
-        since = r.get("since")
-        b0 = _bench_at(since) if since else None
-        if b0:
-            rows.append({"symbol": r["symbol"], "strategy_ret": r["ret_pct"],
-                        "bench_ret": (bench_now / b0 - 1) * 100})
-    if not rows:
+    start = min(r["since"] for r in entries)
+    i0 = bisect.bisect_left(bench_dates, start)
+    if i0 >= len(bench_dates):
         return {}
-    return {"avg_strategy": sum(x["strategy_ret"] for x in rows) / len(rows),
-            "avg_bench": sum(x["bench_ret"] for x in rows) / len(rows),
-            "rows": rows}
+    dates = bench_dates[i0:]
+    aligned = {}
+    for r in entries:
+        pm = price_map.get(r["symbol"]) or {}
+        d, c = pm.get("dates") or [], pm.get("closes") or []
+        if not d:
+            continue
+        arr, j, lastv = [], 0, None
+        for day in dates:
+            while j < len(d) and d[j] <= day:
+                lastv = c[j]; j += 1
+            arr.append(lastv)
+        aligned[r["symbol"]] = arr
+    port, bench = [], []
+    for k, day in enumerate(dates):
+        rs, bs = [], []
+        for r in entries:
+            if r["since"] > day:
+                continue
+            arr = aligned.get(r["symbol"])
+            if arr and arr[k]:
+                rs.append((arr[k] / r["entry"] - 1) * 100)
+            bi = bisect.bisect_right(bench_dates, r["since"]) - 1
+            if bi >= 0 and bench_closes[bi]:
+                bs.append((bench_closes[i0 + k] / bench_closes[bi] - 1) * 100)
+        port.append(sum(rs) / len(rs) if rs else None)
+        bench.append(sum(bs) / len(bs) if bs else None)
+    if not any(v is not None for v in port):
+        return {}
+    return {"dates": dates, "portfolio": port, "bench": bench}

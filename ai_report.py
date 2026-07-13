@@ -58,11 +58,12 @@ MODEL_VERIFY = _no_opus(os.environ.get("REPORT_MODEL_VERIFY",
                         os.environ.get("REPORT_MODEL", "claude-sonnet-5")), "claude-sonnet-5")
 MODEL_WRITE  = _no_opus(os.environ.get("REPORT_MODEL_WRITE", "claude-haiku-4-5"), "claude-haiku-4-5")
 
-# 최종 채택 수(코드가 확정) — 상세 카드가 길어져 미국 5→4로 축소(env로 조절)
-FINAL_BUY      = int(os.environ.get("REPORT_FINAL_BUY", "4"))
-FINAL_WATCH    = int(os.environ.get("REPORT_FINAL_WATCH", "4"))
-KR_FINAL_BUY   = int(os.environ.get("KR_FINAL_BUY", "3"))
-KR_FINAL_WATCH = int(os.environ.get("KR_FINAL_WATCH", "2"))
+# 최종 채택 수(코드가 확정) — 관찰 폐지(2026-07-13): 관찰 슬롯을 매수 후보로 전환.
+# 미국 4+4 → 매수 8, 한국 3+2 → 매수 5. AI 강등분은 관찰 대신 '제외된 후보' 박스에 사유 표기.
+FINAL_BUY      = int(os.environ.get("REPORT_FINAL_BUY", "8"))
+FINAL_WATCH    = int(os.environ.get("REPORT_FINAL_WATCH", "0"))
+KR_FINAL_BUY   = int(os.environ.get("KR_FINAL_BUY", "5"))
+KR_FINAL_WATCH = int(os.environ.get("KR_FINAL_WATCH", "0"))
 MIN_BUY        = 3
 
 
@@ -345,6 +346,9 @@ def _apply_verdicts(buy_pool, watch_pool, vmap, n_buy, n_watch):
         final_buy += restored
     used = {c["symbol"] for c in final_buy}
     final_watch = [c for c in demoted + watch_keep if c["symbol"] not in used][:n_watch]
+    # 관찰 슬롯이 없으면(n_watch=0) 강등분이 어디에도 안 보이게 됨 → '제외' 박스에 사유와 함께 표기
+    shown = used | {c["symbol"] for c in final_watch}
+    excluded += [c for c in demoted if c["symbol"] not in shown]
     return (final_buy, final_watch, excluded,
             {c["symbol"] for c in demoted}, {c["symbol"] for c in restored})
 
@@ -728,8 +732,10 @@ def _excluded_html(items, is_kr=False):
         + rows + '</div>')
 
 
-def holdings_table_html(summary: list, krw: bool = False, chart_cid: str | None = None) -> str:
-    """holdings.live_summary() 결과를 보유현황 표로. summary 없으면 빈 문자열(섹션 자체 생략)."""
+def holdings_table_html(summary: list, krw: bool = False, chart_cid: str | None = None,
+                        totals: dict | None = None) -> str:
+    """holdings.live_summary() 결과를 보유현황 표로. summary 없으면 빈 문자열(섹션 자체 생략).
+    totals={"strategy","bench","index_name"} — 전체 투입자산 기준 누적수익률 vs 지수(있으면 표기)."""
     if not summary:
         return ""
     rows = "".join(
@@ -743,8 +749,17 @@ def holdings_table_html(summary: list, krw: bool = False, chart_cid: str | None 
         for r in summary)
     chart = (f'<img src="cid:{chart_cid}" style="width:100%;max-width:640px;border-radius:8px;margin:8px 0">'
              if chart_cid else "")
+    totals_html = ""
+    if totals:
+        sc = "#15803d" if totals["strategy"] >= 0 else "#b91c1c"
+        bc = "#15803d" if totals["bench"] >= 0 else "#b91c1c"
+        totals_html = (
+            f'<div style="font-size:13px;margin:2px 0 6px">전체 투입자산 기준 '
+            f'<b style="color:{sc}">{totals["strategy"]:+.1f}%</b>'
+            f' <span style="color:#9ca3af">vs</span> {_esc(totals["index_name"])}(동일시점·동일금액) '
+            f'<b style="color:{bc}">{totals["bench"]:+.1f}%</b></div>')
     return (
-        '<h3 style="margin:18px 0 4px">&#128202; 보유현황</h3>'
+        '<h3 style="margin:18px 0 4px">&#128202; 보유현황</h3>' + totals_html +
         '<table role="presentation" style="border-collapse:collapse;font-size:12px;width:100%;max-width:640px">'
         '<tr style="color:#6b7280;text-align:left"><th style="padding:3px 8px">종목</th>'
         '<th style="padding:3px 8px">매수일</th><th style="padding:3px 8px">진입가</th>'

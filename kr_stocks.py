@@ -6,7 +6,7 @@ kr_stocks.py — 코스피200 개별 종목 선별 (STRATEGY.md §3).
   · 유니버스: 코스피200 (한국 모멘텀은 이 유니버스에서만 통계적으로 유의 — universe shrinkage 연구)
   · 펀더멘탈 필터(KRX 공식, pykrx): EPS>0(흑자) · ROE(EPS/BPS)≥8% · 0<PER≤40
   · 추세: 종가>200일선 필수, 점수 = z(12-1 모멘텀)×0.6 + z(52주 고점 근접도)×0.4
-  · 지금매수 3 + 관찰(눌림) 2 — 눌림 = 20일선 -2% 아래 또는 1주 -2%
+  · 매수 후보 풀 6(순위순) — 관찰 폐지(2026-07-13), AI 검증 후 최종 5 확정. 보유 상한 6
   · 매도: 트레일링 -20% 또는 200일선 -3% 이탈 (output/kr_holdings.json 자동 추적)
 
 데이터: 구성종목·펀더멘탈 = pykrx(KRX), 시세 = yfinance(.KS 배치 1회).
@@ -21,9 +21,11 @@ CACHE = "output/kospi200_cache.json"
 KR_HOLDINGS = "output/kr_holdings.json"
 ROE_MIN = float(os.environ.get("KR_ROE_MIN", "0.08"))
 PER_MAX = float(os.environ.get("KR_PER_MAX", "40"))
-# 후보 '풀' 크기 — AI 검증(강등/제외) 후 최종 채택은 ai_report가 3/2로 확정
-N_BUY = int(os.environ.get("KR_POOL_BUY", "4"))
-N_WATCH = int(os.environ.get("KR_POOL_WATCH", "3"))
+# 후보 '풀' 크기 — AI 검증(강등/제외) 후 최종 채택은 ai_report가 KR_FINAL_BUY(5)로 확정.
+# 관찰 폐지(2026-07-13): 풀 전체가 매수 후보, N_WATCH 기본 0.
+N_BUY = int(os.environ.get("KR_POOL_BUY", "6"))
+N_WATCH = int(os.environ.get("KR_POOL_WATCH", "0"))
+MAX_HOLD = int(os.environ.get("KR_MAX_HOLD", "6"))   # 보유 상한(팔아야 산다)
 
 
 def _log(m): print(f"[KR] {m}", file=sys.stderr)
@@ -96,13 +98,6 @@ def _z(values: dict) -> dict:
     return {k: max(-3.0, min(3.0, (v - m) / sd)) if v is not None else 0.0 for k, v in values.items()}
 
 
-def _pulling_back(c) -> bool:
-    w = (c.get("ret") or {}).get("1w")
-    price, ma20 = c.get("price"), c.get("ma20")
-    below20 = (price is not None and ma20 and price < ma20 * 0.98)
-    return bool(below20 or (w is not None and w < -2))
-
-
 def _hot(c) -> bool:
     rsi = c.get("rsi"); price, ma50 = c.get("price"), c.get("ma50")
     gap50 = ((price / ma50 - 1) * 100) if (price and ma50) else 0
@@ -133,7 +128,8 @@ def select(yf) -> dict:
         c = d["closes"]
         price = c[-1]
         ma200 = MS._sma(c, 200); ma50 = MS._sma(c, 50); ma20 = MS._sma(c, 20)
-        ind_map[t] = {"price": price, "ma200": ma200, "closes": c[-252:]}
+        ind_map[t] = {"price": price, "ma200": ma200,
+                      "closes": c[-252:], "dates": d["dates"][-252:]}
         if not ma200 or price <= ma200:      # 200일선 위 필수
             continue
         mom = MS._mom_12_1(c)
@@ -163,14 +159,10 @@ def select(yf) -> dict:
                              + (f" · 52주고점 {c['prox52']:+.1f}%" if c.get("prox52") is not None else ""))
         c["hot"] = _hot(c)
     ranked = sorted(cands.values(), key=lambda x: x["score"], reverse=True)
-    now = [c for c in ranked if not _pulling_back(c)]
-    back = [c for c in ranked if _pulling_back(c)]
-    buy = now[:N_BUY]
-    if len(buy) < N_BUY:
-        buy += [c for c in back if c not in buy][:N_BUY - len(buy)]
-    watch = [c for c in back if c not in buy][:N_WATCH]
-    if len(watch) < N_WATCH:
-        watch += [c for c in now if c not in buy and c not in watch][:N_WATCH - len(watch)]
+    # 관찰 폐지(2026-07-13): 눌림/상승지속 구분 없이 팩터 순위 그대로 매수 후보
+    # (미국 backtest_entry_gate와 동일 취지 — 기술 게이트가 성과를 깎음. hot 태그는 분할계획용 유지)
+    buy = ranked[:N_BUY]
+    watch = ranked[N_BUY:N_BUY + N_WATCH]
     _log(f"선정: 매수 {len(buy)} · 관찰 {len(watch)} (후보 {len(ranked)})")
     return {"as_of": as_of, "buy": buy, "watch": watch, "ind_map": ind_map}
 
@@ -186,12 +178,8 @@ def update_holdings(buy_syms: list, ind_map: dict, today: str) -> list:
 
 
 def add_holdings(buy_syms: list, ind_map: dict, today: str):
-    """AI 검증 후 '최종 매수'로 확정된 종목만 보유목록에 편입."""
+    """AI 검증 후 '최종 매수'로 확정된 종목만 보유목록에 편입(상한 MAX_HOLD — 팔아야 산다)."""
     import holdings as H
     state = H.load(KR_HOLDINGS)
-    holdings = state.setdefault("holdings", {})
-    for sym in buy_syms:
-        if sym not in holdings:
-            p = (ind_map.get(sym) or {}).get("price")
-            holdings[sym] = {"since": today, "entry_price": p, "peak": p}
+    H.add(state, buy_syms, ind_map, today, max_n=MAX_HOLD)
     H.save(state, KR_HOLDINGS)
