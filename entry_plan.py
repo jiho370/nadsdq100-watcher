@@ -11,11 +11,18 @@ entry_plan.py — 매수/매도 '실행 계획'을 규칙으로 확정하는 모
   · 매수(과열 아님): 2분할 — 1차 50% 현재가 / 2차 50% 20일선 부근(현재가보다 위면 -3% 지점).
   · 매수(과열 hot): 3분할 — 30% 현재가 / 30% 20일선 부근 / 40% 50일선 부근.
                     과열 판정은 export_data.split_by_entry(RSI≥72 또는 50일선 +15% 이상)가 확정.
-  · 하한선: 분할 가격이 200일선 아래로 내려가면 200일선까지로 올림(추세 이탈 구간 매수 금지).
+  · 하한선: 분할 가격이 200일선 아래로 내려가면 200일선까지로 올림(추세 이탈 구간 매수 금지) —
+            단 200일선이 현재가보다 '아래'에 있을 때만(진짜 하방 지지선일 때만) 적용한다.
+            진입 필터 폐기(2026-07, STRATEGY.md §2) 이후 이미 200일선 아래에서 편입되는
+            종목이 흔해졌는데, 그럴 땐 200일선이 현재가보다 '위'에 있어 이 하한선을 무조건
+            적용하면 2차 매수가가 1차보다 높아지는 역전이 생겼다(2026-07-15 발견·수정).
   · 손절선(2026-07-13 정정): 기본은 200일선 × (1-SELL_MA_BUFFER)만 표시 — 실제 매도 규칙이
             "6개월 정기 재평가 + 200일선 백업"으로 바뀐 뒤에도(holdings.py) 여기 SELL_TRAIL
             기본값이 옛 -20%로 남아 있어 손절선이 실제 규칙과 안 맞는 문제가 있었다. 트레일링은
             기본 비활성(SELL_TRAIL=0, holdings.py와 동일 env) — 켜져 있으면 참고선으로 병기.
+            200일선이 현재가보다 위(이미 이탈 상태)면 이 손절선 후보를 아예 안 씀(1차 매수가
+            보다 높은 손절선이 나오는 모순 방지, 위 하한선과 동일 이유) — 후보가 없으면
+            "6개월 후 정기 재평가 시 판단"으로 안내.
   · 관찰 → 매수 전환: 20일선 위(-2% 초과 이탈 상태면 회복), RSI<70, 1주 수익률 > -2% 회복.
                       전환 시 계획은 '과열 아님' 2분할과 동일.
   · 매도(2026-07-13 단순화): 확정된 매도 시그널은 **전량 즉시 정리**. backtest_exec.py
@@ -60,12 +67,16 @@ def buy_plan(c: dict, krw: bool = False) -> dict:
 
     def below(base, fallback_ratio, basis):
         """현재가 아래의 매수 지점: 기준선(base)이 유효하고 현재가 아래면 그 값,
-        아니면 현재가 대비 고정 비율 지점. 200일선 아래로는 내리지 않는다."""
+        아니면 현재가 대비 고정 비율 지점. 200일선이 현재가보다 아래에 있을 때만(=진짜
+        하방 지지선일 때만) 그 아래로는 안 내리는 floor로 쓴다. 진입 필터 폐기(2026-07,
+        STRATEGY.md) 이후 200일선 '위'에서 편입되지 않는 종목이 흔해졌는데, 그럴 땐
+        200일선이 현재가보다 위에 있어 floor가 오히려 2차 가격을 현재가보다 높게
+        밀어올려 분할매수 순서가 뒤집히는 버그가 있었다(2026-07-15 발견)."""
         if _valid(base) and base < price:
             p, b = base, basis
         else:
             p, b = price * fallback_ratio, f"현재가 {int((1-fallback_ratio)*100)}% 조정 시"
-        if _valid(ma200) and p < ma200:
+        if _valid(ma200) and ma200 < price and p < ma200:
             p, b = ma200, "200일선(추세 하한)"
         return round(p, 0 if krw else 2), b
 
@@ -89,7 +100,7 @@ def buy_plan(c: dict, krw: bool = False) -> dict:
     candidates = []
     if TRAIL > 0:
         candidates.append((price * (1 - TRAIL), f"1차 매수가 -{int(TRAIL*100)}%"))
-    if _valid(ma200):
+    if _valid(ma200) and ma200 < price:   # 200일선이 현재가 위면(이미 이탈 상태) 손절 기준으로 못 씀
         candidates.append((ma200 * (1 - MA_BUFFER), f"200일선 -{int(MA_BUFFER*100)}%"))
     if candidates:
         stop_val, stop_basis = max(candidates, key=lambda x: x[0])
