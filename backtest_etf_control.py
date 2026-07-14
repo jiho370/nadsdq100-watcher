@@ -22,8 +22,16 @@ backtest_etf_control.py — 팩터 ETF 대조군 백테스트 (2026-07-14 작업
 대체재'로 분류 — 프레임 B가 아니라 D로만 해석(밸류업 지수가 여기 해당할 것으로 예상).
 
 데이터 함정 3개(§3) 반영:
-  1) 분배금 재투자 — KR ETF는 TR 지수 자동매칭 우선. 못 찾으면 가격 시계열로 '평가'하지
-     않는다(§6 금지) — status=blocked_need_tr 로 남기고 건너뜀. 미국은 yfinance Adj Close.
+  1) 분배금 재투자 — KRX에 고배당50/배당성장50의 TR 지수가 아예 없음(로컬에서 전 시장
+     168개 지수명 재확인). 대신 지호가 KRX 정보데이터시스템에서 수동 다운로드한 지수
+     가격+배당수익률 시계열(data/*.csv)로 두 모드 평가:
+     · price(주 판정, PBO 등록): 가격지수+보수 drag. 프레임 A의 커스텀 새틀라이트
+       (valuediv_flow)도 pykrx 가격 기반이라 배당 미반영 — 양쪽 다 고배당 바스켓
+       (수익률 ~4~6%)이므로 가격끼리가 가장 공정한 비교. §6의 가격 시계열 평가 금지는
+       '배당 포함 대상과의 비대칭 비교' 방지가 목적이며 price-vs-price는 그에 해당 안 함.
+     · tr_approx(참고): 일수익률 + 전일 배당수익률/252 발생주의 근사. 절대수준 참고용,
+       A와 비대칭이므로 PBO 미등록.
+     미국은 yfinance Adj Close(배당 반영) — 미국 커스텀 백테스트도 동일 기반이라 대칭.
   2) 밸류업 지수 look-ahead — 지수 발표일(2024-09) 이전 구간을 별도 컬럼으로 분리 표기.
   3) 비용 비대칭 — ETF: 총보수(연, 근사치)+스프레드를 연환산 drag로 반영, 증권거래세 없음.
      개별주(커스텀 새틀라이트): 기존 backtest_kr_strategies 산출(kr_strategy_navs.json)이
@@ -57,16 +65,22 @@ CORE_WEIGHTS_KR = [1.00, 0.90, 0.80, 0.65, 0.50, 0.35, 0.20, 0.10, 0.00]
 CORE_WEIGHTS_US = [1.00, 0.65, 0.35, 0.00]
 
 # fee_pct는 근사치(공시 총보수 기준, 2026-07 시점 확인 필요 — 로컬 실행 시 실제 값으로 교체 권장).
-# index_hint: TR(총수익) 지수 자동탐색용 이름 키워드.
+# local_csv: 지호가 KRX 정보데이터시스템에서 수동 다운로드(2년 단위 분할)한 것을 병합한
+# 추종지수 시계열(date,value[,div_yield_pct]) — ETF 시세 대신 '추종지수 + 보수 drag'로 근사.
+# valueup_etf_proxy: 2026-07-14 지호 지시 — 밸류업은 성장/배당 균형이 내장된 지수이므로
+# 코어스왑(프레임 D)만이 아니라 새틀라이트 비중 그리드(프레임 B)에도 편입해 탐색.
 KR_CANDIDATES = {
-    "plus_highdiv_161510": {"ticker": "161510", "name": "PLUS 고배당주",
-                             "fee_pct": 0.30, "index_hint": ["고배당50", "고배당 50", "고배당지수"]},
-    "kodex_divgrowth_211900": {"ticker": "211900", "name": "KODEX 배당성장",
-                                "fee_pct": 0.25, "index_hint": ["배당성장", "배당 성장"]},
-    "tiger_divgrowth_211560": {"ticker": "211560", "name": "TIGER 배당성장",
-                                "fee_pct": 0.29, "index_hint": ["배당성장", "배당 성장"]},
-    "kodex_highdiv_279530": {"ticker": "279530", "name": "KODEX 고배당",
-                              "fee_pct": 0.30, "index_hint": ["고배당"]},
+    "plus_highdiv_161510": {"ticker": "161510", "name": "PLUS 고배당주", "fee_pct": 0.30,
+                             "local_csv": "data/kospi_highdiv50.csv", "source": "코스피 고배당 50"},
+    "kodex_divgrowth_211900": {"ticker": "211900", "name": "KODEX 배당성장", "fee_pct": 0.25,
+                                "local_csv": "data/kospi_divgrowth50.csv", "source": "코스피 배당성장 50"},
+    "tiger_divgrowth_211560": {"ticker": "211560", "name": "TIGER 배당성장", "fee_pct": 0.29,
+                                "local_csv": "data/kospi_divgrowth50.csv", "source": "코스피 배당성장 50"},
+    "kodex_highdiv_279530": {"ticker": "279530", "name": "KODEX 고배당", "fee_pct": 0.30,
+                              "local_csv": None, "source": "추종지수(FnGuide 계열) 데이터 미확보"},
+    "valueup_etf_proxy": {"ticker": "(밸류업 ETF군)", "name": "코리아 밸류업 지수 추종 ETF",
+                           "fee_pct": 0.05, "local_csv": "data/valueup_index.csv",
+                           "source": "코리아 밸류업 지수"},
 }
 # 동일 지수(코스피 배당성장50)를 추종하는 두 후보 중 데이터 긴 쪽만 채택(§1 표) — 런타임에 결정.
 DUPLICATE_GROUPS = [{"kodex_divgrowth_211900", "tiger_divgrowth_211560"}]
@@ -120,65 +134,24 @@ def corr_vs_core(nav_a: pd.Series, nav_b: pd.Series) -> float | None:
 
 
 # ------------------------- KR ETF 로더 -------------------------
-def _find_tr_index(hints: list[str]):
-    """이름에 hints 중 하나 + ('TR'|'총수익')을 포함하는 지수 티커 탐색. 못 찾으면 None."""
-    from pykrx import stock as K
-    seen = {}
-    for market in ("KOSPI", "KRX", "테마"):
-        try:
-            for t in K.get_index_ticker_list(market=market):
-                if t in seen:
-                    continue
-                try:
-                    name = K.get_index_ticker_name(t)
-                except Exception:
-                    continue
-                seen[t] = name or ""
-        except Exception as e:
-            _log(f"  지수 티커 목록 조회 실패({market}): {e}")
-    for t, name in seen.items():
-        if any(h in name for h in hints) and ("TR" in name or "총수익" in name):
-            return t, name
-    return None
-
-
-def fetch_kr_etf_series(cand_id: str, cfg: dict, start="20120101", cache=None) -> dict:
-    """반환: {nav: Series, tr_used: bool, source_name: str|None, status: str}.
-    §6 금지: TR(또는 분배금 재투자) 확보 못하면 가격 시계열로 '평가'하지 않고 status만 기록."""
-    cache = cache if cache is not None else {}
-    key = f"kr_{cand_id}"
-    end = pd.Timestamp.today().strftime("%Y%m%d")
-    if key in cache and cache[key].get("nav"):
-        d = cache[key]
-        nav = pd.Series(d["nav"]); nav.index = pd.to_datetime(nav.index); nav = nav.sort_index()
-        return {"nav": nav, "tr_used": d.get("tr_used", False),
-                "source_name": d.get("source_name"), "status": d.get("status", "ok")}
-    from pykrx import stock as K
-    found = None
-    try:
-        found = _find_tr_index(cfg["index_hint"])
-    except Exception as e:
-        _log(f"  {cand_id}: TR 지수 탐색 실패: {e}")
-    if found:
-        tr_ticker, tr_name = found
-        try:
-            df = K.get_index_ohlcv_by_date(start, end, tr_ticker)
-            col = "종가" if "종가" in df.columns else df.columns[-1]
-            nav = df[col].astype(float)
-            nav.index = pd.to_datetime(nav.index)
-            nav = nav[nav > 0].sort_index()
-            rec = {"nav": {d.date().isoformat(): float(v) for d, v in nav.items()},
-                   "tr_used": True, "source_name": tr_name, "status": "ok"}
-            cache[key] = rec; _save_cache(cache)
-            _log(f"  {cand_id}: TR 지수 '{tr_name}'({tr_ticker}) 확보 {len(nav)}일")
-            return {"nav": nav, "tr_used": True, "source_name": tr_name, "status": "ok"}
-        except Exception as e:
-            _log(f"  {cand_id}: TR 지수 {tr_ticker} 다운로드 실패: {e}")
-    _log(f"  {cand_id}: TR(총수익) 지수를 못 찾음 — 가격 시계열로는 평가 금지(§6). "
-         f"분배금 이력 또는 TR 지수 CSV를 지호 님께 요청할 것.")
-    rec = {"nav": None, "tr_used": False, "source_name": None, "status": "blocked_need_tr"}
-    cache[key] = rec; _save_cache(cache)
-    return {"nav": None, "tr_used": False, "source_name": None, "status": "blocked_need_tr"}
+def load_kr_index_csv(cand_id: str, cfg: dict) -> dict:
+    """수동 다운로드 지수 CSV(date,value[,div_yield_pct]) 로드.
+    반환: {nav_price, nav_tr(배당수익률 있으면 발생주의 근사, 없으면 None), status}."""
+    path = cfg.get("local_csv")
+    if not path or not os.path.exists(path):
+        _log(f"  {cand_id}: 지수 CSV 없음({path}) — 평가 보류(blocked_need_data)")
+        return {"nav_price": None, "nav_tr": None, "status": "blocked_need_data"}
+    df = pd.read_csv(path)
+    idx = pd.to_datetime(df["date"])
+    px = pd.Series(df["value"].astype(float).values, index=idx).sort_index()
+    nav_tr = None
+    if "div_yield_pct" in df.columns:
+        y = pd.Series(df["div_yield_pct"].astype(float).values, index=idx).sort_index().ffill()
+        r_tr = px.pct_change().fillna(0.0) + y.shift(1).fillna(0.0) / 100.0 / 252.0
+        nav_tr = (1 + r_tr).cumprod()
+    _log(f"  {cand_id}: '{cfg['source']}' {len(px)}일 ({px.index[0].date()}~{px.index[-1].date()})"
+         + (" · TR근사 포함" if nav_tr is not None else " · 가격만(배당수익률 컬럼 없음)"))
+    return {"nav_price": px, "nav_tr": nav_tr, "status": "ok"}
 
 
 def load_valueup_csv(path: str) -> pd.Series | None:
@@ -288,7 +261,6 @@ def run_kr(valueup_csv: str | None, save=True):
     custom_sat = pd.Series(navs["valuediv_flow"]); custom_sat.index = pd.to_datetime(custom_sat.index)
     custom_sat = (custom_sat.sort_index() / custom_sat.sort_index().iloc[0])
 
-    cache = _load_cache()
     n_trials_registered = 0
     trial_parts = []
 
@@ -300,16 +272,16 @@ def run_kr(valueup_csv: str | None, save=True):
     frame_c = {tag: CS.stats(core_kospi, a, b) for tag, a, b in CS.SUBS}
     _log(f"[프레임C] KODEX200(레짐) 100%: {frame_c['full']}")
 
-    # ---- 후보 데이터 확보(각 후보 1회만 조회) + 중복 지수 그룹은 데이터 긴 쪽만 유지 ----
-    fetched = {cid: fetch_kr_etf_series(cid, cfg, cache=cache) for cid, cfg in KR_CANDIDATES.items()}
+    # ---- 후보 데이터 확보 + 중복 지수 그룹은 하나만 유지(데이터 길이 → 보수 낮은 쪽 순) ----
+    fetched = {cid: load_kr_index_csv(cid, cfg) for cid, cfg in KR_CANDIDATES.items()}
     active = dict(KR_CANDIDATES)
     for group in DUPLICATE_GROUPS:
-        avail = {cid: fetched[cid] for cid in group if fetched[cid]["nav"] is not None}
+        avail = {cid: fetched[cid] for cid in group if fetched[cid]["nav_price"] is not None}
         if len(avail) > 1:
-            keep = max(avail, key=lambda c: len(avail[c]["nav"]))
+            keep = max(avail, key=lambda c: (len(avail[c]["nav_price"]), -KR_CANDIDATES[c]["fee_pct"]))
             for cid in group:
                 if cid != keep:
-                    _log(f"  {cid}: 동일 지수 추종 중복 — 데이터 더 긴 {keep}만 채택, 제외")
+                    _log(f"  {cid}: 동일 지수 추종 중복 — {keep}만 채택(데이터 길이·보수 기준), 제외")
                     del active[cid]
 
     # ---- 프레임 B: ETF 새틀라이트, 코어비중 그리드 ----
@@ -319,12 +291,13 @@ def run_kr(valueup_csv: str | None, save=True):
     for cid, cfg in active.items():
         r = fetched[cid]
         info = {"id": cid, "name": cfg["name"], "ticker": cfg["ticker"],
-                "fee_pct_approx": cfg["fee_pct"], "status": r["status"], "tr_used": r["tr_used"],
-                "source_index": r.get("source_name")}
-        if r["nav"] is None:
+                "fee_pct_approx": cfg["fee_pct"], "status": r["status"], "source_index": cfg["source"],
+                "dividend_mode": ("price(주 판정)+tr_approx(참고)" if r["nav_tr"] is not None
+                                   else "price only")}
+        if r["nav_price"] is None:
             candidates_out.append(info)
             continue
-        sat_nav = apply_fee_drag(r["nav"] / r["nav"].iloc[0], cfg["fee_pct"])
+        sat_nav = apply_fee_drag(r["nav_price"] / r["nav_price"].iloc[0], cfg["fee_pct"])
         corr = corr_vs_core(sat_nav, b1)
         info["corr_daily_vs_kospi200"] = corr
         info["classification"] = ("core_replacement" if (corr is not None and corr >= CORR_CORE_REPLACEMENT)
@@ -335,10 +308,17 @@ def run_kr(valueup_csv: str | None, save=True):
             _log(f"  {cid}: 상관 {corr} ≥ {CORR_CORE_REPLACEMENT} → 코어대체재로 재분류(프레임 D로만 해석)")
             continue
         rows, subs, td = weight_grid_sweep(core_kospi, sat_nav, CORE_WEIGHTS_KR, b1, cid)
-        frame_b[cid] = {"rows": rows, "subperiods": {str(w): s for w, s in subs.items()}}
+        frame_b[cid] = {"rows": rows, "subperiods": {str(w): s for w, s in subs.items()},
+                        "mode": "price — 프레임 A 커스텀 새틀라이트(pykrx 가격 기반, 배당 미반영)와 동일 조건"}
         if td:
             trial_parts.append(td)
             n_trials_registered += len(td["trials"])
+        if r["nav_tr"] is not None:
+            sat_tr = apply_fee_drag(r["nav_tr"] / r["nav_tr"].iloc[0], cfg["fee_pct"])
+            rows_tr, _, _ = weight_grid_sweep(core_kospi, sat_tr, CORE_WEIGHTS_KR, b1, cid + "_TR근사")
+            frame_b[cid]["rows_tr_approx"] = rows_tr
+            frame_b[cid]["tr_note"] = ("배당 재투자 근사(전일 배당수익률/252 발생주의) — 절대수준 참고용. "
+                                        "A(배당 미반영)와 비대칭이라 PBO 미등록·판정 미사용")
 
     # ---- 프레임 D: 코어 스왑(H2) — 밸류업 지수 ----
     frame_d = None
@@ -362,6 +342,7 @@ def run_kr(valueup_csv: str | None, save=True):
                            "post_announcement": CS.stats(post) if len(post) > 60 else None})
         d, r = BP.monthly_excess(combos["valueup65_customsat35"], b1.reindex(combos["valueup65_customsat35"].index).ffill())
         trial_parts.append({"dates": d, "trials": ["D_" + n for n in combos], "matrix": [r] * len(combos)})
+        n_trials_registered += len(combos)   # 프레임 D도 다중검정 예산에 등록(§4)
         frame_d = {"corr_valueup_vs_kospi200": corr_vu, "rows": rows_d,
                    "announce_date": VALUEUP_ANNOUNCE,
                    "caution": "발표일 이전 구간은 지수 설계 자체의 사후 적합(look-ahead) 가능성 —"
@@ -387,7 +368,11 @@ def run_kr(valueup_csv: str | None, save=True):
                                                  "net(거래세 0.20% 포함) — 이중 반영 안 함",
                              "core_kospi200_etf_fee_pct_approx": KR_CORE_FEE_PCT,
                              "core_note": "B1(코스피200 지수) 자체엔 KODEX200 보수 미반영(기존 코드 관행과 동일 — "
-                                          "benchmarks_kr.py B1과 동일 계열)"},
+                                          "benchmarks_kr.py B1과 동일 계열)",
+                             "dividend_fairness": "판정용 비교는 전부 가격 기반(배당 미반영)으로 통일 — "
+                                                  "A의 커스텀 새틀라이트(pykrx 가격)와 B의 price 모드 모두 "
+                                                  "고배당 바스켓이라 누락 배당 규모가 비슷해 상쇄. "
+                                                  "rows_tr_approx는 절대수준 참고 전용"},
                "corr_classification_threshold": CORR_CORE_REPLACEMENT,
                "n_trials_registered_this_market": n_trials_registered,
                "data_gaps": [c["id"] for c in candidates_out if c["status"] != "ok"]
