@@ -59,7 +59,112 @@
     }
   },
   "frame_B_etf_satellite": {},
-  "frame_D_core_swap": null,
+  "frame_D_core_swap": {
+    "corr_valueup_vs_kospi200": 0.869,
+    "rows": [
+      {
+        "combo": "valueup100",
+        "full": {
+          "cagr_pct": 23.74,
+          "sharpe": 1.01,
+          "mdd_pct": -32.1
+        },
+        "2018-2021": {
+          "cagr_pct": 13.13,
+          "sharpe": 0.7,
+          "mdd_pct": -32.1
+        },
+        "2022-2023": {
+          "cagr_pct": 6.49,
+          "sharpe": 0.61,
+          "mdd_pct": -14.3
+        },
+        "2024+": {
+          "cagr_pct": 51.83,
+          "sharpe": 1.45,
+          "mdd_pct": -24.6
+        },
+        "pre_announcement_lookahead_caution": {
+          "cagr_pct": 8.16,
+          "sharpe": 0.53,
+          "mdd_pct": -32.1
+        },
+        "post_announcement": {
+          "cagr_pct": 84.55,
+          "sharpe": 1.89,
+          "mdd_pct": -22.3
+        }
+      },
+      {
+        "combo": "valueup90_kospi10",
+        "full": {
+          "cagr_pct": 25.22,
+          "sharpe": 1.08,
+          "mdd_pct": -30.0
+        },
+        "2018-2021": {
+          "cagr_pct": 13.36,
+          "sharpe": 0.74,
+          "mdd_pct": -30.0
+        },
+        "2022-2023": {
+          "cagr_pct": 5.97,
+          "sharpe": 0.59,
+          "mdd_pct": -13.8
+        },
+        "2024+": {
+          "cagr_pct": 57.44,
+          "sharpe": 1.57,
+          "mdd_pct": -24.0
+        },
+        "pre_announcement_lookahead_caution": {
+          "cagr_pct": 7.93,
+          "sharpe": 0.53,
+          "mdd_pct": -30.0
+        },
+        "post_announcement": {
+          "cagr_pct": 95.16,
+          "sharpe": 2.06,
+          "mdd_pct": -20.8
+        }
+      },
+      {
+        "combo": "valueup65_customsat35",
+        "full": {
+          "cagr_pct": 23.52,
+          "sharpe": 1.26,
+          "mdd_pct": -22.4
+        },
+        "2018-2021": {
+          "cagr_pct": 18.89,
+          "sharpe": 1.18,
+          "mdd_pct": -22.4
+        },
+        "2022-2023": {
+          "cagr_pct": 3.36,
+          "sharpe": 0.42,
+          "mdd_pct": -10.1
+        },
+        "2024+": {
+          "cagr_pct": 47.19,
+          "sharpe": 1.71,
+          "mdd_pct": -16.8
+        },
+        "pre_announcement_lookahead_caution": {
+          "cagr_pct": 11.27,
+          "sharpe": 0.83,
+          "mdd_pct": -22.4
+        },
+        "post_announcement": {
+          "cagr_pct": 66.68,
+          "sharpe": 2.07,
+          "mdd_pct": -16.8
+        }
+      }
+    ],
+    "announce_date": "2024-09-24",
+    "caution": "발표일 이전 구간은 지수 설계 자체의 사후 적합(look-ahead) 가능성 — pre_announcement_lookahead_caution 컬럼은 참고용, 채택 근거로 쓰지 않음. 24+ 단독 성과만으로도 채택 결론 금지(§3-2·§6)."
+  },
   "candidates": [
     {
       "id": "plus_highdiv_161510",
@@ -110,7 +215,6 @@
     "plus_highdiv_161510",
     "kodex_divgrowth_211900",
     "tiger_divgrowth_211560",
-    "kodex_highdiv_279530",
-    "valueup_index"
+    "kodex_highdiv_279530"
   ]
 }
