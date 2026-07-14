@@ -43,10 +43,13 @@ def _krx_universe_funda() -> dict | None:
         day = dt.datetime.now(dt.timezone(dt.timedelta(hours=9)))
         # 최근 영업일 탐색(주말·휴장 대비 최대 7일 소급). 구성종목과 재무데이터는 반드시
         # '같은 날짜'에서 함께 유효해야 한다 — 장 시작 전(예: KST 08시 국장 메일) 조회 시
-        # 그날 날짜로는 구성종목은 나오지만 재무데이터(PER/EPS/BPS)가 아직 미발행이라
-        # 전부 NaN으로 채워지는 경우가 실사용 중 확인됨(2026-07-13). float(nan)은 예외를
-        # 던지지 않아 이걸 '성공'으로 오인하면 캐시 폴백(_cached_universe)이 아예 발동하지
-        # 않고 0/200 통과라는 빈 결과가 그대로 나간다 — 반드시 NaN을 걸러야 한다.
+        # 그날 날짜로는 구성종목은 나오지만 재무데이터(PER/EPS/BPS)가 아직 미발행인 경우가
+        # 실사용 중 확인됨. 처음엔 NaN으로 채워지는 줄 알았는데(2026-07-13 수정), 실제로는
+        # pykrx가 미발행 구간을 '0.0으로 채운 자리표시자' 행으로 돌려주는 경우도 있어(2026-
+        # 07-14 재확인 — 이날은 PER·EPS·BPS가 전부 0.0, NaN 검사를 그냥 통과함) 여전히 뚫렸다.
+        # 0.0 자체는 적자기업의 정상적인 PER 값이기도 해서(코스피200 정상 거래일 기준 약
+        # 15%는 PER=0) 개별 종목 단위로는 못 거른다 — 그 날짜 전체가 자리표시자인지는 '그날
+        # PER>0인 종목 비율'로 판정한다(정상 거래일 실측 85% 대비, 미발행일은 0%).
         out, d = {}, None
         for back in range(8):
             d = (day - dt.timedelta(days=back)).strftime("%Y%m%d")
@@ -78,10 +81,12 @@ def _krx_universe_funda() -> dict | None:
                     pass
                 cand[t] = {"name": name, "per": per, "eps": eps, "bps": bps, "roe": round(roe, 4),
                           "pbr": pbr, "div_yield": div if div == div else 0.0}
-            if len(cand) >= len(members) * 0.5:   # 절반 이상 유효해야 그 날짜를 채택
+            nonzero_ratio = (sum(1 for c in cand.values() if c["per"] > 0) / len(cand)) if cand else 0.0
+            if len(cand) >= len(members) * 0.5 and nonzero_ratio >= 0.3:
                 out = cand
                 break
-            _log(f"{d} 재무데이터 대부분 미발행({len(cand)}/{len(members)}) → 하루 더 소급")
+            _log(f"{d} 재무데이터 미발행/자리표시자 의심(유효 {len(cand)}/{len(members)}, "
+                 f"PER>0 비율 {nonzero_ratio:.0%}) → 하루 더 소급")
         if not out:
             _log("코스피200 구성종목/재무데이터 조회 실패"); return None
         os.makedirs("output", exist_ok=True)
