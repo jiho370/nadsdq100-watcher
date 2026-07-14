@@ -309,12 +309,26 @@ def run_kr(no_email: bool = False, force: bool = False):
     sig_images, sig_cids = _signal_images(signals, when="kr")
     images += sig_images
 
+    # 자사주 취득 공시 정보 블록(event_study_kr 검증 — 단기 양의 신호). DART_API_KEY 있을 때만,
+    # 없으면 빈 문자열(그레이스풀). 관련 종목(보유+매수후보+풀 상위 30)으로 조회 범위 한정.
+    kr_events_html = ""
+    try:
+        import kr_events as KE
+        watch_syms = ([c["symbol"] for c in (kr.get("buy") or [])]
+                      + list((kr.get("ind_map") or {}).keys())[:30])
+        ev = KE.recent_events(sorted(set(watch_syms)))
+        name_map = {c["symbol"]: c.get("name") for c in kr_cands}
+        kr_events_html = KE.events_block_html(ev, name_map)
+    except Exception as e:
+        print(f"[정보] 자사주 공시 블록 생략({e})", file=sys.stderr)
+
     # 전일(월요일엔 전주) 시장 요약(나스닥·다우존스·닛케이·유럽·글로벌·비트코인·환율)은 국장 메일에만
     # 붙는다 — 밤사이 미국장 등 요약이 필요한 건 이쪽뿐이고, 추세신호(코스피/코스닥/금)와도 안 겹친다.
     market_html = MS.world_table_html(signals, weekly=is_monday) if signals else ""
     signals_html = MS.signal_cards_html(signals, sig_cids, when="kr") if signals else ""
     html = AR.render_report_html(report, kr.get("as_of") or "", metrics,
                                  market_html=market_html, signals_html=signals_html,
+                                 kr_events_html=kr_events_html,
                                  banner=banner, show_spy=False, is_kr=True,
                                  market_label=("전주" if is_monday else "전일"),
                                  title="🇰🇷 장전 시장 점검 · 코스피200 매수·매도 후보",
