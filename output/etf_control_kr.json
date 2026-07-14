@@ -1,0 +1,857 @@
+{
+  "as_of": "2026-07-10",
+  "market": "kr",
+  "frame_A_current": {
+    "rows": [
+      {
+        "core_weight": 0.65,
+        "cagr_pct": 21.68,
+        "sharpe": 1.22,
+        "mdd_pct": -17.1
+      }
+    ],
+    "subperiods": {
+      "0.65": {
+        "full": {
+          "cagr_pct": 21.68,
+          "sharpe": 1.22,
+          "mdd_pct": -17.1
+        },
+        "2018-2021": {
+          "cagr_pct": 17.17,
+          "sharpe": 1.25,
+          "mdd_pct": -12.0
+        },
+        "2022-2023": {
+          "cagr_pct": -0.23,
+          "sharpe": 0.01,
+          "mdd_pct": -9.9
+        },
+        "2024+": {
+          "cagr_pct": 47.73,
+          "sharpe": 1.7,
+          "mdd_pct": -17.1
+        }
+      }
+    },
+    "note": "커스텀 새틀라이트(valuediv_flow) NAV는 이미 CostModel(kospi) net — 재비용화 안 함"
+  },
+  "frame_C_pure_index": {
+    "full": {
+      "cagr_pct": 18.61,
+      "sharpe": 0.91,
+      "mdd_pct": -21.6
+    },
+    "2018-2021": {
+      "cagr_pct": 5.54,
+      "sharpe": 0.44,
+      "mdd_pct": -21.5
+    },
+    "2022-2023": {
+      "cagr_pct": 0.96,
+      "sharpe": 0.15,
+      "mdd_pct": -10.3
+    },
+    "2024+": {
+      "cagr_pct": 58.29,
+      "sharpe": 1.56,
+      "mdd_pct": -21.6
+    }
+  },
+  "frame_B_etf_satellite": {
+    "plus_highdiv_161510": {
+      "rows": [
+        {
+          "core_weight": 1.0,
+          "cagr_pct": 18.61,
+          "sharpe": 0.91,
+          "mdd_pct": -21.6
+        },
+        {
+          "core_weight": 0.9,
+          "cagr_pct": 17.87,
+          "sharpe": 0.91,
+          "mdd_pct": -21.8
+        },
+        {
+          "core_weight": 0.8,
+          "cagr_pct": 17.0,
+          "sharpe": 0.9,
+          "mdd_pct": -22.1
+        },
+        {
+          "core_weight": 0.65,
+          "cagr_pct": 15.61,
+          "sharpe": 0.88,
+          "mdd_pct": -26.6
+        },
+        {
+          "core_weight": 0.5,
+          "cagr_pct": 14.12,
+          "sharpe": 0.83,
+          "mdd_pct": -31.0
+        },
+        {
+          "core_weight": 0.35,
+          "cagr_pct": 12.52,
+          "sharpe": 0.75,
+          "mdd_pct": -35.5
+        },
+        {
+          "core_weight": 0.2,
+          "cagr_pct": 10.82,
+          "sharpe": 0.66,
+          "mdd_pct": -39.9
+        },
+        {
+          "core_weight": 0.1,
+          "cagr_pct": 9.64,
+          "sharpe": 0.58,
+          "mdd_pct": -42.9
+        },
+        {
+          "core_weight": 0.0,
+          "cagr_pct": 8.07,
+          "sharpe": 0.5,
+          "mdd_pct": -45.8
+        }
+      ],
+      "subperiods": {
+        "1.0": {
+          "full": {
+            "cagr_pct": 18.61,
+            "sharpe": 0.91,
+            "mdd_pct": -21.6
+          },
+          "2018-2021": {
+            "cagr_pct": 5.54,
+            "sharpe": 0.44,
+            "mdd_pct": -21.5
+          },
+          "2022-2023": {
+            "cagr_pct": 0.96,
+            "sharpe": 0.15,
+            "mdd_pct": -10.3
+          },
+          "2024+": {
+            "cagr_pct": 58.29,
+            "sharpe": 1.56,
+            "mdd_pct": -21.6
+          }
+        },
+        "0.9": {
+          "full": {
+            "cagr_pct": 17.87,
+            "sharpe": 0.91,
+            "mdd_pct": -21.8
+          },
+          "2018-2021": {
+            "cagr_pct": 5.96,
+            "sharpe": 0.47,
+            "mdd_pct": -21.8
+          },
+          "2022-2023": {
+            "cagr_pct": 0.4,
+            "sharpe": 0.09,
+            "mdd_pct": -8.8
+          },
+          "2024+": {
+            "cagr_pct": 54.99,
+            "sharpe": 1.56,
+            "mdd_pct": -20.5
+          }
+        },
+        "0.8": {
+          "full": {
+            "cagr_pct": 17.0,
+            "sharpe": 0.9,
+            "mdd_pct": -22.1
+          },
+          "2018-2021": {
+            "cagr_pct": 6.2,
+            "sharpe": 0.49,
+            "mdd_pct": -22.1
+          },
+          "2022-2023": {
+            "cagr_pct": -0.18,
+            "sharpe": 0.02,
+            "mdd_pct": -8.2
+          },
+          "2024+": {
+            "cagr_pct": 51.65,
+            "sharpe": 1.56,
+            "mdd_pct": -19.9
+          }
+        },
+        "0.65": {
+          "full": {
+            "cagr_pct": 15.61,
+            "sharpe": 0.88,
+            "mdd_pct": -26.6
+          },
+          "2018-2021": {
+            "cagr_pct": 6.48,
+            "sharpe": 0.51,
+            "mdd_pct": -26.6
+          },
+          "2022-2023": {
+            "cagr_pct": -1.09,
+            "sharpe": -0.08,
+            "mdd_pct": -10.5
+          },
+          "2024+": {
+            "cagr_pct": 46.57,
+            "sharpe": 1.54,
+            "mdd_pct": -19.0
+          }
+        },
+        "0.5": {
+          "full": {
+            "cagr_pct": 14.12,
+            "sharpe": 0.83,
+            "mdd_pct": -31.0
+          },
+          "2018-2021": {
+            "cagr_pct": 6.68,
+            "sharpe": 0.51,
+            "mdd_pct": -31.0
+          },
+          "2022-2023": {
+            "cagr_pct": -2.04,
+            "sharpe": -0.16,
+            "mdd_pct": -12.7
+          },
+          "2024+": {
+            "cagr_pct": 41.41,
+            "sharpe": 1.5,
+            "mdd_pct": -18.1
+          }
+        },
+        "0.35": {
+          "full": {
+            "cagr_pct": 12.52,
+            "sharpe": 0.75,
+            "mdd_pct": -35.5
+          },
+          "2018-2021": {
+            "cagr_pct": 6.78,
+            "sharpe": 0.5,
+            "mdd_pct": -35.5
+          },
+          "2022-2023": {
+            "cagr_pct": -3.04,
+            "sharpe": -0.21,
+            "mdd_pct": -15.5
+          },
+          "2024+": {
+            "cagr_pct": 36.19,
+            "sharpe": 1.42,
+            "mdd_pct": -17.6
+          }
+        },
+        "0.2": {
+          "full": {
+            "cagr_pct": 10.82,
+            "sharpe": 0.66,
+            "mdd_pct": -39.9
+          },
+          "2018-2021": {
+            "cagr_pct": 6.8,
+            "sharpe": 0.47,
+            "mdd_pct": -39.9
+          },
+          "2022-2023": {
+            "cagr_pct": -4.08,
+            "sharpe": -0.25,
+            "mdd_pct": -18.9
+          },
+          "2024+": {
+            "cagr_pct": 30.9,
+            "sharpe": 1.3,
+            "mdd_pct": -17.1
+          }
+        },
+        "0.1": {
+          "full": {
+            "cagr_pct": 9.64,
+            "sharpe": 0.58,
+            "mdd_pct": -42.9
+          },
+          "2018-2021": {
+            "cagr_pct": 6.75,
+            "sharpe": 0.45,
+            "mdd_pct": -42.9
+          },
+          "2022-2023": {
+            "cagr_pct": -4.8,
+            "sharpe": -0.27,
+            "mdd_pct": -21.1
+          },
+          "2024+": {
+            "cagr_pct": 27.36,
+            "sharpe": 1.2,
+            "mdd_pct": -17.6
+          }
+        },
+        "0.0": {
+          "full": {
+            "cagr_pct": 8.07,
+            "sharpe": 0.5,
+            "mdd_pct": -45.8
+          },
+          "2018-2021": {
+            "cagr_pct": 6.67,
+            "sharpe": 0.43,
+            "mdd_pct": -45.8
+          },
+          "2022-2023": {
+            "cagr_pct": -5.06,
+            "sharpe": -0.25,
+            "mdd_pct": -23.3
+          },
+          "2024+": {
+            "cagr_pct": 22.52,
+            "sharpe": 1.02,
+            "mdd_pct": -23.3
+          }
+        }
+      },
+      "mode": "price — 프레임 A 커스텀 새틀라이트(pykrx 가격 기반, 배당 미반영)와 동일 조건",
+      "rows_tr_approx": [
+        {
+          "core_weight": 1.0,
+          "cagr_pct": 18.61,
+          "sharpe": 0.91,
+          "mdd_pct": -21.6
+        },
+        {
+          "core_weight": 0.9,
+          "cagr_pct": 18.45,
+          "sharpe": 0.93,
+          "mdd_pct": -21.2
+        },
+        {
+          "core_weight": 0.8,
+          "cagr_pct": 18.16,
+          "sharpe": 0.95,
+          "mdd_pct": -21.1
+        },
+        {
+          "core_weight": 0.65,
+          "cagr_pct": 17.62,
+          "sharpe": 0.97,
+          "mdd_pct": -25.0
+        },
+        {
+          "core_weight": 0.5,
+          "cagr_pct": 16.96,
+          "sharpe": 0.96,
+          "mdd_pct": -28.9
+        },
+        {
+          "core_weight": 0.35,
+          "cagr_pct": 16.18,
+          "sharpe": 0.93,
+          "mdd_pct": -32.9
+        },
+        {
+          "core_weight": 0.2,
+          "cagr_pct": 15.28,
+          "sharpe": 0.87,
+          "mdd_pct": -37.3
+        },
+        {
+          "core_weight": 0.1,
+          "cagr_pct": 14.62,
+          "sharpe": 0.82,
+          "mdd_pct": -40.4
+        },
+        {
+          "core_weight": 0.0,
+          "cagr_pct": 13.53,
+          "sharpe": 0.75,
+          "mdd_pct": -43.4
+        }
+      ],
+      "tr_note": "배당 재투자 근사(전일 배당수익률/252 발생주의) — 절대수준 참고용. A(배당 미반영)와 비대칭이라 PBO 미등록·판정 미사용"
+    },
+    "kodex_divgrowth_211900": {
+      "rows": [
+        {
+          "core_weight": 1.0,
+          "cagr_pct": 18.61,
+          "sharpe": 0.91,
+          "mdd_pct": -21.6
+        },
+        {
+          "core_weight": 0.9,
+          "cagr_pct": 18.08,
+          "sharpe": 0.91,
+          "mdd_pct": -21.1
+        },
+        {
+          "core_weight": 0.8,
+          "cagr_pct": 17.44,
+          "sharpe": 0.9,
+          "mdd_pct": -22.0
+        },
+        {
+          "core_weight": 0.65,
+          "cagr_pct": 16.41,
+          "sharpe": 0.87,
+          "mdd_pct": -26.3
+        },
+        {
+          "core_weight": 0.5,
+          "cagr_pct": 15.29,
+          "sharpe": 0.83,
+          "mdd_pct": -30.7
+        },
+        {
+          "core_weight": 0.35,
+          "cagr_pct": 14.09,
+          "sharpe": 0.77,
+          "mdd_pct": -35.3
+        },
+        {
+          "core_weight": 0.2,
+          "cagr_pct": 12.81,
+          "sharpe": 0.7,
+          "mdd_pct": -39.8
+        },
+        {
+          "core_weight": 0.1,
+          "cagr_pct": 11.92,
+          "sharpe": 0.64,
+          "mdd_pct": -42.8
+        },
+        {
+          "core_weight": 0.0,
+          "cagr_pct": 10.54,
+          "sharpe": 0.57,
+          "mdd_pct": -45.7
+        }
+      ],
+      "subperiods": {
+        "1.0": {
+          "full": {
+            "cagr_pct": 18.61,
+            "sharpe": 0.91,
+            "mdd_pct": -21.6
+          },
+          "2018-2021": {
+            "cagr_pct": 5.54,
+            "sharpe": 0.44,
+            "mdd_pct": -21.5
+          },
+          "2022-2023": {
+            "cagr_pct": 0.96,
+            "sharpe": 0.15,
+            "mdd_pct": -10.3
+          },
+          "2024+": {
+            "cagr_pct": 58.29,
+            "sharpe": 1.56,
+            "mdd_pct": -21.6
+          }
+        },
+        "0.9": {
+          "full": {
+            "cagr_pct": 18.08,
+            "sharpe": 0.91,
+            "mdd_pct": -21.1
+          },
+          "2018-2021": {
+            "cagr_pct": 5.78,
+            "sharpe": 0.45,
+            "mdd_pct": -21.1
+          },
+          "2022-2023": {
+            "cagr_pct": 0.52,
+            "sharpe": 0.1,
+            "mdd_pct": -9.0
+          },
+          "2024+": {
+            "cagr_pct": 56.17,
+            "sharpe": 1.57,
+            "mdd_pct": -20.6
+          }
+        },
+        "0.8": {
+          "full": {
+            "cagr_pct": 17.44,
+            "sharpe": 0.9,
+            "mdd_pct": -22.0
+          },
+          "2018-2021": {
+            "cagr_pct": 5.84,
+            "sharpe": 0.46,
+            "mdd_pct": -22.0
+          },
+          "2022-2023": {
+            "cagr_pct": 0.06,
+            "sharpe": 0.05,
+            "mdd_pct": -8.2
+          },
+          "2024+": {
+            "cagr_pct": 54.0,
+            "sharpe": 1.57,
+            "mdd_pct": -20.1
+          }
+        },
+        "0.65": {
+          "full": {
+            "cagr_pct": 16.41,
+            "sharpe": 0.87,
+            "mdd_pct": -26.3
+          },
+          "2018-2021": {
+            "cagr_pct": 5.88,
+            "sharpe": 0.45,
+            "mdd_pct": -26.3
+          },
+          "2022-2023": {
+            "cagr_pct": -0.67,
+            "sharpe": -0.03,
+            "mdd_pct": -10.4
+          },
+          "2024+": {
+            "cagr_pct": 50.65,
+            "sharpe": 1.57,
+            "mdd_pct": -19.4
+          }
+        },
+        "0.5": {
+          "full": {
+            "cagr_pct": 15.29,
+            "sharpe": 0.83,
+            "mdd_pct": -30.7
+          },
+          "2018-2021": {
+            "cagr_pct": 5.85,
+            "sharpe": 0.44,
+            "mdd_pct": -30.7
+          },
+          "2022-2023": {
+            "cagr_pct": -1.45,
+            "sharpe": -0.09,
+            "mdd_pct": -13.0
+          },
+          "2024+": {
+            "cagr_pct": 47.19,
+            "sharpe": 1.55,
+            "mdd_pct": -18.7
+          }
+        },
+        "0.35": {
+          "full": {
+            "cagr_pct": 14.09,
+            "sharpe": 0.77,
+            "mdd_pct": -35.3
+          },
+          "2018-2021": {
+            "cagr_pct": 5.75,
+            "sharpe": 0.41,
+            "mdd_pct": -35.3
+          },
+          "2022-2023": {
+            "cagr_pct": -2.28,
+            "sharpe": -0.13,
+            "mdd_pct": -16.6
+          },
+          "2024+": {
+            "cagr_pct": 43.64,
+            "sharpe": 1.5,
+            "mdd_pct": -18.3
+          }
+        },
+        "0.2": {
+          "full": {
+            "cagr_pct": 12.81,
+            "sharpe": 0.7,
+            "mdd_pct": -39.8
+          },
+          "2018-2021": {
+            "cagr_pct": 5.58,
+            "sharpe": 0.39,
+            "mdd_pct": -39.8
+          },
+          "2022-2023": {
+            "cagr_pct": -3.15,
+            "sharpe": -0.16,
+            "mdd_pct": -20.2
+          },
+          "2024+": {
+            "cagr_pct": 40.0,
+            "sharpe": 1.43,
+            "mdd_pct": -17.9
+          }
+        },
+        "0.1": {
+          "full": {
+            "cagr_pct": 11.92,
+            "sharpe": 0.64,
+            "mdd_pct": -42.8
+          },
+          "2018-2021": {
+            "cagr_pct": 5.43,
+            "sharpe": 0.37,
+            "mdd_pct": -42.8
+          },
+          "2022-2023": {
+            "cagr_pct": -3.75,
+            "sharpe": -0.18,
+            "mdd_pct": -22.6
+          },
+          "2024+": {
+            "cagr_pct": 37.52,
+            "sharpe": 1.36,
+            "mdd_pct": -17.7
+          }
+        },
+        "0.0": {
+          "full": {
+            "cagr_pct": 10.54,
+            "sharpe": 0.57,
+            "mdd_pct": -45.7
+          },
+          "2018-2021": {
+            "cagr_pct": 5.25,
+            "sharpe": 0.35,
+            "mdd_pct": -45.7
+          },
+          "2022-2023": {
+            "cagr_pct": -4.02,
+            "sharpe": -0.17,
+            "mdd_pct": -24.8
+          },
+          "2024+": {
+            "cagr_pct": 33.22,
+            "sharpe": 1.24,
+            "mdd_pct": -18.1
+          }
+        }
+      },
+      "mode": "price — 프레임 A 커스텀 새틀라이트(pykrx 가격 기반, 배당 미반영)와 동일 조건",
+      "rows_tr_approx": [
+        {
+          "core_weight": 1.0,
+          "cagr_pct": 18.61,
+          "sharpe": 0.91,
+          "mdd_pct": -21.6
+        },
+        {
+          "core_weight": 0.9,
+          "cagr_pct": 18.45,
+          "sharpe": 0.92,
+          "mdd_pct": -20.8
+        },
+        {
+          "core_weight": 0.8,
+          "cagr_pct": 18.18,
+          "sharpe": 0.93,
+          "mdd_pct": -21.4
+        },
+        {
+          "core_weight": 0.65,
+          "cagr_pct": 17.7,
+          "sharpe": 0.93,
+          "mdd_pct": -25.4
+        },
+        {
+          "core_weight": 0.5,
+          "cagr_pct": 17.12,
+          "sharpe": 0.91,
+          "mdd_pct": -29.4
+        },
+        {
+          "core_weight": 0.35,
+          "cagr_pct": 16.46,
+          "sharpe": 0.88,
+          "mdd_pct": -33.7
+        },
+        {
+          "core_weight": 0.2,
+          "cagr_pct": 15.7,
+          "sharpe": 0.82,
+          "mdd_pct": -38.2
+        },
+        {
+          "core_weight": 0.1,
+          "cagr_pct": 15.14,
+          "sharpe": 0.78,
+          "mdd_pct": -41.3
+        },
+        {
+          "core_weight": 0.0,
+          "cagr_pct": 14.09,
+          "sharpe": 0.72,
+          "mdd_pct": -44.3
+        }
+      ],
+      "tr_note": "배당 재투자 근사(전일 배당수익률/252 발생주의) — 절대수준 참고용. A(배당 미반영)와 비대칭이라 PBO 미등록·판정 미사용"
+    }
+  },
+  "frame_D_core_swap": {
+    "corr_valueup_vs_kospi200": 0.869,
+    "rows": [
+      {
+        "combo": "valueup100",
+        "full": {
+          "cagr_pct": 23.74,
+          "sharpe": 1.01,
+          "mdd_pct": -32.1
+        },
+        "2018-2021": {
+          "cagr_pct": 13.13,
+          "sharpe": 0.7,
+          "mdd_pct": -32.1
+        },
+        "2022-2023": {
+          "cagr_pct": 6.49,
+          "sharpe": 0.61,
+          "mdd_pct": -14.3
+        },
+        "2024+": {
+          "cagr_pct": 51.83,
+          "sharpe": 1.45,
+          "mdd_pct": -24.6
+        },
+        "pre_announcement_lookahead_caution": {
+          "cagr_pct": 8.16,
+          "sharpe": 0.53,
+          "mdd_pct": -32.1
+        },
+        "post_announcement": {
+          "cagr_pct": 84.55,
+          "sharpe": 1.89,
+          "mdd_pct": -22.3
+        }
+      },
+      {
+        "combo": "valueup90_kospi10",
+        "full": {
+          "cagr_pct": 25.22,
+          "sharpe": 1.08,
+          "mdd_pct": -30.0
+        },
+        "2018-2021": {
+          "cagr_pct": 13.36,
+          "sharpe": 0.74,
+          "mdd_pct": -30.0
+        },
+        "2022-2023": {
+          "cagr_pct": 5.97,
+          "sharpe": 0.59,
+          "mdd_pct": -13.8
+        },
+        "2024+": {
+          "cagr_pct": 57.44,
+          "sharpe": 1.57,
+          "mdd_pct": -24.0
+        },
+        "pre_announcement_lookahead_caution": {
+          "cagr_pct": 7.93,
+          "sharpe": 0.53,
+          "mdd_pct": -30.0
+        },
+        "post_announcement": {
+          "cagr_pct": 95.16,
+          "sharpe": 2.06,
+          "mdd_pct": -20.8
+        }
+      },
+      {
+        "combo": "valueup65_customsat35",
+        "full": {
+          "cagr_pct": 23.52,
+          "sharpe": 1.26,
+          "mdd_pct": -22.4
+        },
+        "2018-2021": {
+          "cagr_pct": 18.89,
+          "sharpe": 1.18,
+          "mdd_pct": -22.4
+        },
+        "2022-2023": {
+          "cagr_pct": 3.36,
+          "sharpe": 0.42,
+          "mdd_pct": -10.1
+        },
+        "2024+": {
+          "cagr_pct": 47.19,
+          "sharpe": 1.71,
+          "mdd_pct": -16.8
+        },
+        "pre_announcement_lookahead_caution": {
+          "cagr_pct": 11.27,
+          "sharpe": 0.83,
+          "mdd_pct": -22.4
+        },
+        "post_announcement": {
+          "cagr_pct": 66.68,
+          "sharpe": 2.07,
+          "mdd_pct": -16.8
+        }
+      }
+    ],
+    "announce_date": "2024-09-24",
+    "caution": "발표일 이전 구간은 지수 설계 자체의 사후 적합(look-ahead) 가능성 — pre_announcement_lookahead_caution 컬럼은 참고용, 채택 근거로 쓰지 않음. 24+ 단독 성과만으로도 채택 결론 금지(§3-2·§6)."
+  },
+  "candidates": [
+    {
+      "id": "plus_highdiv_161510",
+      "name": "PLUS 고배당주",
+      "ticker": "161510",
+      "fee_pct_approx": 0.3,
+      "status": "ok",
+      "source_index": "코스피 고배당 50",
+      "dividend_mode": "price(주 판정)+tr_approx(참고)",
+      "corr_daily_vs_kospi200": 0.718,
+      "classification": "satellite"
+    },
+    {
+      "id": "kodex_divgrowth_211900",
+      "name": "KODEX 배당성장",
+      "ticker": "211900",
+      "fee_pct_approx": 0.25,
+      "status": "ok",
+      "source_index": "코스피 배당성장 50",
+      "dividend_mode": "price(주 판정)+tr_approx(참고)",
+      "corr_daily_vs_kospi200": 0.809,
+      "classification": "satellite"
+    },
+    {
+      "id": "kodex_highdiv_279530",
+      "name": "KODEX 고배당",
+      "ticker": "279530",
+      "fee_pct_approx": 0.3,
+      "status": "blocked_need_data",
+      "source_index": "추종지수(FnGuide 계열) 데이터 미확보",
+      "dividend_mode": "price only"
+    },
+    {
+      "id": "valueup_etf_proxy",
+      "name": "코리아 밸류업 지수 추종 ETF",
+      "ticker": "(밸류업 ETF군)",
+      "fee_pct_approx": 0.05,
+      "status": "ok",
+      "source_index": "코리아 밸류업 지수",
+      "dividend_mode": "price only",
+      "corr_daily_vs_kospi200": 0.955,
+      "classification": "core_replacement"
+    }
+  ],
+  "cost_note": {
+    "etf": "총보수(연,근사)+스프레드를 연환산 산술 drag로 반영, 증권거래세 없음",
+    "custom_satellite": "backtest_kr_strategies.py 산출 시 이미 CostModel(kospi) net(거래세 0.20% 포함) — 이중 반영 안 함",
+    "core_kospi200_etf_fee_pct_approx": 0.15,
+    "core_note": "B1(코스피200 지수) 자체엔 KODEX200 보수 미반영(기존 코드 관행과 동일 — benchmarks_kr.py B1과 동일 계열)",
+    "dividend_fairness": "판정용 비교는 전부 가격 기반(배당 미반영)으로 통일 — A의 커스텀 새틀라이트(pykrx 가격)와 B의 price 모드 모두 고배당 바스켓이라 누락 배당 규모가 비슷해 상쇄. rows_tr_approx는 절대수준 참고 전용"
+  },
+  "corr_classification_threshold": 0.95,
+  "n_trials_registered_this_market": 21,
+  "data_gaps": [
+    "kodex_highdiv_279530"
+  ]
+}

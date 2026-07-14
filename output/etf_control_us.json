@@ -1,0 +1,809 @@
+{
+  "as_of": "2026-07-13",
+  "market": "us",
+  "frame_C_pure_index": {
+    "full": {
+      "cagr_pct": 9.69,
+      "sharpe": 0.77,
+      "mdd_pct": -25.4
+    },
+    "2018-2021": {
+      "cagr_pct": 12.61,
+      "sharpe": 0.91,
+      "mdd_pct": -19.0
+    },
+    "2022-2023": {
+      "cagr_pct": -5.66,
+      "sharpe": -0.5,
+      "mdd_pct": -25.4
+    },
+    "2024+": {
+      "cagr_pct": 15.52,
+      "sharpe": 1.26,
+      "mdd_pct": -10.2
+    }
+  },
+  "frame_B_etf_satellite": {
+    "syld": {
+      "rows": [
+        {
+          "core_weight": 1.0,
+          "cagr_pct": 9.69,
+          "sharpe": 0.77,
+          "mdd_pct": -25.4
+        },
+        {
+          "core_weight": 0.65,
+          "cagr_pct": 10.19,
+          "sharpe": 0.74,
+          "mdd_pct": -25.8
+        },
+        {
+          "core_weight": 0.35,
+          "cagr_pct": 10.29,
+          "sharpe": 0.65,
+          "mdd_pct": -35.0
+        },
+        {
+          "core_weight": 0.0,
+          "cagr_pct": 10.03,
+          "sharpe": 0.54,
+          "mdd_pct": -45.4
+        }
+      ],
+      "subperiods": {
+        "1.0": {
+          "full": {
+            "cagr_pct": 9.69,
+            "sharpe": 0.77,
+            "mdd_pct": -25.4
+          },
+          "2018-2021": {
+            "cagr_pct": 12.61,
+            "sharpe": 0.91,
+            "mdd_pct": -19.0
+          },
+          "2022-2023": {
+            "cagr_pct": -5.66,
+            "sharpe": -0.5,
+            "mdd_pct": -25.4
+          },
+          "2024+": {
+            "cagr_pct": 15.52,
+            "sharpe": 1.26,
+            "mdd_pct": -10.2
+          }
+        },
+        "0.65": {
+          "full": {
+            "cagr_pct": 10.19,
+            "sharpe": 0.74,
+            "mdd_pct": -25.8
+          },
+          "2018-2021": {
+            "cagr_pct": 12.91,
+            "sharpe": 0.85,
+            "mdd_pct": -25.8
+          },
+          "2022-2023": {
+            "cagr_pct": -2.07,
+            "sharpe": -0.1,
+            "mdd_pct": -20.1
+          },
+          "2024+": {
+            "cagr_pct": 13.42,
+            "sharpe": 1.1,
+            "mdd_pct": -14.0
+          }
+        },
+        "0.35": {
+          "full": {
+            "cagr_pct": 10.29,
+            "sharpe": 0.65,
+            "mdd_pct": -35.0
+          },
+          "2018-2021": {
+            "cagr_pct": 12.81,
+            "sharpe": 0.73,
+            "mdd_pct": -35.0
+          },
+          "2022-2023": {
+            "cagr_pct": 0.73,
+            "sharpe": 0.13,
+            "mdd_pct": -19.8
+          },
+          "2024+": {
+            "cagr_pct": 11.47,
+            "sharpe": 0.84,
+            "mdd_pct": -19.9
+          }
+        },
+        "0.0": {
+          "full": {
+            "cagr_pct": 10.03,
+            "sharpe": 0.54,
+            "mdd_pct": -45.4
+          },
+          "2018-2021": {
+            "cagr_pct": 12.27,
+            "sharpe": 0.6,
+            "mdd_pct": -45.4
+          },
+          "2022-2023": {
+            "cagr_pct": 3.65,
+            "sharpe": 0.27,
+            "mdd_pct": -20.3
+          },
+          "2024+": {
+            "cagr_pct": 9.03,
+            "sharpe": 0.57,
+            "mdd_pct": -26.8
+          }
+        }
+      }
+    },
+    "pkw": {
+      "rows": [
+        {
+          "core_weight": 1.0,
+          "cagr_pct": 9.69,
+          "sharpe": 0.77,
+          "mdd_pct": -25.4
+        },
+        {
+          "core_weight": 0.65,
+          "cagr_pct": 10.33,
+          "sharpe": 0.78,
+          "mdd_pct": -24.1
+        },
+        {
+          "core_weight": 0.35,
+          "cagr_pct": 10.68,
+          "sharpe": 0.72,
+          "mdd_pct": -31.9
+        },
+        {
+          "core_weight": 0.0,
+          "cagr_pct": 10.86,
+          "sharpe": 0.63,
+          "mdd_pct": -41.0
+        }
+      ],
+      "subperiods": {
+        "1.0": {
+          "full": {
+            "cagr_pct": 9.69,
+            "sharpe": 0.77,
+            "mdd_pct": -25.4
+          },
+          "2018-2021": {
+            "cagr_pct": 12.61,
+            "sharpe": 0.91,
+            "mdd_pct": -19.0
+          },
+          "2022-2023": {
+            "cagr_pct": -5.66,
+            "sharpe": -0.5,
+            "mdd_pct": -25.4
+          },
+          "2024+": {
+            "cagr_pct": 15.52,
+            "sharpe": 1.26,
+            "mdd_pct": -10.2
+          }
+        },
+        "0.65": {
+          "full": {
+            "cagr_pct": 10.33,
+            "sharpe": 0.78,
+            "mdd_pct": -24.1
+          },
+          "2018-2021": {
+            "cagr_pct": 12.46,
+            "sharpe": 0.85,
+            "mdd_pct": -24.1
+          },
+          "2022-2023": {
+            "cagr_pct": -2.74,
+            "sharpe": -0.17,
+            "mdd_pct": -21.4
+          },
+          "2024+": {
+            "cagr_pct": 15.96,
+            "sharpe": 1.32,
+            "mdd_pct": -12.1
+          }
+        },
+        "0.35": {
+          "full": {
+            "cagr_pct": 10.68,
+            "sharpe": 0.72,
+            "mdd_pct": -31.9
+          },
+          "2018-2021": {
+            "cagr_pct": 12.16,
+            "sharpe": 0.75,
+            "mdd_pct": -31.9
+          },
+          "2022-2023": {
+            "cagr_pct": -0.46,
+            "sharpe": 0.05,
+            "mdd_pct": -22.0
+          },
+          "2024+": {
+            "cagr_pct": 16.15,
+            "sharpe": 1.22,
+            "mdd_pct": -16.2
+          }
+        },
+        "0.0": {
+          "full": {
+            "cagr_pct": 10.86,
+            "sharpe": 0.63,
+            "mdd_pct": -41.0
+          },
+          "2018-2021": {
+            "cagr_pct": 11.62,
+            "sharpe": 0.63,
+            "mdd_pct": -41.0
+          },
+          "2022-2023": {
+            "cagr_pct": 1.92,
+            "sharpe": 0.2,
+            "mdd_pct": -23.5
+          },
+          "2024+": {
+            "cagr_pct": 16.17,
+            "sharpe": 1.04,
+            "mdd_pct": -21.1
+          }
+        }
+      }
+    },
+    "qual": {
+      "rows": [
+        {
+          "core_weight": 1.0,
+          "cagr_pct": 9.69,
+          "sharpe": 0.77,
+          "mdd_pct": -25.4
+        },
+        {
+          "core_weight": 0.65,
+          "cagr_pct": 11.05,
+          "sharpe": 0.84,
+          "mdd_pct": -22.8
+        },
+        {
+          "core_weight": 0.35,
+          "cagr_pct": 12.11,
+          "sharpe": 0.83,
+          "mdd_pct": -27.6
+        },
+        {
+          "core_weight": 0.0,
+          "cagr_pct": 13.22,
+          "sharpe": 0.78,
+          "mdd_pct": -34.1
+        }
+      ],
+      "subperiods": {
+        "1.0": {
+          "full": {
+            "cagr_pct": 9.69,
+            "sharpe": 0.77,
+            "mdd_pct": -25.4
+          },
+          "2018-2021": {
+            "cagr_pct": 12.61,
+            "sharpe": 0.91,
+            "mdd_pct": -19.0
+          },
+          "2022-2023": {
+            "cagr_pct": -5.66,
+            "sharpe": -0.5,
+            "mdd_pct": -25.4
+          },
+          "2024+": {
+            "cagr_pct": 15.52,
+            "sharpe": 1.26,
+            "mdd_pct": -10.2
+          }
+        },
+        "0.65": {
+          "full": {
+            "cagr_pct": 11.05,
+            "sharpe": 0.84,
+            "mdd_pct": -22.8
+          },
+          "2018-2021": {
+            "cagr_pct": 13.54,
+            "sharpe": 0.95,
+            "mdd_pct": -21.8
+          },
+          "2022-2023": {
+            "cagr_pct": -2.69,
+            "sharpe": -0.16,
+            "mdd_pct": -22.7
+          },
+          "2024+": {
+            "cagr_pct": 16.61,
+            "sharpe": 1.32,
+            "mdd_pct": -12.0
+          }
+        },
+        "0.35": {
+          "full": {
+            "cagr_pct": 12.11,
+            "sharpe": 0.83,
+            "mdd_pct": -27.6
+          },
+          "2018-2021": {
+            "cagr_pct": 14.29,
+            "sharpe": 0.93,
+            "mdd_pct": -27.6
+          },
+          "2022-2023": {
+            "cagr_pct": -0.39,
+            "sharpe": 0.05,
+            "mdd_pct": -24.9
+          },
+          "2024+": {
+            "cagr_pct": 17.47,
+            "sharpe": 1.29,
+            "mdd_pct": -14.7
+          }
+        },
+        "0.0": {
+          "full": {
+            "cagr_pct": 13.22,
+            "sharpe": 0.78,
+            "mdd_pct": -34.1
+          },
+          "2018-2021": {
+            "cagr_pct": 15.09,
+            "sharpe": 0.87,
+            "mdd_pct": -34.1
+          },
+          "2022-2023": {
+            "cagr_pct": 2.0,
+            "sharpe": 0.2,
+            "mdd_pct": -27.8
+          },
+          "2024+": {
+            "cagr_pct": 18.38,
+            "sharpe": 1.2,
+            "mdd_pct": -18.0
+          }
+        }
+      }
+    },
+    "cowz": {
+      "rows": [
+        {
+          "core_weight": 1.0,
+          "cagr_pct": 9.69,
+          "sharpe": 0.77,
+          "mdd_pct": -25.4
+        },
+        {
+          "core_weight": 0.65,
+          "cagr_pct": 11.12,
+          "sharpe": 0.86,
+          "mdd_pct": -22.9
+        },
+        {
+          "core_weight": 0.35,
+          "cagr_pct": 11.75,
+          "sharpe": 0.79,
+          "mdd_pct": -30.0
+        },
+        {
+          "core_weight": 0.0,
+          "cagr_pct": 12.2,
+          "sharpe": 0.68,
+          "mdd_pct": -38.7
+        }
+      ],
+      "subperiods": {
+        "1.0": {
+          "full": {
+            "cagr_pct": 9.69,
+            "sharpe": 0.77,
+            "mdd_pct": -25.4
+          },
+          "2018-2021": {
+            "cagr_pct": 12.61,
+            "sharpe": 0.91,
+            "mdd_pct": -19.0
+          },
+          "2022-2023": {
+            "cagr_pct": -5.66,
+            "sharpe": -0.5,
+            "mdd_pct": -25.4
+          },
+          "2024+": {
+            "cagr_pct": 15.52,
+            "sharpe": 1.26,
+            "mdd_pct": -10.2
+          }
+        },
+        "0.65": {
+          "full": {
+            "cagr_pct": 11.12,
+            "sharpe": 0.86,
+            "mdd_pct": -22.9
+          },
+          "2018-2021": {
+            "cagr_pct": 14.91,
+            "sharpe": 1.02,
+            "mdd_pct": -22.9
+          },
+          "2022-2023": {
+            "cagr_pct": -1.07,
+            "sharpe": -0.03,
+            "mdd_pct": -18.0
+          },
+          "2024+": {
+            "cagr_pct": 13.79,
+            "sharpe": 1.19,
+            "mdd_pct": -12.7
+          }
+        },
+        "0.35": {
+          "full": {
+            "cagr_pct": 11.75,
+            "sharpe": 0.79,
+            "mdd_pct": -30.0
+          },
+          "2018-2021": {
+            "cagr_pct": 15.24,
+            "sharpe": 0.91,
+            "mdd_pct": -30.0
+          },
+          "2022-2023": {
+            "cagr_pct": 2.62,
+            "sharpe": 0.24,
+            "mdd_pct": -16.8
+          },
+          "2024+": {
+            "cagr_pct": 12.19,
+            "sharpe": 0.99,
+            "mdd_pct": -16.8
+          }
+        },
+        "0.0": {
+          "full": {
+            "cagr_pct": 12.2,
+            "sharpe": 0.68,
+            "mdd_pct": -38.7
+          },
+          "2018-2021": {
+            "cagr_pct": 15.35,
+            "sharpe": 0.77,
+            "mdd_pct": -38.7
+          },
+          "2022-2023": {
+            "cagr_pct": 6.57,
+            "sharpe": 0.41,
+            "mdd_pct": -21.0
+          },
+          "2024+": {
+            "cagr_pct": 10.21,
+            "sharpe": 0.72,
+            "mdd_pct": -22.1
+          }
+        }
+      }
+    },
+    "schd": {
+      "rows": [
+        {
+          "core_weight": 1.0,
+          "cagr_pct": 9.69,
+          "sharpe": 0.77,
+          "mdd_pct": -25.4
+        },
+        {
+          "core_weight": 0.65,
+          "cagr_pct": 10.76,
+          "sharpe": 0.86,
+          "mdd_pct": -21.3
+        },
+        {
+          "core_weight": 0.35,
+          "cagr_pct": 11.55,
+          "sharpe": 0.85,
+          "mdd_pct": -26.9
+        },
+        {
+          "core_weight": 0.0,
+          "cagr_pct": 12.33,
+          "sharpe": 0.78,
+          "mdd_pct": -33.4
+        }
+      ],
+      "subperiods": {
+        "1.0": {
+          "full": {
+            "cagr_pct": 9.69,
+            "sharpe": 0.77,
+            "mdd_pct": -25.4
+          },
+          "2018-2021": {
+            "cagr_pct": 12.61,
+            "sharpe": 0.91,
+            "mdd_pct": -19.0
+          },
+          "2022-2023": {
+            "cagr_pct": -5.66,
+            "sharpe": -0.5,
+            "mdd_pct": -25.4
+          },
+          "2024+": {
+            "cagr_pct": 15.52,
+            "sharpe": 1.26,
+            "mdd_pct": -10.2
+          }
+        },
+        "0.65": {
+          "full": {
+            "cagr_pct": 10.76,
+            "sharpe": 0.86,
+            "mdd_pct": -21.3
+          },
+          "2018-2021": {
+            "cagr_pct": 13.65,
+            "sharpe": 0.97,
+            "mdd_pct": -21.3
+          },
+          "2022-2023": {
+            "cagr_pct": -3.25,
+            "sharpe": -0.25,
+            "mdd_pct": -20.0
+          },
+          "2024+": {
+            "cagr_pct": 15.23,
+            "sharpe": 1.4,
+            "mdd_pct": -10.1
+          }
+        },
+        "0.35": {
+          "full": {
+            "cagr_pct": 11.55,
+            "sharpe": 0.85,
+            "mdd_pct": -26.9
+          },
+          "2018-2021": {
+            "cagr_pct": 14.49,
+            "sharpe": 0.96,
+            "mdd_pct": -26.9
+          },
+          "2022-2023": {
+            "cagr_pct": -1.39,
+            "sharpe": -0.05,
+            "mdd_pct": -17.7
+          },
+          "2024+": {
+            "cagr_pct": 14.81,
+            "sharpe": 1.32,
+            "mdd_pct": -12.8
+          }
+        },
+        "0.0": {
+          "full": {
+            "cagr_pct": 12.33,
+            "sharpe": 0.78,
+            "mdd_pct": -33.4
+          },
+          "2018-2021": {
+            "cagr_pct": 15.38,
+            "sharpe": 0.89,
+            "mdd_pct": -33.4
+          },
+          "2022-2023": {
+            "cagr_pct": 0.52,
+            "sharpe": 0.11,
+            "mdd_pct": -16.9
+          },
+          "2024+": {
+            "cagr_pct": 14.12,
+            "sharpe": 1.06,
+            "mdd_pct": -16.1
+          }
+        }
+      }
+    },
+    "qual50_syld50": {
+      "rows": [
+        {
+          "core_weight": 1.0,
+          "cagr_pct": 9.69,
+          "sharpe": 0.77,
+          "mdd_pct": -25.4
+        },
+        {
+          "core_weight": 0.65,
+          "cagr_pct": 10.64,
+          "sharpe": 0.8,
+          "mdd_pct": -23.8
+        },
+        {
+          "core_weight": 0.35,
+          "cagr_pct": 11.3,
+          "sharpe": 0.76,
+          "mdd_pct": -31.3
+        },
+        {
+          "core_weight": 0.0,
+          "cagr_pct": 11.87,
+          "sharpe": 0.68,
+          "mdd_pct": -39.7
+        }
+      ],
+      "subperiods": {
+        "1.0": {
+          "full": {
+            "cagr_pct": 9.69,
+            "sharpe": 0.77,
+            "mdd_pct": -25.4
+          },
+          "2018-2021": {
+            "cagr_pct": 12.61,
+            "sharpe": 0.91,
+            "mdd_pct": -19.0
+          },
+          "2022-2023": {
+            "cagr_pct": -5.66,
+            "sharpe": -0.5,
+            "mdd_pct": -25.4
+          },
+          "2024+": {
+            "cagr_pct": 15.52,
+            "sharpe": 1.26,
+            "mdd_pct": -10.2
+          }
+        },
+        "0.65": {
+          "full": {
+            "cagr_pct": 10.64,
+            "sharpe": 0.8,
+            "mdd_pct": -23.8
+          },
+          "2018-2021": {
+            "cagr_pct": 13.24,
+            "sharpe": 0.91,
+            "mdd_pct": -23.8
+          },
+          "2022-2023": {
+            "cagr_pct": -2.35,
+            "sharpe": -0.13,
+            "mdd_pct": -21.3
+          },
+          "2024+": {
+            "cagr_pct": 15.05,
+            "sharpe": 1.23,
+            "mdd_pct": -12.7
+          }
+        },
+        "0.35": {
+          "full": {
+            "cagr_pct": 11.3,
+            "sharpe": 0.76,
+            "mdd_pct": -31.3
+          },
+          "2018-2021": {
+            "cagr_pct": 13.64,
+            "sharpe": 0.84,
+            "mdd_pct": -31.3
+          },
+          "2022-2023": {
+            "cagr_pct": 0.27,
+            "sharpe": 0.1,
+            "mdd_pct": -22.1
+          },
+          "2024+": {
+            "cagr_pct": 14.54,
+            "sharpe": 1.11,
+            "mdd_pct": -16.9
+          }
+        },
+        "0.0": {
+          "full": {
+            "cagr_pct": 11.87,
+            "sharpe": 0.68,
+            "mdd_pct": -39.7
+          },
+          "2018-2021": {
+            "cagr_pct": 13.94,
+            "sharpe": 0.75,
+            "mdd_pct": -39.7
+          },
+          "2022-2023": {
+            "cagr_pct": 3.05,
+            "sharpe": 0.25,
+            "mdd_pct": -23.6
+          },
+          "2024+": {
+            "cagr_pct": 13.84,
+            "sharpe": 0.93,
+            "mdd_pct": -21.9
+          }
+        }
+      }
+    }
+  },
+  "candidates": [
+    {
+      "id": "syld",
+      "name": "Cambria Shareholder Yield",
+      "tickers": [
+        "SYLD"
+      ],
+      "fee_pct_approx": 0.59,
+      "status": "ok",
+      "corr_daily_vs_spy": 0.81
+    },
+    {
+      "id": "pkw",
+      "name": "Invesco Buyback Achievers",
+      "tickers": [
+        "PKW"
+      ],
+      "fee_pct_approx": 0.62,
+      "status": "ok",
+      "corr_daily_vs_spy": 0.909
+    },
+    {
+      "id": "qual",
+      "name": "iShares MSCI USA Quality Factor",
+      "tickers": [
+        "QUAL"
+      ],
+      "fee_pct_approx": 0.15,
+      "status": "ok",
+      "corr_daily_vs_spy": 0.983
+    },
+    {
+      "id": "cowz",
+      "name": "Pacer US Cash Cows 100",
+      "tickers": [
+        "COWZ"
+      ],
+      "fee_pct_approx": 0.49,
+      "status": "ok",
+      "corr_daily_vs_spy": 0.851
+    },
+    {
+      "id": "schd",
+      "name": "Schwab US Dividend Equity",
+      "tickers": [
+        "SCHD"
+      ],
+      "fee_pct_approx": 0.06,
+      "status": "ok",
+      "corr_daily_vs_spy": 0.871
+    },
+    {
+      "id": "qual50_syld50",
+      "name": "QUAL 50% + SYLD 50% 합성",
+      "tickers": [
+        "QUAL",
+        "SYLD"
+      ],
+      "fee_pct_approx": 0.37,
+      "status": "ok",
+      "corr_daily_vs_spy": 0.933
+    }
+  ],
+  "cost_note": {
+    "etf": "총보수(연,근사)를 연환산 drag로 반영",
+    "core_spy_fee_pct_approx": 0.09
+  },
+  "unreplicable_factors": [
+    "rd_mktcap — R&D/시총 대응 ETF 없음, 복제 불가로 결과 해석 시 명시"
+  ],
+  "interpretation_rule": "커스텀 백테스트(topn10, +11~14%p 초과) 대비 ETF 혼합이 크게 못 미치는 것이 정상 — 그 격차 자체를 백테스트 인플레이션 탐지 지표로 기록",
+  "n_trials_registered_this_market": 24,
+  "data_gaps": []
+}
