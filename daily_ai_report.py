@@ -48,6 +48,9 @@ import ai_report as AR
 MAX_CANDIDATES = int(os.environ.get("REPORT_MAX_CANDIDATES", "60"))
 _MA_LABEL = {20: "20일선", 50: "50일선", 200: "200일선"} if _KFONT else {20: "MA20", 50: "MA50", 200: "MA200"}
 _CLOSE_LABEL = "종가" if _KFONT else "Close"
+_PORT_LABEL = "보유 포트폴리오" if _KFONT else "My holdings"
+_BENCH_SUFFIX = "(동일시점·동일금액)" if _KFONT else "(same timing/amount)"
+_CUM_RET_LABEL = "누적수익률(%)" if _KFONT else "Cumulative return (%)"
 
 
 def _ma(arr, w):
@@ -96,12 +99,12 @@ def _holdings_compare_chart_png(series: dict, index_name: str):
     bench = [v if v is not None else np.nan for v in series["bench"]]
     x = np.arange(len(dates))
     fig, ax = plt.subplots(figsize=(7.6, 3.0), dpi=150)
-    ax.plot(x, port, lw=1.8, color="#2563eb", label="보유 포트폴리오")
-    ax.plot(x, bench, lw=1.4, color="#9ca3af", label=f"{index_name} (동일시점·동일금액)")
+    ax.plot(x, port, lw=1.8, color="#2563eb", label=_PORT_LABEL)
+    ax.plot(x, bench, lw=1.4, color="#9ca3af", label=f"{index_name} {_BENCH_SUFFIX}")
     ax.axhline(0, color="#111827", lw=0.8)
     ticks = np.linspace(0, len(dates) - 1, min(6, len(dates))).astype(int)
     ax.set_xticks(ticks); ax.set_xticklabels([dates[i][5:] for i in ticks], fontsize=8)
-    ax.set_ylabel("누적수익률(%)", fontsize=9)
+    ax.set_ylabel(_CUM_RET_LABEL, fontsize=9)
     ax.legend(fontsize=8, frameon=False, loc="upper left")
     ax.grid(True, axis="y", alpha=0.15, lw=0.5)
     for sp in ax.spines.values():
