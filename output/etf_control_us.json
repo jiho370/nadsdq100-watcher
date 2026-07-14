@@ -1,0 +1,6 @@
+{
+  "as_of": "2026-07-14",
+  "market": "us",
+  "status": "blocked_network",
+  "note": "SPY 코어 시계열 확보 실패(원격 세션 네트워크 차단 가능성) — 로컬 PC에서 python backtest_etf_control.py --market us 재실행 필요."
+}

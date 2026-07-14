@@ -1,0 +1,6 @@
+{
+  "kr": null,
+  "us": null,
+  "total_trials_registered": 0,
+  "note": "PBO/DSR은 시장별 CSCV로 각각 계산(서로 다른 캘린더·유니버스 — 행렬 합산 불가). total_trials_registered는 이번 세션 전체 시행 수(다중검정 예산 등록용)."
+}

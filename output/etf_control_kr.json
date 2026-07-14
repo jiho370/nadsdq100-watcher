@@ -1,0 +1,116 @@
+{
+  "as_of": "2026-07-10",
+  "market": "kr",
+  "frame_A_current": {
+    "rows": [
+      {
+        "core_weight": 0.65,
+        "cagr_pct": 21.68,
+        "sharpe": 1.22,
+        "mdd_pct": -17.1
+      }
+    ],
+    "subperiods": {
+      "0.65": {
+        "full": {
+          "cagr_pct": 21.68,
+          "sharpe": 1.22,
+          "mdd_pct": -17.1
+        },
+        "2018-2021": {
+          "cagr_pct": 17.17,
+          "sharpe": 1.25,
+          "mdd_pct": -12.0
+        },
+        "2022-2023": {
+          "cagr_pct": -0.23,
+          "sharpe": 0.01,
+          "mdd_pct": -9.9
+        },
+        "2024+": {
+          "cagr_pct": 47.73,
+          "sharpe": 1.7,
+          "mdd_pct": -17.1
+        }
+      }
+    },
+    "note": "커스텀 새틀라이트(valuediv_flow) NAV는 이미 CostModel(kospi) net — 재비용화 안 함"
+  },
+  "frame_C_pure_index": {
+    "full": {
+      "cagr_pct": 18.61,
+      "sharpe": 0.91,
+      "mdd_pct": -21.6
+    },
+    "2018-2021": {
+      "cagr_pct": 5.54,
+      "sharpe": 0.44,
+      "mdd_pct": -21.5
+    },
+    "2022-2023": {
+      "cagr_pct": 0.96,
+      "sharpe": 0.15,
+      "mdd_pct": -10.3
+    },
+    "2024+": {
+      "cagr_pct": 58.29,
+      "sharpe": 1.56,
+      "mdd_pct": -21.6
+    }
+  },
+  "frame_B_etf_satellite": {},
+  "frame_D_core_swap": null,
+  "candidates": [
+    {
+      "id": "plus_highdiv_161510",
+      "name": "PLUS 고배당주",
+      "ticker": "161510",
+      "fee_pct_approx": 0.3,
+      "status": "blocked_need_tr",
+      "tr_used": false,
+      "source_index": null
+    },
+    {
+      "id": "kodex_divgrowth_211900",
+      "name": "KODEX 배당성장",
+      "ticker": "211900",
+      "fee_pct_approx": 0.25,
+      "status": "blocked_need_tr",
+      "tr_used": false,
+      "source_index": null
+    },
+    {
+      "id": "tiger_divgrowth_211560",
+      "name": "TIGER 배당성장",
+      "ticker": "211560",
+      "fee_pct_approx": 0.29,
+      "status": "blocked_need_tr",
+      "tr_used": false,
+      "source_index": null
+    },
+    {
+      "id": "kodex_highdiv_279530",
+      "name": "KODEX 고배당",
+      "ticker": "279530",
+      "fee_pct_approx": 0.3,
+      "status": "blocked_need_tr",
+      "tr_used": false,
+      "source_index": null
+    }
+  ],
+  "cost_note": {
+    "etf": "총보수(연,근사)+스프레드를 연환산 산술 drag로 반영, 증권거래세 없음",
+    "custom_satellite": "backtest_kr_strategies.py 산출 시 이미 CostModel(kospi) net(거래세 0.20% 포함) — 이중 반영 안 함",
+    "core_kospi200_etf_fee_pct_approx": 0.15,
+    "core_note": "B1(코스피200 지수) 자체엔 KODEX200 보수 미반영(기존 코드 관행과 동일 — benchmarks_kr.py B1과 동일 계열)"
+  },
+  "corr_classification_threshold": 0.95,
+  "n_trials_registered_this_market": 0,
+  "data_gaps": [
+    "plus_highdiv_161510",
+    "kodex_divgrowth_211900",
+    "tiger_divgrowth_211560",
+    "kodex_highdiv_279530",
+    "valueup_index"
+  ]
+}
