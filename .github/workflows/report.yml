@@ -82,10 +82,6 @@ jobs:
           # 없으면 코스피200 섹션이 빈 채로 발송됨(에러는 아님). data.krx.co.kr 가입 후 등록.
           KRX_ID: ${{ secrets.KRX_ID }}
           KRX_PW: ${{ secrets.KRX_PW }}
-          # ── DART OpenAPI(전자공시) — 국장 메일 '자사주 취득 공시' 정보 블록용(event_study_kr
-          #   검증: 취득 공시 후 +5일 평균 초과수익 +1.5%p, t=4.5). 없으면 그 블록만 생략(에러 아님).
-          #   opendart.fss.or.kr 무료 발급 → Secrets에 DART_API_KEY 등록.
-          DART_API_KEY: ${{ secrets.DART_API_KEY }}
           # ── 전략 파라미터 (STRATEGY.md, 2026-07 재검증) — 기본 매도: 6개월 정기재평가 +
           #   200일선 -3% 백업. 트레일링은 순수익을 절반으로 깎는 것으로 확인되어 폐기,
           #   env 자체를 지정하지 않아 holdings.py 기본값(SELL_TRAIL=0, 비활성)을 따른다.

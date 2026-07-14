@@ -793,7 +793,7 @@ def holdings_table_html(summary: list, krw: bool = False, chart_cid: str | None 
 
 def render_report_html(report, as_of="", metrics_by_sym=None, market_html="", signals_html="",
                        kr_sells=None, banner="", title=None, show_spy=True, is_kr=False,
-                       market_label="전일", holdings_html="", kr_events_html=""):
+                       market_label="전일", holdings_html=""):
     """일일 리포트 HTML — 메일 2통 분리 지원.
     title    = 헤더 제목(없으면 기본). KR 장전/US 마감 메일이 각자 지정.
     show_spy = SPY 큰 차트 표시 여부(KR 전용 메일은 SPY 데이터가 없어 False).
@@ -881,7 +881,6 @@ def render_report_html(report, as_of="", metrics_by_sym=None, market_html="", si
         f'{_excluded_html(report.get("ai_excluded"), is_kr=is_kr)}'
         f'{sell_html}'
         f'{kr_sec}'
-        f'{kr_events_html}'
         f'{kr_sell_html}'
         f'{holdings_html}'
         f'<div style="font-size:11px;color:#9ca3af;margin-top:14px;line-height:1.5">'
