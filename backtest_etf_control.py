@@ -211,7 +211,10 @@ def fetch_us_series(tickers: list[str], years: float, cache=None) -> dict:
             df = yf.download(t, period=f"{int(years)+1}y", auto_adjust=False, progress=False)
             if df is None or df.empty or "Adj Close" not in df:
                 continue
-            navs[t] = df["Adj Close"].dropna()
+            adj = df["Adj Close"]
+            if isinstance(adj, pd.DataFrame):  # newer yfinance returns MultiIndex cols even for 1 ticker
+                adj = adj.iloc[:, 0]
+            navs[t] = adj.dropna()
         if not navs:
             raise RuntimeError("데이터 없음")
         rets = pd.DataFrame({t: s.pct_change() for t, s in navs.items()}).dropna(how="all")
@@ -540,7 +543,8 @@ def self_test():
 
     # (5) 밸류업 CSV 로더: 없는 경로는 None, 있으면 정렬된 Series
     assert load_valueup_csv("/nonexistent/path.csv") is None
-    tmp_path = "/tmp/_etf_control_selftest_valueup.csv"
+    import tempfile
+    tmp_path = os.path.join(tempfile.gettempdir(), "_etf_control_selftest_valueup.csv")
     pd.DataFrame({"date": ["2020-01-02", "2020-01-03"], "value": [1000.0, 1005.0]}).to_csv(tmp_path, index=False)
     vu = load_valueup_csv(tmp_path)
     assert vu is not None and len(vu) == 2 and vu.iloc[1] == 1005.0
