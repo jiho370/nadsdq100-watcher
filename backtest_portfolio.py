@@ -69,7 +69,7 @@ def simulate(panel: pd.DataFrame, ma200: pd.DataFrame, decisions: list, topn: in
              sector_of=None, sector_cap=None, trade_log=None,
              ma_buffer=MA_BUFFER, ma_stop_mode="unconditional",
              entry_stop_pct=None, year_end_liquidate=False,
-             year_end_rebuy="wait", full_rebalance=False) -> pd.Series | None:
+             year_end_rebuy="wait", full_rebalance=False, snapshot_log=None) -> pd.Series | None:
     """decisions: [(p, ranked_syms)] — p=panel 행 인덱스(오름차순), ranked_syms=순위순 후보풀.
     반환: 일별 NAV Series(시작 1.0) 또는 None(결정 시점 없음).
     체결은 당일 종가, 비용은 cost.buy/cost.sell을 편도로 각각 적용.
@@ -99,7 +99,9 @@ def simulate(panel: pd.DataFrame, ma200: pd.DataFrame, decisions: list, topn: in
     끈적한 보유가 아니라 "매 결정일마다 전량 정리 후 그날 팩터 랭킹대로 재구성"이었음)면
     reeval_days·풀 소속 여부와 무관하게 매 결정일에 전원 매도 후 topn을 다시 채운다 —
     이 모드에서는 "재평가 주기"의 의미가 reeval_days가 아니라 decisions 자체의 간격
-    (build_kr_snaps의 rebal_days)이 된다."""
+    (build_kr_snaps의 rebal_days)이 된다. snapshot_log가 주어지면 결정일마다(빈 슬롯
+    충원까지 끝난 후) 그 시점 보유 종목 집합을 append — 편입 종목 안정성(overlap ratio)
+    진단용(2026-07-16, 지호 님 질문)."""
     if not decisions:
         return None
     dec_by_p = {p: syms for p, syms in decisions}
@@ -245,6 +247,9 @@ def simulate(panel: pd.DataFrame, ma200: pd.DataFrame, decisions: list, topn: in
                     if trade_log is not None:
                         trade_log.append({"date": today_s, "sym": sym, "action": "buy",
                                           "note": "sector_cap_relaxed"})
+
+            if snapshot_log is not None:
+                snapshot_log.append({"date": today_s, "symbols": sorted(pos.keys())})
 
         nav_out[i] = cash + sum(v["sh"] * prices.get(s, np.nan) for s, v in pos.items()
                                 if np.isfinite(prices.get(s, np.nan)))
@@ -630,6 +635,16 @@ def self_test():
         f"full_rebalance는 2번째·3번째 결정일마다 보유 2종목을 전부 팔아야 함(기대 4건): {full_sells}")
     _log(f"[self-test] 통과: full_rebalance 배선 정상(끈적한 모드 매도 0건 vs "
          f"full_rebalance 매도 {len(full_sells)}건)")
+
+    # 2026-07-16 snapshot_log 배선 확인 — 끈적한 모드(풀에 계속 있으면 안 팔림)라
+    # 3개 결정일의 스냅샷이 전부 동일 종목집합(A,B)이어야 함.
+    snap = []
+    simulate(panelF, ma200F, decF, 2, costF, reeval_days=99999, ma200_backup=False,
+            full_rebalance=False, snapshot_log=snap)
+    assert len(snap) == 3, f"결정일 3번 전부 스냅샷 남아야 함: {snap}"
+    assert all(s["symbols"] == ["A", "B"] for s in snap), (
+        f"끈적한 모드는 매 결정일 스냅샷이 동일해야 함: {snap}")
+    _log(f"[self-test] 통과: snapshot_log 배선 정상({len(snap)}개 스냅샷, 전부 동일 구성)")
 
 
 def main():

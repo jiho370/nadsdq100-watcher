@@ -1,0 +1,179 @@
+{
+  "as_of": "2026-07-15",
+  "core_weight": 0.65,
+  "period": "13년(2013-07~2026-07)",
+  "judgment": "Fable 5 자문 나머지 3개 진단(overlap ratio·블록부트스트랩 샤프CI·하락장지표) — 13년 기준(2026-07-16, 지호 님 지시)",
+  "rows": [
+    {
+      "topn": 3,
+      "cagr_pct": 11.81,
+      "sharpe": 0.81,
+      "mdd_pct": -26.7,
+      "overlap_ratio": 0.767,
+      "sharpe_ci_90": {
+        "lo": -0.675,
+        "median": -0.185,
+        "hi": 0.282,
+        "n_boot": 2000,
+        "block": 6,
+        "ci": 0.9
+      },
+      "calmar": 0.44,
+      "cvar95_monthly_pct": -6.75,
+      "down_capture": 0.35,
+      "n_down_months": 58
+    },
+    {
+      "topn": 4,
+      "cagr_pct": 12.96,
+      "sharpe": 0.88,
+      "mdd_pct": -26.6,
+      "overlap_ratio": 0.779,
+      "sharpe_ci_90": {
+        "lo": -0.591,
+        "median": -0.1,
+        "hi": 0.37,
+        "n_boot": 2000,
+        "block": 6,
+        "ci": 0.9
+      },
+      "calmar": 0.49,
+      "cvar95_monthly_pct": -6.72,
+      "down_capture": 0.33,
+      "n_down_months": 58
+    },
+    {
+      "topn": 5,
+      "cagr_pct": 13.39,
+      "sharpe": 0.91,
+      "mdd_pct": -23.5,
+      "overlap_ratio": 0.8,
+      "sharpe_ci_90": {
+        "lo": -0.548,
+        "median": -0.058,
+        "hi": 0.4,
+        "n_boot": 2000,
+        "block": 6,
+        "ci": 0.9
+      },
+      "calmar": 0.57,
+      "cvar95_monthly_pct": -6.84,
+      "down_capture": 0.33,
+      "n_down_months": 58
+    },
+    {
+      "topn": 6,
+      "cagr_pct": 13.32,
+      "sharpe": 0.9,
+      "mdd_pct": -24.8,
+      "overlap_ratio": 0.779,
+      "sharpe_ci_90": {
+        "lo": -0.545,
+        "median": -0.07,
+        "hi": 0.383,
+        "n_boot": 2000,
+        "block": 6,
+        "ci": 0.9
+      },
+      "calmar": 0.54,
+      "cvar95_monthly_pct": -6.88,
+      "down_capture": 0.35,
+      "n_down_months": 58
+    },
+    {
+      "topn": 7,
+      "cagr_pct": 13.01,
+      "sharpe": 0.88,
+      "mdd_pct": -24.4,
+      "overlap_ratio": 0.787,
+      "sharpe_ci_90": {
+        "lo": -0.563,
+        "median": -0.087,
+        "hi": 0.362,
+        "n_boot": 2000,
+        "block": 6,
+        "ci": 0.9
+      },
+      "calmar": 0.53,
+      "cvar95_monthly_pct": -7.02,
+      "down_capture": 0.35,
+      "n_down_months": 58
+    },
+    {
+      "topn": 8,
+      "cagr_pct": 12.91,
+      "sharpe": 0.88,
+      "mdd_pct": -24.0,
+      "overlap_ratio": 0.804,
+      "sharpe_ci_90": {
+        "lo": -0.563,
+        "median": -0.088,
+        "hi": 0.357,
+        "n_boot": 2000,
+        "block": 6,
+        "ci": 0.9
+      },
+      "calmar": 0.54,
+      "cvar95_monthly_pct": -6.9,
+      "down_capture": 0.35,
+      "n_down_months": 58
+    },
+    {
+      "topn": 9,
+      "cagr_pct": 12.46,
+      "sharpe": 0.86,
+      "mdd_pct": -25.1,
+      "overlap_ratio": 0.81,
+      "sharpe_ci_90": {
+        "lo": -0.593,
+        "median": -0.119,
+        "hi": 0.329,
+        "n_boot": 2000,
+        "block": 6,
+        "ci": 0.9
+      },
+      "calmar": 0.5,
+      "cvar95_monthly_pct": -6.98,
+      "down_capture": 0.37,
+      "n_down_months": 58
+    },
+    {
+      "topn": 10,
+      "cagr_pct": 12.72,
+      "sharpe": 0.87,
+      "mdd_pct": -25.1,
+      "overlap_ratio": 0.791,
+      "sharpe_ci_90": {
+        "lo": -0.564,
+        "median": -0.103,
+        "hi": 0.34,
+        "n_boot": 2000,
+        "block": 6,
+        "ci": 0.9
+      },
+      "calmar": 0.51,
+      "cvar95_monthly_pct": -6.98,
+      "down_capture": 0.38,
+      "n_down_months": 58
+    },
+    {
+      "topn": 15,
+      "cagr_pct": 13.03,
+      "sharpe": 0.89,
+      "mdd_pct": -24.3,
+      "overlap_ratio": 0.808,
+      "sharpe_ci_90": {
+        "lo": -0.538,
+        "median": -0.091,
+        "hi": 0.355,
+        "n_boot": 2000,
+        "block": 6,
+        "ci": 0.9
+      },
+      "calmar": 0.54,
+      "cvar95_monthly_pct": -7.03,
+      "down_capture": 0.37,
+      "n_down_months": 58
+    }
+  ]
+}

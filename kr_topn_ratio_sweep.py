@@ -336,6 +336,104 @@ def run_slippage_stress(core_weight=0.65, save=True):
     return payload
 
 
+def _overlap_ratio(snapshot_log: list) -> float | None:
+    """연속된 결정일 스냅샷 간 평균 overlap 비율(교집합/max보유수) — 낮을수록 종목 구성이
+    자주 바뀐다는 뜻(작은 topn 성과가 노이즈일 가능성 진단, Fable 5 자문 2026-07-16)."""
+    if len(snapshot_log) < 2:
+        return None
+    ratios = []
+    for a, b in zip(snapshot_log, snapshot_log[1:]):
+        sa, sb = set(a["symbols"]), set(b["symbols"])
+        n = max(len(sa), len(sb), 1)
+        ratios.append(len(sa & sb) / n)
+    return round(float(np.mean(ratios)), 3)
+
+
+def _block_bootstrap_sharpe_ci(returns: list, n_boot=2000, block=6, ci=0.90, seed=42) -> dict | None:
+    """월간(비중첩) 초과수익 시계열에서 블록 부트스트랩으로 샤프비율 신뢰구간 산출
+    (2026-07-16, Fable 5 자문) — PBO/DSR과 별개로 "이 샤프 차이가 통계적으로 진짜 다른지"
+    직접 정량화. block=6(반년) 단위로 리샘플해 월간 자기상관을 어느 정도 보존."""
+    r = np.asarray(returns, dtype=float)
+    n = len(r)
+    if n < block * 2:
+        return None
+    rng = np.random.default_rng(seed)
+    n_blocks_needed = int(np.ceil(n / block))
+    sharpes = []
+    for _ in range(n_boot):
+        starts = rng.integers(0, n - block + 1, size=n_blocks_needed)
+        sample = np.concatenate([r[s:s + block] for s in starts])[:n]
+        sd = sample.std()
+        sharpes.append(float(sample.mean() / sd * np.sqrt(12)) if sd > 1e-12 else 0.0)
+    sharpes = np.array(sharpes)
+    lo, mid, hi = np.percentile(sharpes, [(1 - ci) / 2 * 100, 50, (1 + ci) / 2 * 100])
+    return {"lo": round(float(lo), 3), "median": round(float(mid), 3), "hi": round(float(hi), 3),
+           "n_boot": n_boot, "block": block, "ci": ci}
+
+
+def _monthly_returns(nav: pd.Series) -> list:
+    return [float(nav.iloc[t + BP.MONTH] / nav.iloc[t] - 1) for t in range(0, len(nav) - BP.MONTH, BP.MONTH)]
+
+
+def _downside_metrics(mixed: pd.Series, bench: pd.Series, cagr_pct: float, mdd_pct: float) -> dict:
+    """Calmar(CAGR/|MDD|)·CVaR95(월간수익률 최악 5% 평균)·다운캡처(벤치 하락월 대비 포착
+    비율, <1이면 방어적) — 전체 샤프보다 "크게 안 잃기" 철학에 더 맞는 목적함수(Fable 5 자문)."""
+    calmar = round(cagr_pct / abs(mdd_pct), 2) if mdd_pct else None
+    rm = np.array(_monthly_returns(mixed))
+    rb = np.array(_monthly_returns(bench.reindex(mixed.index).ffill()))
+    n = min(len(rm), len(rb))
+    rm, rb = rm[:n], rb[:n]
+    cvar95 = round(float(np.mean(np.sort(rm)[:max(1, int(0.05 * n))])) * 100, 2) if n else None
+    down_mask = rb < 0
+    down_capture = None
+    if down_mask.sum() >= 3 and abs(rb[down_mask].mean()) > 1e-9:
+        down_capture = round(float(rm[down_mask].mean() / rb[down_mask].mean()), 2)
+    return {"calmar": calmar, "cvar95_monthly_pct": cvar95, "down_capture": down_capture,
+           "n_down_months": int(down_mask.sum())}
+
+
+def run_topn_robustness_13y(core_weight=0.65, save=True):
+    """Stage 3.2 — Fable 5 자문 나머지 3개 진단(편입종목 안정성·블록부트스트랩·하락장지표),
+    13년 데이터로 topn 3~10·15 전부 계산(2026-07-16, 지호 님 "시간 걸려도 다 해봐")."""
+    panel, snaps, navs_bm, ma200, cost = _load_long()
+    b1 = navs_bm["B1_kospi200"].dropna()
+    decisions = KS.build_decisions(panel, snaps, "valuediv")
+    reg = CS.regime_series(b1.reindex(panel.index).ffill())
+    core = CS.timed_nav(b1.reindex(panel.index).ffill(), reg)
+
+    rows = []
+    for tn in TOPN_LIST:
+        snap_log = []
+        sat_nav = BP.simulate(panel, ma200, decisions, tn, cost, snapshot_log=snap_log)
+        if sat_nav is None:
+            _log(f"topn={tn}: NAV 산출 실패"); continue
+        sat = sat_nav / sat_nav.iloc[0]
+        mixed = CS.mix_nav(core, sat, core_weight)
+        f = CS.stats(mixed)
+        if f is None:
+            continue
+        overlap = _overlap_ratio(snap_log)
+        d, r = BP.monthly_excess(mixed, b1.reindex(mixed.index).ffill())
+        boot = _block_bootstrap_sharpe_ci(r)
+        down = _downside_metrics(mixed, b1, f["cagr_pct"], f["mdd_pct"])
+        rows.append({"topn": tn, **f, "overlap_ratio": overlap, "sharpe_ci_90": boot, **down})
+        ci_s = f"{boot['lo']}~{boot['hi']}" if boot else "N/A"
+        _log(f"topn={tn:2d}: CAGR {f['cagr_pct']:6.2f}% 샤프 {f['sharpe']:5.2f}(90%CI {ci_s}) "
+             f"MDD {f['mdd_pct']:6.1f}% · overlap {overlap} · Calmar {down['calmar']} · "
+             f"CVaR95월 {down['cvar95_monthly_pct']}% · 다운캡처 {down['down_capture']}")
+    payload = {"as_of": panel.index[-1].date().isoformat(), "core_weight": core_weight,
+              "period": "13년(2013-07~2026-07)",
+              "judgment": "Fable 5 자문 나머지 3개 진단(overlap ratio·블록부트스트랩 샤프CI·"
+                          "하락장지표) — 13년 기준(2026-07-16, 지호 님 지시)",
+              "rows": rows}
+    if save:
+        os.makedirs("output", exist_ok=True)
+        with open("output/kr_topn_robustness_13y.json", "w", encoding="utf-8") as f:
+            json.dump(payload, f, ensure_ascii=False, indent=2)
+        _log("저장: output/kr_topn_robustness_13y.json")
+    return payload
+
+
 # ------------------------- self-test -------------------------
 def self_test():
     _log("[self-test] Stage1/2 배선 검증 — build_decisions·simulate·mix_nav 인터페이스만 확인"
@@ -356,11 +454,36 @@ def self_test():
         assert s is not None and np.isfinite(s["cagr_pct"]), (w, s)
     _log("[self-test] 통과: ratio 6종 전부 유효 NAV 산출")
 
+    # 2026-07-16 Fable 5 나머지 3개 진단 배선 확인
+    snap_same = [{"date": "1", "symbols": ["A", "B", "C"]}, {"date": "2", "symbols": ["A", "B", "C"]}]
+    snap_diff = [{"date": "1", "symbols": ["A", "B", "C"]}, {"date": "2", "symbols": ["D", "E", "F"]}]
+    assert _overlap_ratio(snap_same) == 1.0, "구성 동일하면 overlap=1.0이어야 함"
+    assert _overlap_ratio(snap_diff) == 0.0, "구성 완전히 다르면 overlap=0.0이어야 함"
+    _log("[self-test] 통과: overlap_ratio 배선 정상(동일=1.0, 완전상이=0.0)")
+
+    rng2 = np.random.default_rng(9)
+    good_returns = list(rng2.normal(0.02, 0.03, 60))     # 뚜렷한 양의 평균 — CI가 0 위여야 함
+    boot = _block_bootstrap_sharpe_ci(good_returns, n_boot=500)
+    assert boot is not None and boot["lo"] < boot["median"] < boot["hi"]
+    assert boot["lo"] > 0, f"평균이 뚜렷이 양수인 시계열은 90%CI 하한도 양수여야 함: {boot}"
+    assert _block_bootstrap_sharpe_ci([0.01] * 5) is None, "표본이 block*2보다 짧으면 None"
+    _log(f"[self-test] 통과: 블록부트스트랩 CI 배선 정상({boot['lo']}~{boot['hi']})")
+
+    idxD = pd.bdate_range("2020-01-01", periods=300)
+    navD = pd.Series(100 * np.exp(np.cumsum(rng2.normal(0.0005, 0.01, 300))), index=idxD)
+    benchD = pd.Series(100 * np.exp(np.cumsum(rng2.normal(0.0002, 0.015, 300))), index=idxD)
+    down = _downside_metrics(navD, benchD, 15.0, -20.0)
+    assert down["calmar"] == 0.75   # 15/20
+    assert down["cvar95_monthly_pct"] is not None
+    _log(f"[self-test] 통과: 하락장 지표 배선 정상(Calmar {down['calmar']}·"
+         f"CVaR95월 {down['cvar95_monthly_pct']}%·다운캡처 {down['down_capture']})")
+
 
 def main():
     ap = argparse.ArgumentParser(description="KR valuediv topN·코어비율 스윕")
     ap.add_argument("--stage", choices=["topn", "ratio", "mixed-topn", "sector-turnover",
-                                        "slippage-stress", "mixed-topn-13y"], default="topn")
+                                        "slippage-stress", "mixed-topn-13y", "robustness-13y"],
+                    default="topn")
     ap.add_argument("--topn", type=int, default=6, help="ratio 단계에서 쓸 새틀라이트 topn")
     ap.add_argument("--core-weight", type=float, default=0.65,
                     help="mixed-topn/sector-turnover/slippage-stress 단계의 고정 코어비중")
@@ -379,6 +502,8 @@ def main():
     elif args.stage == "mixed-topn-13y":
         run_mixed_topn_stage(args.core_weight, loader=_load_long,
                              out_prefix="output/kr_mixed_topn_sweep_13y")
+    elif args.stage == "robustness-13y":
+        run_topn_robustness_13y(args.core_weight)
     else:
         run_slippage_stress(args.core_weight)
 
