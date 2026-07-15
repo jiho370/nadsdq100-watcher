@@ -29,7 +29,7 @@ import backtest_portfolio as BP
 import backtest_kr_strategies as KS
 import core_satellite_kr as CS
 
-TOPN_LIST = [3, 4, 6, 8, 10, 15]
+TOPN_LIST = [3, 4, 5, 6, 7, 8, 9, 10, 15]
 RATIO_LIST = [1.0, 0.8, 0.65, 0.5, 0.35, 0.0]
 POOL_KR = KS.POOL_KR
 
