@@ -605,3 +605,40 @@ git : To https://github.com/jiho370/nadsdq100-watcher.git
  
    72fb8c5..49d0010  feat/track-c-exec-and-recent-research -> feat/track-c-exec-and-recent-research
 2026-07-13 22:04:53 [kr] === pregen 완료 ===
+2026-07-15 22:00:02 [kr] === pregen 시작 ===
+git : error: cannot pull with rebase: You have unstaged changes.
+위치 C:\Users\JH\Documents\GitHub\nadsdq100-watcher\run_pregen.ps1:26 문자:1
++ git pull --rebase 2>&1 | Out-File -Append -Encoding utf8 $log
++ ~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (error: cannot p...staged changes.:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+error: Please commit or stash them.
+2026-07-15 22:00:03 [kr] [경고] git pull 실패 — 로컬에 커밋 안 된 변경이 있으면 여기서 막힘. 아래 push도 실패할 수 있음.
+2026-07-15 22:00:03 [kr]         해결: 저장소 폴더에서 'git add -A; git commit -m sync; git push' 한 번 수동 실행.
+python : [KR] 펀더멘탈 통과 170/200종목 (EPS>0·ROE>0)
+위치 C:\Users\JH\Documents\GitHub\nadsdq100-watcher\run_pregen.ps1:33 문자:1
++ python pregen.py --$Mode 2>&1 | Out-File -Append -Encoding utf8 $log
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: ([KR] 펀더멘탈 통과 170/200종목 (EPS>0·ROE>0):String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+[KR] 선정: 매수 5 · 관찰 0 (후보 170)
+[PREGEN] 서술 사전생성 3종목
+[PREGEN] 저장: output/pregen_kr.json (대상일 2026-07-16 · 종목 6 · 서술캐시 3건)
+KRX 로그인 시도...
+  로그인 ID: jiho370
+KRX 로그인 완료.
+  로그인 시간: 2026-07-15 22:00:07
+  만료 시간: 2026-07-15 23:00:07
+[main 7aa802e] chore: pregen kr [skip ci]
+ 1 file changed, 49 insertions(+), 71 deletions(-)
+git : To https://github.com/jiho370/nadsdq100-watcher.git
+위치 C:\Users\JH\Documents\GitHub\nadsdq100-watcher\run_pregen.ps1:50 문자:5
++     git push 2>&1 | Out-File -Append -Encoding utf8 $log
++     ~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (To https://gith...100-watcher.git:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+   b38b435..7aa802e  main -> main
+2026-07-15 22:04:43 [kr] === pregen 완료 ===

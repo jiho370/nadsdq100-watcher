@@ -30,9 +30,18 @@ KR_HOLDINGS = "output/kr_holdings.json"
 # 2026-07-16: topn 6→5 변경(STRATEGY.md §3 Stage 3.1·3.2 — 13년 재검증에서 5가 CAGR·샤프·
 # MDD·Calmar·다운캡처 전부 근소 우위. 통계적으로 유의하진 않으나(부트스트랩 CI 전부 겹침)
 # 6을 유지할 데이터 근거도 마찬가지로 없어 point-estimate 승자로 결정).
-N_BUY = int(os.environ.get("KR_POOL_BUY", "5"))
+# 2026-07-16 재설계(지호 님 질문 — "왜 5종목이 아니라 3종목만 나오냐" + Fable 5 자문):
+# N_BUY는 이제 "AI 검증에 보여줄 풀" 크기(5가 아니라 8) — 최종 채택(KR_FINAL_BUY=5)과
+# 분리했다. 예전엔 풀=최종 채택 수가 똑같아서(5=5) AI가 하나라도 제외/강등시키면 화면에
+# 보이는 종목이 5개보다 줄어들 수밖에 없었다(오늘 실제로 3개까지 줄어듦 — 관찰 슬롯이
+# 2026-07-13에 폐지되면서 강등분이 갈 곳이 없어져 더 심해짐). 미국은 이미 이 구조
+# (REPORT_POOL=10 > FINAL_BUY=8)라 문제가 덜 드러났을 뿐 — 한국만 풀=최종이 같았던 게
+# 설계 공백이었다. ai_report._apply_verdicts()가 이제 "제외"만 종목을 빼고 남은 풀에서
+# 팩터 랭킹 순 상위 KR_FINAL_BUY명을 결정론적으로 채운다(재랭킹 아님) — "관찰강등"은
+# 매수 목록에 그대로 남고 배지로만 표시.
+N_BUY = int(os.environ.get("KR_POOL_BUY", "8"))
 N_WATCH = int(os.environ.get("KR_POOL_WATCH", "0"))
-MAX_HOLD = int(os.environ.get("KR_MAX_HOLD", "5"))   # 보유 상한(팔아야 산다)
+MAX_HOLD = int(os.environ.get("KR_MAX_HOLD", "5"))   # 보유 상한(팔아야 산다) — 최종 채택 수와 동일
 
 
 def _log(m): print(f"[KR] {m}", file=sys.stderr)
@@ -193,7 +202,8 @@ def select(yf) -> dict:
     # (미국 backtest_entry_gate와 동일 취지 — 기술 게이트가 성과를 깎음. hot 태그는 분할계획용 유지)
     buy = ranked[:N_BUY]
     watch = ranked[N_BUY:N_BUY + N_WATCH]
-    _log(f"선정: 매수 {len(buy)} · 관찰 {len(watch)} (후보 {len(ranked)})")
+    _log(f"AI 검증 풀 {len(buy)}(최종 채택은 AI 검증 후 상위 {MAX_HOLD}명) · "
+         f"관찰 {len(watch)} (후보 {len(ranked)})")
     return {"as_of": as_of, "buy": buy, "watch": watch, "ind_map": ind_map,
             "pool": [c["symbol"] for c in ranked]}   # 6개월 재평가용 후보풀(필터+추세 통과 전체)
 
