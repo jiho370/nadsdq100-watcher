@@ -42,7 +42,12 @@ import backtest_portfolio as BP
 import backtest_kr_strategies as KS
 import core_satellite_kr as CS
 
-TOPN = 6           # 현행 라이브값 고정 — 매도알고리즘 질문과 topN 질문을 안 섞음
+TOPN = 6           # 이 스크립트의 모든 기존 결과(output/kr_sell_algo_sweep*.json)는 topn=6
+                   # 고정으로 산출됨 — 매도알고리즘 질문과 topN 질문을 안 섞으려던 설계.
+                   # 2026-07-16: 라이브 topn이 5로 변경됐지만(STRATEGY.md §3 Stage 3.1·3.2),
+                   # 이 상수는 기존 결과와의 정합성을 위해 6 유지 — 매도알고리즘 결론이
+                   # topn=5에서도 그대로인지는 별도 재검증 전까지 미확인(재검증하려면
+                   # TOPN=5로 바꿔 전체 스테이지 재실행 필요, 아직 안 함).
 CORE_WEIGHT = 0.65  # 현행 라이브값 고정
 
 CANDIDATES = {
