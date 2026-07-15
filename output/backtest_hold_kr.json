@@ -1,0 +1,143 @@
+{
+  "as_of": "2026-07-14",
+  "market": "kr",
+  "topn": 6,
+  "n_combos": 12,
+  "rows": [
+    {
+      "hold_months": 1,
+      "cagr_pct": 26.54,
+      "excess_cagr_pct": 2.34,
+      "vol_pct": 31.0,
+      "sharpe": 0.92,
+      "mdd_pct": -51.1,
+      "bench_cagr_pct": 24.2,
+      "bench_mdd_pct": -36.1,
+      "years": 6.7
+    },
+    {
+      "hold_months": 2,
+      "cagr_pct": 26.54,
+      "excess_cagr_pct": 2.34,
+      "vol_pct": 31.0,
+      "sharpe": 0.92,
+      "mdd_pct": -51.1,
+      "bench_cagr_pct": 24.2,
+      "bench_mdd_pct": -36.1,
+      "years": 6.7
+    },
+    {
+      "hold_months": 3,
+      "cagr_pct": 26.54,
+      "excess_cagr_pct": 2.34,
+      "vol_pct": 31.0,
+      "sharpe": 0.92,
+      "mdd_pct": -51.1,
+      "bench_cagr_pct": 24.2,
+      "bench_mdd_pct": -36.1,
+      "years": 6.7
+    },
+    {
+      "hold_months": 4,
+      "cagr_pct": 24.17,
+      "excess_cagr_pct": -0.03,
+      "vol_pct": 33.2,
+      "sharpe": 0.82,
+      "mdd_pct": -49.0,
+      "bench_cagr_pct": 24.2,
+      "bench_mdd_pct": -36.1,
+      "years": 6.7
+    },
+    {
+      "hold_months": 5,
+      "cagr_pct": 24.17,
+      "excess_cagr_pct": -0.03,
+      "vol_pct": 33.2,
+      "sharpe": 0.82,
+      "mdd_pct": -49.0,
+      "bench_cagr_pct": 24.2,
+      "bench_mdd_pct": -36.1,
+      "years": 6.7
+    },
+    {
+      "hold_months": 6,
+      "cagr_pct": 24.17,
+      "excess_cagr_pct": -0.03,
+      "vol_pct": 33.2,
+      "sharpe": 0.82,
+      "mdd_pct": -49.0,
+      "bench_cagr_pct": 24.2,
+      "bench_mdd_pct": -36.1,
+      "years": 6.7
+    },
+    {
+      "hold_months": 7,
+      "cagr_pct": 25.53,
+      "excess_cagr_pct": 1.33,
+      "vol_pct": 31.5,
+      "sharpe": 0.88,
+      "mdd_pct": -47.6,
+      "bench_cagr_pct": 24.2,
+      "bench_mdd_pct": -36.1,
+      "years": 6.7
+    },
+    {
+      "hold_months": 8,
+      "cagr_pct": 25.53,
+      "excess_cagr_pct": 1.33,
+      "vol_pct": 31.5,
+      "sharpe": 0.88,
+      "mdd_pct": -47.6,
+      "bench_cagr_pct": 24.2,
+      "bench_mdd_pct": -36.1,
+      "years": 6.7
+    },
+    {
+      "hold_months": 9,
+      "cagr_pct": 25.53,
+      "excess_cagr_pct": 1.33,
+      "vol_pct": 31.5,
+      "sharpe": 0.88,
+      "mdd_pct": -47.6,
+      "bench_cagr_pct": 24.2,
+      "bench_mdd_pct": -36.1,
+      "years": 6.7
+    },
+    {
+      "hold_months": 10,
+      "cagr_pct": 22.2,
+      "excess_cagr_pct": -2.0,
+      "vol_pct": 30.4,
+      "sharpe": 0.81,
+      "mdd_pct": -50.3,
+      "bench_cagr_pct": 24.2,
+      "bench_mdd_pct": -36.1,
+      "years": 6.7
+    },
+    {
+      "hold_months": 11,
+      "cagr_pct": 22.2,
+      "excess_cagr_pct": -2.0,
+      "vol_pct": 30.4,
+      "sharpe": 0.81,
+      "mdd_pct": -50.3,
+      "bench_cagr_pct": 24.2,
+      "bench_mdd_pct": -36.1,
+      "years": 6.7
+    },
+    {
+      "hold_months": 12,
+      "cagr_pct": 22.2,
+      "excess_cagr_pct": -2.0,
+      "vol_pct": 30.4,
+      "sharpe": 0.81,
+      "mdd_pct": -50.3,
+      "bench_cagr_pct": 24.2,
+      "bench_mdd_pct": -36.1,
+      "years": 6.7
+    }
+  ],
+  "baseline": "hold_months6(현행 재평가 주기)",
+  "note": "포트폴리오 일별 NAV 시뮬레이션, 200일선 조기이탈 백업 없이(순수 보유기간 효과만) 재평가 주기(=대략적인 보유기간) 1~12개월 스윕. topn 고정.",
+  "adoption_criteria": "현행(6개월) 대비 샤프·MDD 개선이 PBO/DSR(월간 초과수익) 판정을 통과할 때만 보유기간 변경 제안"
+}

@@ -108,6 +108,30 @@ def _profiles() -> dict:
     return out
 
 
+_PROFILE_PARTS = None
+
+
+def _profile_parts() -> dict:
+    """{sym: (one_liner, detail)} — _profiles()와 별도 유지: one_liner(브랜드 인지용,
+    ①종목 설명)와 detail(사업구조·전략, ②사업)을 서로 겹치지 않게 화면에 나눠 쓰기 위함
+    (2026-07-15 — 지호 님 피드백: 종목설명·②사업이 같은 문장을 반복하고 있었음)."""
+    global _PROFILE_PARTS
+    if _PROFILE_PARTS is not None:
+        return _PROFILE_PARTS
+    out = {}
+    for path in ("sp500_profiles.json", "kospi200_profiles.json"):
+        try:
+            d = json.load(open(path, encoding="utf-8"))
+            for sym, t in (d.get("tickers") or {}).items():
+                ol, det = (t.get("one_liner") or "").strip(), (t.get("detail") or "").strip()
+                if ol or det:
+                    out[sym] = (ol, det)
+        except Exception:
+            pass
+    _PROFILE_PARTS = out
+    return out
+
+
 # ------------------------- 계획 주입(코드 확정) -------------------------
 def attach_plans(groups: dict):
     """모든 후보에 entry_plan 결과를 붙인다(렌더·AI 컨텍스트 공용). 제자리 수정."""
@@ -558,6 +582,34 @@ def _call_cli(instruction, web=True, system=None, model=None):
 
 
 # ------------------------- 무AI 서술(공용) -------------------------
+def _smart_truncate(text: str, max_len: int) -> str:
+    """문장 중간이 아니라 마지막 '.'(또는 '다.')에서 자른다 — 안 되면 단어 경계 + '…'."""
+    text = (text or "").strip()
+    if len(text) <= max_len:
+        return text
+    cut = text[:max_len]
+    dot = cut.rfind(". ")
+    if dot == -1:
+        dot = cut.rfind(".") if cut.endswith(".") else -1
+    if dot >= max_len * 0.4:                    # 너무 짧게 잘리는 건 피함(원문의 40% 이상은 남길 때만)
+        return cut[:dot + 1]
+    sp = cut.rfind(" ")
+    return (cut[:sp] if sp >= max_len * 0.4 else cut).rstrip("· ,") + "…"
+
+
+def _first_sentence(text: str, max_len: int) -> str:
+    """첫 문장만(있으면) — 요약 라인용. 문장부호 없으면 스마트 자르기로 폴백."""
+    text = (text or "").strip()
+    if not text:
+        return ""
+    dot = text.find(". ")
+    if dot == -1 and text.endswith("."):
+        dot = len(text) - 1
+    if dot != -1 and dot + 1 <= max_len:
+        return text[:dot + 1]
+    return _smart_truncate(text, max_len)
+
+
 def _auto_fields(c) -> dict:
     """AI 없이 지표+프로필만으로 만드는 최소 서술 필드(비용 $0). deterministic_report와
     build_report의 '사전서술 캐시에 없는 심볼(드묾)' 대체용이 공용으로 쓴다."""
@@ -569,13 +621,17 @@ def _auto_fields(c) -> dict:
             f"RSI {c['rsi']:.0f}" if c.get("rsi") is not None else "",
             f"3개월 {r['3m']:+.1f}%" if r.get("3m") is not None else "",
             f"6개월 {r['6m']:+.1f}%" if r.get("6m") is not None else "") if x))
-    prof = _profiles().get(sym)
-    if prof:
-        pts.append("②사업: " + prof[:140])
+    one_liner, detail = _profile_parts().get(sym, ("", ""))
+    if detail:
+        pts.append("②사업: " + _smart_truncate(detail, 140))
     if c.get("headlines"):
-        pts.append("③뉴스: " + str(c["headlines"][0])[:120])
+        pts.append("③뉴스: " + _smart_truncate(str(c["headlines"][0]), 120))
+    # 요약 라인(=종목 설명): one_liner(브랜드 인지용) 우선 — ②사업(detail)과 겹치지 않게
+    # 서로 다른 소스로 분리(2026-07-15, 지호 님 피드백: 둘이 같은 문장을 반복하고 있었음).
+    # one_liner도 없으면(구프로필 과도기) detail 첫 문장으로, 그마저 없으면 내부 라벨 폴백.
+    summary = one_liner or _first_sentence(detail, 90) or (c.get("score_reason") or "")[:90]
     return {"name": c.get("name", ""), "category": c.get("industry") or c.get("sector", ""),
-            "summary": (c.get("score_reason") or prof or "")[:90], "points": pts, "comment": ""}
+            "summary": summary, "points": pts, "comment": ""}
 
 
 # ------------------------- 무AI 폴백 -------------------------
@@ -861,10 +917,12 @@ def render_report_html(report, as_of="", metrics_by_sym=None, market_html="", si
     us_sec = ""
     if buy_cards or watch_cards:
         us_sec = (
-            f'<h3 style="margin:16px 0 2px">&#11088; 미국(S&amp;P500) 매수 후보</h3>{us_note}{buy_cards}'
+            f'<h3 style="margin:16px 0 2px">&#11088; 미국(S&amp;P500) 추천 종목</h3>{us_note}{buy_cards}'
             + (f'<h3 style="margin:18px 0 2px">&#128064; 미국 관찰 · 내려오면 매수 <span style="color:#9ca3af;font-size:12px">'
                f'(좋은 종목이나 지금은 조정 중 · AI 강등 포함)</span></h3>{watch_cards}' if watch_cards else ""))
     head = _esc(title) if title else "&#128200; 데일리 시장 점검 · 매수·매도 후보"
+    # 2026-07-15: 차트+추천종목을 지수·코인 추세 신호보다 위로(지호 님 요청) — KR 전용 호출은
+    # spy/us_sec가 원래 빈 문자열이라 이 순서 변경으로 KR 레이아웃엔 영향 없음.
     return (
         f'<div style="font-family:-apple-system,BlinkMacSystemFont,\'Segoe UI\',\'Malgun Gothic\',sans-serif;'
         f'max-width:700px;margin:0 auto;color:#111">'
@@ -874,10 +932,10 @@ def render_report_html(report, as_of="", metrics_by_sym=None, market_html="", si
         f'<div style="background:#f8fafc;border-left:3px solid #6b7280;padding:8px 12px;font-size:13px;'
         f'line-height:1.6;margin:8px 0"><b>&#129517; 시장</b> {_esc(report.get("market_overview"))}<br>'
         f'<b>&#127760; 환율·한국·코인</b> {_esc(report.get("macro"))}</div>'
-        f'{market_sec}'
-        f'{signals_sec}'
         f'{spy}'
         f'{us_sec}'
+        f'{market_sec}'
+        f'{signals_sec}'
         f'{_excluded_html(report.get("ai_excluded"), is_kr=is_kr)}'
         f'{sell_html}'
         f'{kr_sec}'

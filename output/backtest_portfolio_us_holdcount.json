@@ -1,0 +1,109 @@
+{
+  "as_of": "2026-07-14",
+  "market": "us_holdcount",
+  "n_combos": 9,
+  "rows": [
+    {
+      "topn": 4,
+      "cagr_pct": 44.73,
+      "excess_cagr_pct": 29.66,
+      "vol_pct": 39.7,
+      "sharpe": 1.13,
+      "mdd_pct": -51.7,
+      "bench_cagr_pct": 15.07,
+      "bench_mdd_pct": -33.7,
+      "years": 9.0
+    },
+    {
+      "topn": 5,
+      "cagr_pct": 42.95,
+      "excess_cagr_pct": 27.88,
+      "vol_pct": 37.9,
+      "sharpe": 1.13,
+      "mdd_pct": -49.5,
+      "bench_cagr_pct": 15.07,
+      "bench_mdd_pct": -33.7,
+      "years": 9.0
+    },
+    {
+      "topn": 6,
+      "cagr_pct": 41.72,
+      "excess_cagr_pct": 26.64,
+      "vol_pct": 36.3,
+      "sharpe": 1.14,
+      "mdd_pct": -47.7,
+      "bench_cagr_pct": 15.07,
+      "bench_mdd_pct": -33.7,
+      "years": 9.0
+    },
+    {
+      "topn": 7,
+      "cagr_pct": 41.22,
+      "excess_cagr_pct": 26.15,
+      "vol_pct": 33.4,
+      "sharpe": 1.2,
+      "mdd_pct": -42.2,
+      "bench_cagr_pct": 15.07,
+      "bench_mdd_pct": -33.7,
+      "years": 9.0
+    },
+    {
+      "topn": 8,
+      "cagr_pct": 39.86,
+      "excess_cagr_pct": 24.79,
+      "vol_pct": 30.9,
+      "sharpe": 1.24,
+      "mdd_pct": -37.0,
+      "bench_cagr_pct": 15.07,
+      "bench_mdd_pct": -33.7,
+      "years": 9.0
+    },
+    {
+      "topn": 9,
+      "cagr_pct": 38.85,
+      "excess_cagr_pct": 23.78,
+      "vol_pct": 30.2,
+      "sharpe": 1.24,
+      "mdd_pct": -38.4,
+      "bench_cagr_pct": 15.07,
+      "bench_mdd_pct": -33.7,
+      "years": 9.0
+    },
+    {
+      "topn": 10,
+      "cagr_pct": 36.42,
+      "excess_cagr_pct": 21.34,
+      "vol_pct": 28.7,
+      "sharpe": 1.23,
+      "mdd_pct": -36.1,
+      "bench_cagr_pct": 15.07,
+      "bench_mdd_pct": -33.7,
+      "years": 9.0
+    },
+    {
+      "topn": 11,
+      "cagr_pct": 35.01,
+      "excess_cagr_pct": 19.94,
+      "vol_pct": 28.4,
+      "sharpe": 1.2,
+      "mdd_pct": -35.5,
+      "bench_cagr_pct": 15.07,
+      "bench_mdd_pct": -33.7,
+      "years": 9.0
+    },
+    {
+      "topn": 12,
+      "cagr_pct": 33.16,
+      "excess_cagr_pct": 18.09,
+      "vol_pct": 28.1,
+      "sharpe": 1.16,
+      "mdd_pct": -35.8,
+      "bench_cagr_pct": 15.07,
+      "bench_mdd_pct": -33.7,
+      "years": 9.0
+    }
+  ],
+  "baseline": "topn6(현행 보유 상한)",
+  "note": "포트폴리오 일별 NAV 시뮬레이션(동일비중 진입·6개월 재평가+200일선 매도·슬롯 충원) — 분산투자 효과가 변동성·MDD에 직접 반영됨",
+  "adoption_criteria": "현행 대비 샤프·MDD 개선이 PBO/DSR(월간 초과수익) 판정을 통과할 때만 보유상한 변경 제안"
+}

@@ -32,6 +32,7 @@ ai_commentary.py  —  S&P500 데일리 리포트용 'AI 해석 레이어'
 from __future__ import annotations
 
 import os
+import re
 import sys
 import json
 import math
@@ -328,10 +329,32 @@ def load_ai_result(path) -> dict:
 
 
 # --------------------- 뉴스 헤드라인 수집(헬퍼) ---------------------
+# yfinance .news가 실제 속보(로이터·PR Newswire 등)와 분석·의견 기사(Zacks·Trefis 등 "5 Stocks
+# to Buy", "Is X a Buy?" 류)를 구분 없이 섞어 준다 — 후자는 "주가를 움직인 뉴스"가 아니라
+# 사후 논평이라 걸러낸다(2026-07-15, 지호 님 리포트 — "이건 새 소식이 아니라 분석 기사").
+_ANALYSIS_PUBLISHERS = {
+    "zacks", "motley fool", "the motley fool", "trefis", "24/7 wall st.", "24/7 wall st",
+    "simply wall st", "simply wall st.", "barchart", "investorplace", "tipranks",
+    "insider monkey", "validea", "gurufocus", "seeking alpha", "benzinga insights",
+    "smarter analyst", "insidermonkey.com",
+}
+_ANALYSIS_TITLE_RE = re.compile(
+    r"\b(is\s+\S+\s+(a\s+)?(buy|sell|good stock)|buy,?\s*sell\s*or\s*hold|"
+    r"\d+\s+(stocks?|reasons?|things?)\b|should you (buy|sell)|"
+    r"what if\b|is it time to|here'?s why|trending stock)", re.IGNORECASE)
+
+
+def _is_analysis_headline(title: str, publisher: str) -> bool:
+    if (publisher or "").strip().lower() in _ANALYSIS_PUBLISHERS:
+        return True
+    return bool(_ANALYSIS_TITLE_RE.search(title or ""))
+
+
 def fetch_news_headlines(symbols: list[str], yf_module, max_items: int = 5) -> dict[str, list[str]]:
     """AI 입력용: 종목별 '최근 뉴스 제목' 리스트를 반환.
     기존 fetch_news_flags(True/False)와 달리 실제 제목을 모아 AI 가 호재/악재를 판단하게 한다.
     yfinance 신·구 스키마(title / content.title) 모두 처리. 실패는 조용히 빈 리스트.
+    분석·의견성 기사(발행처 블록리스트 + 제목 패턴)는 제외 — "속보"만 남긴다.
     (호출부에서 from ai_commentary import fetch_news_headlines; fetch_news_headlines(syms, yf))"""
     out: dict[str, list[str]] = {}
     if yf_module is None:
@@ -340,12 +363,16 @@ def fetch_news_headlines(symbols: list[str], yf_module, max_items: int = 5) -> d
         titles: list[str] = []
         try:
             for it in (yf_module.Ticker(sym).news or []):
-                t = None
+                t, pub = None, None
                 if isinstance(it, dict):
                     t = it.get("title")
-                    if not t and isinstance(it.get("content"), dict):
-                        t = it["content"].get("title")
-                if t:
+                    pub = it.get("publisher")
+                    content = it.get("content") if isinstance(it.get("content"), dict) else None
+                    if content:
+                        t = t or content.get("title")
+                        pub = pub or ((content.get("provider") or {}).get("displayName")
+                                      if isinstance(content.get("provider"), dict) else None)
+                if t and not _is_analysis_headline(str(t), pub):
                     titles.append(str(t))
                 if len(titles) >= max_items:
                     break

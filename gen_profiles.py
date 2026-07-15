@@ -34,12 +34,27 @@ KR_PROFILE_PATH = "kospi200_profiles.json"
 US_PROFILE_PATH = "sp500_profiles.json"
 
 _SYSTEM = (
-    "당신은 종목 사전을 만드는 애널리스트다. 각 종목에 대해 detail(한국어 2~3문장)을 쓴다:\n"
-    "① 무엇으로 돈 버는 회사인지(주력 사업·수익 구조) ② 업계 내 위치(경쟁 지위·차별점) "
-    "③ 투자자가 알아야 할 구조적 특징(사이클·규제·고객 집중 등).\n"
-    "규칙: 이 글은 캐시로 오래 재사용된다 — 최신 뉴스·주가·시점 표현('최근','올해') 금지. "
-    "수치를 지어내지 않는다. 쉬운 한국어, 한자 금지.\n"
-    '출력은 JSON 하나만: {"SYM1":"detail 문장...","SYM2":"..."}'
+    "당신은 종목 사전을 만드는 애널리스트다. 각 종목에 대해 두 가지를 쓴다(2026-07-15 개편 —"
+    " 리포트에서 '종목 설명'과 '②사업'으로 각각 표시되며 겹치면 안 된다):\n"
+    "1) one_liner(한 문장, 40~60자): 그 회사가 지금 실제로 뭘로 돈을 버는 회사인지 일반적으로"
+    " 서술 — 브랜드 나열이 아니어도 됨. 숫자·수익구조 세부 설명 금지(그건 detail 몫).\n"
+    "2) detail(한국어 2~3문장, 130~180자 내외): one_liner와 안 겹치게 — 무엇으로 돈 버는지"
+    "(사업부문 구성·어느 쪽이 핵심인지 상대적으로만, 예: 'A가 압도적으로 크고 B가 보조'),"
+    " 업계 내 위치·차별점을 다룬다.\n"
+    "**중요(2026-07-15 추가 — 실사용 중 발견된 편향 수정): '회사가 내세우는 미래 전략·비전'을"
+    " '현재 사업의 실체'처럼 쓰지 않는다.** 예: GM이 '전기차 전환 목표'를 발표했다고 해서"
+    " one_liner를 '전기차 전환 중심 자동차 회사'라고 쓰면 안 된다 — 실제 매출·이익의 압도적"
+    " 비중은 여전히 내연기관 픽업트럭·SUV에서 나오고, EV는 아직 적자에 목표도 후퇴한 상태이니"
+    " '내연기관 픽업트럭·SUV가 주력이고 전동화는 진행 중(성과는 불확실)' 정도가 정확한 서술."
+    " 현재 실제 매출·이익 비중이 큰 사업을 one_liner·detail의 중심으로 삼고, 미래 전략은"
+    " '진행 중'·'추진 중' 같은 미완료 표현으로 부차적으로만 언급한다(전략 성공을 기정사실화"
+    " 금지). 확신이 없으면 회사의 오래되고 확실한 핵심 사업만 쓴다.\n"
+    "규칙: 이 글은 캐시로 오래 재사용된다 — 최신 뉴스·주가·시점 표현('최근','올해','2025년 기준'"
+    " 등 특정 연도 고정 표현) 금지. **정확한 매출액·비율 등 구체적 수치는 절대 쓰지 않는다**"
+    "(학습 데이터 기억에서 나온 숫자는 부정확하거나 철 지난 것일 위험이 커서 금지 — '압도적"
+    "이다/절반 이상이다' 같은 정성적 비교 표현만 허용). 쉬운 한국어, 한자 금지. 두 필드 모두"
+    " 반드시 채운다(분량은 목표치 — 표시 단계에서 넘치면 문장 경계로 다시 자른다).\n"
+    '출력은 JSON 하나만: {"SYM1":{"one_liner":"...","detail":"..."},"SYM2":{...}}'
 )
 
 
@@ -93,7 +108,7 @@ def _build_requests(todo: list, prefix: str) -> list:
             "params": {
                 "model": MODEL, "max_tokens": 4000, "system": _SYSTEM,
                 "messages": [{"role": "user",
-                              "content": "다음 종목들의 detail 을 작성하라. 키는 심볼 그대로.\n"
+                              "content": "다음 종목들의 one_liner·detail 을 작성하라. 키는 심볼 그대로.\n"
                                          + "\n".join(lines)}]},
         })
     return reqs
@@ -101,17 +116,22 @@ def _build_requests(todo: list, prefix: str) -> list:
 
 def _run_cli(reqs: list) -> dict:
     """로컬 claude -p(Pro 구독, $0)로 순차 실행. 분기 1회 일회성 작업이라 배치의
-    동시 처리 없이 순차로도 충분(요청당 몇 초~수십 초, 전체 몇 분)."""
+    동시 처리 없이 순차로도 충분(요청당 몇 초~수십 초, 전체 몇 분).
+    2026-07-15: 703종목 --refresh 시 36청크 중 일부가 이유 불명 타임아웃/부분파싱실패로
+    누락되는 게 확인돼(예: 'timed out after -1186초'처럼 음수 타임아웃까지 관측 — CLI
+    프로세스 자체의 일시적 이상으로 추정, 원인 미상) 1회 재시도를 추가한다."""
     import ai_report as AR
     out = {}
     for i, req in enumerate(reqs, 1):
         cid = req["custom_id"]
         instr = req["params"]["messages"][0]["content"]
         _log(f"  CLI 요청 {i}/{len(reqs)}: {cid}")
-        try:
-            out[cid] = AR._call_cli(instr, web=False, system=_SYSTEM, model=MODEL)
-        except Exception as e:
-            _log(f"  실패: {cid} ({type(e).__name__}: {e})")
+        for attempt in (1, 2):
+            try:
+                out[cid] = AR._call_cli(instr, web=False, system=_SYSTEM, model=MODEL)
+                break
+            except Exception as e:
+                _log(f"  실패({attempt}/2): {cid} ({type(e).__name__}: {e})")
     return out
 
 
@@ -140,16 +160,28 @@ def _run_batch(client, reqs: list) -> dict:
 
 
 def _merge(results: dict, prefix: str, tickers: dict) -> int:
-    """배치 응답(JSON 문자열)을 profiles 파일 구조에 병합."""
+    """배치 응답(JSON 문자열)을 profiles 파일 구조에 병합.
+    2026-07-15: 응답이 {"SYM":{"one_liner":..,"detail":..}} 형태(개편) — 구버전(문자열만)도
+    하위호환으로 detail에 그대로 넣는다(과도기 대비, 곧 --refresh로 전부 새 형식이 됨)."""
     from ai_commentary import _extract_json
     n = 0
     for cid, text in results.items():
         if not cid.startswith(prefix):
             continue
         parsed = _extract_json(text or "") or {}
-        for sym, detail in parsed.items():
-            if sym in tickers and isinstance(detail, str) and detail.strip():
-                tickers[sym]["detail"] = detail.strip()
+        for sym, val in parsed.items():
+            if sym not in tickers:
+                continue
+            if isinstance(val, dict):
+                ol, det = (val.get("one_liner") or "").strip(), (val.get("detail") or "").strip()
+                if ol:
+                    tickers[sym]["one_liner"] = ol
+                if det:
+                    tickers[sym]["detail"] = det
+                if ol or det:
+                    n += 1
+            elif isinstance(val, str) and val.strip():
+                tickers[sym]["detail"] = val.strip()
                 n += 1
     return n
 
