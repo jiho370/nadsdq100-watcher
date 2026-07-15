@@ -1,0 +1,510 @@
+{
+  "as_of": "2026-07-10",
+  "topn": 6,
+  "core_weight": 0.65,
+  "baseline": "reeval180_baseline",
+  "judgment": "베이스라인(현행 라이브: 재평가만, MA백업 없음) 대비 전체기간 +0.5%p CAGR 우위 + MDD 5%p 이내 + 최근3년 하위사분위 아님 — 셋 다 만족해야 채택후보(Fable 5 자문, 2026-07-15)",
+  "results": {
+    "reeval90": {
+      "params": {
+        "reeval_days": 90,
+        "ma200_backup": false
+      },
+      "windows": {
+        "full": {
+          "cagr_pct": 24.23,
+          "sharpe": 1.18,
+          "mdd_pct": -25.0
+        },
+        "1y": {
+          "cagr_pct": 124.08,
+          "sharpe": 2.29,
+          "mdd_pct": -18.6
+        },
+        "2y": {
+          "cagr_pct": 65.71,
+          "sharpe": 1.86,
+          "mdd_pct": -18.6
+        },
+        "3y": {
+          "cagr_pct": 49.89,
+          "sharpe": 1.71,
+          "mdd_pct": -18.6
+        },
+        "5y": {
+          "cagr_pct": 26.7,
+          "sharpe": 1.24,
+          "mdd_pct": -18.6
+        }
+      },
+      "n_sells": 8,
+      "n_ma_sells": 0,
+      "n_entry_sells": 0,
+      "n_reeval_sells": 8,
+      "forward_return_diag": {
+        "n_events": 0,
+        "avg_forward_return_pct": null,
+        "median_forward_return_pct": null
+      }
+    },
+    "reeval120": {
+      "params": {
+        "reeval_days": 120,
+        "ma200_backup": false
+      },
+      "windows": {
+        "full": {
+          "cagr_pct": 24.23,
+          "sharpe": 1.18,
+          "mdd_pct": -25.0
+        },
+        "1y": {
+          "cagr_pct": 124.08,
+          "sharpe": 2.29,
+          "mdd_pct": -18.6
+        },
+        "2y": {
+          "cagr_pct": 65.71,
+          "sharpe": 1.86,
+          "mdd_pct": -18.6
+        },
+        "3y": {
+          "cagr_pct": 49.89,
+          "sharpe": 1.71,
+          "mdd_pct": -18.6
+        },
+        "5y": {
+          "cagr_pct": 26.7,
+          "sharpe": 1.24,
+          "mdd_pct": -18.6
+        }
+      },
+      "n_sells": 8,
+      "n_ma_sells": 0,
+      "n_entry_sells": 0,
+      "n_reeval_sells": 8,
+      "forward_return_diag": {
+        "n_events": 0,
+        "avg_forward_return_pct": null,
+        "median_forward_return_pct": null
+      }
+    },
+    "reeval180_baseline": {
+      "params": {
+        "reeval_days": 180,
+        "ma200_backup": false
+      },
+      "windows": {
+        "full": {
+          "cagr_pct": 24.23,
+          "sharpe": 1.18,
+          "mdd_pct": -25.0
+        },
+        "1y": {
+          "cagr_pct": 124.08,
+          "sharpe": 2.29,
+          "mdd_pct": -18.6
+        },
+        "2y": {
+          "cagr_pct": 65.71,
+          "sharpe": 1.86,
+          "mdd_pct": -18.6
+        },
+        "3y": {
+          "cagr_pct": 49.89,
+          "sharpe": 1.71,
+          "mdd_pct": -18.6
+        },
+        "5y": {
+          "cagr_pct": 26.7,
+          "sharpe": 1.24,
+          "mdd_pct": -18.6
+        }
+      },
+      "n_sells": 8,
+      "n_ma_sells": 0,
+      "n_entry_sells": 0,
+      "n_reeval_sells": 8,
+      "forward_return_diag": {
+        "n_events": 0,
+        "avg_forward_return_pct": null,
+        "median_forward_return_pct": null
+      }
+    },
+    "reeval270": {
+      "params": {
+        "reeval_days": 270,
+        "ma200_backup": false
+      },
+      "windows": {
+        "full": {
+          "cagr_pct": 24.23,
+          "sharpe": 1.18,
+          "mdd_pct": -25.0
+        },
+        "1y": {
+          "cagr_pct": 124.08,
+          "sharpe": 2.29,
+          "mdd_pct": -18.6
+        },
+        "2y": {
+          "cagr_pct": 65.71,
+          "sharpe": 1.86,
+          "mdd_pct": -18.6
+        },
+        "3y": {
+          "cagr_pct": 49.89,
+          "sharpe": 1.71,
+          "mdd_pct": -18.6
+        },
+        "5y": {
+          "cagr_pct": 26.7,
+          "sharpe": 1.24,
+          "mdd_pct": -18.6
+        }
+      },
+      "n_sells": 8,
+      "n_ma_sells": 0,
+      "n_entry_sells": 0,
+      "n_reeval_sells": 8,
+      "forward_return_diag": {
+        "n_events": 0,
+        "avg_forward_return_pct": null,
+        "median_forward_return_pct": null
+      }
+    },
+    "gated_buf3": {
+      "params": {
+        "reeval_days": 180,
+        "ma200_backup": true,
+        "ma_stop_mode": "state_gated",
+        "ma_buffer": 0.03
+      },
+      "windows": {
+        "full": {
+          "cagr_pct": 20.32,
+          "sharpe": 1.1,
+          "mdd_pct": -20.4
+        },
+        "1y": {
+          "cagr_pct": 110.86,
+          "sharpe": 2.26,
+          "mdd_pct": -17.6
+        },
+        "2y": {
+          "cagr_pct": 55.3,
+          "sharpe": 1.74,
+          "mdd_pct": -17.6
+        },
+        "3y": {
+          "cagr_pct": 41.46,
+          "sharpe": 1.59,
+          "mdd_pct": -17.6
+        },
+        "5y": {
+          "cagr_pct": 21.24,
+          "sharpe": 1.11,
+          "mdd_pct": -17.6
+        }
+      },
+      "n_sells": 51,
+      "n_ma_sells": 48,
+      "n_entry_sells": 0,
+      "n_reeval_sells": 3,
+      "forward_return_diag": {
+        "n_events": 46,
+        "avg_forward_return_pct": 5.66,
+        "median_forward_return_pct": 5.11
+      }
+    },
+    "gated_buf5": {
+      "params": {
+        "reeval_days": 180,
+        "ma200_backup": true,
+        "ma_stop_mode": "state_gated",
+        "ma_buffer": 0.05
+      },
+      "windows": {
+        "full": {
+          "cagr_pct": 21.76,
+          "sharpe": 1.14,
+          "mdd_pct": -18.4
+        },
+        "1y": {
+          "cagr_pct": 122.15,
+          "sharpe": 2.32,
+          "mdd_pct": -17.9
+        },
+        "2y": {
+          "cagr_pct": 61.4,
+          "sharpe": 1.81,
+          "mdd_pct": -17.9
+        },
+        "3y": {
+          "cagr_pct": 44.37,
+          "sharpe": 1.6,
+          "mdd_pct": -17.9
+        },
+        "5y": {
+          "cagr_pct": 22.59,
+          "sharpe": 1.12,
+          "mdd_pct": -17.9
+        }
+      },
+      "n_sells": 50,
+      "n_ma_sells": 45,
+      "n_entry_sells": 0,
+      "n_reeval_sells": 5,
+      "forward_return_diag": {
+        "n_events": 45,
+        "avg_forward_return_pct": 2.11,
+        "median_forward_return_pct": 1.09
+      }
+    },
+    "gated_buf10": {
+      "params": {
+        "reeval_days": 180,
+        "ma200_backup": true,
+        "ma_stop_mode": "state_gated",
+        "ma_buffer": 0.1
+      },
+      "windows": {
+        "full": {
+          "cagr_pct": 22.25,
+          "sharpe": 1.17,
+          "mdd_pct": -19.0
+        },
+        "1y": {
+          "cagr_pct": 114.8,
+          "sharpe": 2.27,
+          "mdd_pct": -17.5
+        },
+        "2y": {
+          "cagr_pct": 57.98,
+          "sharpe": 1.77,
+          "mdd_pct": -17.5
+        },
+        "3y": {
+          "cagr_pct": 44.98,
+          "sharpe": 1.65,
+          "mdd_pct": -17.5
+        },
+        "5y": {
+          "cagr_pct": 24.06,
+          "sharpe": 1.2,
+          "mdd_pct": -17.5
+        }
+      },
+      "n_sells": 42,
+      "n_ma_sells": 35,
+      "n_entry_sells": 0,
+      "n_reeval_sells": 7,
+      "forward_return_diag": {
+        "n_events": 34,
+        "avg_forward_return_pct": 4.97,
+        "median_forward_return_pct": 3.61
+      }
+    },
+    "trail25": {
+      "params": {
+        "reeval_days": 180,
+        "ma200_backup": false,
+        "entry_stop_pct": 0.25
+      },
+      "windows": {
+        "full": {
+          "cagr_pct": 24.13,
+          "sharpe": 1.19,
+          "mdd_pct": -18.5
+        },
+        "1y": {
+          "cagr_pct": 124.17,
+          "sharpe": 2.3,
+          "mdd_pct": -18.5
+        },
+        "2y": {
+          "cagr_pct": 65.61,
+          "sharpe": 1.86,
+          "mdd_pct": -18.5
+        },
+        "3y": {
+          "cagr_pct": 49.75,
+          "sharpe": 1.71,
+          "mdd_pct": -18.5
+        },
+        "5y": {
+          "cagr_pct": 26.51,
+          "sharpe": 1.24,
+          "mdd_pct": -18.5
+        }
+      },
+      "n_sells": 13,
+      "n_ma_sells": 0,
+      "n_entry_sells": 8,
+      "n_reeval_sells": 5,
+      "forward_return_diag": {
+        "n_events": 8,
+        "avg_forward_return_pct": 8.57,
+        "median_forward_return_pct": 10.33
+      }
+    },
+    "disaster40": {
+      "params": {
+        "reeval_days": 180,
+        "ma200_backup": false,
+        "entry_stop_pct": 0.4
+      },
+      "windows": {
+        "full": {
+          "cagr_pct": 23.56,
+          "sharpe": 1.16,
+          "mdd_pct": -22.3
+        },
+        "1y": {
+          "cagr_pct": 124.41,
+          "sharpe": 2.3,
+          "mdd_pct": -18.5
+        },
+        "2y": {
+          "cagr_pct": 65.53,
+          "sharpe": 1.86,
+          "mdd_pct": -18.5
+        },
+        "3y": {
+          "cagr_pct": 49.67,
+          "sharpe": 1.71,
+          "mdd_pct": -18.5
+        },
+        "5y": {
+          "cagr_pct": 26.92,
+          "sharpe": 1.25,
+          "mdd_pct": -18.5
+        }
+      },
+      "n_sells": 11,
+      "n_ma_sells": 0,
+      "n_entry_sells": 5,
+      "n_reeval_sells": 6,
+      "forward_return_diag": {
+        "n_events": 5,
+        "avg_forward_return_pct": 31.57,
+        "median_forward_return_pct": 30.74
+      }
+    },
+    "old_buggy_unconditional": {
+      "params": {
+        "reeval_days": 180,
+        "ma200_backup": true,
+        "ma_stop_mode": "unconditional",
+        "ma_buffer": 0.03
+      },
+      "windows": {
+        "full": {
+          "cagr_pct": 20.42,
+          "sharpe": 1.16,
+          "mdd_pct": -17.6
+        },
+        "1y": {
+          "cagr_pct": 110.93,
+          "sharpe": 2.26,
+          "mdd_pct": -17.6
+        },
+        "2y": {
+          "cagr_pct": 55.17,
+          "sharpe": 1.74,
+          "mdd_pct": -17.6
+        },
+        "3y": {
+          "cagr_pct": 40.73,
+          "sharpe": 1.57,
+          "mdd_pct": -17.6
+        },
+        "5y": {
+          "cagr_pct": 21.3,
+          "sharpe": 1.13,
+          "mdd_pct": -17.6
+        }
+      },
+      "n_sells": 80,
+      "n_ma_sells": 79,
+      "n_entry_sells": 0,
+      "n_reeval_sells": 1,
+      "forward_return_diag": {
+        "n_events": 77,
+        "avg_forward_return_pct": 2.79,
+        "median_forward_return_pct": 2.95
+      }
+    }
+  },
+  "verdicts": {
+    "reeval90": {
+      "beats_baseline_cagr_pct": 0.0,
+      "beats_baseline": false,
+      "mdd_within_5pp": true,
+      "recent_3y_not_bottom_quartile": true,
+      "adopt_worthy": false
+    },
+    "reeval120": {
+      "beats_baseline_cagr_pct": 0.0,
+      "beats_baseline": false,
+      "mdd_within_5pp": true,
+      "recent_3y_not_bottom_quartile": true,
+      "adopt_worthy": false
+    },
+    "reeval180_baseline": {
+      "beats_baseline_cagr_pct": 0.0,
+      "beats_baseline": false,
+      "mdd_within_5pp": true,
+      "recent_3y_not_bottom_quartile": true,
+      "adopt_worthy": false
+    },
+    "reeval270": {
+      "beats_baseline_cagr_pct": 0.0,
+      "beats_baseline": false,
+      "mdd_within_5pp": true,
+      "recent_3y_not_bottom_quartile": true,
+      "adopt_worthy": false
+    },
+    "gated_buf3": {
+      "beats_baseline_cagr_pct": -3.91,
+      "beats_baseline": false,
+      "mdd_within_5pp": true,
+      "recent_3y_not_bottom_quartile": false,
+      "adopt_worthy": false
+    },
+    "gated_buf5": {
+      "beats_baseline_cagr_pct": -2.47,
+      "beats_baseline": false,
+      "mdd_within_5pp": true,
+      "recent_3y_not_bottom_quartile": true,
+      "adopt_worthy": false
+    },
+    "gated_buf10": {
+      "beats_baseline_cagr_pct": -1.98,
+      "beats_baseline": false,
+      "mdd_within_5pp": true,
+      "recent_3y_not_bottom_quartile": true,
+      "adopt_worthy": false
+    },
+    "trail25": {
+      "beats_baseline_cagr_pct": -0.1,
+      "beats_baseline": false,
+      "mdd_within_5pp": true,
+      "recent_3y_not_bottom_quartile": true,
+      "adopt_worthy": false
+    },
+    "disaster40": {
+      "beats_baseline_cagr_pct": -0.67,
+      "beats_baseline": false,
+      "mdd_within_5pp": true,
+      "recent_3y_not_bottom_quartile": true,
+      "adopt_worthy": false
+    }
+  },
+  "pbo": 0.5714,
+  "pbo_verdict": "높음(IS 1등이 운일 확률 높음 — 채택 보류 권장)",
+  "dsr": 0.1417,
+  "dsr_verdict": "통과 실패(다중검정 감안 시 샤프가 유의하지 않음)",
+  "passed": false,
+  "n_trials_registered": 9
+}
