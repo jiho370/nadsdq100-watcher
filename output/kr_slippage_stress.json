@@ -1,0 +1,98 @@
+{
+  "as_of": "2026-07-10",
+  "core_weight": 0.65,
+  "judgment": "거래세 20bp 고정, 슬리피지만 5~40bp 스트레스 — topn 순위 뒤집히는지 확인",
+  "rows": [
+    {
+      "slippage_bps": 5,
+      "topn": 4,
+      "cagr_pct": 21.09,
+      "sharpe": 1.19,
+      "mdd_pct": -17.2
+    },
+    {
+      "slippage_bps": 5,
+      "topn": 6,
+      "cagr_pct": 20.42,
+      "sharpe": 1.16,
+      "mdd_pct": -17.6
+    },
+    {
+      "slippage_bps": 5,
+      "topn": 9,
+      "cagr_pct": 20.4,
+      "sharpe": 1.16,
+      "mdd_pct": -17.1
+    },
+    {
+      "slippage_bps": 10,
+      "topn": 4,
+      "cagr_pct": 21.02,
+      "sharpe": 1.19,
+      "mdd_pct": -17.2
+    },
+    {
+      "slippage_bps": 10,
+      "topn": 6,
+      "cagr_pct": 20.35,
+      "sharpe": 1.15,
+      "mdd_pct": -17.6
+    },
+    {
+      "slippage_bps": 10,
+      "topn": 9,
+      "cagr_pct": 20.32,
+      "sharpe": 1.16,
+      "mdd_pct": -17.1
+    },
+    {
+      "slippage_bps": 20,
+      "topn": 4,
+      "cagr_pct": 20.87,
+      "sharpe": 1.18,
+      "mdd_pct": -17.2
+    },
+    {
+      "slippage_bps": 20,
+      "topn": 6,
+      "cagr_pct": 20.2,
+      "sharpe": 1.15,
+      "mdd_pct": -17.6
+    },
+    {
+      "slippage_bps": 20,
+      "topn": 9,
+      "cagr_pct": 20.17,
+      "sharpe": 1.15,
+      "mdd_pct": -17.1
+    },
+    {
+      "slippage_bps": 40,
+      "topn": 4,
+      "cagr_pct": 20.58,
+      "sharpe": 1.17,
+      "mdd_pct": -17.3
+    },
+    {
+      "slippage_bps": 40,
+      "topn": 6,
+      "cagr_pct": 19.9,
+      "sharpe": 1.13,
+      "mdd_pct": -17.6
+    },
+    {
+      "slippage_bps": 40,
+      "topn": 9,
+      "cagr_pct": 19.86,
+      "sharpe": 1.14,
+      "mdd_pct": -17.1
+    }
+  ],
+  "top_topn_by_slippage": {
+    "5": 4,
+    "10": 4,
+    "20": 4,
+    "40": 4
+  },
+  "ranking_flips_across_slippage": false
+}

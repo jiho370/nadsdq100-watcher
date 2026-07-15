@@ -28,6 +28,7 @@ import overfit_stats as OS
 import backtest_portfolio as BP
 import backtest_kr_strategies as KS
 import core_satellite_kr as CS
+import kr_sector as KSEC
 
 TOPN_LIST = [3, 4, 5, 6, 7, 8, 9, 10, 15]
 RATIO_LIST = [1.0, 0.8, 0.65, 0.5, 0.35, 0.0]
@@ -206,6 +207,115 @@ def run_mixed_topn_stage(core_weight=0.65, save=True):
     return payload
 
 
+SECTOR_CAPS = [None, 3, 2]        # Fable 자문(2026-07-15): 캡없음/3/2 세 값만 비교
+SLIP_STRESS_TOPN = [4, 6, 9]      # 클린스윕 후보(4)·현행(6)·하락장방어 후보(9)만 스트레스
+SLIP_STRESS_BPS = [5, 10, 20, 40] # 기본 5bp → 4배까지(거래세 20bp는 고정, 곱하지 않음)
+
+
+def _turnover_diag(trade_log: list) -> dict:
+    """trade_log(simulate() 부산물)에서 회전율 진단 통계 추출."""
+    sells = [e for e in trade_log if e.get("action") == "sell"]
+    buys = [e for e in trade_log if e.get("action") == "buy"]
+    relax = [e for e in trade_log if e.get("action") == "sector_cap_relaxed"]
+    held = [e["held_days"] for e in sells]
+    ma200_stops = sum(1 for e in sells if e.get("reason") == "ma200_stop")
+    reevals = sum(1 for e in sells if e.get("reason") == "reeval")
+    return {"n_buys": len(buys), "n_sells": len(sells),
+           "avg_held_days": round(float(np.mean(held)), 1) if held else None,
+           "median_held_days": round(float(np.median(held)), 1) if held else None,
+           "sell_reason_ma200_stop": ma200_stops, "sell_reason_reeval": reevals,
+           "sector_cap_relax_events": len(relax)}
+
+
+def run_sector_turnover_stage(core_weight=0.65, save=True):
+    """Stage 4 — Fable 자문(2026-07-15) 반영: 섹터캡{없음,3,2} × topn 그리드.
+    목적은 topn 재선택이 아니라 강건성 검증(사전 자문 원칙) — 캡을 넣어도 결과가
+    둔감하면 그게 좋은 신호(현재 섹터 쏠림이 적다는 뜻)."""
+    panel, snaps, navs_bm, ma200, cost = _load()
+    b1 = navs_bm["B1_kospi200"].dropna()
+    decisions = KS.build_decisions(panel, snaps, "valuediv")
+    reg = CS.regime_series(b1.reindex(panel.index).ffill())
+    core = CS.timed_nav(b1.reindex(panel.index).ffill(), reg)
+
+    dates_s = [panel.index[p].strftime("%Y%m%d") for p, _ in decisions]
+    sec_cache = KSEC.fetch_sectors(dates_s)
+    def sector_of(date_s, sym): return KSEC.sector_of(sec_cache, date_s, sym)
+
+    results = {}
+    for cap in SECTOR_CAPS:
+        cap_key = "none" if cap is None else str(cap)
+        rows = []
+        for tn in TOPN_LIST:
+            trade_log = []
+            sat_nav = BP.simulate(panel, ma200, decisions, tn, cost,
+                                  sector_of=sector_of, sector_cap=cap, trade_log=trade_log)
+            if sat_nav is None:
+                _log(f"캡={cap_key} topn={tn}: 새틀라이트 NAV 산출 실패"); continue
+            sat = sat_nav / sat_nav.iloc[0]
+            mixed = CS.mix_nav(core, sat, core_weight)
+            f = CS.stats(mixed)
+            if f is None:
+                continue
+            diag = _turnover_diag(trade_log)
+            rows.append({"topn": tn, **f, **diag})
+            _log(f"캡={cap_key} topn={tn:2d}: CAGR {f['cagr_pct']:6.2f}% 샤프 {f['sharpe']:5.2f} "
+                 f"MDD {f['mdd_pct']:6.1f}% · 평균보유 {diag['avg_held_days']}일 · "
+                 f"매도사유(200일선/재평가) {diag['sell_reason_ma200_stop']}/{diag['sell_reason_reeval']} · "
+                 f"캡완화 {diag['sector_cap_relax_events']}회")
+        results[cap_key] = rows
+    payload = {"as_of": panel.index[-1].date().isoformat(), "core_weight": core_weight,
+              "satellite": "valuediv",
+              "judgment": "섹터캡{없음,3,2}×topn — Fable 자문 반영, 강건성 검증 목적(topn 재선택 아님)",
+              "sector_caps_tested": [c if c is not None else "none" for c in SECTOR_CAPS],
+              "results_by_cap": results}
+    if save:
+        os.makedirs("output", exist_ok=True)
+        with open("output/kr_sector_turnover_sweep.json", "w", encoding="utf-8") as f:
+            json.dump(payload, f, ensure_ascii=False, indent=2)
+        _log("저장: output/kr_sector_turnover_sweep.json")
+    return payload
+
+
+def run_slippage_stress(core_weight=0.65, save=True):
+    """Stage 5 — Fable 자문: 거래세(20bp, 고정)는 그대로 두고 슬리피지만 5→40bp로
+    스트레스. 판정: topn 순위(특히 4 vs 6 vs 9)가 4배 슬리피지에서 뒤집히는가."""
+    panel, snaps, navs_bm, ma200, _ = _load()
+    b1 = navs_bm["B1_kospi200"].dropna()
+    decisions = KS.build_decisions(panel, snaps, "valuediv")
+    reg = CS.regime_series(b1.reindex(panel.index).ffill())
+    core = CS.timed_nav(b1.reindex(panel.index).ffill(), reg)
+
+    rows = []
+    for slip in SLIP_STRESS_BPS:
+        cost = BC.CostModel("kospi", commission_bps=1.5, slippage_bps=slip)
+        for tn in SLIP_STRESS_TOPN:
+            sat_nav = BP.simulate(panel, ma200, decisions, tn, cost)
+            if sat_nav is None:
+                continue
+            sat = sat_nav / sat_nav.iloc[0]
+            mixed = CS.mix_nav(core, sat, core_weight)
+            f = CS.stats(mixed)
+            if f is None:
+                continue
+            rows.append({"slippage_bps": slip, "topn": tn, **f})
+            _log(f"슬리피지={slip}bp topn={tn}: CAGR {f['cagr_pct']:6.2f}% 샤프 {f['sharpe']:5.2f}")
+    ranking_by_slip = {}
+    for slip in SLIP_STRESS_BPS:
+        sub = [r for r in rows if r["slippage_bps"] == slip]
+        ranking_by_slip[slip] = sorted(sub, key=lambda r: -r["sharpe"])[0]["topn"] if sub else None
+    flips = len(set(ranking_by_slip.values())) > 1
+    payload = {"as_of": panel.index[-1].date().isoformat(), "core_weight": core_weight,
+              "judgment": "거래세 20bp 고정, 슬리피지만 5~40bp 스트레스 — topn 순위 뒤집히는지 확인",
+              "rows": rows, "top_topn_by_slippage": ranking_by_slip,
+              "ranking_flips_across_slippage": flips}
+    if save:
+        os.makedirs("output", exist_ok=True)
+        with open("output/kr_slippage_stress.json", "w", encoding="utf-8") as f:
+            json.dump(payload, f, ensure_ascii=False, indent=2)
+        _log(f"저장: output/kr_slippage_stress.json (순위 뒤집힘: {flips})")
+    return payload
+
+
 # ------------------------- self-test -------------------------
 def self_test():
     _log("[self-test] Stage1/2 배선 검증 — build_decisions·simulate·mix_nav 인터페이스만 확인"
@@ -229,9 +339,11 @@ def self_test():
 
 def main():
     ap = argparse.ArgumentParser(description="KR valuediv topN·코어비율 스윕")
-    ap.add_argument("--stage", choices=["topn", "ratio", "mixed-topn"], default="topn")
+    ap.add_argument("--stage", choices=["topn", "ratio", "mixed-topn", "sector-turnover", "slippage-stress"],
+                    default="topn")
     ap.add_argument("--topn", type=int, default=6, help="ratio 단계에서 쓸 새틀라이트 topn")
-    ap.add_argument("--core-weight", type=float, default=0.65, help="mixed-topn 단계의 고정 코어비중")
+    ap.add_argument("--core-weight", type=float, default=0.65,
+                    help="mixed-topn/sector-turnover/slippage-stress 단계의 고정 코어비중")
     ap.add_argument("--self-test", action="store_true")
     args = ap.parse_args()
     if args.self_test:
@@ -240,8 +352,12 @@ def main():
         run_topn_stage()
     elif args.stage == "ratio":
         run_ratio_stage(args.topn)
-    else:
+    elif args.stage == "mixed-topn":
         run_mixed_topn_stage(args.core_weight)
+    elif args.stage == "sector-turnover":
+        run_sector_turnover_stage(args.core_weight)
+    else:
+        run_slippage_stress(args.core_weight)
 
 
 if __name__ == "__main__":

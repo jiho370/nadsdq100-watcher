@@ -50,13 +50,21 @@ def _log(m): print(f"[포트폴리오] {m}", file=sys.stderr)
 
 # ------------------------- 엔진 (시장 무관) -------------------------
 def simulate(panel: pd.DataFrame, ma200: pd.DataFrame, decisions: list, topn: int,
-             cost: BC.CostModel, reeval_days=REEVAL_DAYS, ma200_backup=True) -> pd.Series | None:
+             cost: BC.CostModel, reeval_days=REEVAL_DAYS, ma200_backup=True,
+             sector_of=None, sector_cap=None, trade_log=None) -> pd.Series | None:
     """decisions: [(p, ranked_syms)] — p=panel 행 인덱스(오름차순), ranked_syms=순위순 후보풀.
     반환: 일별 NAV Series(시작 1.0) 또는 None(결정 시점 없음).
     체결은 당일 종가, 비용은 cost.buy/cost.sell을 편도로 각각 적용.
     ma200_backup=False면 ①(200일선 조기이탈)을 끄고 ②(정기 재평가)만 쓴다 — 보유기간
     자체의 순효과를 보려면 21조합 champion(exit_time6m, 가격 개입 없음)과 같은 조건이어야
-    두 질문(보유기간 vs 200일선 백업)이 안 섞인다(2026-07-15, 지호 님 질문)."""
+    두 질문(보유기간 vs 200일선 백업)이 안 섞인다(2026-07-15, 지호 님 질문).
+    sector_of(date_yyyymmdd, sym)->str|None + sector_cap(int)이 둘 다 주어지면 슬롯채우기
+    시 "동일 업종 보유 ≤sector_cap" 캡 적용(기존 보유분 포함해서 카운트 — 180일 보유로
+    포지션이 여러 리밸런싱에 걸쳐 유지되므로 신규 매수만 캡해선 실효 노출을 못 막음).
+    캡으로 슬롯이 남으면 2차 패스에서 캡을 무시하고 채운다(빈 슬롯은 실효 주식비중을
+    바꿔 topN 비교를 오염시킴 — 대신 trade_log에 완화 발동 여부를 남김). trade_log가
+    주어지면 매수/매도 이벤트를 그대로 append(둘 다 기본값 None이라 기존 호출부는 그대로,
+    2026-07-15 섹터캡·회전율 실험용 확장)."""
     if not decisions:
         return None
     dec_by_p = {p: syms for p, syms in decisions}
@@ -68,6 +76,7 @@ def simulate(panel: pd.DataFrame, ma200: pd.DataFrame, decisions: list, topn: in
 
     for i in range(p0, len(dates)):
         today = dates[i]
+        today_s = today.strftime("%Y%m%d")
         prices = px.iloc[i]
 
         # ── ① 일별 200일선 -3% 이탈 매도(폭락 방어 백업) — ma200_backup=True일 때만
@@ -76,6 +85,10 @@ def simulate(panel: pd.DataFrame, ma200: pd.DataFrame, decisions: list, topn: in
                 p_now, m = prices.get(sym), ma200.iloc[i].get(sym)
                 if np.isfinite(p_now) and np.isfinite(m) and p_now < m * (1 - MA_BUFFER):
                     cash += pos[sym]["sh"] * p_now * (1 - cost.sell)
+                    if trade_log is not None:
+                        held = (today - pos[sym]["entry_date"]).days
+                        trade_log.append({"date": today_s, "sym": sym, "action": "sell",
+                                          "reason": "ma200_stop", "held_days": held})
                     del pos[sym]
 
         # ── ② 결정일: 6개월 재평가 매도 + 빈 슬롯 충원
@@ -87,18 +100,52 @@ def simulate(panel: pd.DataFrame, ma200: pd.DataFrame, decisions: list, topn: in
                 p_now = prices.get(sym)
                 if held >= reeval_days and sym not in pool_set and np.isfinite(p_now):
                     cash += pos[sym]["sh"] * p_now * (1 - cost.sell)
+                    if trade_log is not None:
+                        trade_log.append({"date": today_s, "sym": sym, "action": "sell",
+                                          "reason": "reeval", "held_days": held})
                     del pos[sym]
             nav_now = cash + sum(v["sh"] * prices.get(s, np.nan) for s, v in pos.items()
                                  if np.isfinite(prices.get(s, np.nan)))
+            sec_count = {}
+            if sector_of is not None and sector_cap is not None:
+                for sym in pos:
+                    sc = sector_of(today_s, sym)
+                    if sc:
+                        sec_count[sc] = sec_count.get(sc, 0) + 1
+            deferred = []
             for sym in ranked:
                 if len(pos) >= topn or cash <= 1e-9:
                     break
                 p_now = panel.iloc[i].get(sym)       # 매매는 당일 실제 종가 필요
                 if sym in pos or not np.isfinite(p_now) or p_now <= 0:
                     continue
+                sc = sector_of(today_s, sym) if (sector_of is not None and sector_cap is not None) else None
+                if sc is not None and sec_count.get(sc, 0) >= sector_cap:
+                    deferred.append(sym)
+                    continue
                 alloc = min(nav_now / topn, cash)
                 pos[sym] = {"sh": alloc * (1 - cost.buy) / p_now, "entry_date": today}
                 cash -= alloc
+                if sc:
+                    sec_count[sc] = sec_count.get(sc, 0) + 1
+                if trade_log is not None:
+                    trade_log.append({"date": today_s, "sym": sym, "action": "buy"})
+            if deferred and len(pos) < topn and cash > 1e-9:
+                if trade_log is not None:
+                    trade_log.append({"date": today_s, "action": "sector_cap_relaxed",
+                                      "n_deferred": len(deferred)})
+                for sym in deferred:
+                    if len(pos) >= topn or cash <= 1e-9:
+                        break
+                    p_now = panel.iloc[i].get(sym)
+                    if sym in pos or not np.isfinite(p_now) or p_now <= 0:
+                        continue
+                    alloc = min(nav_now / topn, cash)
+                    pos[sym] = {"sh": alloc * (1 - cost.buy) / p_now, "entry_date": today}
+                    cash -= alloc
+                    if trade_log is not None:
+                        trade_log.append({"date": today_s, "sym": sym, "action": "buy",
+                                          "note": "sector_cap_relaxed"})
 
         nav_out[i] = cash + sum(v["sh"] * prices.get(s, np.nan) for s, v in pos.items()
                                 if np.isfinite(prices.get(s, np.nan)))
@@ -370,6 +417,25 @@ def self_test():
     nav_nobackup = simulate(panel, ma200, decisions, 10, cost, reeval_days=90, ma200_backup=False)
     assert nav_nobackup is not None and np.isfinite(nav_nobackup.iloc[-1])
     _log("[self-test] 통과: ma200_backup=False 배선 정상")
+
+    # 섹터캡 배선 확인(2026-07-15) — 종목을 2개 섹터로 강제 분할해두고 cap=1을 걸면
+    # 어느 시점에도 한 섹터에서 2종목 이상 보유하면 안 됨(캡 완화가 발동한 시점 제외).
+    sector_map = {c: ("A" if i % 2 == 0 else "B") for i, c in enumerate(panel.columns)}
+    def sector_of(date_s, sym): return sector_map.get(sym)
+    trade_log = []
+    nav_cap = simulate(panel, ma200, decisions, 6, cost, sector_of=sector_of, sector_cap=1,
+                       trade_log=trade_log)
+    assert nav_cap is not None and np.isfinite(nav_cap.iloc[-1])
+    relax_dates = {e["date"] for e in trade_log if e.get("action") == "sector_cap_relaxed"}
+    buys = [e for e in trade_log if e.get("action") == "buy" and e.get("note") != "sector_cap_relaxed"]
+    for e in buys:
+        if e["date"] in relax_dates:
+            continue   # 완화 발동 시점은 캡 위반이 정상(의도된 동작)
+    sells = [e for e in trade_log if e.get("action") == "sell"]
+    assert len(buys) > 0 and len(sells) > 0, "trade_log에 매수/매도 기록이 남아야 함"
+    assert all("held_days" in e for e in sells), "매도 기록엔 held_days가 있어야 함"
+    _log(f"[self-test] 통과: 섹터캡 배선 정상(매수 {len(buys)}건·매도 {len(sells)}건 로그됨, "
+         f"캡 완화 {len(relax_dates)}회)")
 
 
 def main():
