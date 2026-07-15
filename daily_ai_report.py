@@ -379,7 +379,7 @@ def run_us(no_email: bool = False, force: bool = False):
 
     # 편입: 보유 상한 10 + 동일 회사 복수 클래스(GOOG/GOOGL 등) 중복 배제 — 팔아야 산다
     H.add(hstate, [r["symbol"] for r in report.get("buy_now", [])], data["ind_map"], as_of,
-          max_n=int(os.environ.get("US_MAX_HOLD", "10")))
+          max_n=int(os.environ.get("US_MAX_HOLD", "8")))
     H.save(hstate)
 
     # 보유현황(라이브 트래킹): 전체 투입자산 기준 누적수익률 vs SPY(동일시점·동일금액) 시계열

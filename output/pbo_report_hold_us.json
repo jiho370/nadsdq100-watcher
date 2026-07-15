@@ -1,0 +1,41 @@
+{
+  "input": {
+    "horizon": "hold_us",
+    "universe": "pit",
+    "cost": "us: 매수 5.0bp + 매도 5.28bp (왕복 10.28bp)"
+  },
+  "n_trials": 12,
+  "n_events": 107,
+  "pbo": {
+    "pbo": 0.3106,
+    "embargo": 0,
+    "purged_events_total": 0,
+    "n_combos": 924,
+    "n_blocks": 12,
+    "lambda_mean": 1.1079,
+    "is_sharpe_mean": 0.3756,
+    "oos_sharpe_mean": 0.37,
+    "degradation_slope": -0.9461,
+    "prob_oos_loss": 0.0
+  },
+  "pbo_verdict": "중간(주의)",
+  "dsr": {
+    "sr": 0.367,
+    "sr0": 0.0136,
+    "dsr": 1.0,
+    "dsr_uncorrected": 1.0,
+    "skew": 0.8,
+    "kurtosis": 5.993,
+    "T": 107,
+    "T_eff": 107,
+    "N": 12,
+    "best_trial": "hold1m"
+  },
+  "dsr_verdict": "95% 신뢰수준 통과",
+  "passed": true,
+  "references": [
+    "Bailey et al. 2017 (PBO/CSCV)",
+    "Bailey & López de Prado 2014 (DSR)"
+  ],
+  "note": "조합 간 상관으로 N이 과대계상될 수 있어 DSR은 보수적(실제보다 낮게) 추정됨."
+}

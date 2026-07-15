@@ -44,6 +44,9 @@ except Exception:
 
 TRAIL = float(os.environ.get("SELL_TRAIL", "0"))              # 기본 비활성(holdings.py와 동일 env)
 MA_BUFFER = float(os.environ.get("SELL_MA_BUFFER", "0.03"))  # 200일선 -3% 이탈
+# 2026-07-15: holdings.py가 200일선 백업을 기본 비활성화(21조합 검증 하위권 확인)한 것과
+# 정합 — 켜져 있지도 않은 매도 트리거를 화면에 손절선으로 표시하면 실제 동작과 안 맞는다.
+MA200_BACKUP = os.environ.get("SELL_MA200_BACKUP", "0") == "1"
 
 
 def _fmt(p, krw=False):
@@ -95,12 +98,13 @@ def buy_plan(c: dict, krw: bool = False) -> dict:
             {"label": "2차", "price": p2, "pct": 50, "basis": b2},
         ]
         note = "2분할 — 1차 후 조정 오면 2차, 안 오면 1차분만 보유"
-    # 손절선(진입 직후 참고): 기본은 200일선 백업만. TRAIL>0(SELL_TRAIL env)일 때만
-    # 트레일링 참고선도 후보에 넣는다 — 둘 중 높은(더 가까운) 쪽을 표시.
+    # 손절선(진입 직후 참고): 2026-07-15부터 200일선 백업 기본 비활성(holdings.py와 동일 —
+    # 21조합 검증 하위권 확인, 실제 매도 트리거로 안 씀). TRAIL>0이거나 MA200_BACKUP=1일 때만
+    # 해당 후보를 넣는다 — 둘 중 높은(더 가까운) 쪽을 표시.
     candidates = []
     if TRAIL > 0:
         candidates.append((price * (1 - TRAIL), f"1차 매수가 -{int(TRAIL*100)}%"))
-    if _valid(ma200) and ma200 < price:   # 200일선이 현재가 위면(이미 이탈 상태) 손절 기준으로 못 씀
+    if MA200_BACKUP and _valid(ma200) and ma200 < price:   # 200일선이 현재가 위면(이미 이탈 상태) 손절 기준으로 못 씀
         candidates.append((ma200 * (1 - MA_BUFFER), f"200일선 -{int(MA_BUFFER*100)}%"))
     if candidates:
         stop_val, stop_basis = max(candidates, key=lambda x: x[0])

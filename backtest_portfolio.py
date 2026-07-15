@@ -50,10 +50,13 @@ def _log(m): print(f"[포트폴리오] {m}", file=sys.stderr)
 
 # ------------------------- 엔진 (시장 무관) -------------------------
 def simulate(panel: pd.DataFrame, ma200: pd.DataFrame, decisions: list, topn: int,
-             cost: BC.CostModel, reeval_days=REEVAL_DAYS) -> pd.Series | None:
+             cost: BC.CostModel, reeval_days=REEVAL_DAYS, ma200_backup=True) -> pd.Series | None:
     """decisions: [(p, ranked_syms)] — p=panel 행 인덱스(오름차순), ranked_syms=순위순 후보풀.
     반환: 일별 NAV Series(시작 1.0) 또는 None(결정 시점 없음).
-    체결은 당일 종가, 비용은 cost.buy/cost.sell을 편도로 각각 적용."""
+    체결은 당일 종가, 비용은 cost.buy/cost.sell을 편도로 각각 적용.
+    ma200_backup=False면 ①(200일선 조기이탈)을 끄고 ②(정기 재평가)만 쓴다 — 보유기간
+    자체의 순효과를 보려면 21조합 champion(exit_time6m, 가격 개입 없음)과 같은 조건이어야
+    두 질문(보유기간 vs 200일선 백업)이 안 섞인다(2026-07-15, 지호 님 질문)."""
     if not decisions:
         return None
     dec_by_p = {p: syms for p, syms in decisions}
@@ -67,12 +70,13 @@ def simulate(panel: pd.DataFrame, ma200: pd.DataFrame, decisions: list, topn: in
         today = dates[i]
         prices = px.iloc[i]
 
-        # ── ① 일별 200일선 -3% 이탈 매도(폭락 방어 백업)
-        for sym in list(pos):
-            p_now, m = prices.get(sym), ma200.iloc[i].get(sym)
-            if np.isfinite(p_now) and np.isfinite(m) and p_now < m * (1 - MA_BUFFER):
-                cash += pos[sym]["sh"] * p_now * (1 - cost.sell)
-                del pos[sym]
+        # ── ① 일별 200일선 -3% 이탈 매도(폭락 방어 백업) — ma200_backup=True일 때만
+        if ma200_backup:
+            for sym in list(pos):
+                p_now, m = prices.get(sym), ma200.iloc[i].get(sym)
+                if np.isfinite(p_now) and np.isfinite(m) and p_now < m * (1 - MA_BUFFER):
+                    cash += pos[sym]["sh"] * p_now * (1 - cost.sell)
+                    del pos[sym]
 
         # ── ② 결정일: 6개월 재평가 매도 + 빈 슬롯 충원
         ranked = dec_by_p.get(i)
@@ -133,10 +137,10 @@ def monthly_excess(nav: pd.Series, bench: pd.Series) -> tuple[list, list]:
     return out_d, out_r
 
 
-def run_sweep(panel, ma200, bench, decisions, topn_list, cost, market: str):
+def run_sweep(panel, ma200, bench, decisions, topn_list, cost, market: str, ma200_backup=True):
     rows, matrix, dates0 = [], [], None
     for tn in topn_list:
-        nav = simulate(panel, ma200, decisions, tn, cost)
+        nav = simulate(panel, ma200, decisions, tn, cost, ma200_backup=ma200_backup)
         if nav is None:
             _log(f"topn={tn}: NAV 산출 실패(결정 시점 부족)"); continue
         m = metrics(nav, bench)
@@ -172,6 +176,56 @@ def run_sweep(panel, ma200, bench, decisions, topn_list, cost, market: str):
     with open(f"output/pbo_report_portfolio_{market}.json", "w", encoding="utf-8") as f:
         json.dump(report, f, ensure_ascii=False, indent=2)
     _log(f"저장: output/backtest_portfolio_{market}.json · output/pbo_report_portfolio_{market}.json")
+    return payload, report
+
+
+# 2026-07-15 확장(지호 님 질문 — "6개월이 최적이야? 3/9/12개월은?"): backtest_weights.py의
+# 보유기간 스윕은 {1,3,6,12}개월 4점뿐이고 '단일 코호트 decay'만 봤다(재투자·회전율 비용
+# 복리효과 미반영). 여기서는 topN과 같은 포트폴리오 NAV 프레임으로 1~12개월 전부(월 단위)
+# 스윕한다 — 200일선 백업은 끈다(순수 보유기간 효과만, 위 ma200_backup 주석 참고).
+HOLD_MONTHS = list(range(1, 13))
+
+
+def run_hold_sweep(panel, ma200, bench, decisions, topn, cost, market: str):
+    """보유기간(1~12개월, 재평가 주기=reeval_days) 스윕 — topn 고정, ma200 백업 없음."""
+    rows, matrix, dates0 = [], [], None
+    for mo in HOLD_MONTHS:
+        reeval_days = mo * 30
+        nav = simulate(panel, ma200, decisions, topn, cost, reeval_days=reeval_days, ma200_backup=False)
+        if nav is None:
+            _log(f"{mo}개월: NAV 산출 실패"); continue
+        m = metrics(nav, bench)
+        d, r = monthly_excess(nav, bench)
+        if dates0 is None:
+            dates0 = d
+        matrix.append(r[:len(dates0)])
+        rows.append({"hold_months": mo, **m})
+        _log(f"{mo}개월: CAGR {m['cagr_pct']}% (초과 {m['excess_cagr_pct']}%p) · "
+             f"변동성 {m['vol_pct']}% · 샤프 {m['sharpe']} · MDD {m['mdd_pct']}%")
+    if not rows:
+        raise RuntimeError("어떤 보유기간도 시뮬레이션 실패")
+    n_ev = min(len(r) for r in matrix)
+    matrix = [r[:n_ev] for r in matrix]
+
+    payload = {"as_of": panel.index[-1].date().isoformat(), "market": market, "topn": topn,
+              "n_combos": len(rows), "rows": rows, "baseline": "hold_months6(현행 재평가 주기)",
+              "note": "포트폴리오 일별 NAV 시뮬레이션, 200일선 조기이탈 백업 없이(순수 보유기간 "
+                      "효과만) 재평가 주기(=대략적인 보유기간) 1~12개월 스윕. topn 고정.",
+              "adoption_criteria": "현행(6개월) 대비 샤프·MDD 개선이 PBO/DSR(월간 초과수익) "
+                                   "판정을 통과할 때만 보유기간 변경 제안"}
+    trial_data = {"horizon": f"hold_{market}", "universe": "pit", "cost": cost.describe(),
+                 "rebal_days": MONTH, "hold_days": MONTH,
+                 "dates": dates0[:n_ev], "trials": [f"hold{r['hold_months']}m" for r in rows],
+                 "excess_returns": matrix}
+    os.makedirs("output", exist_ok=True)
+    with open(f"output/backtest_hold_{market}.json", "w", encoding="utf-8") as f:
+        json.dump(payload, f, ensure_ascii=False, indent=2)
+    with open(f"output/trial_returns_hold_{market}.json", "w", encoding="utf-8") as f:
+        json.dump(trial_data, f, ensure_ascii=False)
+    report = OS.analyze(trial_data, save=False)
+    with open(f"output/pbo_report_hold_{market}.json", "w", encoding="utf-8") as f:
+        json.dump(report, f, ensure_ascii=False, indent=2)
+    _log(f"저장: output/backtest_hold_{market}.json · output/pbo_report_hold_{market}.json")
     return payload, report
 
 
@@ -312,6 +366,11 @@ def self_test():
     _log(f"[self-test] 통과: vol(N=2) {m2['vol_pct']}% > vol(N=20) {m20['vol_pct']}% · "
          f"월간 초과수익 {len(r)}개")
 
+    # ma200_backup=False 배선 확인 — 꺼도 시뮬레이션이 정상 동작해야 함
+    nav_nobackup = simulate(panel, ma200, decisions, 10, cost, reeval_days=90, ma200_backup=False)
+    assert nav_nobackup is not None and np.isfinite(nav_nobackup.iloc[-1])
+    _log("[self-test] 통과: ma200_backup=False 배선 정상")
+
 
 def main():
     ap = argparse.ArgumentParser(description="포트폴리오 NAV 기반 topN 판정")
@@ -320,6 +379,8 @@ def main():
     ap.add_argument("--rebal-days", type=int, default=63, help="KR 스냅 간격(캐시 재사용을 위해 63 권장)")
     ap.add_argument("--rerank-sweep", action="store_true",
                     help="2단계 재랭킹 스윕(풀 60 고정, 상위 topn 선별 팩터만 교체) — 미국만")
+    ap.add_argument("--hold-sweep", action="store_true",
+                    help="보유기간(1~12개월) 스윕 — topn 고정, 200일선 백업 없이")
     ap.add_argument("--topn", type=int, default=10)
     ap.add_argument("--self-test", action="store_true")
     args = ap.parse_args()
@@ -336,6 +397,9 @@ def main():
             run_rerank_sweep(panel, ma200, spy, dec_by_method, args.topn, cost)
             return
         decisions = us_decisions(panel, funds, pit)
+        if args.hold_sweep:
+            run_hold_sweep(panel, ma200, spy, decisions, args.topn, cost, "us")
+            return
         run_sweep(panel, ma200, spy, decisions, TOPN_US, cost, "us")
     else:
         import backtest_kr as BK
@@ -346,6 +410,9 @@ def main():
         cost = BC.CostModel("kospi", commission_bps=1.5, slippage_bps=5.0)
         ma200 = panel.rolling(200, min_periods=200).mean()
         decisions = kr_decisions(panel, snaps)
+        if args.hold_sweep:
+            run_hold_sweep(panel, ma200, bench, decisions, args.topn, cost, "kr")
+            return
         run_sweep(panel, ma200, bench, decisions, TOPN_KR, cost, "kr")
 
 
