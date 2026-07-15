@@ -1,0 +1,41 @@
+{
+  "input": {
+    "horizon": "entry_ratio",
+    "universe": "pit",
+    "cost": "kospi: 매수 6.5bp + 매도 26.50bp (왕복 33.00bp)"
+  },
+  "n_trials": 7,
+  "n_events": 44,
+  "pbo": {
+    "pbo": 0.0725,
+    "embargo": 3,
+    "purged_events_total": 13734,
+    "n_combos": 772,
+    "n_blocks": 12,
+    "lambda_mean": 1.6615,
+    "is_sharpe_mean": 0.4235,
+    "oos_sharpe_mean": 0.4939,
+    "degradation_slope": -1.4784,
+    "prob_oos_loss": 0.1865
+  },
+  "pbo_verdict": "낮음(과최적화 가능성 작음)",
+  "dsr": {
+    "sr": 0.4046,
+    "sr0": 0.0762,
+    "dsr": 0.8362,
+    "dsr_uncorrected": 0.9788,
+    "skew": -0.133,
+    "kurtosis": 2.756,
+    "T": 44,
+    "T_eff": 11,
+    "N": 7,
+    "best_trial": "entry3_204040"
+  },
+  "dsr_verdict": "통과 실패(다중검정 감안 시 샤프가 유의하지 않음)",
+  "passed": false,
+  "references": [
+    "Bailey et al. 2017 (PBO/CSCV)",
+    "Bailey & López de Prado 2014 (DSR)"
+  ],
+  "note": "조합 간 상관으로 N이 과대계상될 수 있어 DSR은 보수적(실제보다 낮게) 추정됨."
+}
