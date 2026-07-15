@@ -1,0 +1,75 @@
+{
+  "as_of": "2026-07-15",
+  "weights_used": null,
+  "topn": 15,
+  "rebal_days": 63,
+  "n_combos": 7,
+  "rows": [
+    {
+      "entry": "entry1_full",
+      "exit": "exit_time6m",
+      "net_pct": 6.05,
+      "stop_rate_pct": 0.0,
+      "mdd_pct": -13.3,
+      "unfilled_pct": 0.0,
+      "n_events": 44
+    },
+    {
+      "entry": "entry2_5050",
+      "exit": "exit_time6m",
+      "net_pct": 6.73,
+      "stop_rate_pct": 0.0,
+      "mdd_pct": -12.7,
+      "unfilled_pct": 27.3,
+      "n_events": 44
+    },
+    {
+      "entry": "entry2_3070",
+      "exit": "exit_time6m",
+      "net_pct": 7.01,
+      "stop_rate_pct": 0.0,
+      "mdd_pct": -12.5,
+      "unfilled_pct": 38.3,
+      "n_events": 44
+    },
+    {
+      "entry": "entry2_7030",
+      "exit": "exit_time6m",
+      "net_pct": 6.45,
+      "stop_rate_pct": 0.0,
+      "mdd_pct": -12.9,
+      "unfilled_pct": 16.4,
+      "n_events": 44
+    },
+    {
+      "entry": "entry3_303040",
+      "exit": "exit_time6m",
+      "net_pct": 7.22,
+      "stop_rate_pct": 0.0,
+      "mdd_pct": -12.3,
+      "unfilled_pct": 44.7,
+      "n_events": 44
+    },
+    {
+      "entry": "entry3_502525",
+      "exit": "exit_time6m",
+      "net_pct": 6.82,
+      "stop_rate_pct": 0.0,
+      "mdd_pct": -12.6,
+      "unfilled_pct": 31.3,
+      "n_events": 44
+    },
+    {
+      "entry": "entry3_204040",
+      "exit": "exit_time6m",
+      "net_pct": 7.42,
+      "stop_rate_pct": 0.0,
+      "mdd_pct": -12.1,
+      "unfilled_pct": 50.1,
+      "n_events": 44
+    }
+  ],
+  "baseline": "entry2_5050(현행 평시 50/50) · entry3_303040(현행 과열 30/30/40)",
+  "note": "청산 exit_time6m 고정 — 진입 '비율'만 순수 비교(진입×청산 교차 스윕 아님)",
+  "adoption_criteria": "현행 비율(entry2_5050/entry3_303040) 대비 net 개선이 T_eff 보정 후에도 유지될 때만 비율 변경 제안"
+}

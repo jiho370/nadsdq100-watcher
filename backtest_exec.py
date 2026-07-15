@@ -545,18 +545,26 @@ def run_exec(panel, spy, funds, pit, rebal_days=63, topn=15, cost=None,
     return payload, report
 
 
-def run_entry_ratio_sweep(panel, spy, funds, pit, rebal_days=63, topn=15, cost=None, lookback=None):
+def run_entry_ratio_sweep(panel, spy, funds, pit, rebal_days=63, topn=15, cost=None, lookback=None,
+                          select_fn=None, out_suffix="", entries=None):
     """분할매수 '비율' 자체를 스윕(트리거 기준선 20일선-3%/50일선-8%는 라이브와 동일하게 고정,
     비율만 변수) — 청산은 채택된 exit_time6m 1종 고정(entry×exit 교차 아님, entry만 순수 비교).
 
     배경: run_exec의 21조합은 entry1_full(전량) vs entry2/3_pullback(분할)만 비교했다 —
     분할이 이긴다는 결론은 있지만, '왜 50/50과 30/30/40이라는 정확한 비율인가'는 검증된
-    적이 없었다(다른 비율은 시도조차 안 함). 이 함수가 그 공백을 메운다."""
+    적이 없었다(다른 비율은 시도조차 안 함). 이 함수가 그 공백을 메운다.
+
+    select_fn(p)->basket 지정 시 자체 선정(미장 가중치) 대신 사용 — run_exec()과 동일한 주입
+    패턴(2026-07-16, KR 전용 검증용 kr_entry_exit_sweep.py가 valuediv 랭킹을 주입).
+    entries 지정 시 ENTRY_RATIO_SWEEP 대신 사용 — 예: entry1_full을 포함시켜 '분할 vs 전량'
+    자체를 이 함수 하나로 같이 비교(2026-07-16, KR은 21조합을 따로 안 돌려도 되게)."""
     cost = cost or BC.CostModel("us", commission_bps=0.0, slippage_bps=5.0)
-    weights = _load_exec_weights()
-    import tech_factors as T
-    cross = T.build_panels(panel)
-    select_fn = lambda p: _select_basket(panel, p, funds, cross, pit, weights, topn)
+    weights = None
+    if select_fn is None:
+        weights = _load_exec_weights()
+        import tech_factors as T
+        cross = T.build_panels(panel)
+        select_fn = lambda p: _select_basket(panel, p, funds, cross, pit, weights, topn)
     ma20, ma50, ma200, atr = _ma(panel, 20), _ma(panel, 50), _ma(panel, 200), _atr_close(panel)
     spy = spy.reindex(panel.index).ffill() if spy is not None else None
     n = len(panel)
@@ -565,7 +573,7 @@ def run_entry_ratio_sweep(panel, spy, funds, pit, rebal_days=63, topn=15, cost=N
         raise RuntimeError("기간이 짧아 리밸런싱 시점 없음.")
 
     exit_rule = "exit_time6m"
-    entries = ENTRY_RATIO_SWEEP
+    entries = entries or ENTRY_RATIO_SWEEP
     per_combo = {e: {"excess": [], "dates": []} for e in entries}
     stats = {e: {"stop": [], "mdd": [], "unfilled": [], "net": []} for e in entries}
 
@@ -619,9 +627,9 @@ def run_entry_ratio_sweep(panel, spy, funds, pit, rebal_days=63, topn=15, cost=N
                                    "T_eff 보정 후에도 유지될 때만 비율 변경 제안"}
 
     os.makedirs("output", exist_ok=True)
-    compare_path = "output/backtest_entry_ratio_compare.json"
-    trial_path = "output/trial_returns_entry_ratio.json"
-    report_path = "output/pbo_report_entry_ratio.json"
+    compare_path = f"output/backtest_entry_ratio_compare{out_suffix}.json"
+    trial_path = f"output/trial_returns_entry_ratio{out_suffix}.json"
+    report_path = f"output/pbo_report_entry_ratio{out_suffix}.json"
     with open(compare_path, "w", encoding="utf-8") as f:
         json.dump(payload, f, ensure_ascii=False, indent=2)
     trial_data = {"horizon": "entry_ratio", "universe": "pit", "cost": cost.describe(),
@@ -636,14 +644,20 @@ def run_entry_ratio_sweep(panel, spy, funds, pit, rebal_days=63, topn=15, cost=N
     return payload, report
 
 
-def run_disposal_sweep(panel, spy, funds, pit, rebal_days=63, topn=15, cost=None, lookback=None):
+def run_disposal_sweep(panel, spy, funds, pit, rebal_days=63, topn=15, cost=None, lookback=None,
+                       select_fn=None, out_suffix=""):
     """매도 '처분' 방식 스윕 — 트리거(6개월 시점)는 고정, 그 이후 전량즉시 vs 분할+반등대기를
-    비교한다. 진입은 entry1_full로 고정(처분 효과만 순수 비교, 진입 방식과 섞지 않음)."""
+    비교한다. 진입은 entry1_full로 고정(처분 효과만 순수 비교, 진입 방식과 섞지 않음).
+
+    select_fn(p)->basket 지정 시 자체 선정(미장 가중치) 대신 사용(2026-07-16, KR 전용
+    검증용 — run_entry_ratio_sweep과 동일 주입 패턴)."""
     cost = cost or BC.CostModel("us", commission_bps=0.0, slippage_bps=5.0)
-    weights = _load_exec_weights()
-    import tech_factors as T
-    cross = T.build_panels(panel)
-    select_fn = lambda p: _select_basket(panel, p, funds, cross, pit, weights, topn)
+    weights = None
+    if select_fn is None:
+        weights = _load_exec_weights()
+        import tech_factors as T
+        cross = T.build_panels(panel)
+        select_fn = lambda p: _select_basket(panel, p, funds, cross, pit, weights, topn)
     ma20, ma50, ma200, atr = _ma(panel, 20), _ma(panel, 50), _ma(panel, 200), _atr_close(panel)
     spy = spy.reindex(panel.index).ffill() if spy is not None else None
     n = len(panel)
@@ -706,9 +720,9 @@ def run_disposal_sweep(panel, spy, funds, pit, rebal_days=63, topn=15, cost=None
                                    "T_eff 보정 후에도 유지될 때만 처분 방식 변경 제안"}
 
     os.makedirs("output", exist_ok=True)
-    compare_path = "output/backtest_disposal_compare.json"
-    trial_path = "output/trial_returns_disposal.json"
-    report_path = "output/pbo_report_disposal.json"
+    compare_path = f"output/backtest_disposal_compare{out_suffix}.json"
+    trial_path = f"output/trial_returns_disposal{out_suffix}.json"
+    report_path = f"output/pbo_report_disposal{out_suffix}.json"
     with open(compare_path, "w", encoding="utf-8") as f:
         json.dump(payload, f, ensure_ascii=False, indent=2)
     trial_data = {"horizon": "disposal", "universe": "pit", "cost": cost.describe(),
