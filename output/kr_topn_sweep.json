@@ -23,6 +23,15 @@
       "excess_vs_B2": -0.7
     },
     {
+      "topn": 5,
+      "cagr_pct": 13.82,
+      "vol_pct": 15.5,
+      "sharpe": 0.91,
+      "mdd_pct": -20.9,
+      "excess_vs_B1": -11.81,
+      "excess_vs_B2": -1.06
+    },
+    {
       "topn": 6,
       "cagr_pct": 12.6,
       "vol_pct": 14.9,
@@ -32,6 +41,15 @@
       "excess_vs_B2": -2.29
     },
     {
+      "topn": 7,
+      "cagr_pct": 11.16,
+      "vol_pct": 14.1,
+      "sharpe": 0.82,
+      "mdd_pct": -19.2,
+      "excess_vs_B1": -14.47,
+      "excess_vs_B2": -3.73
+    },
+    {
       "topn": 8,
       "cagr_pct": 13.07,
       "vol_pct": 15.1,
@@ -39,6 +57,15 @@
       "mdd_pct": -22.8,
       "excess_vs_B1": -12.57,
       "excess_vs_B2": -1.82
+    },
+    {
+      "topn": 9,
+      "cagr_pct": 12.57,
+      "vol_pct": 14.3,
+      "sharpe": 0.9,
+      "mdd_pct": -21.7,
+      "excess_vs_B1": -13.06,
+      "excess_vs_B2": -2.32
     },
     {
       "topn": 10,
@@ -59,9 +86,9 @@
       "excess_vs_B2": -1.7
     }
   ],
-  "pbo": 0.5628,
-  "pbo_verdict": "높음(IS 1등이 운일 확률 높음 — 채택 보류 권장)",
-  "dsr": 0.2901,
+  "pbo": 0.4968,
+  "pbo_verdict": "중간(주의)",
+  "dsr": 0.2759,
   "dsr_verdict": "통과 실패(다중검정 감안 시 샤프가 유의하지 않음)",
   "passed": false
 }

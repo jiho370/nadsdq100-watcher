@@ -50,32 +50,74 @@ def _log(m): print(f"[포트폴리오] {m}", file=sys.stderr)
 
 # ------------------------- 엔진 (시장 무관) -------------------------
 def simulate(panel: pd.DataFrame, ma200: pd.DataFrame, decisions: list, topn: int,
-             cost: BC.CostModel, reeval_days=REEVAL_DAYS, ma200_backup=True) -> pd.Series | None:
+             cost: BC.CostModel, reeval_days=REEVAL_DAYS, ma200_backup=True,
+             sector_of=None, sector_cap=None, trade_log=None,
+             ma_buffer=MA_BUFFER, ma_stop_mode="unconditional",
+             entry_stop_pct=None) -> pd.Series | None:
     """decisions: [(p, ranked_syms)] — p=panel 행 인덱스(오름차순), ranked_syms=순위순 후보풀.
     반환: 일별 NAV Series(시작 1.0) 또는 None(결정 시점 없음).
     체결은 당일 종가, 비용은 cost.buy/cost.sell을 편도로 각각 적용.
     ma200_backup=False면 ①(200일선 조기이탈)을 끄고 ②(정기 재평가)만 쓴다 — 보유기간
     자체의 순효과를 보려면 21조합 champion(exit_time6m, 가격 개입 없음)과 같은 조건이어야
-    두 질문(보유기간 vs 200일선 백업)이 안 섞인다(2026-07-15, 지호 님 질문)."""
+    두 질문(보유기간 vs 200일선 백업)이 안 섞인다(2026-07-15, 지호 님 질문).
+    sector_of(date_yyyymmdd, sym)->str|None + sector_cap(int)이 둘 다 주어지면 슬롯채우기
+    시 "동일 업종 보유 ≤sector_cap" 캡 적용(기존 보유분 포함해서 카운트 — 180일 보유로
+    포지션이 여러 리밸런싱에 걸쳐 유지되므로 신규 매수만 캡해선 실효 노출을 못 막음).
+    캡으로 슬롯이 남으면 2차 패스에서 캡을 무시하고 채운다(빈 슬롯은 실효 주식비중을
+    바꿔 topN 비교를 오염시킴 — 대신 trade_log에 완화 발동 여부를 남김). trade_log가
+    주어지면 매수/매도 이벤트를 그대로 append(둘 다 기본값 None이라 기존 호출부는 그대로,
+    2026-07-15 섹터캡·회전율 실험용 확장).
+    ma_stop_mode="state_gated"(2026-07-15, Fable 5 자문 — 매도알고리즘 실험)면 매수 시점에
+    이미 200일선 버퍼 아래였던 종목(밸류 전략이 의도적으로 매수하는 케이스)은 MA 백업에서
+    처음엔 면제되고, 이후 한 번이라도 버퍼 위로 회복("armed")한 다음에야 재이탈 시 매도된다
+    — "매수 직후 즉시 매도" 버그의 근본 해법(진입 시점 조건부 면제보다 갈등 재발 여지가
+    적음). entry_stop_pct가 주어지면 MA와 무관하게 "진입가 대비 -X% 하락 시 매도"를
+    독립적으로 적용(트레일링/재난 스톱 — 둘 다 이 파라미터로 표현, 값만 다름: -25%=완만한
+    트레일링, -40%=재난 스톱 근사, DART 이벤트 데이터 미연동이라 가격 임계값으로 근사)."""
     if not decisions:
         return None
     dec_by_p = {p: syms for p, syms in decisions}
     p0 = decisions[0][0]
     px = panel.ffill()                      # 평가용(결측일은 직전가) — 매매는 원 종가 유효할 때만
     dates = panel.index
-    cash, pos = 1.0, {}                     # pos: sym -> {"sh", "entry_date"}
+    cash, pos = 1.0, {}                     # pos: sym -> {"sh", "entry_date", "entry_price", "armed"}
     nav_out = np.full(len(dates), np.nan)
 
     for i in range(p0, len(dates)):
         today = dates[i]
+        today_s = today.strftime("%Y%m%d")
         prices = px.iloc[i]
 
-        # ── ① 일별 200일선 -3% 이탈 매도(폭락 방어 백업) — ma200_backup=True일 때만
+        # ── ① 일별 200일선 -버퍼 이탈 매도(폭락 방어 백업) — ma200_backup=True일 때만
         if ma200_backup:
             for sym in list(pos):
                 p_now, m = prices.get(sym), ma200.iloc[i].get(sym)
-                if np.isfinite(p_now) and np.isfinite(m) and p_now < m * (1 - MA_BUFFER):
+                if not (np.isfinite(p_now) and np.isfinite(m)):
+                    continue
+                above_line = p_now >= m * (1 - ma_buffer)
+                if ma_stop_mode == "state_gated" and not pos[sym].get("armed", False):
+                    if above_line:
+                        pos[sym]["armed"] = True   # 버퍼 위로 회복 — 이제부터 스톱 적용 대상
+                    continue                       # 아직 미회복(면제 구간)이면 이번 스텝은 건너뜀
+                if not above_line:
                     cash += pos[sym]["sh"] * p_now * (1 - cost.sell)
+                    if trade_log is not None:
+                        held = (today - pos[sym]["entry_date"]).days
+                        trade_log.append({"date": today_s, "sym": sym, "action": "sell",
+                                          "reason": "ma200_stop", "held_days": held})
+                    del pos[sym]
+
+        # ── ①b 진입가 대비 -entry_stop_pct% 하락 매도(트레일링/재난 스톱, MA와 무관)
+        if entry_stop_pct is not None:
+            for sym in list(pos):
+                p_now = prices.get(sym)
+                ep = pos[sym].get("entry_price")
+                if np.isfinite(p_now) and ep and p_now < ep * (1 - entry_stop_pct):
+                    cash += pos[sym]["sh"] * p_now * (1 - cost.sell)
+                    if trade_log is not None:
+                        held = (today - pos[sym]["entry_date"]).days
+                        trade_log.append({"date": today_s, "sym": sym, "action": "sell",
+                                          "reason": "entry_stop", "held_days": held})
                     del pos[sym]
 
         # ── ② 결정일: 6개월 재평가 매도 + 빈 슬롯 충원
@@ -87,18 +129,58 @@ def simulate(panel: pd.DataFrame, ma200: pd.DataFrame, decisions: list, topn: in
                 p_now = prices.get(sym)
                 if held >= reeval_days and sym not in pool_set and np.isfinite(p_now):
                     cash += pos[sym]["sh"] * p_now * (1 - cost.sell)
+                    if trade_log is not None:
+                        trade_log.append({"date": today_s, "sym": sym, "action": "sell",
+                                          "reason": "reeval", "held_days": held})
                     del pos[sym]
             nav_now = cash + sum(v["sh"] * prices.get(s, np.nan) for s, v in pos.items()
                                  if np.isfinite(prices.get(s, np.nan)))
+            sec_count = {}
+            if sector_of is not None and sector_cap is not None:
+                for sym in pos:
+                    sc = sector_of(today_s, sym)
+                    if sc:
+                        sec_count[sc] = sec_count.get(sc, 0) + 1
+            deferred = []
             for sym in ranked:
                 if len(pos) >= topn or cash <= 1e-9:
                     break
                 p_now = panel.iloc[i].get(sym)       # 매매는 당일 실제 종가 필요
                 if sym in pos or not np.isfinite(p_now) or p_now <= 0:
                     continue
+                sc = sector_of(today_s, sym) if (sector_of is not None and sector_cap is not None) else None
+                if sc is not None and sec_count.get(sc, 0) >= sector_cap:
+                    deferred.append(sym)
+                    continue
                 alloc = min(nav_now / topn, cash)
-                pos[sym] = {"sh": alloc * (1 - cost.buy) / p_now, "entry_date": today}
+                m_now = ma200.iloc[i].get(sym)
+                armed0 = not (np.isfinite(m_now) and p_now < m_now * (1 - ma_buffer))  # 매수 시 이미 버퍼 아래면 미무장
+                pos[sym] = {"sh": alloc * (1 - cost.buy) / p_now, "entry_date": today,
+                           "entry_price": p_now, "armed": armed0}
                 cash -= alloc
+                if sc:
+                    sec_count[sc] = sec_count.get(sc, 0) + 1
+                if trade_log is not None:
+                    trade_log.append({"date": today_s, "sym": sym, "action": "buy"})
+            if deferred and len(pos) < topn and cash > 1e-9:
+                if trade_log is not None:
+                    trade_log.append({"date": today_s, "action": "sector_cap_relaxed",
+                                      "n_deferred": len(deferred)})
+                for sym in deferred:
+                    if len(pos) >= topn or cash <= 1e-9:
+                        break
+                    p_now = panel.iloc[i].get(sym)
+                    if sym in pos or not np.isfinite(p_now) or p_now <= 0:
+                        continue
+                    alloc = min(nav_now / topn, cash)
+                    m_now = ma200.iloc[i].get(sym)
+                    armed0 = not (np.isfinite(m_now) and p_now < m_now * (1 - ma_buffer))
+                    pos[sym] = {"sh": alloc * (1 - cost.buy) / p_now, "entry_date": today,
+                               "entry_price": p_now, "armed": armed0}
+                    cash -= alloc
+                    if trade_log is not None:
+                        trade_log.append({"date": today_s, "sym": sym, "action": "buy",
+                                          "note": "sector_cap_relaxed"})
 
         nav_out[i] = cash + sum(v["sh"] * prices.get(s, np.nan) for s, v in pos.items()
                                 if np.isfinite(prices.get(s, np.nan)))
@@ -370,6 +452,64 @@ def self_test():
     nav_nobackup = simulate(panel, ma200, decisions, 10, cost, reeval_days=90, ma200_backup=False)
     assert nav_nobackup is not None and np.isfinite(nav_nobackup.iloc[-1])
     _log("[self-test] 통과: ma200_backup=False 배선 정상")
+
+    # 섹터캡 배선 확인(2026-07-15) — 종목을 2개 섹터로 강제 분할해두고 cap=1을 걸면
+    # 어느 시점에도 한 섹터에서 2종목 이상 보유하면 안 됨(캡 완화가 발동한 시점 제외).
+    sector_map = {c: ("A" if i % 2 == 0 else "B") for i, c in enumerate(panel.columns)}
+    def sector_of(date_s, sym): return sector_map.get(sym)
+    trade_log = []
+    nav_cap = simulate(panel, ma200, decisions, 6, cost, sector_of=sector_of, sector_cap=1,
+                       trade_log=trade_log)
+    assert nav_cap is not None and np.isfinite(nav_cap.iloc[-1])
+    relax_dates = {e["date"] for e in trade_log if e.get("action") == "sector_cap_relaxed"}
+    buys = [e for e in trade_log if e.get("action") == "buy" and e.get("note") != "sector_cap_relaxed"]
+    for e in buys:
+        if e["date"] in relax_dates:
+            continue   # 완화 발동 시점은 캡 위반이 정상(의도된 동작)
+    sells = [e for e in trade_log if e.get("action") == "sell"]
+    assert len(buys) > 0 and len(sells) > 0, "trade_log에 매수/매도 기록이 남아야 함"
+    assert all("held_days" in e for e in sells), "매도 기록엔 held_days가 있어야 함"
+    _log(f"[self-test] 통과: 섹터캡 배선 정상(매수 {len(buys)}건·매도 {len(sells)}건 로그됨, "
+         f"캡 완화 {len(relax_dates)}회)")
+
+    # 2026-07-15 "매수 직후 즉시매도" 버그 재현·수정 확인 — 지호 님 리포트 대응.
+    # 종목 A를 200일선 버퍼 아래에서 매수(밸류 전략이 실제로 하는 행동)하도록 가격을 설계:
+    # 처음 260일은 평탄(MA 형성용), 이후 급락시켜 매수 시점엔 이미 버퍼 아래.
+    idx2 = pd.bdate_range("2020-01-01", periods=400)
+    flat = np.full(180, 100.0)
+    predecline = 100.0 * np.exp(np.cumsum(np.full(80, -0.0025)))    # 매수 전 완만한 하락
+    postdecline = predecline[-1] * np.exp(np.cumsum(np.full(140, -0.001)))  # 매수 후도 계속 하락(회복 없음)
+    priceA = pd.Series(np.concatenate([flat, predecline, postdecline]), index=idx2)
+    # 매수 시점(day 260) 가격이 이미 MA 버퍼(-3%) 아래인지 확인(테스트 전제 조건)
+    assert priceA.iloc[260] < priceA.rolling(200, min_periods=200).mean().iloc[260] * 0.97
+    panelA = pd.DataFrame({"A": priceA})
+    ma200A = panelA.rolling(200, min_periods=200).mean()
+    decA = [(260, ["A"])]
+    costA = BC.CostModel("kospi", commission_bps=1.5, slippage_bps=5.0)
+
+    log_unconditional = []
+    simulate(panelA, ma200A, decA, 1, costA, reeval_days=99999, ma200_backup=True,
+            ma_stop_mode="unconditional", trade_log=log_unconditional)
+    ma200_sells_uncond = [e for e in log_unconditional if e.get("reason") == "ma200_stop"]
+    assert ma200_sells_uncond and ma200_sells_uncond[0]["held_days"] <= 10, (
+        f"unconditional 모드는 버퍼 아래 매수 시 즉시(수일 내) 매도돼야 버그 재현: {log_unconditional}")
+
+    log_gated = []
+    simulate(panelA, ma200A, decA, 1, costA, reeval_days=99999, ma200_backup=True,
+            ma_stop_mode="state_gated", trade_log=log_gated)
+    ma200_sells_gated = [e for e in log_gated if e.get("reason") == "ma200_stop"]
+    assert not ma200_sells_gated, (
+        f"state_gated 모드는 회복 없이 계속 버퍼 아래면 MA스톱이 아예 발동하면 안 됨(면제 유지): {log_gated}")
+    _log(f"[self-test] 통과: 매수직후즉시매도 버그 — unconditional 재현(held_days="
+         f"{ma200_sells_uncond[0]['held_days']}) vs state_gated 면제(스톱 0건) 확인")
+
+    # entry_stop_pct(트레일링/재난 스톱) 배선 확인 — MA와 무관하게 진입가 대비 하락으로 매도
+    log_entry_stop = []
+    simulate(panelA, ma200A, decA, 1, costA, reeval_days=99999, ma200_backup=False,
+            entry_stop_pct=0.10, trade_log=log_entry_stop)
+    entry_stop_sells = [e for e in log_entry_stop if e.get("reason") == "entry_stop"]
+    assert entry_stop_sells, f"진입가 -10% 하락 시 entry_stop 매도가 발동해야 함: {log_entry_stop}"
+    _log(f"[self-test] 통과: entry_stop_pct 배선 정상(held_days={entry_stop_sells[0]['held_days']})")
 
 
 def main():

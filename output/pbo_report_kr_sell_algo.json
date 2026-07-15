@@ -1,35 +1,35 @@
 {
   "input": {
-    "horizon": "kr_mixed_topn",
+    "horizon": "kr_sell_algo",
     "universe": "kospi200_pit",
     "cost": "kospi: 매수 6.5bp + 매도 26.50bp (왕복 33.00bp)"
   },
   "n_trials": 9,
   "n_events": 80,
   "pbo": {
-    "pbo": 0.5487,
+    "pbo": 0.5714,
     "embargo": 0,
     "purged_events_total": 0,
     "n_combos": 924,
     "n_blocks": 12,
-    "lambda_mean": -0.0936,
-    "is_sharpe_mean": -0.1173,
-    "oos_sharpe_mean": -0.1391,
-    "degradation_slope": -0.9921,
-    "prob_oos_loss": 0.8604
+    "lambda_mean": 0.1445,
+    "is_sharpe_mean": -0.071,
+    "oos_sharpe_mean": -0.097,
+    "degradation_slope": -1.0469,
+    "prob_oos_loss": 0.737
   },
   "pbo_verdict": "높음(IS 1등이 운일 확률 높음 — 채택 보류 권장)",
   "dsr": {
-    "sr": -0.1195,
-    "sr0": 0.0137,
-    "dsr": 0.1217,
-    "dsr_uncorrected": 0.1217,
-    "skew": 0.16,
-    "kurtosis": 4.098,
+    "sr": -0.0778,
+    "sr0": 0.0425,
+    "dsr": 0.1417,
+    "dsr_uncorrected": 0.1417,
+    "skew": -0.138,
+    "kurtosis": 3.614,
     "T": 80,
     "T_eff": 80,
     "N": 9,
-    "best_trial": "topn5"
+    "best_trial": "reeval90"
   },
   "dsr_verdict": "통과 실패(다중검정 감안 시 샤프가 유의하지 않음)",
   "passed": false,
