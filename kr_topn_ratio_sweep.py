@@ -50,6 +50,25 @@ def _load():
     return panel, snaps, navs_bm, ma200, cost
 
 
+def _load_long(rebal_days=63, cache_path="output/kr_panel_cache_13y.pkl"):
+    """8년 공용 캐시와 별도인 13년 캐시 로더(2026-07-16, 지호 님 질문 — 손절% 재검증에서
+    8년 표본이 결론을 왜곡한 게 드러나서 topn도 같은 함정인지 확인). kr_sell_algo_sweep.py
+    의 동명 함수와 동일 — 캐시는 backtest_kr.prepare_kr_data(years=13)로 미리 생성해둔
+    output/kr_panel_cache_13y.pkl(gitignore 대상, 로컬 전용) 재사용."""
+    import pickle
+    import backtest_kr as BK
+    from benchmarks_kr import build_benchmarks
+    with open(cache_path, "rb") as f:
+        d = pickle.load(f)
+    panel, bench = d["panel"], d["bench"]
+    snaps, _, _ = BK.build_kr_snaps(panel, bench, d["membership"], d["fundamentals"],
+                                    rebal_days=rebal_days, flows=d["flows"], mktcaps=d["mktcaps"])
+    navs_bm = build_benchmarks(panel, d["membership"], d["mktcaps"], bench)
+    ma200 = panel.rolling(200, min_periods=200).mean()
+    cost = BC.CostModel("kospi", commission_bps=1.5, slippage_bps=5.0)
+    return panel, snaps, navs_bm, ma200, cost
+
+
 def run_topn_stage(save=True):
     panel, snaps, navs_bm, ma200, cost = _load()
     b1 = navs_bm["B1_kospi200"].reindex(panel.index).ffill()
@@ -151,10 +170,11 @@ def run_ratio_stage(topn: int, save=True):
     return payload
 
 
-def run_mixed_topn_stage(core_weight=0.65, save=True):
+def run_mixed_topn_stage(core_weight=0.65, save=True, loader=_load, out_prefix="output/kr_mixed_topn_sweep"):
     """Stage 3 — 코어비중 고정(현행 0.65), 그 안에서 새틀라이트 topn만 스윕.
-    Stage 1(새틀라이트 단독 vs B2)과 다른 질문: '65:35로 섞을 때 새틀라이트 몇 종목이 나은가'."""
-    panel, snaps, navs_bm, ma200, cost = _load()
+    Stage 1(새틀라이트 단독 vs B2)과 다른 질문: '65:35로 섞을 때 새틀라이트 몇 종목이 나은가'.
+    loader=_load_long·out_prefix로 13년 재검증도 동일 함수로 재사용(2026-07-16)."""
+    panel, snaps, navs_bm, ma200, cost = loader()
     b1 = navs_bm["B1_kospi200"].dropna()
     decisions = KS.build_decisions(panel, snaps, "valuediv")
     reg = CS.regime_series(b1.reindex(panel.index).ffill())
@@ -199,11 +219,11 @@ def run_mixed_topn_stage(core_weight=0.65, save=True):
               "passed": rpt.get("passed", False)}
     if save:
         os.makedirs("output", exist_ok=True)
-        with open("output/kr_mixed_topn_sweep.json", "w", encoding="utf-8") as f:
+        with open(f"{out_prefix}.json", "w", encoding="utf-8") as f:
             json.dump(payload, f, ensure_ascii=False, indent=2)
-        with open("output/pbo_report_kr_mixed_topn.json", "w", encoding="utf-8") as f:
+        with open(f"{out_prefix}_pbo.json", "w", encoding="utf-8") as f:
             json.dump(rpt, f, ensure_ascii=False, indent=2)
-        _log(f"저장: output/kr_mixed_topn_sweep.json · PBO {payload['pbo']} · DSR {payload['dsr']}")
+        _log(f"저장: {out_prefix}.json · PBO {payload['pbo']} · DSR {payload['dsr']}")
     return payload
 
 
@@ -339,8 +359,8 @@ def self_test():
 
 def main():
     ap = argparse.ArgumentParser(description="KR valuediv topN·코어비율 스윕")
-    ap.add_argument("--stage", choices=["topn", "ratio", "mixed-topn", "sector-turnover", "slippage-stress"],
-                    default="topn")
+    ap.add_argument("--stage", choices=["topn", "ratio", "mixed-topn", "sector-turnover",
+                                        "slippage-stress", "mixed-topn-13y"], default="topn")
     ap.add_argument("--topn", type=int, default=6, help="ratio 단계에서 쓸 새틀라이트 topn")
     ap.add_argument("--core-weight", type=float, default=0.65,
                     help="mixed-topn/sector-turnover/slippage-stress 단계의 고정 코어비중")
@@ -356,6 +376,9 @@ def main():
         run_mixed_topn_stage(args.core_weight)
     elif args.stage == "sector-turnover":
         run_sector_turnover_stage(args.core_weight)
+    elif args.stage == "mixed-topn-13y":
+        run_mixed_topn_stage(args.core_weight, loader=_load_long,
+                             out_prefix="output/kr_mixed_topn_sweep_13y")
     else:
         run_slippage_stress(args.core_weight)
 
