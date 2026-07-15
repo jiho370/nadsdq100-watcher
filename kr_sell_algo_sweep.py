@@ -200,6 +200,108 @@ def run(save=True):
     return payload
 
 
+ENTRY_STOP_GRID = [0.10, 0.15, 0.20, 0.25, 0.30, 0.35, 0.40]
+
+
+def run_entry_stop_grid(save=True):
+    """2026-07-15 지호 님 질문 대응: -25%는 그리드 스윕 없이 고른 값이었다는 지적이 맞음.
+    Fable 5 자문: 10~40%로 스윕해 평탄 고지대(고르면 신뢰)인지 뾰족한 최적점(과적합 신호로
+    오히려 신뢰 하락)인지 확인, 발동 빈도도 같이 기록(연 1회 미만이면 통계 아니라 일화)."""
+    panel, snaps, navs_bm, ma200, cost = _load()
+    b1 = navs_bm["B1_kospi200"].dropna()
+    decisions = KS.build_decisions(panel, snaps, "valuediv")
+    reg = CS.regime_series(b1.reindex(panel.index).ffill())
+    core = CS.timed_nav(b1.reindex(panel.index).ffill(), reg)
+    n_years = (panel.index[-1] - panel.index[0]).days / 365.25
+
+    rows = []
+    for pct in ENTRY_STOP_GRID:
+        trade_log = []
+        sat_nav = BP.simulate(panel, ma200, decisions, TOPN, cost, reeval_days=180,
+                              ma200_backup=False, entry_stop_pct=pct, trade_log=trade_log)
+        if sat_nav is None:
+            continue
+        sat = sat_nav / sat_nav.iloc[0]
+        mixed = CS.mix_nav(core, sat, CORE_WEIGHT)
+        f = CS.stats(mixed)
+        if f is None:
+            continue
+        diag = _forward_return_diag(trade_log, panel)
+        n_stops = sum(1 for e in trade_log if e.get("reason") == "entry_stop")
+        rows.append({"entry_stop_pct": pct, **f, "n_stops": n_stops,
+                    "stops_per_year": round(n_stops / n_years, 2),
+                    "forward_return_diag": diag})
+        _log(f"entry_stop=-{pct*100:.0f}%: CAGR {f['cagr_pct']:6.2f}% 샤프 {f['sharpe']:5.2f} "
+             f"MDD {f['mdd_pct']:6.1f}% · 발동 {n_stops}회(연 {n_stops/n_years:.2f}회) · "
+             f"발동후{FWD_HORIZON}일 평균수익률 {diag['avg_forward_return_pct']}%")
+    payload = {"as_of": panel.index[-1].date().isoformat(), "topn": TOPN, "core_weight": CORE_WEIGHT,
+              "judgment": "10~40% 그리드 — 평탄고지대 vs 뾰족한최적점 확인(Fable 5 자문, "
+                          "2026-07-16). 이론적 참고: 코스피 개별주 연변동성 ~35%면 6개월 보유 "
+                          "시 반기 시그마 ≈25% — -25%는 대략 1시그마(정상 등락과 구분 어려움), "
+                          "-40%가 대략 2시그마(진짜 이상 신호에 가까움)",
+              "rows": rows}
+    if save:
+        os.makedirs("output", exist_ok=True)
+        with open("output/kr_entry_stop_grid.json", "w", encoding="utf-8") as f:
+            json.dump(payload, f, ensure_ascii=False, indent=2)
+        _log("저장: output/kr_entry_stop_grid.json")
+    return payload
+
+
+YEAR_END_REEVAL_TEST = [90, 180]
+
+
+def run_year_end_stage(save=True):
+    """2026-07-15 지호 님 질문: 연말에 절세 목적으로 수익 포지션을 강제 정리해야 하는
+    실제 관행이 있는데, 이걸 반영하면 3개월(90일) vs 6개월(180일) 재평가 결론이 바뀔까?
+    (직전 백테스트에서 reeval 90~270일이 전부 동일했던 건 이 제약이 없어서였을 가능성 —
+    Fable 5 예측: 연말 제약을 넣으면 드디어 갈릴 것, 180일이 1월매수+7월재평가+12월강제
+    정리로 자연스럽게 정렬돼 90일보다 나을 것으로 예상). year_end_rebuy="wait"(재매수 안
+    하고 다음 리밸런싱까지 현금 보유) vs "immediate"(같은 날 재매수, 세금 이벤트만 발생)
+    두 변형 비교 — 그 차이가 이 제약의 실질 비용."""
+    panel, snaps, navs_bm, ma200, cost = _load()
+    b1 = navs_bm["B1_kospi200"].dropna()
+    decisions = KS.build_decisions(panel, snaps, "valuediv")
+    reg = CS.regime_series(b1.reindex(panel.index).ffill())
+    core = CS.timed_nav(b1.reindex(panel.index).ffill(), reg)
+
+    rows = []
+    for reeval in YEAR_END_REEVAL_TEST:
+        for rebuy in ("wait", "immediate"):
+            trade_log = []
+            sat_nav = BP.simulate(panel, ma200, decisions, TOPN, cost, reeval_days=reeval,
+                                  ma200_backup=False, year_end_liquidate=True,
+                                  year_end_rebuy=rebuy, trade_log=trade_log)
+            if sat_nav is None:
+                continue
+            sat = sat_nav / sat_nav.iloc[0]
+            mixed = CS.mix_nav(core, sat, CORE_WEIGHT)
+            f = CS.stats(mixed)
+            if f is None:
+                continue
+            n_ye = sum(1 for e in trade_log if e.get("reason") == "year_end_taxharvest")
+            rows.append({"reeval_days": reeval, "year_end_rebuy": rebuy, **f,
+                        "n_year_end_sells": n_ye})
+            _log(f"reeval={reeval} rebuy={rebuy}: CAGR {f['cagr_pct']:6.2f}% 샤프 {f['sharpe']:5.2f} "
+                 f"MDD {f['mdd_pct']:6.1f}% · 연말강제매도 {n_ye}회")
+    sat_nav0 = BP.simulate(panel, ma200, decisions, TOPN, cost, reeval_days=180, ma200_backup=False)
+    sat0 = sat_nav0 / sat_nav0.iloc[0]
+    mixed0 = CS.mix_nav(core, sat0, CORE_WEIGHT)
+    f0 = CS.stats(mixed0)
+    _log(f"(참고) 연말 제약 없는 현행(reeval180): CAGR {f0['cagr_pct']:.2f}% 샤프 {f0['sharpe']:.2f} "
+         f"MDD {f0['mdd_pct']:.1f}%")
+    payload = {"as_of": panel.index[-1].date().isoformat(), "topn": TOPN, "core_weight": CORE_WEIGHT,
+              "judgment": "연말 강제정리(수익종목만 매도, 손실종목은 유지) 제약 하에서 재평가 "
+                          "90일 vs 180일, 즉시재매수 vs 대기재매수 비교(Fable 5 자문, 2026-07-16)",
+              "no_constraint_baseline": f0, "rows": rows}
+    if save:
+        os.makedirs("output", exist_ok=True)
+        with open("output/kr_year_end_sweep.json", "w", encoding="utf-8") as f:
+            json.dump(payload, f, ensure_ascii=False, indent=2)
+        _log("저장: output/kr_year_end_sweep.json")
+    return payload
+
+
 # ------------------------- self-test -------------------------
 def self_test():
     _log("[self-test] 합성 데이터로 후보별 배선·다기간 슬라이싱·전방수익률 진단 검증(네트워크 없음)")
@@ -241,11 +343,17 @@ def self_test():
 
 def main():
     ap = argparse.ArgumentParser(description="국장 새틀라이트 매도알고리즘 강건성 검증")
+    ap.add_argument("--stage", choices=["main", "entry-stop-grid", "year-end"], default="main")
     ap.add_argument("--self-test", action="store_true")
     args = ap.parse_args()
     if args.self_test:
         self_test(); return
-    run()
+    if args.stage == "main":
+        run()
+    elif args.stage == "entry-stop-grid":
+        run_entry_stop_grid()
+    else:
+        run_year_end_stage()
 
 
 if __name__ == "__main__":

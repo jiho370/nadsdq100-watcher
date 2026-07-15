@@ -48,12 +48,28 @@ US_RERANKS = ["base", "mom12_1", "mom6", "hi52", "lowvol", "value"]
 def _log(m): print(f"[포트폴리오] {m}", file=sys.stderr)
 
 
+def _year_end_trigger_dates(dates: pd.DatetimeIndex, cutoff_month=12, cutoff_day=28,
+                            lookback_days=7) -> set:
+    """연도별 (월,일) 컷오프 직전(±lookback_days 내) 마지막 거래일 집합 — 절세 목적 연말
+    강제 정리 트리거(2026-07-15, 지호 님 질문). lookback_days 창 안에 실제 거래일이
+    있어야만 트리거로 인정 — 데이터가 12월까지 안 닿는 마지막 부분연도를 "연말"로
+    오인하는 버그 방지(self-test로 재현·수정 확인)."""
+    trig = set()
+    for y in sorted(set(dates.year)):
+        cutoff = pd.Timestamp(year=y, month=cutoff_month, day=cutoff_day)
+        window = dates[(dates <= cutoff) & (dates >= cutoff - pd.Timedelta(days=int(lookback_days)))]
+        if len(window):
+            trig.add(window.max())
+    return trig
+
+
 # ------------------------- 엔진 (시장 무관) -------------------------
 def simulate(panel: pd.DataFrame, ma200: pd.DataFrame, decisions: list, topn: int,
              cost: BC.CostModel, reeval_days=REEVAL_DAYS, ma200_backup=True,
              sector_of=None, sector_cap=None, trade_log=None,
              ma_buffer=MA_BUFFER, ma_stop_mode="unconditional",
-             entry_stop_pct=None) -> pd.Series | None:
+             entry_stop_pct=None, year_end_liquidate=False,
+             year_end_rebuy="wait") -> pd.Series | None:
     """decisions: [(p, ranked_syms)] — p=panel 행 인덱스(오름차순), ranked_syms=순위순 후보풀.
     반환: 일별 NAV Series(시작 1.0) 또는 None(결정 시점 없음).
     체결은 당일 종가, 비용은 cost.buy/cost.sell을 편도로 각각 적용.
@@ -73,13 +89,19 @@ def simulate(panel: pd.DataFrame, ma200: pd.DataFrame, decisions: list, topn: in
     — "매수 직후 즉시 매도" 버그의 근본 해법(진입 시점 조건부 면제보다 갈등 재발 여지가
     적음). entry_stop_pct가 주어지면 MA와 무관하게 "진입가 대비 -X% 하락 시 매도"를
     독립적으로 적용(트레일링/재난 스톱 — 둘 다 이 파라미터로 표현, 값만 다름: -25%=완만한
-    트레일링, -40%=재난 스톱 근사, DART 이벤트 데이터 미연동이라 가격 임계값으로 근사)."""
+    트레일링, -40%=재난 스톱 근사, DART 이벤트 데이터 미연동이라 가격 임계값으로 근사).
+    year_end_liquidate=True(2026-07-15, 지호 님 질문 — 연말 절세 관행)면 매년 12/28
+    이전 마지막 거래일에 **수익 포지션만** 강제 매도(손실 포지션은 유지 — 손익 비대칭이
+    핵심, Fable 5 자문). year_end_rebuy="immediate"면 같은 날 같은 종목·비중으로 즉시
+    재매수(세금 이벤트만 발생, 시장노출 유지) — "wait"(기본)면 재매수 안 하고 다음
+    정기 리밸런싱의 빈 슬롯 충원 로직이 자연스럽게 채우도록 둔다(현금 보유 구간 발생)."""
     if not decisions:
         return None
     dec_by_p = {p: syms for p, syms in decisions}
     p0 = decisions[0][0]
     px = panel.ffill()                      # 평가용(결측일은 직전가) — 매매는 원 종가 유효할 때만
     dates = panel.index
+    year_end_dates = _year_end_trigger_dates(dates) if year_end_liquidate else set()
     cash, pos = 1.0, {}                     # pos: sym -> {"sh", "entry_date", "entry_price", "armed"}
     nav_out = np.full(len(dates), np.nan)
 
@@ -119,6 +141,36 @@ def simulate(panel: pd.DataFrame, ma200: pd.DataFrame, decisions: list, topn: in
                         trade_log.append({"date": today_s, "sym": sym, "action": "sell",
                                           "reason": "entry_stop", "held_days": held})
                     del pos[sym]
+
+        # ── ①c 연말 강제 정리(절세 관행) — 수익 포지션만 매도, 손실은 유지
+        if year_end_liquidate and today in year_end_dates:
+            rebuy = []
+            for sym in list(pos):
+                p_now = prices.get(sym)
+                ep = pos[sym].get("entry_price")
+                if np.isfinite(p_now) and ep and p_now > ep:
+                    cash += pos[sym]["sh"] * p_now * (1 - cost.sell)
+                    if trade_log is not None:
+                        held = (today - pos[sym]["entry_date"]).days
+                        trade_log.append({"date": today_s, "sym": sym, "action": "sell",
+                                          "reason": "year_end_taxharvest", "held_days": held})
+                    armed_prev = pos[sym].get("armed", True)
+                    del pos[sym]
+                    if year_end_rebuy == "immediate":
+                        rebuy.append((sym, p_now, armed_prev))
+            if rebuy:
+                nav_now = cash + sum(v["sh"] * prices.get(s, np.nan) for s, v in pos.items()
+                                     if np.isfinite(prices.get(s, np.nan)))
+                for sym, p_now, armed_prev in rebuy:
+                    if cash <= 1e-9 or not np.isfinite(p_now) or p_now <= 0:
+                        continue
+                    alloc = min(nav_now / topn, cash)
+                    pos[sym] = {"sh": alloc * (1 - cost.buy) / p_now, "entry_date": today,
+                               "entry_price": p_now, "armed": armed_prev}
+                    cash -= alloc
+                    if trade_log is not None:
+                        trade_log.append({"date": today_s, "sym": sym, "action": "buy",
+                                          "note": "year_end_immediate_rebuy"})
 
         # ── ② 결정일: 6개월 재평가 매도 + 빈 슬롯 충원
         ranked = dec_by_p.get(i)
@@ -510,6 +562,38 @@ def self_test():
     entry_stop_sells = [e for e in log_entry_stop if e.get("reason") == "entry_stop"]
     assert entry_stop_sells, f"진입가 -10% 하락 시 entry_stop 매도가 발동해야 함: {log_entry_stop}"
     _log(f"[self-test] 통과: entry_stop_pct 배선 정상(held_days={entry_stop_sells[0]['held_days']})")
+
+    # 2026-07-15 연말 강제 정리(절세) 배선 확인 — 수익 종목(W)만 매도, 손실 종목(L)은 유지.
+    idxY = pd.bdate_range("2020-01-01", periods=300)
+    up = 100.0 * np.exp(np.cumsum(np.full(250, 0.003)))     # 수익 종목
+    down = 100.0 * np.exp(np.cumsum(np.full(250, -0.003)))  # 손실 종목
+    panelY = pd.DataFrame({"W": np.concatenate([np.full(50, 100.0), up]),
+                           "L": np.concatenate([np.full(50, 100.0), down])}, index=idxY)
+    ma200Y = panelY.rolling(50, min_periods=1).mean()   # ma200_backup 안 씀 — armed 초기화용 더미
+    decY = [(50, ["W", "L"])]
+    costY = BC.CostModel("kospi", commission_bps=1.5, slippage_bps=5.0)
+
+    log_wait = []
+    simulate(panelY, ma200Y, decY, 2, costY, reeval_days=99999, ma200_backup=False,
+            year_end_liquidate=True, year_end_rebuy="wait", trade_log=log_wait)
+    ye_sells = [e for e in log_wait if e.get("reason") == "year_end_taxharvest"]
+    assert len(ye_sells) >= 1 and all(e["sym"] == "W" for e in ye_sells), (
+        f"연말 강제정리는 수익종목(W)만 팔아야 함: {ye_sells}")
+    assert not any(e.get("action") == "buy" and e.get("note") == "year_end_immediate_rebuy"
+                  for e in log_wait), "year_end_rebuy='wait'는 즉시 재매수하면 안 됨"
+
+    log_immediate = []
+    simulate(panelY, ma200Y, decY, 2, costY, reeval_days=99999, ma200_backup=False,
+            year_end_liquidate=True, year_end_rebuy="immediate", trade_log=log_immediate)
+    rebuys = [e for e in log_immediate if e.get("note") == "year_end_immediate_rebuy"]
+    assert len(rebuys) >= 1 and all(e["sym"] == "W" for e in rebuys), (
+        f"year_end_rebuy='immediate'는 매도된 수익종목을 같은 날 재매수해야 함: {rebuys}")
+    # 부분연도(12월까지 안 닿는 마지막 구간) 오탐 방지 확인 — 패널이 2021-02-23에서 끝나므로
+    # 2021년엔 실제 12월 데이터가 없어 트리거가 없어야 함(있으면 버그).
+    trig = _year_end_trigger_dates(panelY.index)
+    assert all(d.month == 12 for d in trig), f"12월 데이터 없는 부분연도가 트리거로 오탐: {trig}"
+    _log(f"[self-test] 통과: 연말 강제정리 배선 정상(수익종목만 매도 {len(ye_sells)}회, "
+         f"즉시재매수 모드 재매수 {len(rebuys)}회, 트리거일 {sorted(trig)})")
 
 
 def main():

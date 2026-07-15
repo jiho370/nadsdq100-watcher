@@ -1,0 +1,99 @@
+{
+  "as_of": "2026-07-10",
+  "topn": 6,
+  "core_weight": 0.65,
+  "judgment": "10~40% 그리드 — 평탄고지대 vs 뾰족한최적점 확인(Fable 5 자문, 2026-07-16). 이론적 참고: 코스피 개별주 연변동성 ~35%면 6개월 보유 시 반기 시그마 ≈25% — -25%는 대략 1시그마(정상 등락과 구분 어려움), -40%가 대략 2시그마(진짜 이상 신호에 가까움)",
+  "rows": [
+    {
+      "entry_stop_pct": 0.1,
+      "cagr_pct": 24.62,
+      "sharpe": 1.21,
+      "mdd_pct": -18.7,
+      "n_stops": 17,
+      "stops_per_year": 2.13,
+      "forward_return_diag": {
+        "n_events": 17,
+        "avg_forward_return_pct": -3.35,
+        "median_forward_return_pct": -3.61
+      }
+    },
+    {
+      "entry_stop_pct": 0.15,
+      "cagr_pct": 23.83,
+      "sharpe": 1.18,
+      "mdd_pct": -18.5,
+      "n_stops": 14,
+      "stops_per_year": 1.75,
+      "forward_return_diag": {
+        "n_events": 14,
+        "avg_forward_return_pct": 3.95,
+        "median_forward_return_pct": -1.54
+      }
+    },
+    {
+      "entry_stop_pct": 0.2,
+      "cagr_pct": 24.63,
+      "sharpe": 1.21,
+      "mdd_pct": -18.5,
+      "n_stops": 9,
+      "stops_per_year": 1.13,
+      "forward_return_diag": {
+        "n_events": 9,
+        "avg_forward_return_pct": 2.8,
+        "median_forward_return_pct": 6.5
+      }
+    },
+    {
+      "entry_stop_pct": 0.25,
+      "cagr_pct": 24.13,
+      "sharpe": 1.19,
+      "mdd_pct": -18.5,
+      "n_stops": 8,
+      "stops_per_year": 1.0,
+      "forward_return_diag": {
+        "n_events": 8,
+        "avg_forward_return_pct": 8.57,
+        "median_forward_return_pct": 10.33
+      }
+    },
+    {
+      "entry_stop_pct": 0.3,
+      "cagr_pct": 23.66,
+      "sharpe": 1.17,
+      "mdd_pct": -19.8,
+      "n_stops": 8,
+      "stops_per_year": 1.0,
+      "forward_return_diag": {
+        "n_events": 8,
+        "avg_forward_return_pct": 17.31,
+        "median_forward_return_pct": 16.17
+      }
+    },
+    {
+      "entry_stop_pct": 0.35,
+      "cagr_pct": 23.01,
+      "sharpe": 1.13,
+      "mdd_pct": -22.3,
+      "n_stops": 7,
+      "stops_per_year": 0.88,
+      "forward_return_diag": {
+        "n_events": 7,
+        "avg_forward_return_pct": 25.23,
+        "median_forward_return_pct": 29.71
+      }
+    },
+    {
+      "entry_stop_pct": 0.4,
+      "cagr_pct": 23.56,
+      "sharpe": 1.16,
+      "mdd_pct": -22.3,
+      "n_stops": 5,
+      "stops_per_year": 0.63,
+      "forward_return_diag": {
+        "n_events": 5,
+        "avg_forward_return_pct": 31.57,
+        "median_forward_return_pct": 30.74
+      }
+    }
+  ]
+}
