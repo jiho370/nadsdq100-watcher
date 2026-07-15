@@ -1,0 +1,41 @@
+{
+  "as_of": "20260701",
+  "screen": "PBR≤0.8·0<PER≤8.0·거래대금≥3e+08·시총≥3e+10·시총하위50%",
+  "bench": "코스닥 종합지수",
+  "rows": [
+    {
+      "topn": 10,
+      "cagr_pct": -3.46,
+      "excess_vs_kosdaq_pct": -5.05,
+      "sharpe": 0.02,
+      "mdd_pct": -50.8,
+      "n_rebal": 96
+    },
+    {
+      "topn": 20,
+      "cagr_pct": 2.81,
+      "excess_vs_kosdaq_pct": 1.22,
+      "sharpe": 0.24,
+      "mdd_pct": -41.0,
+      "n_rebal": 96
+    },
+    {
+      "topn": 30,
+      "cagr_pct": 2.66,
+      "excess_vs_kosdaq_pct": 1.07,
+      "sharpe": 0.23,
+      "mdd_pct": -41.6,
+      "n_rebal": 96
+    }
+  ],
+  "limitations": [
+    "3년연속흑자·부채비율 필터 미적용(DART 필요) — PBR·PER·거래대금으로 축소",
+    "관리종목 지정이력 미반영(거래대금·PER로 근사)",
+    "상폐 청산은 마지막 실거래 종가 근사(정리매매 실제가 아님)"
+  ],
+  "pbo": 0.8225,
+  "pbo_verdict": "높음(IS 1등이 운일 확률 높음 — 채택 보류 권장)",
+  "dsr": 0.4462,
+  "dsr_verdict": "통과 실패(다중검정 감안 시 샤프가 유의하지 않음)",
+  "passed": false
+}
