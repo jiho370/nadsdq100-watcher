@@ -69,7 +69,7 @@ def simulate(panel: pd.DataFrame, ma200: pd.DataFrame, decisions: list, topn: in
              sector_of=None, sector_cap=None, trade_log=None,
              ma_buffer=MA_BUFFER, ma_stop_mode="unconditional",
              entry_stop_pct=None, year_end_liquidate=False,
-             year_end_rebuy="wait") -> pd.Series | None:
+             year_end_rebuy="wait", full_rebalance=False) -> pd.Series | None:
     """decisions: [(p, ranked_syms)] — p=panel 행 인덱스(오름차순), ranked_syms=순위순 후보풀.
     반환: 일별 NAV Series(시작 1.0) 또는 None(결정 시점 없음).
     체결은 당일 종가, 비용은 cost.buy/cost.sell을 편도로 각각 적용.
@@ -94,7 +94,12 @@ def simulate(panel: pd.DataFrame, ma200: pd.DataFrame, decisions: list, topn: in
     이전 마지막 거래일에 **수익 포지션만** 강제 매도(손실 포지션은 유지 — 손익 비대칭이
     핵심, Fable 5 자문). year_end_rebuy="immediate"면 같은 날 같은 종목·비중으로 즉시
     재매수(세금 이벤트만 발생, 시장노출 유지) — "wait"(기본)면 재매수 안 하고 다음
-    정기 리밸런싱의 빈 슬롯 충원 로직이 자연스럽게 채우도록 둔다(현금 보유 구간 발생)."""
+    정기 리밸런싱의 빈 슬롯 충원 로직이 자연스럽게 채우도록 둔다(현금 보유 구간 발생).
+    full_rebalance=True(2026-07-16, 지호 님 정정 — "재평가 주기"가 뜻한 건 held_days
+    끈적한 보유가 아니라 "매 결정일마다 전량 정리 후 그날 팩터 랭킹대로 재구성"이었음)면
+    reeval_days·풀 소속 여부와 무관하게 매 결정일에 전원 매도 후 topn을 다시 채운다 —
+    이 모드에서는 "재평가 주기"의 의미가 reeval_days가 아니라 decisions 자체의 간격
+    (build_kr_snaps의 rebal_days)이 된다."""
     if not decisions:
         return None
     dec_by_p = {p: syms for p, syms in decisions}
@@ -172,18 +177,25 @@ def simulate(panel: pd.DataFrame, ma200: pd.DataFrame, decisions: list, topn: in
                         trade_log.append({"date": today_s, "sym": sym, "action": "buy",
                                           "note": "year_end_immediate_rebuy"})
 
-        # ── ② 결정일: 6개월 재평가 매도 + 빈 슬롯 충원
+        # ── ② 결정일: 6개월 재평가 매도 + 빈 슬롯 충원 (또는 full_rebalance면 전량 정리 후 재구성)
         ranked = dec_by_p.get(i)
         if ranked:
             pool_set = set(ranked)
             for sym in list(pos):
                 held = (today - pos[sym]["entry_date"]).days
                 p_now = prices.get(sym)
-                if held >= reeval_days and sym not in pool_set and np.isfinite(p_now):
+                if not np.isfinite(p_now):
+                    continue
+                # full_rebalance=True(2026-07-16, 지호 님 정정 — "재평가 시점마다 전량
+                # 정리하고 그날 팩터 랭킹대로 다시 산다"는 의미였음): held_days·풀 소속
+                # 무관하게 결정일마다 전원 매도 후 재구성. False(기본, 라이브 방식)면
+                # 기존처럼 "보유 ≥reeval_days AND 풀 밖"인 종목만 선별 매도(끈적한 보유).
+                if full_rebalance or (held >= reeval_days and sym not in pool_set):
                     cash += pos[sym]["sh"] * p_now * (1 - cost.sell)
                     if trade_log is not None:
                         trade_log.append({"date": today_s, "sym": sym, "action": "sell",
-                                          "reason": "reeval", "held_days": held})
+                                          "reason": "full_rebalance" if full_rebalance else "reeval",
+                                          "held_days": held})
                     del pos[sym]
             nav_now = cash + sum(v["sh"] * prices.get(s, np.nan) for s, v in pos.items()
                                  if np.isfinite(prices.get(s, np.nan)))
@@ -594,6 +606,30 @@ def self_test():
     assert all(d.month == 12 for d in trig), f"12월 데이터 없는 부분연도가 트리거로 오탐: {trig}"
     _log(f"[self-test] 통과: 연말 강제정리 배선 정상(수익종목만 매도 {len(ye_sells)}회, "
          f"즉시재매수 모드 재매수 {len(rebuys)}회, 트리거일 {sorted(trig)})")
+
+    # 2026-07-16 full_rebalance 배선 확인 — 여전히 풀 안에 있어도(끈적한 보유였다면 안 팔림)
+    # 결정일마다 무조건 전량 매도 후 재구성돼야 함.
+    idxF = pd.bdate_range("2020-01-01", periods=400)
+    flatF = np.full(400, 100.0)
+    panelF = pd.DataFrame({"A": flatF, "B": flatF}, index=idxF)
+    ma200F = panelF.rolling(50, min_periods=1).mean()
+    decF = [(50, ["A", "B"]), (150, ["A", "B"]), (250, ["A", "B"])]   # 매 결정일 동일 풀(끈적하면 안 팔릴 케이스)
+    costF = BC.CostModel("kospi", commission_bps=1.5, slippage_bps=5.0)
+
+    log_sticky = []
+    simulate(panelF, ma200F, decF, 2, costF, reeval_days=99999, ma200_backup=False,
+            full_rebalance=False, trade_log=log_sticky)
+    sticky_sells = [e for e in log_sticky if e.get("action") == "sell"]
+    assert not sticky_sells, f"끈적한 모드는 풀에 계속 있으면 안 팔려야 함: {sticky_sells}"
+
+    log_full = []
+    simulate(panelF, ma200F, decF, 2, costF, reeval_days=99999, ma200_backup=False,
+            full_rebalance=True, trade_log=log_full)
+    full_sells = [e for e in log_full if e.get("reason") == "full_rebalance"]
+    assert len(full_sells) == 4, (   # 결정일 150·250에서 A·B 각각 매도 = 2×2=4건(첫 결정일은 신규매수뿐)
+        f"full_rebalance는 2번째·3번째 결정일마다 보유 2종목을 전부 팔아야 함(기대 4건): {full_sells}")
+    _log(f"[self-test] 통과: full_rebalance 배선 정상(끈적한 모드 매도 0건 vs "
+         f"full_rebalance 매도 {len(full_sells)}건)")
 
 
 def main():
