@@ -119,6 +119,29 @@ def update(state: dict, buy_now_syms: list, ind_map: dict, today: str, pool_syms
     return sells
 
 
+def remove_excluded(state: dict, excluded: dict, ind_map: dict) -> list:
+    """AI가 오늘 '제외' 판정한 종목 중 보유 중인 게 있으면 즉시 매도 처리(보유목록에서 제거).
+    excluded={symbol: reason}. 2026-07-16(지호 님 피드백 — 한국전력 사례): 매수후보 알고리즘이
+    AI 제외로 걸러낸 종목을 계속 보유하는 건 앞뒤가 안 맞음 — 기존 매도 트리거(6개월 재평가/
+    200일선)와 별개로, 검증된 개별종목 악재는 보유 여부와 무관하게 곧바로 반영한다.
+    state는 제자리 수정, 저장(save)은 호출부 책임."""
+    holdings = state.get("holdings") or {}
+    sells = []
+    for sym, reason in excluded.items():
+        h = holdings.get(sym)
+        if not h:
+            continue
+        ind = ind_map.get(sym) or {}
+        price = ind.get("price")
+        entry = h.get("entry_price")
+        ret = ((price / entry - 1) * 100) if (price and entry) else None
+        sells.append({"symbol": sym, "reason": f"[AI 제외] {reason}" if reason else "[AI 제외]",
+                      "since": h.get("since"), "entry": entry, "price": price,
+                      "ret_pct": ret, "peak": h.get("peak")})
+        del holdings[sym]
+    return sells
+
+
 # 동일 회사 복수 클래스(의결권 차이만) — 둘 다 담으면 사실상 같은 종목 2배 보유
 _CLASS_ALIAS = {"GOOGL": "GOOG", "FOXA": "FOX", "NWSA": "NWS"}
 

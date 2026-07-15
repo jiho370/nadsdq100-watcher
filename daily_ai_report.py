@@ -266,6 +266,16 @@ def run_kr(no_email: bool = False, force: bool = False):
     kr_cands = (kr.get("buy") or []) + (kr.get("watch") or [])
     _attach_headlines(kr_cands, suffix=".KS")
 
+    # 이미 보유 중인 후보엔 배지·계획 문구를 다르게(지호 님 피드백 2026-07-16) — 신규 매수처럼
+    # "1차 매수 후 조정 시 2차"를 보여주면 어제 이미 산 종목도 새 매수 제안처럼 보여 혼동됨.
+    try:
+        import holdings as H
+        held_syms = set((H.load(KR.KR_HOLDINGS).get("holdings") or {}).keys())
+        for c in kr_cands:
+            c["already_held"] = c.get("symbol") in held_syms
+    except Exception as e:
+        print(f"[경고] 보유중 배지 판단 실패({type(e).__name__}: {e})", file=sys.stderr)
+
     # 시황 컨텍스트: 신호(국장 표시분=코스피/코스닥/금만)+세계(밤사이 미국 마감 포함 — 코드 계산이라 비용 0)
     is_monday = _dt.datetime.now(R.KST).weekday() == 0
     market = {"as_of": kr.get("as_of"), "weekly_recap": is_monday}
@@ -280,6 +290,24 @@ def run_kr(no_email: bool = False, force: bool = False):
     if not report:
         print("[정보] AI 실패 → 지표+계획 기반 리포트로 발송", file=sys.stderr)
         report = AR.deterministic_report(groups, market)
+
+    # AI가 오늘 '제외' 판정한 종목 중 보유 중인 게 있으면 보유목록에서도 뺀다(지호 님 피드백
+    # 2026-07-16 — 한국전력 사례: 매수후보 알고리즘이 AI 제외로 걸러낸 종목을 계속 보유하는 건
+    # 앞뒤가 안 맞음). 6개월 재평가/200일선 트리거와 별개로 즉시 반영, 매도 카드로도 표시.
+    if kr.get("ind_map"):
+        ai_excluded_map = {str(x["symbol"]): x.get("reason", "") for x in (report.get("ai_excluded") or [])}
+        if ai_excluded_map:
+            try:
+                ai_sells = KR.sell_ai_excluded(ai_excluded_map, kr["ind_map"])
+                if ai_sells:
+                    name_map_ai = {c["symbol"]: c.get("name") for c in kr_cands if c.get("name")}
+                    for s in ai_sells:
+                        s["name"] = name_map_ai.get(s["symbol"], s["symbol"])
+                    report["sells"] = ai_sells + (report.get("sells") or [])
+                    print(f"[정보] AI 제외 판정으로 보유종목 {len(ai_sells)}개 매도 처리: "
+                          f"{', '.join(s['symbol'] for s in ai_sells)}", file=sys.stderr)
+            except Exception as e:
+                print(f"[경고] AI 제외 종목 보유목록 정리 실패({type(e).__name__}: {e})", file=sys.stderr)
 
     # 최종 매수만 보유목록 편입
     holdings_html = ""

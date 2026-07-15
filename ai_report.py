@@ -440,7 +440,8 @@ def _mk_item(c, kind, vmap, wmap):
             "comment": (w.get("comment") or "").strip(),
             "verdict_reason": (v.get("verdict_reason") or "").strip(),
             "plan": c.get("plan") or {}, "hot": bool(c.get("hot")),
-            "rank": c.get("rank"), "pool_size": c.get("pool_size")}
+            "rank": c.get("rank"), "pool_size": c.get("pool_size"),
+            "already_held": bool(c.get("already_held"))}
     if kind == "watch":
         item["trigger"] = c.get("trigger") or ""
     return item
@@ -688,7 +689,8 @@ def deterministic_report(groups: dict, market: dict) -> dict:
         af = _auto_fields(c)
         d = {"symbol": sym, "name": af["name"], "category": af["category"], "summary": af["summary"],
              "points": af["points"], "news": "", "catalyst": "", "comment": "", "flag": None,
-             "verdict_reason": "", "plan": c.get("plan") or {}, "hot": bool(c.get("hot"))}
+             "verdict_reason": "", "plan": c.get("plan") or {}, "hot": bool(c.get("hot")),
+             "already_held": bool(c.get("already_held"))}
         if kind == "watch":
             d["trigger"] = c.get("trigger") or "20일선 회복 확인 후 매수 검토"
         return d
@@ -769,6 +771,7 @@ def _card(i, r, metrics_by_sym, kind, is_kr=False):
     flag_chip = _chip(fl, flag_color.get(fl, "#6b7280"), True) if fl else ""
     cat_chip = _chip(_esc(r.get("category")), "#7c3aed") if r.get("category") else ""
     hot_chip = _chip("과열·분할", "#c2410c", True) if (kind == "buy" and r.get("hot")) else ""
+    held_chip = _chip("보유중", "#0369a1", True) if r.get("already_held") else ""
     pts = "".join(f'<li style="margin:1px 0">{_esc(p)}</li>' for p in r.get("points", []))
     pts_html = (f'<ul style="margin:6px 0 0;padding-left:16px;font-size:12px;color:#374151;'
                 f'line-height:1.55">{pts}</ul>') if pts else ""
@@ -802,7 +805,7 @@ def _card(i, r, metrics_by_sym, kind, is_kr=False):
         f'border-radius:10px;margin:10px 0;background:#fff;overflow:hidden"><tr>'
         f'<td width="56%" valign="top" style="padding:12px 14px">'
         f'<div style="font-size:15px;font-weight:700">{header}</div>'
-        f'<div style="margin:4px 0 2px">{cat_chip}{hot_chip}{flag_chip}</div>'
+        f'<div style="margin:4px 0 2px">{cat_chip}{held_chip}{hot_chip}{flag_chip}</div>'
         f'<div style="font-size:13px;color:#111;margin-top:4px;line-height:1.5">{_esc(r.get("summary"))}</div>'
         f'{fact_html}{pts_html}{act}{news}{cata}</td>'
         f'<td width="44%" valign="top" style="padding:12px 12px 12px 0">{chart}'

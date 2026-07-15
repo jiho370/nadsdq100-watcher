@@ -84,6 +84,7 @@ def buy_plan(c: dict, krw: bool = False) -> dict:
         return round(p, 0 if krw else 2), b
 
     p2, b2 = below(ma20, 0.97, "20일선 부근")
+    already_held = bool(c.get("already_held"))
     if hot:
         p3, b3 = below(ma50, 0.92, "50일선 부근")
         tranches = [
@@ -91,13 +92,15 @@ def buy_plan(c: dict, krw: bool = False) -> dict:
             {"label": "2차", "price": p2, "pct": 30, "basis": b2},
             {"label": "3차", "price": p3, "pct": 40, "basis": b3},
         ]
-        note = "과열 구간 — 반드시 나눠서, 조정을 기다리며 채운다"
+        note = ("이미 보유 중 — 아래는 추가 매수 참고 가격대(과열 구간, 조정 기다리며)"
+                if already_held else "과열 구간 — 반드시 나눠서, 조정을 기다리며 채운다")
     else:
         tranches = [
             {"label": "1차", "price": round(price, 0 if krw else 2), "pct": 50, "basis": "현재가"},
             {"label": "2차", "price": p2, "pct": 50, "basis": b2},
         ]
-        note = "2분할 — 1차 후 조정 오면 2차, 안 오면 1차분만 보유"
+        note = ("이미 보유 중 — 신규 매수 아님, 아래는 추가 매수 시 참고 가격대"
+                if already_held else "2분할 — 1차 후 조정 오면 2차, 안 오면 1차분만 보유")
     # 손절선(진입 직후 참고): 2026-07-15부터 200일선 백업 기본 비활성(holdings.py와 동일 —
     # 21조합 검증 하위권 확인, 실제 매도 트리거로 안 씀). TRAIL>0이거나 MA200_BACKUP=1일 때만
     # 해당 후보를 넣는다 — 둘 중 높은(더 가까운) 쪽을 표시.
