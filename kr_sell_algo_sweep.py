@@ -248,6 +248,79 @@ def run_entry_stop_grid(save=True):
     return payload
 
 
+def _load_long(rebal_days=63, cache_path="output/kr_panel_cache_13y.pkl"):
+    """8년 공용 캐시(output/kr_panel_cache.pkl, Stage 1~6 전부가 물려 있음)를 안 건드리는
+    별도 장기(13년) 캐시 로더(2026-07-16, 지호 님 질문 — 더 긴 시계열로 재검증). 이 캐시는
+    `backtest_kr.prepare_kr_data(years=13)`로 미리 따로 생성해뒀다(2013-07~2026-07,
+    322종목·커버리지 95%) — entry_stop 미세그리드 장기재검증 전용, 다른 Stage는 무관."""
+    import pickle
+    import backtest_kr as BK
+    from benchmarks_kr import build_benchmarks
+    with open(cache_path, "rb") as f:
+        d = pickle.load(f)
+    panel, bench = d["panel"], d["bench"]
+    snaps, _, _ = BK.build_kr_snaps(panel, bench, d["membership"], d["fundamentals"],
+                                    rebal_days=rebal_days, flows=d["flows"], mktcaps=d["mktcaps"])
+    navs_bm = build_benchmarks(panel, d["membership"], d["mktcaps"], bench)
+    ma200 = panel.rolling(200, min_periods=200).mean()
+    cost = BC.CostModel("kospi", commission_bps=1.5, slippage_bps=5.0)
+    return panel, snaps, navs_bm, ma200, cost
+
+
+ENTRY_STOP_FINE_GRID = [0.05, 0.06, 0.07, 0.08, 0.09, 0.10, 0.11, 0.12, 0.13, 0.14, 0.15,
+                        0.16, 0.17, 0.18, 0.19, 0.20]
+
+
+def run_entry_stop_fine_grid(save=True):
+    """2026-07-16 지호 님 질문: "-10%가 맞다면 -5~-20% 구간을 촘촘하게, 기간도 더 길게".
+    13년(2013-07~2026-07, _load_long — 8년 공용 캐시와 별도)으로 1%p 단위 재검증."""
+    panel, snaps, navs_bm, ma200, cost = _load_long()
+    b1 = navs_bm["B1_kospi200"].dropna()
+    decisions = KS.build_decisions(panel, snaps, "valuediv")
+    reg = CS.regime_series(b1.reindex(panel.index).ffill())
+    core = CS.timed_nav(b1.reindex(panel.index).ffill(), reg)
+    n_years = (panel.index[-1] - panel.index[0]).days / 365.25
+
+    rows = []
+    for pct in ENTRY_STOP_FINE_GRID:
+        trade_log = []
+        sat_nav = BP.simulate(panel, ma200, decisions, TOPN, cost, reeval_days=180,
+                              ma200_backup=False, entry_stop_pct=pct, trade_log=trade_log)
+        if sat_nav is None:
+            continue
+        sat = sat_nav / sat_nav.iloc[0]
+        mixed = CS.mix_nav(core, sat, CORE_WEIGHT)
+        f = CS.stats(mixed)
+        if f is None:
+            continue
+        diag = _forward_return_diag(trade_log, panel)
+        n_stops = sum(1 for e in trade_log if e.get("reason") == "entry_stop")
+        rows.append({"entry_stop_pct": pct, **f, "n_stops": n_stops,
+                    "stops_per_year": round(n_stops / n_years, 2),
+                    "forward_return_diag": diag})
+        _log(f"[13년] entry_stop=-{pct*100:.0f}%: CAGR {f['cagr_pct']:6.2f}% 샤프 {f['sharpe']:5.2f} "
+             f"MDD {f['mdd_pct']:6.1f}% · 발동 {n_stops}회(연 {n_stops/n_years:.2f}회) · "
+             f"발동후{FWD_HORIZON}일 평균수익률 {diag['avg_forward_return_pct']}%")
+    sat_nav0 = BP.simulate(panel, ma200, decisions, TOPN, cost, reeval_days=180, ma200_backup=False)
+    sat0 = sat_nav0 / sat_nav0.iloc[0]
+    mixed0 = CS.mix_nav(core, sat0, CORE_WEIGHT)
+    f0 = CS.stats(mixed0)
+    _log(f"[13년] (참고) 손절없음 베이스라인: CAGR {f0['cagr_pct']:.2f}% 샤프 {f0['sharpe']:.2f} "
+         f"MDD {f0['mdd_pct']:.1f}%")
+    payload = {"as_of": panel.index[-1].date().isoformat(), "topn": TOPN, "core_weight": CORE_WEIGHT,
+              "period_years": round(n_years, 1), "period_start": panel.index[0].date().isoformat(),
+              "period_end": panel.index[-1].date().isoformat(),
+              "judgment": "-5~-20% 1%p 단위 미세그리드, 13년(8년 공용 캐시와 별도) 재검증"
+                          "(2026-07-16, 지호 님 질문)",
+              "no_stop_baseline": f0, "rows": rows}
+    if save:
+        os.makedirs("output", exist_ok=True)
+        with open("output/kr_entry_stop_fine_grid_13y.json", "w", encoding="utf-8") as f:
+            json.dump(payload, f, ensure_ascii=False, indent=2)
+        _log("저장: output/kr_entry_stop_fine_grid_13y.json")
+    return payload
+
+
 YEAR_END_REEVAL_TEST = [90, 180]
 
 
@@ -384,8 +457,8 @@ def self_test():
 
 def main():
     ap = argparse.ArgumentParser(description="국장 새틀라이트 매도알고리즘 강건성 검증")
-    ap.add_argument("--stage", choices=["main", "entry-stop-grid", "year-end", "full-rebalance"],
-                    default="main")
+    ap.add_argument("--stage", choices=["main", "entry-stop-grid", "entry-stop-fine-13y",
+                                        "year-end", "full-rebalance"], default="main")
     ap.add_argument("--self-test", action="store_true")
     args = ap.parse_args()
     if args.self_test:
@@ -394,6 +467,8 @@ def main():
         run()
     elif args.stage == "entry-stop-grid":
         run_entry_stop_grid()
+    elif args.stage == "entry-stop-fine-13y":
+        run_entry_stop_fine_grid()
     elif args.stage == "year-end":
         run_year_end_stage()
     else:
