@@ -228,3 +228,13 @@ def add_holdings(buy_syms: list, ind_map: dict, today: str):
     state = H.load(KR_HOLDINGS)
     H.add(state, buy_syms, ind_map, today, max_n=MAX_HOLD)
     H.save(state, KR_HOLDINGS)
+
+
+def sell_ai_excluded(excluded: dict, ind_map: dict) -> list:
+    """오늘 AI가 '제외' 판정한 종목 중 보유 중인 게 있으면 매도 처리. excluded={symbol: reason}."""
+    import holdings as H
+    state = H.load(KR_HOLDINGS)
+    sells = H.remove_excluded(state, excluded, ind_map)
+    if sells:
+        H.save(state, KR_HOLDINGS)
+    return sells
