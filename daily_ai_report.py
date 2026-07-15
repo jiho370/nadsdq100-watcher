@@ -123,7 +123,8 @@ def _bench_series(signals, key):
     return [], []
 
 
-def _holdings_section(hstate, ind_map, price_map, bench_dates, bench_closes, index_name, krw=False):
+def _holdings_section(hstate, ind_map, price_map, bench_dates, bench_closes, index_name, krw=False,
+                      name_map=None):
     """holdings.py 보유현황 표+포트폴리오 비교차트를 조립. (html, images) — 데이터 없으면 ("", [])."""
     import holdings as H
     summary = H.live_summary(hstate, ind_map)
@@ -140,7 +141,8 @@ def _holdings_section(hstate, ind_map, price_map, bench_dates, bench_closes, ind
         lb = [v for v in series["bench"] if v is not None]
         if lp and lb:
             totals = {"strategy": lp[-1], "bench": lb[-1], "index_name": index_name}
-    return AR.holdings_table_html(summary, krw=krw, chart_cid=chart_cid, totals=totals), images
+    return AR.holdings_table_html(summary, krw=krw, chart_cid=chart_cid, totals=totals,
+                                  name_map=name_map), images
 
 
 # ------------------------- 공용 헬퍼 -------------------------
@@ -291,8 +293,23 @@ def run_kr(no_email: bool = False, force: bool = False):
             price_map = {sym: {"dates": (kr["ind_map"].get(sym) or {}).get("dates") or [],
                                "closes": (kr["ind_map"].get(sym) or {}).get("closes") or []}
                          for sym in kr_state.get("holdings", {})}
+            # 보유현황 표 종목명: 종목코드(숫자)만으론 못 알아보므로 이름으로 치환(2026-07-15).
+            # 오늘 후보풀(kr_cands)엔 있지만, 보유 중인데 오늘 후보풀 밖으로 밀린 종목은 코스피200
+            # 캐시(kr_stocks._cached_universe)로 보강 — 그래도 없으면 표시 단계에서 코드 그대로.
+            name_map = {c["symbol"]: c.get("name") for c in kr_cands if c.get("name")}
+            missing = [s for s in kr_state.get("holdings", {}) if s not in name_map]
+            if missing:
+                try:
+                    uni = KR._cached_universe() or {}
+                    for s in missing:
+                        n = (uni.get(s) or {}).get("name")
+                        if n:
+                            name_map[s] = n
+                except Exception:
+                    pass
             holdings_html, holdings_images = _holdings_section(
-                kr_state, kr["ind_map"], price_map, bench_dates, bench_closes, "코스피", krw=True)
+                kr_state, kr["ind_map"], price_map, bench_dates, bench_closes, "코스피", krw=True,
+                name_map=name_map)
         except Exception as e:
             print(f"[경고] 한국 보유목록 갱신 실패({e})", file=sys.stderr)
 

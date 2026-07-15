@@ -813,13 +813,16 @@ def _excluded_html(items, is_kr=False):
 
 
 def holdings_table_html(summary: list, krw: bool = False, chart_cid: str | None = None,
-                        totals: dict | None = None) -> str:
+                        totals: dict | None = None, name_map: dict | None = None) -> str:
     """holdings.live_summary() 결과를 보유현황 표로. summary 없으면 빈 문자열(섹션 자체 생략).
-    totals={"strategy","bench","index_name"} — 전체 투입자산 기준 누적수익률 vs 지수(있으면 표기)."""
+    totals={"strategy","bench","index_name"} — 전체 투입자산 기준 누적수익률 vs 지수(있으면 표기).
+    name_map={symbol:name} — 한국은 종목코드(숫자)만으론 못 알아보므로 이름으로 치환
+    (2026-07-15, 지호 님 피드백). 없으면 symbol 그대로(미국은 티커 자체가 읽을 만해 그대로 둠)."""
     if not summary:
         return ""
+    name_map = name_map or {}
     rows = "".join(
-        f'<tr><td style="padding:3px 8px">{_esc(r["symbol"])}</td>'
+        f'<tr><td style="padding:3px 8px">{_esc(name_map.get(r["symbol"], r["symbol"]))}</td>'
         f'<td style="padding:3px 8px;color:#6b7280">{_esc(r.get("since"))}</td>'
         f'<td style="padding:3px 8px">{EP._fmt(r.get("entry"), krw)}</td>'
         f'<td style="padding:3px 8px">{EP._fmt(r.get("price"), krw)}</td>'
