@@ -1,0 +1,27 @@
+{
+  "topn": 6,
+  "core_weight": 0.65,
+  "judgment": "full_rebalance=True(매 결정일 전량 정리 후 팩터랭킹 재구성) 하에서 3개월 vs 6개월 결정간격 비교(2026-07-16, 지호 님 정정 반영)",
+  "rows": [
+    {
+      "cycle": "3개월(63거래일)",
+      "rebal_days": 63,
+      "n_decisions": 23,
+      "cagr_pct": 24.04,
+      "sharpe": 1.14,
+      "mdd_pct": -25.6,
+      "n_sells": 132,
+      "sells_per_year": 16.5
+    },
+    {
+      "cycle": "6개월(126거래일)",
+      "rebal_days": 126,
+      "n_decisions": 12,
+      "cagr_pct": 24.56,
+      "sharpe": 1.16,
+      "mdd_pct": -25.7,
+      "n_sells": 66,
+      "sells_per_year": 8.3
+    }
+  ]
+}

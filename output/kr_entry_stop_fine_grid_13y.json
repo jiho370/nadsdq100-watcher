@@ -1,0 +1,224 @@
+{
+  "as_of": "2026-07-15",
+  "topn": 6,
+  "core_weight": 0.65,
+  "period_years": 13.0,
+  "period_start": "2013-07-15",
+  "period_end": "2026-07-15",
+  "judgment": "-5~-20% 1%p 단위 미세그리드, 13년(8년 공용 캐시와 별도) 재검증(2026-07-16, 지호 님 질문)",
+  "no_stop_baseline": {
+    "cagr_pct": 15.73,
+    "sharpe": 0.99,
+    "mdd_pct": -31.7
+  },
+  "rows": [
+    {
+      "entry_stop_pct": 0.05,
+      "cagr_pct": 13.58,
+      "sharpe": 0.89,
+      "mdd_pct": -33.1,
+      "n_stops": 75,
+      "stops_per_year": 5.77,
+      "forward_return_diag": {
+        "n_events": 75,
+        "avg_forward_return_pct": 2.45,
+        "median_forward_return_pct": 2.0
+      }
+    },
+    {
+      "entry_stop_pct": 0.06,
+      "cagr_pct": 14.35,
+      "sharpe": 0.91,
+      "mdd_pct": -33.7,
+      "n_stops": 63,
+      "stops_per_year": 4.85,
+      "forward_return_diag": {
+        "n_events": 63,
+        "avg_forward_return_pct": 0.24,
+        "median_forward_return_pct": -3.37
+      }
+    },
+    {
+      "entry_stop_pct": 0.07,
+      "cagr_pct": 15.07,
+      "sharpe": 0.95,
+      "mdd_pct": -27.3,
+      "n_stops": 58,
+      "stops_per_year": 4.46,
+      "forward_return_diag": {
+        "n_events": 58,
+        "avg_forward_return_pct": 1.63,
+        "median_forward_return_pct": -1.1
+      }
+    },
+    {
+      "entry_stop_pct": 0.08,
+      "cagr_pct": 15.34,
+      "sharpe": 0.97,
+      "mdd_pct": -26.3,
+      "n_stops": 52,
+      "stops_per_year": 4.0,
+      "forward_return_diag": {
+        "n_events": 52,
+        "avg_forward_return_pct": 1.57,
+        "median_forward_return_pct": -1.36
+      }
+    },
+    {
+      "entry_stop_pct": 0.09,
+      "cagr_pct": 15.37,
+      "sharpe": 0.97,
+      "mdd_pct": -26.1,
+      "n_stops": 47,
+      "stops_per_year": 3.62,
+      "forward_return_diag": {
+        "n_events": 47,
+        "avg_forward_return_pct": 1.42,
+        "median_forward_return_pct": -2.08
+      }
+    },
+    {
+      "entry_stop_pct": 0.1,
+      "cagr_pct": 14.74,
+      "sharpe": 0.93,
+      "mdd_pct": -29.3,
+      "n_stops": 40,
+      "stops_per_year": 3.08,
+      "forward_return_diag": {
+        "n_events": 40,
+        "avg_forward_return_pct": 3.13,
+        "median_forward_return_pct": -0.66
+      }
+    },
+    {
+      "entry_stop_pct": 0.11,
+      "cagr_pct": 14.79,
+      "sharpe": 0.94,
+      "mdd_pct": -28.4,
+      "n_stops": 36,
+      "stops_per_year": 2.77,
+      "forward_return_diag": {
+        "n_events": 36,
+        "avg_forward_return_pct": 1.94,
+        "median_forward_return_pct": -1.89
+      }
+    },
+    {
+      "entry_stop_pct": 0.12,
+      "cagr_pct": 14.86,
+      "sharpe": 0.93,
+      "mdd_pct": -28.4,
+      "n_stops": 32,
+      "stops_per_year": 2.46,
+      "forward_return_diag": {
+        "n_events": 32,
+        "avg_forward_return_pct": -0.85,
+        "median_forward_return_pct": -4.05
+      }
+    },
+    {
+      "entry_stop_pct": 0.13,
+      "cagr_pct": 14.82,
+      "sharpe": 0.93,
+      "mdd_pct": -29.0,
+      "n_stops": 31,
+      "stops_per_year": 2.38,
+      "forward_return_diag": {
+        "n_events": 31,
+        "avg_forward_return_pct": -0.3,
+        "median_forward_return_pct": -1.44
+      }
+    },
+    {
+      "entry_stop_pct": 0.14,
+      "cagr_pct": 14.61,
+      "sharpe": 0.92,
+      "mdd_pct": -29.6,
+      "n_stops": 30,
+      "stops_per_year": 2.31,
+      "forward_return_diag": {
+        "n_events": 30,
+        "avg_forward_return_pct": 0.64,
+        "median_forward_return_pct": 0.01
+      }
+    },
+    {
+      "entry_stop_pct": 0.15,
+      "cagr_pct": 14.66,
+      "sharpe": 0.92,
+      "mdd_pct": -28.8,
+      "n_stops": 29,
+      "stops_per_year": 2.23,
+      "forward_return_diag": {
+        "n_events": 29,
+        "avg_forward_return_pct": 0.03,
+        "median_forward_return_pct": -0.4
+      }
+    },
+    {
+      "entry_stop_pct": 0.16,
+      "cagr_pct": 14.74,
+      "sharpe": 0.93,
+      "mdd_pct": -28.5,
+      "n_stops": 27,
+      "stops_per_year": 2.08,
+      "forward_return_diag": {
+        "n_events": 27,
+        "avg_forward_return_pct": -1.1,
+        "median_forward_return_pct": -3.13
+      }
+    },
+    {
+      "entry_stop_pct": 0.17,
+      "cagr_pct": 14.52,
+      "sharpe": 0.92,
+      "mdd_pct": -28.7,
+      "n_stops": 28,
+      "stops_per_year": 2.15,
+      "forward_return_diag": {
+        "n_events": 28,
+        "avg_forward_return_pct": -0.27,
+        "median_forward_return_pct": -1.07
+      }
+    },
+    {
+      "entry_stop_pct": 0.18,
+      "cagr_pct": 14.58,
+      "sharpe": 0.92,
+      "mdd_pct": -28.3,
+      "n_stops": 26,
+      "stops_per_year": 2.0,
+      "forward_return_diag": {
+        "n_events": 26,
+        "avg_forward_return_pct": 1.32,
+        "median_forward_return_pct": 3.26
+      }
+    },
+    {
+      "entry_stop_pct": 0.19,
+      "cagr_pct": 14.49,
+      "sharpe": 0.91,
+      "mdd_pct": -28.8,
+      "n_stops": 25,
+      "stops_per_year": 1.92,
+      "forward_return_diag": {
+        "n_events": 25,
+        "avg_forward_return_pct": 1.51,
+        "median_forward_return_pct": 2.48
+      }
+    },
+    {
+      "entry_stop_pct": 0.2,
+      "cagr_pct": 14.53,
+      "sharpe": 0.92,
+      "mdd_pct": -29.2,
+      "n_stops": 25,
+      "stops_per_year": 1.92,
+      "forward_return_diag": {
+        "n_events": 25,
+        "avg_forward_return_pct": 3.18,
+        "median_forward_return_pct": 2.3
+      }
+    }
+  ]
+}

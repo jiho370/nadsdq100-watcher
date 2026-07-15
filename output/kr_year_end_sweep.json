@@ -1,0 +1,45 @@
+{
+  "as_of": "2026-07-10",
+  "topn": 6,
+  "core_weight": 0.65,
+  "judgment": "연말 강제정리(수익종목만 매도, 손실종목은 유지) 제약 하에서 재평가 90일 vs 180일, 즉시재매수 vs 대기재매수 비교(Fable 5 자문, 2026-07-16)",
+  "no_constraint_baseline": {
+    "cagr_pct": 24.23,
+    "sharpe": 1.18,
+    "mdd_pct": -25.0
+  },
+  "rows": [
+    {
+      "reeval_days": 90,
+      "year_end_rebuy": "wait",
+      "cagr_pct": 21.56,
+      "sharpe": 1.17,
+      "mdd_pct": -24.5,
+      "n_year_end_sells": 30
+    },
+    {
+      "reeval_days": 90,
+      "year_end_rebuy": "immediate",
+      "cagr_pct": 23.83,
+      "sharpe": 1.17,
+      "mdd_pct": -24.7,
+      "n_year_end_sells": 30
+    },
+    {
+      "reeval_days": 180,
+      "year_end_rebuy": "wait",
+      "cagr_pct": 21.2,
+      "sharpe": 1.14,
+      "mdd_pct": -24.5,
+      "n_year_end_sells": 27
+    },
+    {
+      "reeval_days": 180,
+      "year_end_rebuy": "immediate",
+      "cagr_pct": 23.86,
+      "sharpe": 1.17,
+      "mdd_pct": -24.7,
+      "n_year_end_sells": 30
+    }
+  ]
+}
