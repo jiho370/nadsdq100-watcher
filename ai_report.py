@@ -166,11 +166,15 @@ _V_SYSTEM = (
     "2) verdict은 종목마다 독립적으로 판단한다 — 다른 후보와 비교하거나 상대적으로 더/덜 "
     "매력적인지 순위를 매기지 않는다(정량 팩터 랭킹이 이미 그 역할을 함, 당신은 순위를 "
     "재조정하는 게 아니라 개별종목 결격사유만 확인).\n"
-    "3) verdict: 악재 없음='매수유지' / 개별종목 고유의 검증된 악재는 아니지만 거시·업종\n"
-    "   전반 이벤트로 단기 변동성이 커진 경우='관찰강등'(매수 목록에서 빠지지 않음, 정보성 "
-    "경고일 뿐) / 그 종목만의 명백·검증된 악재(회계부정·소송·상장폐지 위기 등 실제로 다시 "
-    "회복하기 어려운 구조적 문제)='제외'(신중히, 종목을 빼는 결정이니 사유 필수 — '거시 "
-    "이벤트로 인한 하락'만으로는 제외 사유가 되지 않음, 그건 관찰강등).\n"
+    "3) verdict은 둘 중 하나다(관찰·보류 같은 중간 등급 없음 — 애매하게 남겨두지 말고 결정할 것):\n"
+    "   - '매수유지': 확인된 악재가 없거나, 하락이 그 종목만의 문제가 아니라 시장·업종 전반의 "
+    "조정 때문임이 확인된 경우.\n"
+    "   - '제외': 그 종목 고유의 검증된 부정적 정보 — 실적 쇼크·가이던스 하향·거버넌스 훼손"
+    "(예: 자사주 매입 후 소각 대신 교환사채 발행 등으로 주주환원 기대를 저버림)·소송/규제·회계 "
+    "이슈·공매도 리포트 등 매수 논거를 약화시키는 사안. 회계부정·상장폐지처럼 극단적인 사안만 "
+    "해당하는 게 아니다 — '이걸 알고도 이 종목을 사겠는가'라는 질문에 아니라고 답하게 되는 "
+    "사안이면 제외한다. 애매하면 매수유지 쪽으로 밀어붙이지 말고 제외한다(제외되면 다음 순위 "
+    "후보가 자동으로 채워지므로 신중한 제외에 대한 부담이 없음). 사유 필수.\n"
     "4) 확인 안 된 내용은 쓰지 않는다. 수치를 지어내지 않는다.\n"
     "5) 출력은 지정된 JSON 하나만. 문장은 짧게(뉴스·촉매 각 한 줄)."
 )
@@ -180,7 +184,7 @@ _V_SCHEMA = (
     ' "macro":"환율·한국·코인 흐름 한 줄",\n'
     ' "signal_note":"제공된 신호 중 오늘 가장 중요한 변화 1-2문장(등급은 바꾸지 말 것)",\n'
     ' "risks":"이번 주 공통 리스크 1-2문장(FOMC/실적시즌/지정학 등 구체적으로)",\n'
-    ' "stocks":[{"symbol":"AAA","verdict":"매수유지|관찰강등|관찰유지|제외","verdict_reason":"강등/제외 사유(유지면 빈칸)",\n'
+    ' "stocks":[{"symbol":"AAA","verdict":"매수유지|제외","verdict_reason":"제외 사유(유지면 빈칸)",\n'
     '   "news":"최근 이슈 한 줄(없으면 빈칸)","catalyst":"다가올 이벤트/촉매 한 줄(없으면 빈칸)","flag":"호재|악재|중립"}]}'
 )
 
@@ -389,27 +393,25 @@ def _log_verdicts(buy_pool, kr_buy_pool, vmap, market):
 # ------------------------- verdict 적용(기존 로직 유지) -------------------------
 def _apply_verdicts(buy_pool, watch_pool, vmap, n_buy, n_watch):
     """1단계 verdict 반영해 최종 목록 확정. AI가 없으면 전원 '유지'로 동작.
-    2026-07-16 재설계(Fable 5 자문, 지호 님 질문 — "풀을 넓혀서 거르고 남는 것 중 상위
-    n_buy개로 하는 게 맞나"): **'제외'만 종목을 뺀다.** '관찰강등'은 정보성 배지일 뿐
-    매수 목록에서 빠지지 않는다 — AI가 팩터 랭킹을 재조정하지 않도록 하기 위함(이 프로젝트의
-    2단계 재랭킹 백테스트에서 검증 안 된 재정렬은 전부 원래 팩터 신호보다 나빴다, STRATEGY.md
-    §3). 최종 n_buy명은 제외되지 않은 후보 중 원래 팩터 랭킹 순 상위 n_buy — buy_pool이
-    n_buy보다 넓으면(예: 한국 풀8→최종5) 제외분만큼 자동으로 다음 순위가 결정론적으로
-    채워진다(AI가 고르는 게 아니라 팩터 랭킹이 그대로 채움). 반환 5번째 값은 shortfall —
-    풀 전체가 제외로 소진돼 n_buy에 못 미치면 양수(그 경우 억지로 더 아래 순위까지 끌어오지
-    않는다 — 그런 날은 이례적인 상황이니 경보로 다루는 게 숫자를 맞추는 것보다 유용)."""
-    survivors, demoted_syms, excluded = [], set(), []
+    2026-07-16 2차 수정(지호 님 피드백 — KCC 사례: 실적 부진+자사주 소각 기대를 저버린 거버넌스
+    이슈를 '관찰강등'으로 분류해 매수 목록에 그대로 남긴 게 부적절했음, "관찰 없어졌으니 강등이면
+    빠지는 게 맞다"). 관찰(watch) 슬롯이 폐지된 지금은 '강등'이 갈 곳이 없다 — verdict가
+    '매수유지'가 아니면(제외든 구버전 캐시의 관찰강등이든) 전부 빼고, 넓힌 풀(kr_stocks.N_BUY=8
+    등)에서 팩터 랭킹 순으로 결정론적으로 채운다(AI가 고르는 게 아니라 팩터 랭킹이 그대로 채움).
+    반환 4번째 값은 shortfall — 풀 전체가 제외로 소진돼 n_buy에 못 미치면 양수(그 경우 억지로
+    더 아래 순위까지 끌어오지 않는다 — 그런 날은 이례적인 상황이니 경보로 다루는 게 숫자를
+    맞추는 것보다 유용)."""
+    survivors, excluded = [], []
     for c in buy_pool:
         v = ((vmap.get(str(c["symbol"])) or {}).get("verdict") or "매수유지").strip()
-        if v == "제외":
-            excluded.append(c)
+        if v == "매수유지":
+            survivors.append(c)
         else:
-            survivors.append(c)   # 관찰강등도 survivors에 남음(팩터 순위 유지, 배지만 붙음)
-            if v in ("관찰강등", "관찰", "강등"):
-                demoted_syms.add(c["symbol"])
+            excluded.append(c)   # '제외'든 구버전 '관찰강등' 캐시든 전부 뺀다
     watch_keep = []
     for c in watch_pool:
-        if ((vmap.get(str(c["symbol"])) or {}).get("verdict") or "").strip() == "제외":
+        v = ((vmap.get(str(c["symbol"])) or {}).get("verdict") or "").strip()
+        if v and v != "매수유지":
             excluded.append(c)
         else:
             watch_keep.append(c)
@@ -417,11 +419,11 @@ def _apply_verdicts(buy_pool, watch_pool, vmap, n_buy, n_watch):
     shortfall = max(0, n_buy - len(final_buy))
     used = {c["symbol"] for c in final_buy}
     final_watch = [c for c in watch_keep if c["symbol"] not in used][:n_watch]
-    return final_buy, final_watch, excluded, demoted_syms, shortfall
+    return final_buy, final_watch, excluded, shortfall
 
 
 # ------------------------- 조립 -------------------------
-def _mk_item(c, kind, vmap, wmap, dem=()):
+def _mk_item(c, kind, vmap, wmap):
     """후보 c + 검증(vmap) + 서술(wmap) → 렌더용 아이템. AI가 없어도 최소 구성이 된다."""
     sym = str(c["symbol"])
     v = vmap.get(sym) or {}
@@ -441,7 +443,6 @@ def _mk_item(c, kind, vmap, wmap, dem=()):
             "rank": c.get("rank"), "pool_size": c.get("pool_size")}
     if kind == "watch":
         item["trigger"] = c.get("trigger") or ""
-    if sym in dem:  item["ai_demoted"] = True
     return item
 
 
@@ -483,9 +484,9 @@ def build_report(groups: dict, market: dict, pregen: dict | None = None) -> dict
         _log_verdicts(buy_pool, kr_buy_pool, vmap, market)
 
         # ── 코드가 최종 목록 확정
-        fb, fw, fx, dem, fshort = _apply_verdicts(buy_pool, watch_pool, vmap, FINAL_BUY, FINAL_WATCH)
-        kfb, kfw, kfx, kdem, kshort = _apply_verdicts(kr_buy_pool, kr_watch_pool, vmap,
-                                                       KR_FINAL_BUY, KR_FINAL_WATCH)
+        fb, fw, fx, fshort = _apply_verdicts(buy_pool, watch_pool, vmap, FINAL_BUY, FINAL_WATCH)
+        kfb, kfw, kfx, kshort = _apply_verdicts(kr_buy_pool, kr_watch_pool, vmap,
+                                                 KR_FINAL_BUY, KR_FINAL_WATCH)
         # shortfall(제외가 너무 많아 풀이 목표에 못 미침)을 억지로 더 아래 순위로 채우지 않는다
         # — 대신 경보로 표시(MIN_BUY=서킷브레이커 임계값). 지호 님 질문 대응(2026-07-16, Fable 5 자문).
         if fshort or kshort:
@@ -537,10 +538,10 @@ def build_report(groups: dict, market: dict, pregen: dict | None = None) -> dict
         out = {
             "market_overview": pick("market_overview"), "macro": pick("macro"),
             "signal_note": pick("signal_note"), "risks": risks_text,
-            "buy_now": [_mk_item(c, "buy", vmap, wmap, dem) for c in fb],
-            "watch": [_mk_item(c, "watch", vmap, wmap, dem) for c in fw],
-            "kr_buy": [_mk_item(c, "buy", vmap, wmap, kdem) for c in kfb],
-            "kr_watch": [_mk_item(c, "watch", vmap, wmap, kdem) for c in kfw],
+            "buy_now": [_mk_item(c, "buy", vmap, wmap) for c in fb],
+            "watch": [_mk_item(c, "watch", vmap, wmap) for c in fw],
+            "kr_buy": [_mk_item(c, "buy", vmap, wmap) for c in kfb],
+            "kr_watch": [_mk_item(c, "watch", vmap, wmap) for c in kfw],
             "ai_excluded": [{"symbol": c["symbol"], "name": c.get("name", ""),
                              "reason": ((vmap.get(str(c["symbol"])) or {}).get("verdict_reason") or "").strip()}
                             for c in fx + kfx],
@@ -768,7 +769,6 @@ def _card(i, r, metrics_by_sym, kind, is_kr=False):
     flag_chip = _chip(fl, flag_color.get(fl, "#6b7280"), True) if fl else ""
     cat_chip = _chip(_esc(r.get("category")), "#7c3aed") if r.get("category") else ""
     hot_chip = _chip("과열·분할", "#c2410c", True) if (kind == "buy" and r.get("hot")) else ""
-    ai_chip = _chip("AI 강등", "#0e7490", True) if r.get("ai_demoted") else ""
     pts = "".join(f'<li style="margin:1px 0">{_esc(p)}</li>' for p in r.get("points", []))
     pts_html = (f'<ul style="margin:6px 0 0;padding-left:16px;font-size:12px;color:#374151;'
                 f'line-height:1.55">{pts}</ul>') if pts else ""
@@ -788,9 +788,6 @@ def _card(i, r, metrics_by_sym, kind, is_kr=False):
                    + (f'<div style="color:#1d4ed8;margin-top:2px">&#128172; {_esc(r.get("comment"))}</div>'
                       if r.get("comment") else "")
                    + '</div>')
-    vr = r.get("verdict_reason") or ""
-    vr_html = (f'<div style="font-size:11px;color:#0e7490;margin-top:4px;line-height:1.5">[AI] {_esc(vr)}</div>'
-               if vr and r.get("ai_demoted") else "")
     _nw = r.get("news") or ""
     news = (f'<div style="color:#6b7280;font-size:11px;margin-top:5px;line-height:1.5">&#128480; {_esc(_nw)}</div>'
             if (_nw and fl != "중립" and "확인" not in _nw) else "")
@@ -805,9 +802,9 @@ def _card(i, r, metrics_by_sym, kind, is_kr=False):
         f'border-radius:10px;margin:10px 0;background:#fff;overflow:hidden"><tr>'
         f'<td width="56%" valign="top" style="padding:12px 14px">'
         f'<div style="font-size:15px;font-weight:700">{header}</div>'
-        f'<div style="margin:4px 0 2px">{cat_chip}{hot_chip}{ai_chip}{flag_chip}</div>'
+        f'<div style="margin:4px 0 2px">{cat_chip}{hot_chip}{flag_chip}</div>'
         f'<div style="font-size:13px;color:#111;margin-top:4px;line-height:1.5">{_esc(r.get("summary"))}</div>'
-        f'{fact_html}{pts_html}{act}{vr_html}{news}{cata}</td>'
+        f'{fact_html}{pts_html}{act}{news}{cata}</td>'
         f'<td width="44%" valign="top" style="padding:12px 12px 12px 0">{chart}'
         f'<div style="margin-top:6px">{_metric_chips(m)}</div></td></tr></table>')
 

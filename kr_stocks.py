@@ -36,9 +36,10 @@ KR_HOLDINGS = "output/kr_holdings.json"
 # 보이는 종목이 5개보다 줄어들 수밖에 없었다(오늘 실제로 3개까지 줄어듦 — 관찰 슬롯이
 # 2026-07-13에 폐지되면서 강등분이 갈 곳이 없어져 더 심해짐). 미국은 이미 이 구조
 # (REPORT_POOL=10 > FINAL_BUY=8)라 문제가 덜 드러났을 뿐 — 한국만 풀=최종이 같았던 게
-# 설계 공백이었다. ai_report._apply_verdicts()가 이제 "제외"만 종목을 빼고 남은 풀에서
-# 팩터 랭킹 순 상위 KR_FINAL_BUY명을 결정론적으로 채운다(재랭킹 아님) — "관찰강등"은
-# 매수 목록에 그대로 남고 배지로만 표시.
+# 설계 공백이었다. ai_report._apply_verdicts()가 남은 풀에서 팩터 랭킹 순 상위 KR_FINAL_BUY명을
+# 결정론적으로 채운다(재랭킹 아님) — 풀을 넓힌 이유는 AI가 뺀 자리를 채울 여유를 주기 위함.
+# 2026-07-16 2차 수정(지호 님 피드백 — KCC 사례로 "관찰강등"을 매수 목록에 남긴 게 부적절함이
+# 드러남): verdict는 매수유지/제외 둘뿐이고, 제외는(구버전의 관찰강등 포함) 전부 목록에서 빠진다.
 N_BUY = int(os.environ.get("KR_POOL_BUY", "8"))
 N_WATCH = int(os.environ.get("KR_POOL_WATCH", "0"))
 MAX_HOLD = int(os.environ.get("KR_MAX_HOLD", "5"))   # 보유 상한(팔아야 산다) — 최종 채택 수와 동일
