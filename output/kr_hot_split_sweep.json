@@ -1,0 +1,139 @@
+{
+  "as_of": "2026-07-15",
+  "market": "kr",
+  "note": "결정 시점마다 valuediv 풀(30)을 hot(RSI≥72 또는 50일선+15%)/normal로 나눠 entry1_full·entry2_5050·entry3_303040을 그룹별로 독립 비교 — '과열이면 3분할'이라는 조건분기 자체가 근거 있는지 검증(2026-07-16, 지호 님 질문)",
+  "hot": {
+    "rows": [
+      {
+        "entry": "entry1_full",
+        "net_pct": 6.05,
+        "mdd_pct": -12.5,
+        "avg_n_syms": 3.5,
+        "n_events": 33
+      },
+      {
+        "entry": "entry2_5050",
+        "net_pct": 7.02,
+        "mdd_pct": -11.7,
+        "avg_n_syms": 3.5,
+        "n_events": 33
+      },
+      {
+        "entry": "entry3_303040",
+        "net_pct": 7.41,
+        "mdd_pct": -11.3,
+        "avg_n_syms": 3.5,
+        "n_events": 33
+      }
+    ],
+    "n_events": 33,
+    "report": {
+      "input": {
+        "horizon": "hotsplit_hot",
+        "universe": "pit",
+        "cost": "kospi: 매수 6.5bp + 매도 26.50bp (왕복 33.00bp)"
+      },
+      "n_trials": 3,
+      "n_events": 33,
+      "pbo": {
+        "pbo": 0.0979,
+        "embargo": 3,
+        "purged_events_total": 12138,
+        "n_combos": 337,
+        "n_blocks": 12,
+        "lambda_mean": 0.9324,
+        "is_sharpe_mean": 0.0699,
+        "oos_sharpe_mean": -0.1956,
+        "degradation_slope": -1.2965,
+        "prob_oos_loss": 0.6766
+      },
+      "pbo_verdict": "낮음(과최적화 가능성 작음)",
+      "dsr": {
+        "sr": 0.0886,
+        "sr0": 0.0355,
+        "dsr": 0.5568,
+        "dsr_uncorrected": 0.62,
+        "skew": 0.411,
+        "kurtosis": 4.097,
+        "T": 33,
+        "T_eff": 8,
+        "N": 3,
+        "best_trial": "entry3_303040"
+      },
+      "dsr_verdict": "통과 실패(다중검정 감안 시 샤프가 유의하지 않음)",
+      "passed": false,
+      "references": [
+        "Bailey et al. 2017 (PBO/CSCV)",
+        "Bailey & López de Prado 2014 (DSR)"
+      ],
+      "note": "조합 간 상관으로 N이 과대계상될 수 있어 DSR은 보수적(실제보다 낮게) 추정됨."
+    }
+  },
+  "normal": {
+    "rows": [
+      {
+        "entry": "entry1_full",
+        "net_pct": 6.12,
+        "mdd_pct": -13.2,
+        "avg_n_syms": 27.3,
+        "n_events": 44
+      },
+      {
+        "entry": "entry2_5050",
+        "net_pct": 6.79,
+        "mdd_pct": -12.6,
+        "avg_n_syms": 27.3,
+        "n_events": 44
+      },
+      {
+        "entry": "entry3_303040",
+        "net_pct": 7.33,
+        "mdd_pct": -12.2,
+        "avg_n_syms": 27.3,
+        "n_events": 44
+      }
+    ],
+    "n_events": 44,
+    "report": {
+      "input": {
+        "horizon": "hotsplit_normal",
+        "universe": "pit",
+        "cost": "kospi: 매수 6.5bp + 매도 26.50bp (왕복 33.00bp)"
+      },
+      "n_trials": 3,
+      "n_events": 44,
+      "pbo": {
+        "pbo": 0.0,
+        "embargo": 3,
+        "purged_events_total": 13734,
+        "n_combos": 772,
+        "n_blocks": 12,
+        "lambda_mean": 1.0986,
+        "is_sharpe_mean": 0.4692,
+        "oos_sharpe_mean": 0.5201,
+        "degradation_slope": -0.8296,
+        "prob_oos_loss": 0.1762
+      },
+      "pbo_verdict": "낮음(과최적화 가능성 작음)",
+      "dsr": {
+        "sr": 0.4516,
+        "sr0": 0.0682,
+        "dsr": 0.8774,
+        "dsr_uncorrected": 0.992,
+        "skew": -0.066,
+        "kurtosis": 2.145,
+        "T": 44,
+        "T_eff": 11,
+        "N": 3,
+        "best_trial": "entry3_303040"
+      },
+      "dsr_verdict": "통과 실패(다중검정 감안 시 샤프가 유의하지 않음)",
+      "passed": false,
+      "references": [
+        "Bailey et al. 2017 (PBO/CSCV)",
+        "Bailey & López de Prado 2014 (DSR)"
+      ],
+      "note": "조합 간 상관으로 N이 과대계상될 수 있어 DSR은 보수적(실제보다 낮게) 추정됨."
+    }
+  }
+}
