@@ -27,13 +27,20 @@ from __future__ import annotations
 import os, sys, json, time, shutil, argparse, datetime
 
 MODEL = os.environ.get("PROFILE_MODEL", "claude-haiku-4-5")
+# 2026-07-16(지호 님 지적 — 아세아 오서술 사건): 업종 분류 '근거'만 주는 건 여전히 기억 기반
+# 지어내기다 — 실제로 검색해서 확인한 정보로 쓰는 게 원래 요청이었다. 한국 종목은 검색을
+# 켜고(WebSearch), 검색+판단이 필요한 작업이라 ai_report.py의 다른 검색 단계(verify_stage)와
+# 동일하게 haiku가 아니라 sonnet을 쓴다.
+MODEL_SEARCH = os.environ.get("PROFILE_MODEL_SEARCH", "claude-sonnet-5")
 CLAUDE_BIN = os.environ.get("CLAUDE_BIN", "claude")
 CHUNK = 20            # 요청당 종목 수 — 출력 JSON 이 안정적으로 파싱되는 크기
+CHUNK_SEARCH = 5       # 검색 모드는 종목마다 실제 검색이 필요해 묶음을 작게(요청 수는 늘지만
+                       # 회사당 검색 품질을 우선) — 미국(GICS 근거 있음)은 기존 방식 유지, 한국만 적용.
 POLL_SEC = 20
 KR_PROFILE_PATH = "kospi200_profiles.json"
 US_PROFILE_PATH = "sp500_profiles.json"
 
-_SYSTEM = (
+_SYSTEM_BASE = (
     "당신은 종목 사전을 만드는 애널리스트다. 각 종목에 대해 두 가지를 쓴다(2026-07-15 개편 —"
     " 리포트에서 '종목 설명'과 '②사업'으로 각각 표시되며 겹치면 안 된다):\n"
     "1) one_liner(한 문장, 40~60자): 그 회사가 지금 실제로 뭘로 돈을 버는 회사인지 일반적으로"
@@ -51,9 +58,39 @@ _SYSTEM = (
     " 금지). 확신이 없으면 회사의 오래되고 확실한 핵심 사업만 쓴다.\n"
     "규칙: 이 글은 캐시로 오래 재사용된다 — 최신 뉴스·주가·시점 표현('최근','올해','2025년 기준'"
     " 등 특정 연도 고정 표현) 금지. **정확한 매출액·비율 등 구체적 수치는 절대 쓰지 않는다**"
-    "(학습 데이터 기억에서 나온 숫자는 부정확하거나 철 지난 것일 위험이 커서 금지 — '압도적"
-    "이다/절반 이상이다' 같은 정성적 비교 표현만 허용). 쉬운 한국어, 한자 금지. 두 필드 모두"
-    " 반드시 채운다(분량은 목표치 — 표시 단계에서 넘치면 문장 경계로 다시 자른다).\n"
+    "(부정확하거나 철 지난 것일 위험이 커서 금지 — '압도적이다/절반 이상이다' 같은 정성적"
+    " 비교 표현만 허용). 쉬운 한국어, 한자 금지. 두 필드 모두 반드시 채운다(분량은 목표치 —"
+    " 표시 단계에서 넘치면 문장 경계로 다시 자른다)."
+)
+
+# 미국(US): 실사용 중 검증된 GICS sub_industry 근거 + 기억 기반(검색 없음, 저비용 haiku).
+_SYSTEM = (
+    _SYSTEM_BASE + "\n"
+    "**입력 종목명 뒤 괄호 안 업종(있으면)은 거래소(GICS)의 검증된 공식 분류다 — 반드시"
+    " 그 업종과 맞는 사업으로 서술할 것.**\n"
+    "**도구를 쓸 수 없다 — 파일을 찾아보거나 웹을 검색하지 말고, 확인 절차를 설명하는 문장도"
+    " 쓰지 마라. 주어진 심볼·이름·업종만으로 그 자리에서 바로 판단해 JSON만 출력한다.**\n"
+    '출력은 JSON 하나만: {"SYM1":{"one_liner":"...","detail":"..."},"SYM2":{...}}'
+)
+
+# 한국(KR): 2026-07-16 재설계(지호 님 지적 — "업종 분류를 근거로 서술하는 게 아니라 실제
+# 정보를 검색 기반으로 생성해달라 한 거야"). 아세아(002030)를 '자동차부품사'로 완전히 잘못
+# 서술한 사고를 업종 태그만으로 막으려 했으나, 지주회사처럼 업종 분류 자체가 애매한 경우
+# (KRX 분류 "일반서비스")엔 태그를 줘도 AI가 또 다른 틀린 추측('백화점·마트 유통업')을
+# 내놓는 걸 테스트로 확인 — 근본 해법은 태그가 아니라 실제 검색이었다. WebSearch를 켜고
+# 종목마다 실제로 검색해 확인하도록 강제. 검색+판단 작업이라 haiku가 아니라 sonnet 사용,
+# 묶음도 20→5로 줄여 종목당 검색 품질을 우선한다(CHUNK_SEARCH).
+_SYSTEM_SEARCH = (
+    _SYSTEM_BASE + "\n"
+    "**반드시 웹검색으로 확인한다 — 기억에 의존해 지어내지 마라.** 각 종목마다 최소 1회"
+    " 이상 검색해서 그 회사가 실제로 무슨 사업을 하는지(공식 홈페이지·사업보고서·뉴스 등)"
+    " 확인한 뒤에 쓴다. 이름이 비슷하거나 덜 알려진 회사를 다른 유명한 회사와 혼동해 완전히"
+    " 다른 업종으로 지어내는 사고가 실제로 발생했다(예: 지주회사 '아세아'를 검색 없이"
+    " '자동차부품사'로 서술). 검색 결과가 자신의 기억과 다르면 검색 결과를 따른다. 검색해도"
+    " 확실한 정보를 못 찾으면 지어내지 말고 회사명·업종에서 유추 가능한 가장 안전하고 일반적인"
+    " 서술로 그친다(예: '지주회사로 여러 계열사를 보유' 정도). 종목별로 따로 검색하되, 검색"
+    " 횟수가 제한되니 한 번의 검색으로 여러 정보를 확인할 수 있게 검색어를 효율적으로 구성"
+    " 한다(예: '{회사명} 사업보고서' 또는 '{회사명} 주요사업').\n"
     '출력은 JSON 하나만: {"SYM1":{"one_liner":"...","detail":"..."},"SYM2":{...}}'
 )
 
@@ -77,7 +114,16 @@ def _collect_us(refresh: bool) -> tuple[dict, list]:
 
 
 def _collect_kr(refresh: bool) -> tuple[dict, list]:
-    """kospi200_profiles.json(없으면 새로) + KRX 캐시에서 구성종목."""
+    """kospi200_profiles.json(없으면 새로) + KRX 캐시에서 구성종목.
+
+    2026-07-16 수정(지호 님 리포트 — 아세아(002030)를 AI가 '자동차 부품사'로 완전히 잘못
+    서술한 사례): _collect_us는 GICS sub_industry를 세 번째 값으로 넘겨 AI가 그 업종
+    맥락 안에서만 회사를 서술하게 하는데, 이 함수는 그 자리에 빈 문자열(""))만 넘기고
+    있었다 — 즉 한국 쪽만 AI가 심볼·이름 두 개만 보고 '학습 데이터 기억'에 전적으로
+    의존해 서술을 지어냈다(같은 이름의 다른 회사와 혼동하기 쉬움). kr_sector.py가 이미
+    확보해둔 KRX 공식 업종분류(get_market_sector_classifications, 26종)를 세 번째 값으로
+    넘겨 US와 동일하게 업종 맥락을 앵커로 준다 — 완전한 환각 방지는 아니지만(맥락이 있어도
+    세부 내용은 여전히 기억에 의존) '전혀 다른 업종으로 착각'하는 최악의 사례는 크게 줄어든다."""
     try:
         with open(KR_PROFILE_PATH, encoding="utf-8") as f:
             prof = json.load(f)
@@ -89,24 +135,36 @@ def _collect_kr(refresh: bool) -> tuple[dict, list]:
     except Exception:
         _log("output/kospi200_cache.json 없음 → 한국 생략(데일리 1회 실행 후 다시)")
         return prof, []
+    sec_by_ticker = {}
+    try:
+        import kr_sector as KS
+        today8 = datetime.date.today().strftime("%Y%m%d")
+        sec_by_date = KS.fetch_sectors([today8])
+        sec_by_ticker = sec_by_date.get(today8) or {}
+        _log(f"KRX 업종분류 확보: {len(sec_by_ticker)}종목")
+    except Exception as e:
+        _log(f"KRX 업종분류 조회 실패({type(e).__name__}: {e}) → 업종 맥락 없이 진행")
     tk = prof.setdefault("tickers", {})
     todo = []
     for code, row in uni.items():
         cur = tk.setdefault(code, {"name": row.get("name", ""), "one_liner": "", "detail": ""})
         if refresh or not (cur.get("detail") or "").strip():
-            todo.append((code, row.get("name", ""), ""))
+            todo.append((code, row.get("name", ""), sec_by_ticker.get(code, "")))
     return prof, todo
 
 
-def _build_requests(todo: list, prefix: str) -> list:
-    """20종목씩 묶은 배치 요청 목록. custom_id 로 결과를 되찾는다."""
+def _build_requests(todo: list, prefix: str, chunk_size=CHUNK, model=MODEL,
+                    system=_SYSTEM, web=False) -> list:
+    """chunk_size종목씩 묶은 배치 요청 목록. custom_id 로 결과를 되찾는다.
+    2026-07-16: model/system/web을 파라미터화 — 한국은 검색모드(_SYSTEM_SEARCH·sonnet·
+    web=True·CHUNK_SEARCH)를, 미국은 기존 방식(_SYSTEM·haiku·검색 없음·CHUNK)을 쓴다."""
     reqs = []
-    for i, chunk in enumerate(_chunks(todo, CHUNK)):
+    for i, chunk in enumerate(_chunks(todo, chunk_size)):
         lines = [f"- {sym}: {name}" + (f" ({ind})" if ind else "") for sym, name, ind in chunk]
         reqs.append({
             "custom_id": f"{prefix}-{i}",
             "params": {
-                "model": MODEL, "max_tokens": 4000, "system": _SYSTEM,
+                "model": model, "max_tokens": 4000, "system": system, "web": web,
                 "messages": [{"role": "user",
                               "content": "다음 종목들의 one_liner·detail 을 작성하라. 키는 심볼 그대로.\n"
                                          + "\n".join(lines)}]},
@@ -119,16 +177,20 @@ def _run_cli(reqs: list) -> dict:
     동시 처리 없이 순차로도 충분(요청당 몇 초~수십 초, 전체 몇 분).
     2026-07-15: 703종목 --refresh 시 36청크 중 일부가 이유 불명 타임아웃/부분파싱실패로
     누락되는 게 확인돼(예: 'timed out after -1186초'처럼 음수 타임아웃까지 관측 — CLI
-    프로세스 자체의 일시적 이상으로 추정, 원인 미상) 1회 재시도를 추가한다."""
+    프로세스 자체의 일시적 이상으로 추정, 원인 미상) 1회 재시도를 추가한다.
+    2026-07-16: model/system/web을 req["params"]에서 그대로 읽는다(하드코딩된 _SYSTEM/MODEL
+    대신) — 검색모드 요청(한국)과 기존 요청(미국)이 섞여도 각자 맞는 설정으로 호출된다."""
     import ai_report as AR
     out = {}
     for i, req in enumerate(reqs, 1):
         cid = req["custom_id"]
-        instr = req["params"]["messages"][0]["content"]
-        _log(f"  CLI 요청 {i}/{len(reqs)}: {cid}")
+        p = req["params"]
+        instr = p["messages"][0]["content"]
+        _log(f"  CLI 요청 {i}/{len(reqs)}: {cid}" + (" (검색)" if p.get("web") else ""))
         for attempt in (1, 2):
             try:
-                out[cid] = AR._call_cli(instr, web=False, system=_SYSTEM, model=MODEL)
+                out[cid] = AR._call_cli(instr, web=p.get("web", False), system=p["system"],
+                                        model=p["model"])
                 break
             except Exception as e:
                 _log(f"  실패({attempt}/2): {cid} ({type(e).__name__}: {e})")
@@ -212,7 +274,9 @@ def main():
     if not (us_todo or kr_todo):
         _log("채울 것이 없음 — 종료 (--refresh 로 전체 재생성 가능)"); return
 
-    reqs = _build_requests(us_todo, "us") + _build_requests(kr_todo, "kr")
+    reqs = (_build_requests(us_todo, "us")
+           + _build_requests(kr_todo, "kr", chunk_size=CHUNK_SEARCH, model=MODEL_SEARCH,
+                             system=_SYSTEM_SEARCH, web=True))
     if use_cli:
         results = _run_cli(reqs)
     else:
