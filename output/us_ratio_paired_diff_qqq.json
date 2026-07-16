@@ -1,0 +1,12 @@
+{
+  "core_ticker": "QQQ",
+  "w1": 0.0,
+  "w2": 0.65,
+  "n_boot": 5000,
+  "block_months": 6,
+  "n_months": 107,
+  "mean_diff_pct": 15.45,
+  "ci95_lo": 5.23,
+  "ci95_hi": 26.76,
+  "pct_positive": 99.8
+}
