@@ -89,18 +89,28 @@ def _stock_chart_png(closes, ticker, big=False):
     return b.getvalue()
 
 
+_CORE_WEIGHT = 0.65  # 코어(지수) : 새틀라이트(보유종목) = 65:35 — STRATEGY.md §2-F(한국,
+# 검증됨). 미국은 이 비율이 공식 검증된 적 없음(§3.5 H1-미국은 연구용 스윕이지 권장치가
+# 아님) — 그래도 같은 형식으로 참고 표시(2026-07-17, 지호 님 요청).
+_MIX_LABEL = f"코어{int(_CORE_WEIGHT*100)}:새틀{int((1-_CORE_WEIGHT)*100)} 혼합" if _KFONT \
+             else f"{int(_CORE_WEIGHT*100)}:{int((1-_CORE_WEIGHT)*100)} blend"
+
+
 def _holdings_compare_chart_png(series: dict, index_name: str):
     """포트폴리오(각 종목 진입일에 동일 금액 투입 가정) 누적수익률 vs 같은 날짜에 같은 금액을
-    지수에 넣었을 때의 누적수익률 — 시계열 라인 비교."""
+    지수에 넣었을 때의 누적수익률 vs 코어:새틀라이트 65:35 혼합 — 시계열 3선 비교."""
     dates = series.get("dates") or []
     if not dates:
         return None
     port = [v if v is not None else np.nan for v in series["portfolio"]]
     bench = [v if v is not None else np.nan for v in series["bench"]]
+    mix = [_CORE_WEIGHT * b + (1 - _CORE_WEIGHT) * p if (p == p and b == b) else np.nan
+           for p, b in zip(port, bench)]
     x = np.arange(len(dates))
     fig, ax = plt.subplots(figsize=(7.6, 3.0), dpi=150)
-    ax.plot(x, port, lw=1.8, color="#2563eb", label=_PORT_LABEL)
     ax.plot(x, bench, lw=1.4, color="#9ca3af", label=f"{index_name} {_BENCH_SUFFIX}")
+    ax.plot(x, port, lw=1.8, color="#2563eb", label=_PORT_LABEL)
+    ax.plot(x, mix, lw=1.6, color="#059669", linestyle="--", label=_MIX_LABEL)
     ax.axhline(0, color="#111827", lw=0.8)
     ticks = np.linspace(0, len(dates) - 1, min(6, len(dates))).astype(int)
     ax.set_xticks(ticks); ax.set_xticklabels([dates[i][5:] for i in ticks], fontsize=8)
@@ -302,7 +312,15 @@ def run_kr(no_email: bool = False, force: bool = False):
     # AI가 오늘 '제외' 판정한 종목 중 보유 중인 게 있으면 보유목록에서도 뺀다(지호 님 피드백
     # 2026-07-16 — 한국전력 사례: 매수후보 알고리즘이 AI 제외로 걸러낸 종목을 계속 보유하는 건
     # 앞뒤가 안 맞음). 6개월 재평가/200일선 트리거와 별개로 즉시 반영, 매도 카드로도 표시.
-    if kr.get("ind_map"):
+    #
+    # 2026-07-17 기본 비활성(지호 님 질문 + Fable 5 자문): 매수 게이트용 verdict 프롬프트
+    # ("애매하면 제외로 판정 — 다음 순위 후보가 자동 충원되니 신중할 부담 없음")를 매도
+    # 트리거에 그대로 재사용하는 건 비용 구조가 다른 두 결정(매수 후보 제외=기회비용 거의 0
+    # vs 보유종목 매도=거래비용·세금·확정손실)에 동일한 편향을 이식한 것 — 사전 백테스트도
+    # 불가능(ai_verdict_log.py 자체 docstring이 이유를 명시). 검증 로그(매도 시점 반사실적
+    # 수익률 비교) 없이 실거래에 자동 반영해온 상태였다. 재활성화하려면 AI_SELL_ON_EXCLUDE=1
+    # (검증 인프라 추가 전에는 켜지 말 것).
+    if os.environ.get("AI_SELL_ON_EXCLUDE", "0") == "1" and kr.get("ind_map"):
         ai_excluded_map = {str(x["symbol"]): x.get("reason", "") for x in (report.get("ai_excluded") or [])}
         if ai_excluded_map:
             try:

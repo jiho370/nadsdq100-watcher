@@ -1,0 +1,11 @@
+{
+  "w1": 0.0,
+  "w2": 0.65,
+  "n_boot": 5000,
+  "block_months": 6,
+  "n_months": 107,
+  "mean_diff_pct": 20.97,
+  "ci95_lo": 10.38,
+  "ci95_hi": 32.75,
+  "pct_positive": 100.0
+}
