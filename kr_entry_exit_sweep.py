@@ -31,16 +31,20 @@ POOL_KR=30의 절반).
       output/backtest_disposal_compare_kr.json · output/pbo_report_disposal_kr.json
 """
 from __future__ import annotations
-import os, sys, argparse
+import os, sys, json, argparse
 import numpy as np
 import pandas as pd
 
 import backtest_costs as BC
 import backtest_exec as BE
 import backtest_kr_strategies as KS
+import overfit_stats as OS
 
 TOPN = 15
 REBAL_DAYS = 63
+HOT_RSI = 72          # kr_stocks._hot()과 동일 기준
+HOT_GAP50 = 15        # 50일선 대비 +15% 이상
+CORE_ENTRIES = ["entry1_full", "entry2_5050", "entry3_303040"]  # 전량 vs 현행 2분할 vs 현행 3분할
 
 
 def _log(m): print(f"[매수매도집행KR] {m}", file=sys.stderr)
@@ -84,6 +88,105 @@ def run_entry_ratio_sweep_kr(save=True):
     return BE.run_entry_ratio_sweep(panel, bench, None, None, rebal_days=REBAL_DAYS, topn=TOPN,
                                     cost=cost, select_fn=select_fn, out_suffix="_kr",
                                     lookback=BK.LOOKBACK, entries=entries)
+
+
+def _classify_hot(panel: pd.DataFrame, p: int, syms: list) -> tuple[list, list]:
+    """kr_stocks._hot()과 동일 기준(RSI≥72 또는 50일선 대비 +15% 이상)으로 hot/normal 분류.
+    p 시점까지의 종가만 사용(미래 참조 없음)."""
+    from market_signals import _rsi
+    hot, normal = [], []
+    for sym in syms:
+        closes = panel[sym].iloc[:p + 1].dropna()
+        if len(closes) < 51:
+            normal.append(sym); continue
+        price = float(closes.iloc[-1])
+        ma50 = float(closes.iloc[-50:].mean())
+        rsi = _rsi(closes.iloc[-30:].tolist())
+        gap50 = (price / ma50 - 1) * 100 if ma50 else 0.0
+        is_hot = (rsi is not None and rsi >= HOT_RSI) or gap50 >= HOT_GAP50
+        (hot if is_hot else normal).append(sym)
+    return hot, normal
+
+
+def run_hot_split_sweep(save=True):
+    """지호 님 질문(2026-07-16): "과열이면 3분할, 평시면 2분할"이라는 조건분기 자체가
+    검증된 적이 있나 — 없었다. 기존 entry-ratio-sweep은 바스켓 전체에 규칙 하나를 통째로
+    적용해 "분할이 전량매수를 이긴다"만 확인했지, "과열 종목이 진짜로 3분할에서 더 득을
+    보는가"는 안 봤다. 여기서는 매 결정 시점마다 후보(valuediv 풀 30)를 hot/normal로 나눠
+    각 그룹 안에서 entry1_full·entry2_5050·entry3_303040 3종을 따로 비교한다."""
+    import backtest_kr as BK
+    panel, snaps, navs_bm, cost = _load_long()
+    bench = navs_bm["B2_equal"].reindex(panel.index).ffill()
+    decisions = KS.build_decisions(panel, snaps, "valuediv")   # 풀 30(전체) — 두 그룹으로 나눌 여유 확보
+    ma20, ma50, ma200, atr = BE._ma(panel, 20), BE._ma(panel, 50), BE._ma(panel, 200), BE._atr_close(panel)
+    bench_r = bench.reindex(panel.index).ffill()
+
+    per_combo = {("hot", e): {"excess": [], "dates": []} for e in CORE_ENTRIES}
+    per_combo.update({("normal", e): {"excess": [], "dates": []} for e in CORE_ENTRIES})
+    stats = {k: {"net": [], "mdd": [], "n_syms": []} for k in per_combo}
+    exit_rule = "exit_time6m"
+    n_hot_events, n_normal_events = 0, 0
+
+    for p, ranked in decisions:
+        date = panel.index[p].date().isoformat()
+        entry_day = p + 1
+        hot_syms, normal_syms = _classify_hot(panel, p, ranked)
+        n_hot_events += len(hot_syms); n_normal_events += len(normal_syms)
+        for group, syms in (("hot", hot_syms), ("normal", normal_syms)):
+            if not syms:
+                continue
+            for e in CORE_ENTRIES:
+                evs = []
+                for sym in syms:
+                    r = BE._simulate_trade(panel, ma20, ma50, ma200, atr, sym, entry_day, e, exit_rule)
+                    if r is None:
+                        continue
+                    net = cost.net(r["exit_price"] / r["entry_price"] - 1)
+                    b_ret = 0.0
+                    if np.isfinite(bench_r.iloc[r["exit_day"]]) and np.isfinite(bench_r.iloc[entry_day]):
+                        b_ret = float(bench_r.iloc[r["exit_day"]] / bench_r.iloc[entry_day] - 1)
+                    evs.append({"net": net, "excess": net - b_ret, "mdd": r["mdd"]})
+                if not evs:
+                    continue
+                key = (group, e)
+                per_combo[key]["excess"].append(round(float(np.mean([x["excess"] for x in evs])), 6))
+                per_combo[key]["dates"].append(date)
+                stats[key]["net"].append(float(np.mean([x["net"] for x in evs])))
+                stats[key]["mdd"].append(float(np.mean([x["mdd"] for x in evs])))
+                stats[key]["n_syms"].append(len(evs))
+
+    _log(f"결정 시점 {len(decisions)}개 · 종목-이벤트 누적 hot {n_hot_events}건 · normal {n_normal_events}건")
+
+    results = {}
+    for group in ("hot", "normal"):
+        n_ev = min((len(per_combo[(group, e)]["excess"]) for e in CORE_ENTRIES), default=0)
+        if n_ev < 4:
+            _log(f"[{group}] 이벤트 부족(n_ev={n_ev}) — 판정 생략"); results[group] = None; continue
+        matrix = [per_combo[(group, e)]["excess"][:n_ev] for e in CORE_ENTRIES]
+        dates0 = per_combo[(group, CORE_ENTRIES[0])]["dates"][:n_ev]
+        rows = [{"entry": e, "net_pct": round(100 * float(np.mean(stats[(group, e)]["net"])), 2),
+                "mdd_pct": round(100 * float(np.mean(stats[(group, e)]["mdd"])), 1),
+                "avg_n_syms": round(float(np.mean(stats[(group, e)]["n_syms"])), 1),
+                "n_events": n_ev} for e in CORE_ENTRIES]
+        trial_data = {"horizon": f"hotsplit_{group}", "universe": "pit", "cost": cost.describe(),
+                     "rebal_days": REBAL_DAYS, "hold_days": BE.MAX_HOLD,
+                     "dates": dates0, "trials": CORE_ENTRIES, "excess_returns": matrix}
+        report = OS.analyze(trial_data, save=False)
+        results[group] = {"rows": rows, "n_events": n_ev, "report": report}
+        _log(f"[{group}] " + " · ".join(f"{r['entry']}={r['net_pct']}%p(MDD{r['mdd_pct']}%,평균{r['avg_n_syms']}종목)"
+                                        for r in rows))
+
+    payload = {"as_of": panel.index[-1].date().isoformat(), "market": "kr",
+              "note": "결정 시점마다 valuediv 풀(30)을 hot(RSI≥72 또는 50일선+15%)/normal로 나눠 "
+                      "entry1_full·entry2_5050·entry3_303040을 그룹별로 독립 비교 — '과열이면 3분할'"
+                      "이라는 조건분기 자체가 근거 있는지 검증(2026-07-16, 지호 님 질문)",
+              "hot": results["hot"], "normal": results["normal"]}
+    if save:
+        os.makedirs("output", exist_ok=True)
+        with open("output/kr_hot_split_sweep.json", "w", encoding="utf-8") as f:
+            json.dump(payload, f, ensure_ascii=False, indent=2)
+        _log("저장: output/kr_hot_split_sweep.json")
+    return payload
 
 
 def run_disposal_sweep_kr(save=True):
@@ -133,6 +236,17 @@ def self_test():
     _log(f"[self-test] 통과: disposal 배선 정상({payload2['n_combos']}종 조합, "
          f"{payload2['rows'][0]['n_events']}건 이벤트)")
 
+    # _classify_hot 배선 확인 — RSI 급등 종목(HOT)과 평탄한 종목(NORMAL)을 합성으로 만들어
+    # 정확히 갈리는지 확인(kr_stocks._hot()과 동일 기준: RSI≥72 또는 50일선 대비 +15%).
+    idx3 = pd.bdate_range("2020-01-01", periods=120)
+    rng3 = np.random.default_rng(11)
+    flat_px = 100.0 * np.exp(np.cumsum(rng3.normal(0.0, 0.005, 120)))   # 잔잔한 등락(진짜 non-hot)
+    surge_px = np.concatenate([np.full(60, 100.0), 100.0 * np.exp(np.cumsum(np.full(60, 0.006)))])
+    panel3 = pd.DataFrame({"FLAT": flat_px, "SURGE": surge_px}, index=idx3)
+    hot3, normal3 = _classify_hot(panel3, 119, ["FLAT", "SURGE"])
+    assert hot3 == ["SURGE"] and normal3 == ["FLAT"], f"hot/normal 분류 오류: hot={hot3} normal={normal3}"
+    _log("[self-test] 통과: _classify_hot 배선 정상(급등 종목만 hot 판정)")
+
     # 정리(합성 self-test 산출물이 실제 결과 파일을 덮어쓰지 않도록 out_suffix로 분리했지만,
     # 굳이 output/에 남길 필요 없는 임시 산출물이므로 삭제)
     for f in ("backtest_entry_ratio_compare_kr_selftest.json", "trial_returns_entry_ratio_kr_selftest.json",
@@ -149,6 +263,8 @@ def main():
     ap = argparse.ArgumentParser(description="국장 새틀라이트 매수/매도 집행방식(분할비율·처분방식) 검증")
     ap.add_argument("--entry-ratio-sweep", action="store_true", help="매수 분할비율 스윕")
     ap.add_argument("--disposal-sweep", action="store_true", help="매도 처분방식(즉시 vs 분할) 스윕")
+    ap.add_argument("--hot-split-sweep", action="store_true",
+                    help="'과열이면 3분할' 조건분기 자체가 근거 있는지(hot/normal 그룹별 비교)")
     ap.add_argument("--self-test", action="store_true")
     args = ap.parse_args()
     if args.self_test:
@@ -157,7 +273,9 @@ def main():
         run_entry_ratio_sweep_kr(); return
     if args.disposal_sweep:
         run_disposal_sweep_kr(); return
-    ap.error("--entry-ratio-sweep, --disposal-sweep, --self-test 중 하나를 지정하세요.")
+    if args.hot_split_sweep:
+        run_hot_split_sweep(); return
+    ap.error("--entry-ratio-sweep, --disposal-sweep, --hot-split-sweep, --self-test 중 하나를 지정하세요.")
 
 
 if __name__ == "__main__":
