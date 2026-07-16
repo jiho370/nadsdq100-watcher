@@ -241,7 +241,13 @@ def portfolio_series(summary: list, price_map: dict, bench_dates: list, bench_cl
                 continue
             arr = aligned.get(r["symbol"])
             if arr and arr[k]:
-                rs.append((arr[k] / r["entry"] - 1) * 100)
+                # 편입 당일(day == since)은 정의상 수익률 0%로 고정한다 — entry_price는 편입 시점
+                # 실행가로 기록된 값인데, arr[k](그날의 종가)는 나중에(오늘) 다시 조회한 과거
+                # 시세라 데이터 소스 재조회 시점 차이로 미세하게 다를 수 있다(수정주가 소급반영
+                # 등). 이 오차가 그래프 시작점을 0%가 아닌 값으로 보이게 했다(2026-07-17,
+                # 지호 님 리포트).
+                px = r["entry"] if day == since else arr[k]
+                rs.append((px / r["entry"] - 1) * 100)
             bi = bisect.bisect_right(bench_dates, since) - 1
             if bi >= 0 and bench_closes[bi]:
                 bs.append((bench_closes[i0 + k] / bench_closes[bi] - 1) * 100)
