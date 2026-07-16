@@ -137,10 +137,18 @@ def _holdings_section(hstate, ind_map, price_map, bench_dates, bench_closes, ind
         if png:
             chart_cid = "holdings_cmp"
             images.append((chart_cid, png))
+        else:
+            print(f"[경고] {index_name} 보유현황 차트 PNG 생성 실패(series 있음) — "
+                  f"dates={series.get('dates')}", file=sys.stderr)
         lp = [v for v in series["portfolio"] if v is not None]
         lb = [v for v in series["bench"] if v is not None]
         if lp and lb:
             totals = {"strategy": lp[-1], "bench": lb[-1], "index_name": index_name}
+    else:
+        since_min = min((r.get("since") for r in summary if r.get("since")), default=None)
+        print(f"[경고] {index_name} 보유현황 그래프 생략(series 없음) — "
+              f"보유종목 최소편입일={since_min}, 벤치마크 마지막날짜={bench_dates[-1] if bench_dates else None}",
+              file=sys.stderr)
     return AR.holdings_table_html(summary, krw=krw, chart_cid=chart_cid, totals=totals,
                                   name_map=name_map), images
 

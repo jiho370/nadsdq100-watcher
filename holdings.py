@@ -206,10 +206,21 @@ def portfolio_series(summary: list, price_map: dict, bench_dates: list, bench_cl
         return {}
     start = min(r["since"] for r in entries)
     i0 = bisect.bisect_left(bench_dates, start)
+    # 2026-07-17: 종목 데이터(pykrx/yfinance 개별)와 지수 데이터(market_signals, 별도 소스)의
+    # 최신성이 하루 어긋날 수 있다 — 오늘 막 편입한 종목의 since가 지수 달력의 마지막 날짜보다
+    # 미래면(장 시작 직후 실행 등, 지수 쪽이 아직 전날치까지만 있을 때) i0가 범위를 벗어나
+    # 그래프 전체가 통째로 사라지는 문제가 실사용 중 확인됨. 그럴 땐 지수 달력의 마지막 날짜로
+    # 앵커를 당겨 최소 1일치라도 그린다(빈 그래프보다 낫다).
     if i0 >= len(bench_dates):
-        return {}
+        i0 = len(bench_dates) - 1
     dates = bench_dates[i0:]
-    aligned = {}
+    # 개별 종목의 since가 지수 달력의 마지막 날짜보다 미래(예: 오늘 막 편입했는데 지수 쪽
+    # 데이터가 아직 어제치까지만 있음)면 아래 'since > day' 필터에 전부 걸려 이 종목이
+    # 결과에서 통째로 빠진다 — 그럴 때만(진짜 도달 불가능할 때만) 달력의 마지막 날짜로
+    # clamp한다(dates[0]로 당기면 원래 유효했던 최근 편입일까지 왜곡되므로 dates[-1] 사용).
+    dlast = dates[-1]
+    since_capped = {r["symbol"]: (dlast if r["since"] > dlast else r["since"]) for r in entries}
+    aligned, anchor = {}, {}
     for r in entries:
         pm = price_map.get(r["symbol"]) or {}
         d, c = pm.get("dates") or [], pm.get("closes") or []
@@ -221,16 +232,32 @@ def portfolio_series(summary: list, price_map: dict, bench_dates: list, bench_cl
                 lastv = c[j]; j += 1
             arr.append(lastv)
         aligned[r["symbol"]] = arr
+        # 2026-07-17(지호 님 피드백 — "0으로 그냥 보정하면 수치오류 아니냐"): 맞는 지적이라
+        # 근본 수정. entry_price는 편입 시점에 저장된 값인데, arr는 이후(오늘) 재조회한
+        # 시계열이다 — yfinance가 auto_adjust=True(수정주가)라 배당락 등이 생길 때마다
+        # 과거 시세 전체가 소급 조정돼, 저장된 entry_price와 재조회 시계열이 시간이 갈수록
+        # 계속 어긋난다(0일차만이 아니라 이후 날짜도 전부 같은 방향으로 살짝 밀림). "0으로
+        # 고정"은 0일차 증상만 가릴 뿐 근본 원인은 그대로였다 — 진짜 수정은 분모(기준가)를
+        # entry_price 대신 같은 재조회 시계열 안에서 시작일에 해당하는 값으로 통일하는 것
+        # (전 구간이 같은 소스·같은 조정기준이 되어 데이터가 실제로 동기화됨).
+        since = since_capped[r["symbol"]]
+        a0 = None
+        for k2, day2 in enumerate(dates):
+            if day2 >= since and arr[k2]:
+                a0 = arr[k2]; break
+        anchor[r["symbol"]] = a0 if a0 else r["entry"]   # 재조회 시계열에 값이 없으면만 폴백
     port, bench = [], []
     for k, day in enumerate(dates):
         rs, bs = [], []
         for r in entries:
-            if r["since"] > day:
+            since = since_capped[r["symbol"]]
+            if since > day:
                 continue
             arr = aligned.get(r["symbol"])
-            if arr and arr[k]:
-                rs.append((arr[k] / r["entry"] - 1) * 100)
-            bi = bisect.bisect_right(bench_dates, r["since"]) - 1
+            base = anchor.get(r["symbol"]) or r["entry"]
+            if arr and arr[k] and base:
+                rs.append((arr[k] / base - 1) * 100)
+            bi = bisect.bisect_right(bench_dates, since) - 1
             if bi >= 0 and bench_closes[bi]:
                 bs.append((bench_closes[i0 + k] / bench_closes[bi] - 1) * 100)
         port.append(sum(rs) / len(rs) if rs else None)
