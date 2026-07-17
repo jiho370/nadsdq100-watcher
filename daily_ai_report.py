@@ -320,8 +320,17 @@ def run_kr(no_email: bool = False, force: bool = False):
     # 불가능(ai_verdict_log.py 자체 docstring이 이유를 명시). 검증 로그(매도 시점 반사실적
     # 수익률 비교) 없이 실거래에 자동 반영해온 상태였다. 재활성화하려면 AI_SELL_ON_EXCLUDE=1
     # (검증 인프라 추가 전에는 켜지 말 것).
+    #
+    # 2026-07-17 severity 게이트 추가(지호 님 제안 — "장기 펀더멘탈 훼손일 때만 매도가 낫지
+    # 않을까" + Fable 5 자문): AI_SELL_ON_EXCLUDE=1이어도 severity='구조적'(회계부정·상장폐지
+    # 절차·핵심사업 인허가 취소 등 문서화된 사건, ai_report._V_SYSTEM 3-1 참고)인 제외만
+    # 실제 매도로 보낸다 — 단기 뉴스·애널리스트 의견·수급성 '일시적' 제외는 매수 후보에서만
+    # 빠지고(이미 그렇게 됨) 보유종목 매도 방아쇠는 되지 않는다. kr_sell_algo_sweep.py가
+    # 검증한 "가격 개입 없는 6개월 재평가가 최선"이라는 결론과 같은 방향 — 일시적 악재로
+    # 만드는 조기매도는 밸류·배당 전략의 평균회귀를 방해하는 것과 같은 실수일 수 있다.
     if os.environ.get("AI_SELL_ON_EXCLUDE", "0") == "1" and kr.get("ind_map"):
-        ai_excluded_map = {str(x["symbol"]): x.get("reason", "") for x in (report.get("ai_excluded") or [])}
+        ai_excluded_map = {str(x["symbol"]): x.get("reason", "") for x in (report.get("ai_excluded") or [])
+                           if x.get("severity") == "구조적"}
         if ai_excluded_map:
             try:
                 ai_sells = KR.sell_ai_excluded(ai_excluded_map, kr["ind_map"])

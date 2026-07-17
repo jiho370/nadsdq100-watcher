@@ -175,13 +175,35 @@ _V_SYSTEM = (
     "해당하는 게 아니다 — '이걸 알고도 이 종목을 사겠는가'라는 질문에 아니라고 답하게 되는 "
     "사안이면 제외한다. 애매하면 매수유지 쪽으로 밀어붙이지 말고 제외한다(제외되면 다음 순위 "
     "후보가 자동으로 채워지므로 신중한 제외에 대한 부담이 없음). 사유 필수.\n"
+    "3-1) verdict='제외'면 severity를 반드시 붙인다(매수유지면 빈칸). 이건 '얼마나 심각해 "
+    "보이는가'라는 인상이 아니라 사건의 유형을 규칙대로 분류하는 것이다. 판별축 두 가지: "
+    "(A)확정성 — 문서화된 사건(절차 개시·판결·공시·규제조치)인가, 아니면 주장·전망·의견·수급"
+    "(애널리스트 의견·공매도 리포트·내부자 매도 등)인가. (B)비중 — 그 사건이 매출·기업가치의 "
+    "대략 30% 이상을 차지하는 핵심 사업에 대한 것인가.\n"
+    "   'severity=구조적'은 아래 목록에 해당하고 (A)(B)를 모두 충족할 때만 부여한다:\n"
+    "   ① 회계부정·감사의견 거절/한정·재무제표 신뢰성 붕괴(대규모 정정, 규제기관 회계조사 착수 포함)\n"
+    "   ② 파산·법정관리·워크아웃·상장폐지 절차 개시\n"
+    "   ③ 규제기관의 핵심사업 금지·인허가 취소·강제 판매중단(조사 착수·경고장은 해당 안 됨)\n"
+    "   ④ 핵심 제품·라이선스·특허·최대고객의 확정적 상실(비중 (B) 충족 시)\n"
+    "   ⑤ 자기자본 대비 중대한(대략 20% 이상) 확정 판결·합의금(소송 '제기'는 해당 안 됨)\n"
+    "   ⑥ 신용등급 투기등급 강등에 유동성 위험이 적시된 경우\n"
+    "   'severity=일시적' = 그 외 전부. 특히 다음은 절대 구조적이 아니다: 한두 분기 실적 미스·"
+    "가이던스 하향, 애널리스트 의견·목표가 하향, 공매도 리포트 등 제3자 주장(규제기관·감사인이 "
+    "확인하기 전), 내부자 매도·외국인 매도세 등 수급, 섹터·거시·관세 역풍, 비핵심 파이프라인·"
+    "단일 수주의 실패, 주가 급락 그 자체.\n"
+    "   방향에 주의: verdict는 애매하면 '제외'지만 severity는 애매하면 '일시적'이다 — 구조적 "
+    "판정은 보유 종목 매도로까지 이어질 수 있는 별도의 무거운 결정이므로, 문서화된 사실을 "
+    "특정할 수 없으면 절대 구조적으로 올리지 않는다. 구조적이면 verdict_reason에 근거 사건과 "
+    "날짜를 반드시 명시한다.\n"
     "4) 확인 안 된 내용은 쓰지 않는다. 수치를 지어내지 않는다.\n"
     "5) 출력은 지정된 JSON 하나만. 문장은 짧게(뉴스·촉매 각 한 줄).\n"
     "6) 종목 데이터에 prev_verdict(전날 판정)가 있으면 오늘 판정이 그것과 달라질 때만 "
     "change_reason에 '전날 판정 이후 새로 확인된 사실'을 날짜와 함께 명시한다(예: "
     "'7/16 실적발표에서 가이던스 상향'). prev_verdict와 같은 사실을 다르게 재해석했을 "
     "뿐이거나 오늘 검색에서 그 사실을 못 찾았을 뿐이면 판정을 바꾸지 말고 prev_verdict를 "
-    "그대로 유지한다 — '새 정보 없이 뒤집기 금지'가 원칙."
+    "그대로 유지한다 — '새 정보 없이 뒤집기 금지'가 원칙. prev_verdict가 '제외'였고 "
+    "prev_severity가 '구조적'이었다면, 복귀의 change_reason은 그 구조적 사건이 해소·정정·"
+    "기각됐음을 보여주는 문서화된 사실이어야 한다(주가 반등·의견 상향은 근거가 아니다)."
 )
 
 _V_SCHEMA = (
@@ -189,10 +211,24 @@ _V_SCHEMA = (
     ' "macro":"환율·한국·코인 흐름 한 줄",\n'
     ' "signal_note":"제공된 신호 중 오늘 가장 중요한 변화 1-2문장(등급은 바꾸지 말 것)",\n'
     ' "risks":"이번 주 공통 리스크 1-2문장(FOMC/실적시즌/지정학 등 구체적으로)",\n'
-    ' "stocks":[{"symbol":"AAA","verdict":"매수유지|제외","verdict_reason":"제외 사유(유지면 빈칸)",\n'
+    ' "stocks":[{"symbol":"AAA","verdict":"매수유지|제외",\n'
+    '   "severity":"제외일 때만: 구조적|일시적(매수유지면 빈칸)",\n'
+    '   "verdict_reason":"제외 사유(유지면 빈칸, 구조적이면 사건+날짜 필수)",\n'
     '   "change_reason":"전날과 판정이 다를 때만: 새로 확인된 사실+날짜(없으면 빈칸)",\n'
     '   "news":"최근 이슈 한 줄(없으면 빈칸)","catalyst":"다가올 이벤트/촉매 한 줄(없으면 빈칸)","flag":"호재|악재|중립"}]}'
 )
+
+
+def _normalize_severity(v: dict):
+    """severity 페일세이프(2026-07-17, Fable 5 자문) — 모델이 태그를 빠뜨리거나 오타를
+    내거나(구버전 pregen 캐시 포함) 값이 {구조적,일시적} 밖이면 무조건 '일시적'로 강제한다.
+    태그 누락이 절대 매도 방아쇠(구조적) 쪽으로 새지 않게 하는 안전망 — 매수 게이트
+    (_apply_verdicts)엔 영향 없음(제외면 severity 무관하게 후보에서 빠짐)."""
+    if (v.get("verdict") or "").strip() != "제외":
+        v["severity"] = ""
+        return
+    if (v.get("severity") or "").strip() != "구조적":
+        v["severity"] = "일시적"
 
 
 def _weekly_note(market: dict) -> str:
@@ -216,6 +252,7 @@ def _v_stock(c, kind, prior=None):
         d["prev_verdict"] = prior.get("verdict")
         d["prev_reason"] = prior.get("reason") or ""
         d["prev_date"] = prior.get("date")
+        d["prev_severity"] = prior.get("severity") or ""
     return d
 
 
@@ -259,6 +296,7 @@ def verify_stage(groups, market) -> dict:
         by = {}
         for r in p.get("stocks") or []:
             if isinstance(r, dict) and r.get("symbol"):
+                _normalize_severity(r)
                 by[str(r["symbol"])] = r
         return {"by_sym": by,
                 "market_overview": (p.get("market_overview") or "").strip(),
@@ -409,6 +447,7 @@ def _log_verdicts(buy_pool, kr_buy_pool, vmap, market):
                 v = vmap.get(sym) or {}
                 entries.append({"date": date, "market": mkt, "symbol": sym,
                                 "name": c.get("name", ""), "verdict": v.get("verdict") or "매수유지",
+                                "severity": v.get("severity", ""),
                                 "reason": v.get("verdict_reason", ""), "price": c.get("price")})
         AVL.log(entries)
     except Exception as e:
@@ -416,12 +455,17 @@ def _log_verdicts(buy_pool, kr_buy_pool, vmap, market):
 
 
 STICKY_EXCLUDE_DAYS = int(os.environ.get("AI_STICKY_EXCLUDE_DAYS", "5"))
+STICKY_EXCLUDE_DAYS_STRUCTURAL = int(os.environ.get("AI_STICKY_EXCLUDE_DAYS_STRUCTURAL", "20"))
 
 
-def _apply_sticky_exclusion(vmap: dict, pool: list, market: str, as_of: str, sticky_days=STICKY_EXCLUDE_DAYS):
+def _apply_sticky_exclusion(vmap: dict, pool: list, market: str, as_of: str,
+                            sticky_days=STICKY_EXCLUDE_DAYS,
+                            sticky_days_structural=STICKY_EXCLUDE_DAYS_STRUCTURAL):
     """제외는 즉시, 복귀는 최소 sticky_days(거래일 근사) 저지 — 비대칭 히스테리시스
     (2026-07-17, Fable 5 자문). REGN·KCC(002380)·003030처럼 새 근거 없이 하루~며칠 만에
     제외→매수유지로 뒤집히는 걸 프롬프트 순응에 기대지 않고 코드 레벨에서 막는다.
+    severity(구조적/일시적, 같은 날 도입)에 따라 점착 기간을 차등: 구조적(회계부정·상장폐지
+    절차 등, verdict='제외')은 며칠 만에 해소되는 성질이 아니므로 20일, 일시적은 5일.
     오늘 change_reason이 채워져 있으면(모델이 새 정보를 인용) 점착을 걸지 않고 통과시킨다
     — '제외 자체를 못 풀게'가 아니라 '근거 없는 복귀만' 막는 게 목적. vmap은 제자리 수정."""
     if not as_of:
@@ -443,6 +487,7 @@ def _apply_sticky_exclusion(vmap: dict, pool: list, market: str, as_of: str, sti
         h = hist.get(sym) or []
         if not h or (h[0].get("verdict") or "").strip() != "제외":
             continue
+        limit = sticky_days_structural if (h[0].get("severity") or "").strip() == "구조적" else sticky_days
         since = None
         for e in h:
             if (e.get("verdict") or "").strip() != "제외":
@@ -455,11 +500,12 @@ def _apply_sticky_exclusion(vmap: dict, pool: list, market: str, as_of: str, sti
         except Exception:
             continue
         days_elapsed = (today - since_d).days
-        if days_elapsed < sticky_days:
+        if days_elapsed < limit:
             v["verdict"] = "제외"
+            v["severity"] = h[0].get("severity") or "일시적"
             v["verdict_reason"] = (h[0].get("reason") or v.get("verdict_reason") or "").strip() \
                 or "점착 유지(새 근거 없이 복귀 저지)"
-            v["change_reason"] = f"점착 유지 — {since} 제외 이후 {days_elapsed}일 경과(<{sticky_days}일), 복귀 근거 없음"
+            v["change_reason"] = f"점착 유지 — {since} 제외 이후 {days_elapsed}일 경과(<{limit}일), 복귀 근거 없음"
 
 
 # ------------------------- verdict 적용(기존 로직 유지) -------------------------
@@ -554,6 +600,8 @@ def build_report(groups: dict, market: dict, pregen: dict | None = None) -> dict
             if not ver:
                 _log("검증 실패 → 전원 유지로 서술만 진행"); ver = {"by_sym": {}}
         vmap = ver.get("by_sym") or {}
+        for v in vmap.values():   # pregen 캐시 경로(구버전 severity 없는 캐시 포함) 페일세이프
+            _normalize_severity(v)
         as_of = str(market.get("as_of") or "").strip()
         try:
             _apply_sticky_exclusion(vmap, buy_pool, "us", as_of)
@@ -622,7 +670,8 @@ def build_report(groups: dict, market: dict, pregen: dict | None = None) -> dict
             "kr_buy": [_mk_item(c, "buy", vmap, wmap) for c in kfb],
             "kr_watch": [_mk_item(c, "watch", vmap, wmap) for c in kfw],
             "ai_excluded": [{"symbol": c["symbol"], "name": c.get("name", ""),
-                             "reason": ((vmap.get(str(c["symbol"])) or {}).get("verdict_reason") or "").strip()}
+                             "reason": ((vmap.get(str(c["symbol"])) or {}).get("verdict_reason") or "").strip(),
+                             "severity": ((vmap.get(str(c["symbol"])) or {}).get("severity") or "").strip()}
                             for c in fx + kfx],
             "sells": [{"symbol": s["symbol"], "name": s.get("name", ""), "reason": s.get("reason", ""),
                        "since": s.get("since"), "ret_pct": s.get("ret_pct"), "plan": s.get("plan", ""),
@@ -916,11 +965,20 @@ def _sell_card(i, s, is_kr=False):
 def _excluded_html(items, is_kr=False):
     if not items:
         return ""
+    def _badge(x):
+        # 2026-07-17(지호 님 제안 — 매도는 장기 펀더멘탈 훼손일 때만): 구조적/일시적을 표기해
+        # 독자가 "이건 그냥 단기 뉴스라 매수만 안 하는 것"과 "회사 자체가 흔들리는 것"을 구분.
+        sev = (x.get("severity") or "").strip()
+        if sev == "구조적":
+            return ' <span style="font-size:10px;color:#991b1b;font-weight:700">[구조적]</span>'
+        if sev == "일시적":
+            return ' <span style="font-size:10px;color:#9ca3af">[일시적]</span>'
+        return ""
     rows = "".join(
         (f'<div style="font-size:12px;color:#374151;margin:3px 0">'
-         f'<b>{_esc(x.get("name"))}</b> — {_esc(x.get("reason") or "사유 미기재")}</div>' if is_kr else
+         f'<b>{_esc(x.get("name"))}</b>{_badge(x)} — {_esc(x.get("reason") or "사유 미기재")}</div>' if is_kr else
          f'<div style="font-size:12px;color:#374151;margin:3px 0">'
-         f'<b>{_esc(x.get("symbol"))}</b> {_esc(x.get("name"))} — {_esc(x.get("reason") or "사유 미기재")}</div>')
+         f'<b>{_esc(x.get("symbol"))}</b> {_esc(x.get("name"))}{_badge(x)} — {_esc(x.get("reason") or "사유 미기재")}</div>')
         for x in items)
     return (
         '<div style="border:1px solid #e5e7eb;border-radius:10px;padding:10px 13px;margin:10px 0;background:#f8fafc">'
