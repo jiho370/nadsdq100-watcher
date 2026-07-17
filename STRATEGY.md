@@ -286,6 +286,31 @@ FINAL_BUY=10 대비 충분히 큰 풀이라 문제 없음 확인.
 
 원자료: `output/us_sector_cap_sweep.json`·`output/pbo_report_us_sector_cap.json`.
 
+### 팩터 가중치 세밀조정 + rd_mktcap formulation 대안 검증 — 기각 (2026-07-17, `us_factor_formula_sweep.py`)
+
+지호 님 요청: "섹터캡으로 증상만 누르지 말고 gp_assets·rd_mktcap·shareholder_yield 비율을
+세밀하게(현행 1:2:2보다 촘촘히, 레벨 0~3) 조정하는 것과 품질게이트·순위변환도 한 번에
+백테스트해보자." Fable 5 자문 반영: 섹터중립화(2026-07-10 `backtest_sector_neutral.py`)는
+이미 시행·기각(OOS 붕괴, 최적 가중치가 rd_mktcap=0 선택)됐으므로 재등록하지 않고, 대신
+(a) 3팩터 가중치 격자(0~3, 49개 유니크 비율) × (b) rd_mktcap formulation 3종(raw=현행
+z-score ±3클립 / rank=순위→[-3,3] 선형매핑 / qgate=품질게이트, int_gp_assets나
+shareholder_yield가 양수인 종목에만 R&D 가점) = **147개 시행을 하나로 등록**해 PBO/DSR로
+정직하게 다중검정 처리(수익 개선이 아니라 섹터쏠림 개선+비열등성 프레임).
+
+**결과: 표본이 얇아(63일 리밸런싱·6개월 forward라 이벤트 32회, 중첩보정 후 유효표본
+T_eff=16) PBO 41.2%("중간, 주의")로 신뢰도가 낮음.** 1등(`shareholder_yield`단독,
+초과6M +10.18%p·샤프 2.12)이 나왔으나 소표본 노이즈일 가능성이 높고, formulation별
+차이(raw/rank/qgate)도 rd_mktcap에 유의미한 가중치가 걸린 조합들 사이에서 뚜렷하지
+않았음(섹터쏠림 지표도 3.0~3.6 범위로 formulation 간 큰 차이 없음). 현행 라이브(1:2:2,
+raw)는 147개 중 69위였으나 이 순위 자체도 얇은 표본 탓에 신뢰하기 어려움 — 현행 가중치는
+훨씬 큰 표본(daily-panel 108회 시뮬레이션, PBO 15%·DSR 0.97 통과)으로 검증됐던 것이라
+이 소규모 스윕 결과로 뒤집기엔 근거가 약함.
+
+**결정**: 팩터 가중치·rd_mktcap 계산식은 현행 유지, 섹터캡=2(위)를 리스크 관리 장치로
+계속 사용. 이번 세션 총 등록 시행수 45+3(섹터캡)+147(팩터공식) = 195.
+
+원자료: `output/us_factor_formula_sweep.json`·`output/pbo_report_us_factor_formula.json`.
+
 ### 코어(SPY):새틀라이트(개별종목) 비율 검증 — 지금까지 없었음 (2026-07-17, `us_core_satellite_ratio.py`)
 
 지호 님 질문 대응: 한국은 §2-F/§3.5에서 코어(KODEX200):새틀라이트 비율을 이미 검증했는데
