@@ -350,8 +350,50 @@ shareholder_yield가 양수인 종목에만 R&D 가점) = **147개 시행을 하
 
 원자료: `output/us_factor_formula_pit_sweep.json`.
 
-**결정**: 팩터 가중치·rd_mktcap 계산식은 현행 유지, 섹터캡=2(위)를 리스크 관리 장치로
-계속 사용. 이번 세션 총 등록 시행수 45+3(섹터캡)+147(팩터공식) = 195.
+### topn8 무캡 세밀 탐색 + 백필 위기 + 최종 종료 (2026-07-17, 같은 날 후속)
+
+지호 님 요청 "topn8 무캡으로 여러 조건 세밀하고 다양하게 보정해가면서 백테스트"에 따라
+추가로 두 그리드를 더 돌림: (a) `us_factor_formula_pit_grid_top8.py`(레벨 0~3, 147시행,
+topn8·무캡) (b) `us_factor_formula_pit_grid_nonzero.py`(레벨 1~5·0 배제, 345시행, 지호
+님 지시 "팩터 세 개 다 0은 아니어야함" 반영).
+
+**결과**: (a) 1등 `rd_mktcap1·shareholder_yield3[qgate]`(초과6M+9.06%p·샤프1.50·쏠림3.06,
+현행 대비 전부 우세)이나 **DSR 0.9079로 미통과**. (b) 1등 `int_gp_assets5·rd_mktcap3·
+shareholder_yield5[raw]`(초과6M+8.61%p·샤프1.57·쏠림3.29)이 **DSR 0.9598로 통과**. 현행은
+(a)에서 147개 중 33위, (b)에서 345개 중 77위.
+
+**백필 위기와 복구**: 지호 님이 "이전엔 어떻게 복구한 건데, 복구 안 하면 의미 없다"고
+재차 요청 — 재조사 결과 남은 102종목 중 다수가 실제로는 **살아있는 활성 기업인데
+`company_tickers.json`(SEC 정적 파일) 자체가 불완전**해서 빠진 것으로 확인(Comerica·
+Kellanova·Hologic·TEGNA·Hanesbrands 등 대형주도 이 파일엔 없음). SEC `browse-edgar`의
+CIK 파라미터가 티커 심볼을 직접 받아 더 넓은 커버리지를 주는 걸 발견해 `fundamentals_
+edgar.py`에 폴백으로 추가(`_browse_edgar_cik()`). 단, **티커 재활용 함정 5건 실제
+발견**(HCP→HashiCorp, LLL→JX Luxventure, MON→Monument Circle Acquisition, PX→Ridgepost
+Capital, XL→Spruce Power — 전부 옛 회사와 무관한 신생/신규상장 기업이 같은 티커를 나중에
+재사용한 것)해 `_TICKER_COLLISION_BLOCKLIST`로 영구 차단. 40종목 검증 후 정상 복구.
+
+재백필 중 `--refresh`를 `--tickers`(부분목록)와 같이 써서 **fundamentals_cache.json
+전체가 그 102종목만 남기고 통째로 덮어써지는 사고 발생**(503+198종목 기존 데이터 소실
+위험) — git에 커밋해둔 직전 버전(`cdca2ef`)에서 즉시 복구 후 40종목만 수동 병합해
+해결. 커버리지 85.4%→**91.1%**.
+
+**그런데 재검증 결과가 소수점까지 완전히 동일** — 원인: 새로 복구한 40종목 대부분이
+가격 데이터(yfinance) 자체가 없어(`build_panel_pit`이 이미 보고한 "95종목 누락"과 상당히
+겹침) 애초에 랭킹에 오를 수 없었음. 진짜 병목은 펀더멘탈이 아니라 가격 데이터였다 —
+백필 자체는 방법론적으로 정당했으나 이번 결과엔 영향 없음.
+
+**최종 결정**: 오늘 하루 이 질문("더 나은 팩터 공식이 있나")에 147+5+147+345=**644회**
+시도. 그리드를 넓힐 때마다 DSR 통과 여부가 뒤집히고(미통과→통과) **1등 조합 자체가
+스윕마다 계속 바뀜**(rd1·sy3[qgate] → gp5·rd3·sy5[raw]) — 진짜 신호보다 "충분히 넓게
+반복 탐색하면 우연히 문턱을 넘는 조합이 나온다"는 전형적 패턴에 가깝다. 각 스윕 내부
+DSR은 그 스윕의 다중검정만 보정하지 "하루에 몇 번 다시 돌렸는가"는 보정 못 함 — §4
+원칙상 이 정도 반복 탐색 뒤의 "통과 1건"을 근거로 채택하는 건 부적절. **팩터 가중치·
+계산식 현행 최종 확정 유지, 섹터캡=2 유지, 이 주제 완전히 종료**(재시도 안 함).
+이번 세션 이 주제 총 등록 시행수 45+3(섹터캡)+147+5+147+345 = 692.
+
+원자료: `output/us_factor_formula_pit_grid_top8.json`·`output/us_factor_formula_pit_grid_nonzero.json`.
+`fundamentals_edgar.py`의 `_browse_edgar_cik()`/`_TICKER_COLLISION_BLOCKLIST`는 향후
+펀더멘탈 백필에 계속 재사용 가능(이번 결론과 무관하게 유용한 인프라 개선).
 
 원자료: `output/us_factor_formula_sweep.json`·`output/pbo_report_us_factor_formula.json`.
 
