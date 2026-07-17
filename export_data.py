@@ -231,9 +231,19 @@ def _load_funds():
 
 
 def select_by_weights(weights: dict, ind_map: dict, n: int, funds: dict | None = None,
-                      cross: dict | None = None) -> list[tuple]:
+                      cross: dict | None = None, sector_map: dict | None = None,
+                      sector_cap: int | None = 2) -> list[tuple]:
     """지표 z-score 가중합성점수로 상위 n 선정 — 백테스트(backtest_weights)와 '동일 지표·정의' 사용.
-       모멘텀=ind_map, 펀더멘탈=fundamentals_edgar.factor_values, 크로스오버=tech_factors(cross)."""
+       모멘텀=ind_map, 펀더멘탈=fundamentals_edgar.factor_values, 크로스오버=tech_factors(cross).
+    sector_cap(기본 2, 2026-07-17 지호 님 결정 — us_sector_cap_sweep.py 백테스트 반영):
+       rd_mktcap(R&D/시가총액) 팩터가 구조적으로 바이오/제약을 편애(REGN 0.539로 전체 1위,
+       2위의 2배)해 실제로 상위 8종목 중 4종목이 Health Care로 쏠리는 걸 실측 확인 — 임상
+       실패 등 섹터 공통 리스크가 상관돼 8종목 '분산'의 실효성이 떨어짐. 백테스트(10년,
+       topn=8 고정) 결과 캡=2가 CAGR -5%p(40.4%→35.4%) 대신 MDD -35.8%→-32.8% 개선 —
+       한국(Stage 4, 캡이 사실상 공짜)과 달리 여기선 실질적 트레이드오프이고 PBO도 93.5%로
+       높아(3후보 중 뭐가 진짜 나은지 이 백테스트로 확정 못 함) 순수 수익 극대화 관점에선
+       무제한이 유리하나, 분산을 우선한 지호 님 선택 — CAGR 저하는 감수. sector_cap=None이면
+       기존 동작(무제한)."""
     import numpy as _np, pandas as _pd, datetime as _dt
     today = _dt.date.today().isoformat()
     try:
@@ -260,7 +270,10 @@ def select_by_weights(weights: dict, ind_map: dict, n: int, funds: dict | None =
     valid = df["mom6"].notna() | df["mom12_1"].notna()   # 모멘텀 결측 종목 제외
     comp = comp[valid].sort_values(ascending=False)
     lbl = "가중합성(" + "·".join(f"{k}{v}" for k, v in weights.items() if v) + ")"
-    return [(s, float(comp[s]), lbl) for s in comp.index[:n]]
+    scored_all = [(s, float(comp[s]), lbl) for s in comp.index]
+    if sector_cap is not None and sector_map:
+        return R.pick_with_sector_cap(scored_all, sector_map, n, sector_cap)
+    return scored_all[:n]
 
 
 def split_by_entry(candidates: list, k: int = 5):
@@ -310,7 +323,8 @@ def select_pool(data: dict, n: int):
             cross = _T.latest_by_sym(data.get("hist") or {})
         except Exception:
             cross = None
-        scored = select_by_weights(w, data["ind_map"], n, funds=funds, cross=cross)
+        scored = select_by_weights(w, data["ind_map"], n, funds=funds, cross=cross,
+                                   sector_map=data.get("sector_map"))
         label = ("weights " + "·".join(f"{k}{v}" for k, v in w.items() if v)
                  + ("" if funds else " [펀더멘탈캐시 없음:모멘텀만]"))
     else:
