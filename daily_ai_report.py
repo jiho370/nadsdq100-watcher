@@ -226,11 +226,14 @@ def _signal_images(signals, when=None):
 
 
 def _attach_headlines(cands, suffix=""):
-    """야후 헤드라인(무료)을 후보에 주입 — AI 웹검색 의존 축소. 한국은 '.KS' 접미사."""
+    """야후 헤드라인(무료)을 후보에 주입 — AI 웹검색 의존 축소. 한국은 '.KS' 접미사.
+    names를 같이 넘겨 관련성 필터(_is_relevant_headline)가 회사명 매칭도 쓰게 한다
+    (2026-07-17, 지호 님 리포트 — HPQ에 무관한 "Domino's..." 기사가 붙던 버그 수정)."""
     try:
         from ai_commentary import fetch_news_headlines
         ysyms = {c["symbol"]: c["symbol"] + suffix for c in cands}
-        heads = fetch_news_headlines(list(ysyms.values()), getattr(R, "yf", None))
+        names = {ysyms[c["symbol"]]: c.get("name", "") for c in cands}
+        heads = fetch_news_headlines(list(ysyms.values()), getattr(R, "yf", None), names=names)
         for c in cands:
             c["headlines"] = (heads.get(ysyms[c["symbol"]]) or [])[:4]
     except Exception as e:
