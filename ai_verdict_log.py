@@ -57,6 +57,22 @@ def log(entries: list[dict]):
             json.dump({"entries": cur}, f, ensure_ascii=False, indent=2)
 
 
+def history_by_symbol(market: str, before_date: str) -> dict[str, list[dict]]:
+    """market의 (before_date보다 엄격히 이전인) 로그를 종목별로 최신순 정렬해 반환.
+    2026-07-17(지호 님 지적 — REGN/KCC/003030 판정이 새 근거 없이 하루 만에 뒤집힘) 대응:
+    ai_report.py가 이걸로 (a)전날 판정을 프롬프트에 주입 (b)제외 판정의 연속일수(점착성)를
+    계산한다."""
+    entries = load()
+    by_sym: dict[str, list[dict]] = {}
+    for e in entries:
+        if e.get("market") != market or not e.get("date") or e["date"] >= before_date:
+            continue
+        by_sym.setdefault(e["symbol"], []).append(e)
+    for sym in by_sym:
+        by_sym[sym].sort(key=lambda e: e["date"], reverse=True)
+    return by_sym
+
+
 def forward_return_summary(price_lookup, min_days: int = MIN_DAYS, min_n: int = MIN_N) -> dict | None:
     """price_lookup(symbol, market)->현재가|None.
     반환: {"긍정(매수유지)":{"avg_ret_pct","n"}, "부정(강등·제외)":{...}} 또는

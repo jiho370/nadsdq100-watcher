@@ -176,7 +176,12 @@ _V_SYSTEM = (
     "사안이면 제외한다. 애매하면 매수유지 쪽으로 밀어붙이지 말고 제외한다(제외되면 다음 순위 "
     "후보가 자동으로 채워지므로 신중한 제외에 대한 부담이 없음). 사유 필수.\n"
     "4) 확인 안 된 내용은 쓰지 않는다. 수치를 지어내지 않는다.\n"
-    "5) 출력은 지정된 JSON 하나만. 문장은 짧게(뉴스·촉매 각 한 줄)."
+    "5) 출력은 지정된 JSON 하나만. 문장은 짧게(뉴스·촉매 각 한 줄).\n"
+    "6) 종목 데이터에 prev_verdict(전날 판정)가 있으면 오늘 판정이 그것과 달라질 때만 "
+    "change_reason에 '전날 판정 이후 새로 확인된 사실'을 날짜와 함께 명시한다(예: "
+    "'7/16 실적발표에서 가이던스 상향'). prev_verdict와 같은 사실을 다르게 재해석했을 "
+    "뿐이거나 오늘 검색에서 그 사실을 못 찾았을 뿐이면 판정을 바꾸지 말고 prev_verdict를 "
+    "그대로 유지한다 — '새 정보 없이 뒤집기 금지'가 원칙."
 )
 
 _V_SCHEMA = (
@@ -185,6 +190,7 @@ _V_SCHEMA = (
     ' "signal_note":"제공된 신호 중 오늘 가장 중요한 변화 1-2문장(등급은 바꾸지 말 것)",\n'
     ' "risks":"이번 주 공통 리스크 1-2문장(FOMC/실적시즌/지정학 등 구체적으로)",\n'
     ' "stocks":[{"symbol":"AAA","verdict":"매수유지|제외","verdict_reason":"제외 사유(유지면 빈칸)",\n'
+    '   "change_reason":"전날과 판정이 다를 때만: 새로 확인된 사실+날짜(없으면 빈칸)",\n'
     '   "news":"최근 이슈 한 줄(없으면 빈칸)","catalyst":"다가올 이벤트/촉매 한 줄(없으면 빈칸)","flag":"호재|악재|중립"}]}'
 )
 
@@ -197,21 +203,38 @@ def _weekly_note(market: dict) -> str:
             if market.get("weekly_recap") else "")
 
 
-def _v_stock(c, kind):
-    """검증 입력은 최소 필드만(토큰 절약). 판단에 필요한 것: 정체+최근 급등락+헤드라인."""
+def _v_stock(c, kind, prior=None):
+    """검증 입력은 최소 필드만(토큰 절약). 판단에 필요한 것: 정체+최근 급등락+헤드라인.
+    prior={"verdict","reason","date"}가 있으면 전날 판정을 같이 줘서(2026-07-17, 지호 님
+    지적 — REGN/KCC/003030이 새 근거 없이 하루 만에 뒤집힘) 모델이 '새 정보 없이 뒤집기'를
+    피하게 한다."""
     r = c.get("ret") or {}
-    return {"symbol": c.get("symbol"), "name": c.get("name"), "kind": kind,
-            "sector": c.get("sector"), "ret_1w": r.get("1w"), "ret_1m": r.get("1m"),
-            "hot": bool(c.get("hot")), "headlines": (c.get("headlines") or [])[:4]}
+    d = {"symbol": c.get("symbol"), "name": c.get("name"), "kind": kind,
+         "sector": c.get("sector"), "ret_1w": r.get("1w"), "ret_1m": r.get("1m"),
+         "hot": bool(c.get("hot")), "headlines": (c.get("headlines") or [])[:4]}
+    if prior:
+        d["prev_verdict"] = prior.get("verdict")
+        d["prev_reason"] = prior.get("reason") or ""
+        d["prev_date"] = prior.get("date")
+    return d
 
 
 def verify_stage(groups, market) -> dict:
-    """반환: {"by_sym":{sym:{verdict,verdict_reason,news,catalyst,flag}},
+    """반환: {"by_sym":{sym:{verdict,verdict_reason,change_reason,news,catalyst,flag}},
              "market_overview","macro","signal_note","risks"}  실패 시 {}."""
-    stocks = ([_v_stock(c, "buy") for c in groups.get("buy_now") or []]
-              + [_v_stock(c, "watch") for c in groups.get("watch") or []]
-              + [_v_stock(c, "buy") for c in groups.get("kr_buy") or []]
-              + [_v_stock(c, "watch") for c in groups.get("kr_watch") or []]
+    as_of = str(market.get("as_of") or "").strip()
+    prior_us, prior_kr = {}, {}
+    if as_of:
+        try:
+            import ai_verdict_log as AVL
+            prior_us = {s: h[0] for s, h in AVL.history_by_symbol("us", as_of).items() if h}
+            prior_kr = {s: h[0] for s, h in AVL.history_by_symbol("kr", as_of).items() if h}
+        except Exception:
+            pass
+    stocks = ([_v_stock(c, "buy", prior_us.get(str(c.get("symbol")))) for c in groups.get("buy_now") or []]
+              + [_v_stock(c, "watch", prior_us.get(str(c.get("symbol")))) for c in groups.get("watch") or []]
+              + [_v_stock(c, "buy", prior_kr.get(str(c.get("symbol")))) for c in groups.get("kr_buy") or []]
+              + [_v_stock(c, "watch", prior_kr.get(str(c.get("symbol")))) for c in groups.get("kr_watch") or []]
               + [{"symbol": s.get("symbol"), "name": s.get("name"), "kind": "sell",
                   "reason": s.get("reason")} for s in (groups.get("sells") or []) + (groups.get("kr_sells") or [])])
     instr = (
@@ -390,6 +413,53 @@ def _log_verdicts(buy_pool, kr_buy_pool, vmap, market):
         _log(f"verdict 로그 기록 생략({type(e).__name__}: {e})")
 
 
+STICKY_EXCLUDE_DAYS = int(os.environ.get("AI_STICKY_EXCLUDE_DAYS", "5"))
+
+
+def _apply_sticky_exclusion(vmap: dict, pool: list, market: str, as_of: str, sticky_days=STICKY_EXCLUDE_DAYS):
+    """제외는 즉시, 복귀는 최소 sticky_days(거래일 근사) 저지 — 비대칭 히스테리시스
+    (2026-07-17, Fable 5 자문). REGN·KCC(002380)·003030처럼 새 근거 없이 하루~며칠 만에
+    제외→매수유지로 뒤집히는 걸 프롬프트 순응에 기대지 않고 코드 레벨에서 막는다.
+    오늘 change_reason이 채워져 있으면(모델이 새 정보를 인용) 점착을 걸지 않고 통과시킨다
+    — '제외 자체를 못 풀게'가 아니라 '근거 없는 복귀만' 막는 게 목적. vmap은 제자리 수정."""
+    if not as_of:
+        return
+    import datetime as _dt
+    try:
+        today = _dt.date.fromisoformat(as_of)
+    except Exception:
+        return
+    import ai_verdict_log as AVL
+    hist = AVL.history_by_symbol(market, as_of)
+    for c in pool:
+        sym = str(c.get("symbol"))
+        v = vmap.get(sym)
+        if not v or (v.get("verdict") or "").strip() == "제외":
+            continue
+        if (v.get("change_reason") or "").strip():
+            continue
+        h = hist.get(sym) or []
+        if not h or (h[0].get("verdict") or "").strip() != "제외":
+            continue
+        since = None
+        for e in h:
+            if (e.get("verdict") or "").strip() != "제외":
+                break
+            since = e.get("date")
+        if not since:
+            continue
+        try:
+            since_d = _dt.date.fromisoformat(since)
+        except Exception:
+            continue
+        days_elapsed = (today - since_d).days
+        if days_elapsed < sticky_days:
+            v["verdict"] = "제외"
+            v["verdict_reason"] = (h[0].get("reason") or v.get("verdict_reason") or "").strip() \
+                or "점착 유지(새 근거 없이 복귀 저지)"
+            v["change_reason"] = f"점착 유지 — {since} 제외 이후 {days_elapsed}일 경과(<{sticky_days}일), 복귀 근거 없음"
+
+
 # ------------------------- verdict 적용(기존 로직 유지) -------------------------
 def _apply_verdicts(buy_pool, watch_pool, vmap, n_buy, n_watch):
     """1단계 verdict 반영해 최종 목록 확정. AI가 없으면 전원 '유지'로 동작.
@@ -482,6 +552,12 @@ def build_report(groups: dict, market: dict, pregen: dict | None = None) -> dict
             if not ver:
                 _log("검증 실패 → 전원 유지로 서술만 진행"); ver = {"by_sym": {}}
         vmap = ver.get("by_sym") or {}
+        as_of = str(market.get("as_of") or "").strip()
+        try:
+            _apply_sticky_exclusion(vmap, buy_pool, "us", as_of)
+            _apply_sticky_exclusion(vmap, kr_buy_pool, "kr", as_of)
+        except Exception as e:
+            _log(f"제외 점착성 적용 생략({type(e).__name__}: {e})")
         _log_verdicts(buy_pool, kr_buy_pool, vmap, market)
 
         # ── 코드가 최종 목록 확정
