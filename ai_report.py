@@ -60,7 +60,9 @@ MODEL_WRITE  = _no_opus(os.environ.get("REPORT_MODEL_WRITE", "claude-haiku-4-5")
 
 # 최종 채택 수(코드가 확정) — 관찰 폐지(2026-07-13): 관찰 슬롯을 매수 후보로 전환.
 # 미국 4+4 → 매수 8, 한국 3+2 → 매수 5. AI 강등분은 관찰 대신 '제외된 후보' 박스에 사유 표기.
-FINAL_BUY      = int(os.environ.get("REPORT_FINAL_BUY", "8"))
+# 2026-07-17(지호 님 요청): 미국 추천폭을 8→10으로 확대(판단의 폭을 넓히기 위해) — 보유
+# 상한(daily_ai_report.py US_MAX_HOLD)은 8로 그대로 둠, 추천(추천풀)과 실제 편입은 별개.
+FINAL_BUY      = int(os.environ.get("REPORT_FINAL_BUY", "10"))
 FINAL_WATCH    = int(os.environ.get("REPORT_FINAL_WATCH", "0"))
 KR_FINAL_BUY   = int(os.environ.get("KR_FINAL_BUY", "5"))
 KR_FINAL_WATCH = int(os.environ.get("KR_FINAL_WATCH", "0"))
@@ -910,7 +912,10 @@ def _card(i, r, metrics_by_sym, kind, is_kr=False):
     flag_chip = _chip(fl, flag_color.get(fl, "#6b7280"), True) if fl else ""
     cat_chip = _chip(_esc(r.get("category")), "#7c3aed") if r.get("category") else ""
     hot_chip = _chip("과열·분할", "#c2410c", True) if (kind == "buy" and r.get("hot")) else ""
-    held_chip = _chip("보유중", "#0369a1", True) if r.get("already_held") else ""
+    # 2026-07-17(지호 님 요청): 보유중/신규를 둘 다 명시적으로 표기해 구별되게 — 국장은
+    # already_held를 이미 쓰고 있었는데 미장엔 안 켜져 있었음(daily_ai_report.run_us에서 신규 배선).
+    held_chip = (_chip("보유중", "#0369a1", True) if r.get("already_held")
+                else _chip("신규", "#15803d", True)) if kind == "buy" else ""
     pts = "".join(f'<li style="margin:1px 0">{_esc(p)}</li>' for p in r.get("points", []))
     pts_html = (f'<ul style="margin:6px 0 0;padding-left:16px;font-size:12px;color:#374151;'
                 f'line-height:1.55">{pts}</ul>') if pts else ""
