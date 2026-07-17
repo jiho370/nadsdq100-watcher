@@ -246,11 +246,13 @@ def verify_stage(groups, market) -> dict:
     try:
         try:
             text = (_call_cli(instr, REPORT_WEB, system=_V_SYSTEM, model=MODEL_VERIFY) if AI_BACKEND == "cli"
-                    else _call_api(instr, REPORT_WEB, system=_V_SYSTEM, model=MODEL_VERIFY, max_tokens=3000))
+                    else _call_api(instr, REPORT_WEB, system=_V_SYSTEM, model=MODEL_VERIFY,
+                                   max_tokens=3000, temperature=0))
         except Exception as e1:
             _log(f"검증 1차 실패({type(e1).__name__}) → 웹검색 없이 재시도")
             text = (_call_cli(instr, False, system=_V_SYSTEM, model=MODEL_VERIFY) if AI_BACKEND == "cli"
-                    else _call_api(instr, False, system=_V_SYSTEM, model=MODEL_VERIFY, max_tokens=3000))
+                    else _call_api(instr, False, system=_V_SYSTEM, model=MODEL_VERIFY,
+                                   max_tokens=3000, temperature=0))
         p = _extract_json(text or "")
         if not isinstance(p, dict):
             return {}
@@ -637,14 +639,19 @@ def build_report(groups: dict, market: dict, pregen: dict | None = None) -> dict
 
 
 # ------------------------- API/CLI 호출 -------------------------
-def _call_api(instruction, web=True, system=None, model=None, max_tokens=6000):
+def _call_api(instruction, web=True, system=None, model=None, max_tokens=6000, temperature=None):
     """Anthropic API. 시스템 프롬프트에 cache_control — 같은 실행 내 재시도/재호출 때
-    캐시 적중(입력 90% 할인). 일 1회 실행이라 날짜 간 캐시는 TTL(5분)상 해당 없음."""
+    캐시 적중(입력 90% 할인). 일 1회 실행이라 날짜 간 캐시는 TTL(5분)상 해당 없음.
+    temperature=0(검증 단계 전용, 2026-07-17 Fable 5 자문): 분류 작업이라 창의성이
+    불필요 — 모델 자체의 출력 분산을 한 축 제거해 같은 입력에 더 재현 가능한 판정이
+    나오게 한다(검색 결과 분산은 못 줄이지만 공짜로 줄일 수 있는 분산은 줄임)."""
     client = anthropic.Anthropic(timeout=AI_TIMEOUT)
     kw = {}
     if web:
         kw["tools"] = [{"type": "web_search_20250305", "name": "web_search",
                         "max_uses": REPORT_WEB_USES}]
+    if temperature is not None:
+        kw["temperature"] = temperature
     msg = client.messages.create(
         model=_no_opus(model or MODEL_VERIFY, "claude-sonnet-5"),
         max_tokens=max_tokens,
