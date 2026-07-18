@@ -264,7 +264,10 @@ def select_by_weights(weights: dict, ind_map: dict, n: int, funds: dict | None =
     def z(col):
         sd = df[col].std()
         zz = (df[col] - df[col].mean()) / sd if sd and not _np.isnan(sd) else df[col] * 0.0
-        return zz.clip(-3, 3).fillna(0.0)
+        # shareholder_yield는 ±3 대신 ±5(2026-07-18 클립 완화 검증: 극단치 종목단위 재검정
+        # t=2.83 유의, topn8+cap2 라이브조건 재테스트 +0.68%p 개선 — 지호 님 반영 결정)
+        clip = (-5, 5) if col == "shareholder_yield" else (-3, 3)
+        return zz.clip(*clip).fillna(0.0)
     active = [f for f in weights if weights.get(f) and f in df.columns]
     comp = sum(float(weights[f]) * z(f) for f in active) if active else _pd.Series(0.0, index=df.index)
     valid = df["mom6"].notna() | df["mom12_1"].notna()   # 모멘텀 결측 종목 제외

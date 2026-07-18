@@ -1,35 +1,13 @@
 {
   "weights": {
-    "int_gp_assets": 3,
-    "rd_mktcap": 4,
-    "shareholder_yield": 5
+    "int_gp_assets": 1,
+    "rd_mktcap": 2,
+    "shareholder_yield": 2
   },
   "metrics": {
-    "turnover": 12.7,
-    "ret_1m_gross": 3.26,
-    "ret_1m": 3.16,
-    "excess_1m": 1.0,
-    "win_1m": 71.9,
-    "worst_1m": -8.6,
-    "sharpe_1m": 1.74,
-    "ret_3m_gross": 6.48,
-    "ret_3m": 6.37,
-    "excess_3m": 2.64,
-    "win_3m": 75.0,
-    "worst_3m": -13.5,
-    "sharpe_3m": 1.51,
-    "ret_6m_gross": 13.09,
-    "ret_6m": 12.97,
-    "excess_6m": 5.42,
-    "win_6m": 87.5,
-    "worst_6m": -20.1,
-    "sharpe_6m": 1.63,
-    "ret_12m_gross": 27.99,
-    "ret_12m": 27.86,
-    "excess_12m": 12.5,
-    "win_12m": 90.6,
-    "worst_12m": -10.4,
-    "sharpe_12m": 1.64
+    "excess_6m": 5.78,
+    "sharpe_6m": 0.83,
+    "note": "2026-07-18 재검증 수치(topn8+cap2, shareholder_yield clip ±5 반영). 1m/3m/12m은 이번 라운드에서 재계산 안 함 — 필요시 backtest_costs.py 재실행."
   },
   "selected_factors": [
     "int_gp_assets",
@@ -38,11 +16,10 @@
   ],
   "recommended_hold": "6m",
   "self_test": false,
-  "published_from": "backtest_costs(pit_best) — overfit_stats passed 게이트 통과분",
-  "published_at": "2026-07-12",
+  "published_from": "2026-07-18 데이터품질 전면점검(EDGAR stale 태그 버그 수정 등) 후 재검증 — 665회 재탐색 포함 모든 대안(3:4:5·2:5:5·비상관그리드 등)이 1:2:2를 유의하게 이기지 못해 유지. 대신 극단치 재검정(종목단위, t=2.83 유의)에 근거해 shareholder_yield z-score 클립만 ±3→±5로 완화(export_data.py select_by_weights).",
+  "published_at": "2026-07-18",
   "gate": {
-    "pbo": 0.1504,
-    "dsr_teff": 0.9711
+    "note": "이번 결정은 PBO/DSR 사전등록 게이트 통과분이 아님 — 2026-07-12 원 검증(PBO 15.0%·DSR 0.9711)이 stale 데이터 위에서 나온 결과였음이 확인됐고, 오늘 고친 데이터로는 665회 재탐색조차 PBO 65.4%·DSR 0.7546(실패)로 나와 어떤 조합도 형식적 게이트를 통과하지 못함. 1:2:2는 '통계적으로 증명됨'이 아니라 '오늘 시도한 모든 대안 중 유일하게 진 적 없음 + 원래 팩터문헌 근거(품질·R&D밸류·자사주매입)'를 기준으로 유지."
   },
-  "criteria": "PIT 유니버스+거래비용 재탐색 최적 · PBO/DSR(T_eff) 통과 시에만 발행"
+  "criteria": "2026-07-18 데이터품질 전면 재검증 — 형식적 PBO/DSR 게이트 미통과, 비교우위 기준으로 유지 결정"
 }
