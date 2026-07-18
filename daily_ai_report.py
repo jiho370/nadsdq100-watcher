@@ -89,28 +89,24 @@ def _stock_chart_png(closes, ticker, big=False):
     return b.getvalue()
 
 
-_CORE_WEIGHT = 0.65  # 코어(지수) : 새틀라이트(보유종목) = 65:35 — STRATEGY.md §2-F(한국,
-# 검증됨). 미국은 이 비율이 공식 검증된 적 없음(§3.5 H1-미국은 연구용 스윕이지 권장치가
-# 아님) — 그래도 같은 형식으로 참고 표시(2026-07-17, 지호 님 요청).
-_MIX_LABEL = f"코어{int(_CORE_WEIGHT*100)}:새틀{int((1-_CORE_WEIGHT)*100)} 혼합" if _KFONT \
-             else f"{int(_CORE_WEIGHT*100)}:{int((1-_CORE_WEIGHT)*100)} blend"
-
-
-def _holdings_compare_chart_png(series: dict, index_name: str):
+def _holdings_compare_chart_png(series: dict, index_name: str, extra_line: dict | None = None):
     """포트폴리오(각 종목 진입일에 동일 금액 투입 가정) 누적수익률 vs 같은 날짜에 같은 금액을
-    지수에 넣었을 때의 누적수익률 vs 코어:새틀라이트 65:35 혼합 — 시계열 3선 비교."""
+    지수에 넣었을 때의 누적수익률 — 2선 비교. extra_line={"values","label"}(series['dates']와
+    길이 동일)을 주면 3번째 선 추가(2026-07-17, 지호 님 요청 — 미장은 코어65:새틀35 참고선
+    대신 나스닥100 비교선. 그 혼합선은 §2 검증에서 0%(코어 없음)가 통계적으로 유의하게
+    이긴다고 나와 "권장 비율"처럼 보이는 게 오해 소지가 있었음 — 그냥 지수 하나 더
+    보여주는 게 나음)."""
     dates = series.get("dates") or []
     if not dates:
         return None
     port = [v if v is not None else np.nan for v in series["portfolio"]]
     bench = [v if v is not None else np.nan for v in series["bench"]]
-    mix = [_CORE_WEIGHT * b + (1 - _CORE_WEIGHT) * p if (p == p and b == b) else np.nan
-           for p, b in zip(port, bench)]
     x = np.arange(len(dates))
     fig, ax = plt.subplots(figsize=(7.6, 3.0), dpi=150)
     ax.plot(x, bench, lw=1.4, color="#9ca3af", label=f"{index_name} {_BENCH_SUFFIX}")
     ax.plot(x, port, lw=1.8, color="#2563eb", label=_PORT_LABEL)
-    ax.plot(x, mix, lw=1.6, color="#059669", linestyle="--", label=_MIX_LABEL)
+    if extra_line and extra_line.get("values"):
+        ax.plot(x, extra_line["values"], lw=1.4, color="#059669", linestyle="--", label=extra_line["label"])
     ax.axhline(0, color="#111827", lw=0.8)
     ticks = np.linspace(0, len(dates) - 1, min(6, len(dates))).astype(int)
     ax.set_xticks(ticks); ax.set_xticklabels([dates[i][5:] for i in ticks], fontsize=8)
@@ -134,8 +130,11 @@ def _bench_series(signals, key):
 
 
 def _holdings_section(hstate, ind_map, price_map, bench_dates, bench_closes, index_name, krw=False,
-                      name_map=None):
-    """holdings.py 보유현황 표+포트폴리오 비교차트를 조립. (html, images) — 데이터 없으면 ("", [])."""
+                      name_map=None, extra_index=None):
+    """holdings.py 보유현황 표+포트폴리오 비교차트를 조립. (html, images) — 데이터 없으면 ("", []).
+    extra_index={"label","dates","closes"}(선택) — 3번째 비교선(2026-07-17, 지호 님 요청 —
+    미장은 나스닥100). 같은 summary/price_map으로 두 번째 portfolio_series를 구해 그 'bench'
+    (같은 시점·같은 금액을 그 지수에 넣었을 때 수익률)만 뽑아 주선의 dates에 맞춰 정렬."""
     import holdings as H
     summary = H.live_summary(hstate, ind_map)
     if not summary:
@@ -143,7 +142,15 @@ def _holdings_section(hstate, ind_map, price_map, bench_dates, bench_closes, ind
     series = H.portfolio_series(summary, price_map, bench_dates, bench_closes)
     images, chart_cid, totals = [], None, None
     if series:
-        png = _holdings_compare_chart_png(series, index_name)
+        extra_line = None
+        if extra_index and extra_index.get("dates") and extra_index.get("closes"):
+            series2 = H.portfolio_series(summary, price_map, extra_index["dates"], extra_index["closes"])
+            if series2:
+                by_date = dict(zip(series2["dates"], series2["bench"]))
+                vals = [by_date.get(d) for d in series["dates"]]
+                if any(v is not None for v in vals):
+                    extra_line = {"label": extra_index["label"], "values": vals}
+        png = _holdings_compare_chart_png(series, index_name, extra_line)
         if png:
             chart_cid = "holdings_cmp"
             images.append((chart_cid, png))
@@ -226,11 +233,14 @@ def _signal_images(signals, when=None):
 
 
 def _attach_headlines(cands, suffix=""):
-    """야후 헤드라인(무료)을 후보에 주입 — AI 웹검색 의존 축소. 한국은 '.KS' 접미사."""
+    """야후 헤드라인(무료)을 후보에 주입 — AI 웹검색 의존 축소. 한국은 '.KS' 접미사.
+    names를 같이 넘겨 관련성 필터(_is_relevant_headline)가 회사명 매칭도 쓰게 한다
+    (2026-07-17, 지호 님 리포트 — HPQ에 무관한 "Domino's..." 기사가 붙던 버그 수정)."""
     try:
         from ai_commentary import fetch_news_headlines
         ysyms = {c["symbol"]: c["symbol"] + suffix for c in cands}
-        heads = fetch_news_headlines(list(ysyms.values()), getattr(R, "yf", None))
+        names = {ysyms[c["symbol"]]: c.get("name", "") for c in cands}
+        heads = fetch_news_headlines(list(ysyms.values()), getattr(R, "yf", None), names=names)
         for c in cands:
             c["headlines"] = (heads.get(ysyms[c["symbol"]]) or [])[:4]
     except Exception as e:
@@ -437,6 +447,11 @@ def run_us(no_email: bool = False, force: bool = False):
 
     import holdings as H
     hstate = H.load()
+    # 이미 보유 중인 후보엔 배지를 다르게(2026-07-17, 지호 님 요청 — 국장은 이미 하고 있던
+    # "보유중" 표기를 미장에도 동일 적용, ai_report._card()가 already_held를 그대로 씀).
+    held_syms_us = set((hstate.get("holdings") or {}).keys())
+    for c in buy_now:
+        c["already_held"] = c.get("symbol") in held_syms_us
     # pool_syms = 오늘 팩터 후보풀(60) — 6개월 경과 보유종목이 풀 밖이면 정기 재평가 매도(2026-07 재검증)
     sells = H.update(hstate, [], data["ind_map"], as_of,
                      pool_syms={s for s, _, _ in scored})
@@ -479,8 +494,11 @@ def run_us(no_email: bool = False, force: bool = False):
             hs = hs.dropna()
             price_map[sym] = {"dates": [d.date().isoformat() for d in hs.index],
                               "closes": [float(v) for v in hs.tolist()]}
+    ndx_dates, ndx_closes = _bench_series(signals, "NDX")
+    ndx_label = "나스닥100" if _KFONT else "NASDAQ100"
     holdings_html, holdings_images = _holdings_section(
-        hstate, data["ind_map"], price_map, bench_dates, bench_closes, "S&P500")
+        hstate, data["ind_map"], price_map, bench_dates, bench_closes, "S&P500",
+        extra_index={"label": ndx_label, "dates": ndx_dates, "closes": ndx_closes})
 
     # 차트: SPY(큰 차트) + 종목 + 신호
     images, metrics = list(holdings_images), {}

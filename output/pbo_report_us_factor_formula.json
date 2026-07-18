@@ -1,0 +1,43 @@
+{
+  "input": {
+    "horizon": "us_factor_formula",
+    "universe": "sp500_full",
+    "cost": {
+      "round_trip_bps": 20.0
+    }
+  },
+  "n_trials": 147,
+  "n_events": 32,
+  "pbo": {
+    "pbo": 0.4123,
+    "embargo": 1,
+    "purged_events_total": 5544,
+    "n_combos": 924,
+    "n_blocks": 12,
+    "lambda_mean": 0.3978,
+    "is_sharpe_mean": 1.6617,
+    "oos_sharpe_mean": 1.0012,
+    "degradation_slope": -0.2845,
+    "prob_oos_loss": 0.0065
+  },
+  "pbo_verdict": "중간(주의)",
+  "dsr": {
+    "sr": 1.4745,
+    "sr0": 0.6889,
+    "dsr": 0.9814,
+    "dsr_uncorrected": 0.9986,
+    "skew": -0.021,
+    "kurtosis": 3.025,
+    "T": 32,
+    "T_eff": 16,
+    "N": 147,
+    "best_trial": "shareholder_yield1[raw]"
+  },
+  "dsr_verdict": "95% 신뢰수준 통과",
+  "passed": true,
+  "references": [
+    "Bailey et al. 2017 (PBO/CSCV)",
+    "Bailey & López de Prado 2014 (DSR)"
+  ],
+  "note": "조합 간 상관으로 N이 과대계상될 수 있어 DSR은 보수적(실제보다 낮게) 추정됨."
+}

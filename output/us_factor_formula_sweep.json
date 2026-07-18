@@ -1,0 +1,1931 @@
+{
+  "as_of": "2026-07-16",
+  "n_trials": 147,
+  "grid_levels": [
+    0,
+    1,
+    2,
+    3
+  ],
+  "rows": [
+    {
+      "label": "shareholder_yield1[raw]",
+      "weights": {
+        "int_gp_assets": 0,
+        "rd_mktcap": 0,
+        "shareholder_yield": 1
+      },
+      "rd_mode": "raw",
+      "n": 32,
+      "excess_6m_mean_pct": 10.18,
+      "excess_6m_sharpe": 2.12,
+      "avg_max_sector_in_top8": 3.19
+    },
+    {
+      "label": "shareholder_yield1[rank]",
+      "weights": {
+        "int_gp_assets": 0,
+        "rd_mktcap": 0,
+        "shareholder_yield": 1
+      },
+      "rd_mode": "rank",
+      "n": 32,
+      "excess_6m_mean_pct": 10.18,
+      "excess_6m_sharpe": 2.12,
+      "avg_max_sector_in_top8": 3.19
+    },
+    {
+      "label": "shareholder_yield1[qgate]",
+      "weights": {
+        "int_gp_assets": 0,
+        "rd_mktcap": 0,
+        "shareholder_yield": 1
+      },
+      "rd_mode": "qgate",
+      "n": 32,
+      "excess_6m_mean_pct": 10.18,
+      "excess_6m_sharpe": 2.12,
+      "avg_max_sector_in_top8": 3.19
+    },
+    {
+      "label": "rd_mktcap1·shareholder_yield3[rank]",
+      "weights": {
+        "int_gp_assets": 0,
+        "rd_mktcap": 1,
+        "shareholder_yield": 3
+      },
+      "rd_mode": "rank",
+      "n": 32,
+      "excess_6m_mean_pct": 9.12,
+      "excess_6m_sharpe": 2.03,
+      "avg_max_sector_in_top8": 3.25
+    },
+    {
+      "label": "int_gp_assets1·rd_mktcap1·shareholder_yield3[qgate]",
+      "weights": {
+        "int_gp_assets": 1,
+        "rd_mktcap": 1,
+        "shareholder_yield": 3
+      },
+      "rd_mode": "qgate",
+      "n": 32,
+      "excess_6m_mean_pct": 9.98,
+      "excess_6m_sharpe": 2.0,
+      "avg_max_sector_in_top8": 3.44
+    },
+    {
+      "label": "int_gp_assets1·rd_mktcap1·shareholder_yield3[raw]",
+      "weights": {
+        "int_gp_assets": 1,
+        "rd_mktcap": 1,
+        "shareholder_yield": 3
+      },
+      "rd_mode": "raw",
+      "n": 32,
+      "excess_6m_mean_pct": 9.9,
+      "excess_6m_sharpe": 1.95,
+      "avg_max_sector_in_top8": 3.41
+    },
+    {
+      "label": "int_gp_assets1·rd_mktcap3·shareholder_yield2[rank]",
+      "weights": {
+        "int_gp_assets": 1,
+        "rd_mktcap": 3,
+        "shareholder_yield": 2
+      },
+      "rd_mode": "rank",
+      "n": 32,
+      "excess_6m_mean_pct": 7.73,
+      "excess_6m_sharpe": 1.92,
+      "avg_max_sector_in_top8": 3.09
+    },
+    {
+      "label": "int_gp_assets1·rd_mktcap1·shareholder_yield2[qgate]",
+      "weights": {
+        "int_gp_assets": 1,
+        "rd_mktcap": 1,
+        "shareholder_yield": 2
+      },
+      "rd_mode": "qgate",
+      "n": 32,
+      "excess_6m_mean_pct": 11.5,
+      "excess_6m_sharpe": 1.85,
+      "avg_max_sector_in_top8": 3.62
+    },
+    {
+      "label": "int_gp_assets1·rd_mktcap2·shareholder_yield3[rank]",
+      "weights": {
+        "int_gp_assets": 1,
+        "rd_mktcap": 2,
+        "shareholder_yield": 3
+      },
+      "rd_mode": "rank",
+      "n": 32,
+      "excess_6m_mean_pct": 7.14,
+      "excess_6m_sharpe": 1.85,
+      "avg_max_sector_in_top8": 3.0
+    },
+    {
+      "label": "rd_mktcap1·shareholder_yield2[rank]",
+      "weights": {
+        "int_gp_assets": 0,
+        "rd_mktcap": 1,
+        "shareholder_yield": 2
+      },
+      "rd_mode": "rank",
+      "n": 32,
+      "excess_6m_mean_pct": 8.32,
+      "excess_6m_sharpe": 1.81,
+      "avg_max_sector_in_top8": 3.34
+    },
+    {
+      "label": "int_gp_assets1·rd_mktcap1·shareholder_yield2[raw]",
+      "weights": {
+        "int_gp_assets": 1,
+        "rd_mktcap": 1,
+        "shareholder_yield": 2
+      },
+      "rd_mode": "raw",
+      "n": 32,
+      "excess_6m_mean_pct": 11.46,
+      "excess_6m_sharpe": 1.79,
+      "avg_max_sector_in_top8": 3.56
+    },
+    {
+      "label": "rd_mktcap1·shareholder_yield3[qgate]",
+      "weights": {
+        "int_gp_assets": 0,
+        "rd_mktcap": 1,
+        "shareholder_yield": 3
+      },
+      "rd_mode": "qgate",
+      "n": 32,
+      "excess_6m_mean_pct": 9.16,
+      "excess_6m_sharpe": 1.78,
+      "avg_max_sector_in_top8": 3.47
+    },
+    {
+      "label": "int_gp_assets1·rd_mktcap3·shareholder_yield3[rank]",
+      "weights": {
+        "int_gp_assets": 1,
+        "rd_mktcap": 3,
+        "shareholder_yield": 3
+      },
+      "rd_mode": "rank",
+      "n": 32,
+      "excess_6m_mean_pct": 7.18,
+      "excess_6m_sharpe": 1.77,
+      "avg_max_sector_in_top8": 3.06
+    },
+    {
+      "label": "int_gp_assets2·rd_mktcap1·shareholder_yield2[raw]",
+      "weights": {
+        "int_gp_assets": 2,
+        "rd_mktcap": 1,
+        "shareholder_yield": 2
+      },
+      "rd_mode": "raw",
+      "n": 32,
+      "excess_6m_mean_pct": 10.77,
+      "excess_6m_sharpe": 1.74,
+      "avg_max_sector_in_top8": 3.34
+    },
+    {
+      "label": "rd_mktcap1·shareholder_yield2[qgate]",
+      "weights": {
+        "int_gp_assets": 0,
+        "rd_mktcap": 1,
+        "shareholder_yield": 2
+      },
+      "rd_mode": "qgate",
+      "n": 32,
+      "excess_6m_mean_pct": 8.97,
+      "excess_6m_sharpe": 1.73,
+      "avg_max_sector_in_top8": 3.47
+    },
+    {
+      "label": "int_gp_assets1·rd_mktcap1·shareholder_yield3[rank]",
+      "weights": {
+        "int_gp_assets": 1,
+        "rd_mktcap": 1,
+        "shareholder_yield": 3
+      },
+      "rd_mode": "rank",
+      "n": 32,
+      "excess_6m_mean_pct": 8.43,
+      "excess_6m_sharpe": 1.73,
+      "avg_max_sector_in_top8": 3.16
+    },
+    {
+      "label": "int_gp_assets2·rd_mktcap1·shareholder_yield2[qgate]",
+      "weights": {
+        "int_gp_assets": 2,
+        "rd_mktcap": 1,
+        "shareholder_yield": 2
+      },
+      "rd_mode": "qgate",
+      "n": 32,
+      "excess_6m_mean_pct": 10.7,
+      "excess_6m_sharpe": 1.71,
+      "avg_max_sector_in_top8": 3.31
+    },
+    {
+      "label": "int_gp_assets1·rd_mktcap2·shareholder_yield2[rank]",
+      "weights": {
+        "int_gp_assets": 1,
+        "rd_mktcap": 2,
+        "shareholder_yield": 2
+      },
+      "rd_mode": "rank",
+      "n": 32,
+      "excess_6m_mean_pct": 7.18,
+      "excess_6m_sharpe": 1.68,
+      "avg_max_sector_in_top8": 2.94
+    },
+    {
+      "label": "int_gp_assets2·rd_mktcap3·shareholder_yield2[rank]",
+      "weights": {
+        "int_gp_assets": 2,
+        "rd_mktcap": 3,
+        "shareholder_yield": 2
+      },
+      "rd_mode": "rank",
+      "n": 32,
+      "excess_6m_mean_pct": 7.93,
+      "excess_6m_sharpe": 1.66,
+      "avg_max_sector_in_top8": 2.84
+    },
+    {
+      "label": "int_gp_assets3·rd_mktcap2·shareholder_yield3[rank]",
+      "weights": {
+        "int_gp_assets": 3,
+        "rd_mktcap": 2,
+        "shareholder_yield": 3
+      },
+      "rd_mode": "rank",
+      "n": 32,
+      "excess_6m_mean_pct": 8.58,
+      "excess_6m_sharpe": 1.65,
+      "avg_max_sector_in_top8": 3.47
+    },
+    {
+      "label": "int_gp_assets2·rd_mktcap2·shareholder_yield3[qgate]",
+      "weights": {
+        "int_gp_assets": 2,
+        "rd_mktcap": 2,
+        "shareholder_yield": 3
+      },
+      "rd_mode": "qgate",
+      "n": 32,
+      "excess_6m_mean_pct": 11.4,
+      "excess_6m_sharpe": 1.63,
+      "avg_max_sector_in_top8": 3.75
+    },
+    {
+      "label": "rd_mktcap1·shareholder_yield2[raw]",
+      "weights": {
+        "int_gp_assets": 0,
+        "rd_mktcap": 1,
+        "shareholder_yield": 2
+      },
+      "rd_mode": "raw",
+      "n": 32,
+      "excess_6m_mean_pct": 9.1,
+      "excess_6m_sharpe": 1.62,
+      "avg_max_sector_in_top8": 3.47
+    },
+    {
+      "label": "int_gp_assets2·rd_mktcap3·shareholder_yield3[rank]",
+      "weights": {
+        "int_gp_assets": 2,
+        "rd_mktcap": 3,
+        "shareholder_yield": 3
+      },
+      "rd_mode": "rank",
+      "n": 32,
+      "excess_6m_mean_pct": 7.33,
+      "excess_6m_sharpe": 1.62,
+      "avg_max_sector_in_top8": 2.91
+    },
+    {
+      "label": "int_gp_assets1·rd_mktcap2·shareholder_yield1[rank]",
+      "weights": {
+        "int_gp_assets": 1,
+        "rd_mktcap": 2,
+        "shareholder_yield": 1
+      },
+      "rd_mode": "rank",
+      "n": 32,
+      "excess_6m_mean_pct": 7.74,
+      "excess_6m_sharpe": 1.61,
+      "avg_max_sector_in_top8": 2.88
+    },
+    {
+      "label": "int_gp_assets1·rd_mktcap3·shareholder_yield1[rank]",
+      "weights": {
+        "int_gp_assets": 1,
+        "rd_mktcap": 3,
+        "shareholder_yield": 1
+      },
+      "rd_mode": "rank",
+      "n": 32,
+      "excess_6m_mean_pct": 7.84,
+      "excess_6m_sharpe": 1.61,
+      "avg_max_sector_in_top8": 3.16
+    },
+    {
+      "label": "rd_mktcap1·shareholder_yield3[raw]",
+      "weights": {
+        "int_gp_assets": 0,
+        "rd_mktcap": 1,
+        "shareholder_yield": 3
+      },
+      "rd_mode": "raw",
+      "n": 32,
+      "excess_6m_mean_pct": 8.8,
+      "excess_6m_sharpe": 1.59,
+      "avg_max_sector_in_top8": 3.44
+    },
+    {
+      "label": "int_gp_assets2·rd_mktcap1·shareholder_yield3[raw]",
+      "weights": {
+        "int_gp_assets": 2,
+        "rd_mktcap": 1,
+        "shareholder_yield": 3
+      },
+      "rd_mode": "raw",
+      "n": 32,
+      "excess_6m_mean_pct": 9.55,
+      "excess_6m_sharpe": 1.57,
+      "avg_max_sector_in_top8": 3.28
+    },
+    {
+      "label": "int_gp_assets2·rd_mktcap1·shareholder_yield3[qgate]",
+      "weights": {
+        "int_gp_assets": 2,
+        "rd_mktcap": 1,
+        "shareholder_yield": 3
+      },
+      "rd_mode": "qgate",
+      "n": 32,
+      "excess_6m_mean_pct": 9.55,
+      "excess_6m_sharpe": 1.57,
+      "avg_max_sector_in_top8": 3.28
+    },
+    {
+      "label": "int_gp_assets2·shareholder_yield3[raw]",
+      "weights": {
+        "int_gp_assets": 2,
+        "rd_mktcap": 0,
+        "shareholder_yield": 3
+      },
+      "rd_mode": "raw",
+      "n": 32,
+      "excess_6m_mean_pct": 9.4,
+      "excess_6m_sharpe": 1.56,
+      "avg_max_sector_in_top8": 3.28
+    },
+    {
+      "label": "int_gp_assets2·shareholder_yield3[rank]",
+      "weights": {
+        "int_gp_assets": 2,
+        "rd_mktcap": 0,
+        "shareholder_yield": 3
+      },
+      "rd_mode": "rank",
+      "n": 32,
+      "excess_6m_mean_pct": 9.4,
+      "excess_6m_sharpe": 1.56,
+      "avg_max_sector_in_top8": 3.28
+    },
+    {
+      "label": "int_gp_assets2·shareholder_yield3[qgate]",
+      "weights": {
+        "int_gp_assets": 2,
+        "rd_mktcap": 0,
+        "shareholder_yield": 3
+      },
+      "rd_mode": "qgate",
+      "n": 32,
+      "excess_6m_mean_pct": 9.4,
+      "excess_6m_sharpe": 1.56,
+      "avg_max_sector_in_top8": 3.28
+    },
+    {
+      "label": "int_gp_assets2·rd_mktcap3·shareholder_yield3[qgate]",
+      "weights": {
+        "int_gp_assets": 2,
+        "rd_mktcap": 3,
+        "shareholder_yield": 3
+      },
+      "rd_mode": "qgate",
+      "n": 32,
+      "excess_6m_mean_pct": 11.01,
+      "excess_6m_sharpe": 1.56,
+      "avg_max_sector_in_top8": 3.97
+    },
+    {
+      "label": "int_gp_assets3·rd_mktcap2·shareholder_yield3[raw]",
+      "weights": {
+        "int_gp_assets": 3,
+        "rd_mktcap": 2,
+        "shareholder_yield": 3
+      },
+      "rd_mode": "raw",
+      "n": 32,
+      "excess_6m_mean_pct": 10.47,
+      "excess_6m_sharpe": 1.56,
+      "avg_max_sector_in_top8": 3.47
+    },
+    {
+      "label": "int_gp_assets3·rd_mktcap2·shareholder_yield3[qgate]",
+      "weights": {
+        "int_gp_assets": 3,
+        "rd_mktcap": 2,
+        "shareholder_yield": 3
+      },
+      "rd_mode": "qgate",
+      "n": 32,
+      "excess_6m_mean_pct": 10.59,
+      "excess_6m_sharpe": 1.56,
+      "avg_max_sector_in_top8": 3.44
+    },
+    {
+      "label": "rd_mktcap2·shareholder_yield3[qgate]",
+      "weights": {
+        "int_gp_assets": 0,
+        "rd_mktcap": 2,
+        "shareholder_yield": 3
+      },
+      "rd_mode": "qgate",
+      "n": 32,
+      "excess_6m_mean_pct": 10.41,
+      "excess_6m_sharpe": 1.54,
+      "avg_max_sector_in_top8": 3.56
+    },
+    {
+      "label": "int_gp_assets2·rd_mktcap1·shareholder_yield3[rank]",
+      "weights": {
+        "int_gp_assets": 2,
+        "rd_mktcap": 1,
+        "shareholder_yield": 3
+      },
+      "rd_mode": "rank",
+      "n": 32,
+      "excess_6m_mean_pct": 8.61,
+      "excess_6m_sharpe": 1.54,
+      "avg_max_sector_in_top8": 3.5
+    },
+    {
+      "label": "int_gp_assets2·rd_mktcap2·shareholder_yield3[raw]",
+      "weights": {
+        "int_gp_assets": 2,
+        "rd_mktcap": 2,
+        "shareholder_yield": 3
+      },
+      "rd_mode": "raw",
+      "n": 32,
+      "excess_6m_mean_pct": 11.55,
+      "excess_6m_sharpe": 1.53,
+      "avg_max_sector_in_top8": 3.72
+    },
+    {
+      "label": "int_gp_assets1·rd_mktcap1·shareholder_yield2[rank]",
+      "weights": {
+        "int_gp_assets": 1,
+        "rd_mktcap": 1,
+        "shareholder_yield": 2
+      },
+      "rd_mode": "rank",
+      "n": 32,
+      "excess_6m_mean_pct": 6.67,
+      "excess_6m_sharpe": 1.51,
+      "avg_max_sector_in_top8": 3.25
+    },
+    {
+      "label": "int_gp_assets1·rd_mktcap2·shareholder_yield3[qgate]",
+      "weights": {
+        "int_gp_assets": 1,
+        "rd_mktcap": 2,
+        "shareholder_yield": 3
+      },
+      "rd_mode": "qgate",
+      "n": 32,
+      "excess_6m_mean_pct": 10.5,
+      "excess_6m_sharpe": 1.51,
+      "avg_max_sector_in_top8": 3.62
+    },
+    {
+      "label": "int_gp_assets1·rd_mktcap3·shareholder_yield3[qgate]",
+      "weights": {
+        "int_gp_assets": 1,
+        "rd_mktcap": 3,
+        "shareholder_yield": 3
+      },
+      "rd_mode": "qgate",
+      "n": 32,
+      "excess_6m_mean_pct": 10.87,
+      "excess_6m_sharpe": 1.51,
+      "avg_max_sector_in_top8": 3.75
+    },
+    {
+      "label": "int_gp_assets1·rd_mktcap1·shareholder_yield1[rank]",
+      "weights": {
+        "int_gp_assets": 1,
+        "rd_mktcap": 1,
+        "shareholder_yield": 1
+      },
+      "rd_mode": "rank",
+      "n": 32,
+      "excess_6m_mean_pct": 7.58,
+      "excess_6m_sharpe": 1.49,
+      "avg_max_sector_in_top8": 3.41
+    },
+    {
+      "label": "rd_mktcap2·shareholder_yield3[rank]",
+      "weights": {
+        "int_gp_assets": 0,
+        "rd_mktcap": 2,
+        "shareholder_yield": 3
+      },
+      "rd_mode": "rank",
+      "n": 32,
+      "excess_6m_mean_pct": 7.36,
+      "excess_6m_sharpe": 1.48,
+      "avg_max_sector_in_top8": 3.34
+    },
+    {
+      "label": "int_gp_assets1·rd_mktcap2·shareholder_yield2[qgate]",
+      "weights": {
+        "int_gp_assets": 1,
+        "rd_mktcap": 2,
+        "shareholder_yield": 2
+      },
+      "rd_mode": "qgate",
+      "n": 32,
+      "excess_6m_mean_pct": 10.6,
+      "excess_6m_sharpe": 1.47,
+      "avg_max_sector_in_top8": 3.84
+    },
+    {
+      "label": "int_gp_assets2·rd_mktcap1·shareholder_yield2[rank]",
+      "weights": {
+        "int_gp_assets": 2,
+        "rd_mktcap": 1,
+        "shareholder_yield": 2
+      },
+      "rd_mode": "rank",
+      "n": 32,
+      "excess_6m_mean_pct": 8.9,
+      "excess_6m_sharpe": 1.47,
+      "avg_max_sector_in_top8": 3.47
+    },
+    {
+      "label": "rd_mktcap1·shareholder_yield1[qgate]",
+      "weights": {
+        "int_gp_assets": 0,
+        "rd_mktcap": 1,
+        "shareholder_yield": 1
+      },
+      "rd_mode": "qgate",
+      "n": 32,
+      "excess_6m_mean_pct": 10.52,
+      "excess_6m_sharpe": 1.46,
+      "avg_max_sector_in_top8": 3.62
+    },
+    {
+      "label": "int_gp_assets3·rd_mktcap1·shareholder_yield3[raw]",
+      "weights": {
+        "int_gp_assets": 3,
+        "rd_mktcap": 1,
+        "shareholder_yield": 3
+      },
+      "rd_mode": "raw",
+      "n": 32,
+      "excess_6m_mean_pct": 9.71,
+      "excess_6m_sharpe": 1.46,
+      "avg_max_sector_in_top8": 3.31
+    },
+    {
+      "label": "int_gp_assets2·rd_mktcap3·shareholder_yield3[raw]",
+      "weights": {
+        "int_gp_assets": 2,
+        "rd_mktcap": 3,
+        "shareholder_yield": 3
+      },
+      "rd_mode": "raw",
+      "n": 32,
+      "excess_6m_mean_pct": 10.7,
+      "excess_6m_sharpe": 1.45,
+      "avg_max_sector_in_top8": 4.03
+    },
+    {
+      "label": "int_gp_assets3·rd_mktcap1·shareholder_yield3[qgate]",
+      "weights": {
+        "int_gp_assets": 3,
+        "rd_mktcap": 1,
+        "shareholder_yield": 3
+      },
+      "rd_mode": "qgate",
+      "n": 32,
+      "excess_6m_mean_pct": 9.78,
+      "excess_6m_sharpe": 1.45,
+      "avg_max_sector_in_top8": 3.28
+    },
+    {
+      "label": "int_gp_assets2·rd_mktcap2·shareholder_yield1[rank]",
+      "weights": {
+        "int_gp_assets": 2,
+        "rd_mktcap": 2,
+        "shareholder_yield": 1
+      },
+      "rd_mode": "rank",
+      "n": 32,
+      "excess_6m_mean_pct": 9.17,
+      "excess_6m_sharpe": 1.44,
+      "avg_max_sector_in_top8": 3.41
+    },
+    {
+      "label": "int_gp_assets3·rd_mktcap2·shareholder_yield2[rank]",
+      "weights": {
+        "int_gp_assets": 3,
+        "rd_mktcap": 2,
+        "shareholder_yield": 2
+      },
+      "rd_mode": "rank",
+      "n": 32,
+      "excess_6m_mean_pct": 9.01,
+      "excess_6m_sharpe": 1.44,
+      "avg_max_sector_in_top8": 3.28
+    },
+    {
+      "label": "rd_mktcap3·shareholder_yield2[qgate]",
+      "weights": {
+        "int_gp_assets": 0,
+        "rd_mktcap": 3,
+        "shareholder_yield": 2
+      },
+      "rd_mode": "qgate",
+      "n": 32,
+      "excess_6m_mean_pct": 12.54,
+      "excess_6m_sharpe": 1.42,
+      "avg_max_sector_in_top8": 4.25
+    },
+    {
+      "label": "int_gp_assets1·rd_mktcap2·shareholder_yield3[raw]",
+      "weights": {
+        "int_gp_assets": 1,
+        "rd_mktcap": 2,
+        "shareholder_yield": 3
+      },
+      "rd_mode": "raw",
+      "n": 32,
+      "excess_6m_mean_pct": 10.65,
+      "excess_6m_sharpe": 1.41,
+      "avg_max_sector_in_top8": 3.75
+    },
+    {
+      "label": "int_gp_assets1·rd_mktcap3·shareholder_yield3[raw]",
+      "weights": {
+        "int_gp_assets": 1,
+        "rd_mktcap": 3,
+        "shareholder_yield": 3
+      },
+      "rd_mode": "raw",
+      "n": 32,
+      "excess_6m_mean_pct": 11.01,
+      "excess_6m_sharpe": 1.41,
+      "avg_max_sector_in_top8": 3.84
+    },
+    {
+      "label": "int_gp_assets2·rd_mktcap3·shareholder_yield1[rank]",
+      "weights": {
+        "int_gp_assets": 2,
+        "rd_mktcap": 3,
+        "shareholder_yield": 1
+      },
+      "rd_mode": "rank",
+      "n": 32,
+      "excess_6m_mean_pct": 7.67,
+      "excess_6m_sharpe": 1.4,
+      "avg_max_sector_in_top8": 2.88
+    },
+    {
+      "label": "int_gp_assets2·rd_mktcap3·shareholder_yield2[qgate]",
+      "weights": {
+        "int_gp_assets": 2,
+        "rd_mktcap": 3,
+        "shareholder_yield": 2
+      },
+      "rd_mode": "qgate",
+      "n": 32,
+      "excess_6m_mean_pct": 13.08,
+      "excess_6m_sharpe": 1.39,
+      "avg_max_sector_in_top8": 4.78
+    },
+    {
+      "label": "int_gp_assets1·rd_mktcap1·shareholder_yield1[qgate]",
+      "weights": {
+        "int_gp_assets": 1,
+        "rd_mktcap": 1,
+        "shareholder_yield": 1
+      },
+      "rd_mode": "qgate",
+      "n": 32,
+      "excess_6m_mean_pct": 11.13,
+      "excess_6m_sharpe": 1.38,
+      "avg_max_sector_in_top8": 3.97
+    },
+    {
+      "label": "int_gp_assets3·rd_mktcap2·shareholder_yield1[rank]",
+      "weights": {
+        "int_gp_assets": 3,
+        "rd_mktcap": 2,
+        "shareholder_yield": 1
+      },
+      "rd_mode": "rank",
+      "n": 32,
+      "excess_6m_mean_pct": 9.64,
+      "excess_6m_sharpe": 1.38,
+      "avg_max_sector_in_top8": 3.22
+    },
+    {
+      "label": "int_gp_assets2·rd_mktcap2·shareholder_yield1[qgate]",
+      "weights": {
+        "int_gp_assets": 2,
+        "rd_mktcap": 2,
+        "shareholder_yield": 1
+      },
+      "rd_mode": "qgate",
+      "n": 32,
+      "excess_6m_mean_pct": 14.04,
+      "excess_6m_sharpe": 1.37,
+      "avg_max_sector_in_top8": 5.09
+    },
+    {
+      "label": "int_gp_assets3·rd_mktcap3·shareholder_yield2[qgate]",
+      "weights": {
+        "int_gp_assets": 3,
+        "rd_mktcap": 3,
+        "shareholder_yield": 2
+      },
+      "rd_mode": "qgate",
+      "n": 32,
+      "excess_6m_mean_pct": 13.84,
+      "excess_6m_sharpe": 1.37,
+      "avg_max_sector_in_top8": 5.16
+    },
+    {
+      "label": "int_gp_assets1·rd_mktcap2·shareholder_yield1[qgate]",
+      "weights": {
+        "int_gp_assets": 1,
+        "rd_mktcap": 2,
+        "shareholder_yield": 1
+      },
+      "rd_mode": "qgate",
+      "n": 32,
+      "excess_6m_mean_pct": 14.12,
+      "excess_6m_sharpe": 1.36,
+      "avg_max_sector_in_top8": 5.09
+    },
+    {
+      "label": "int_gp_assets2·rd_mktcap2·shareholder_yield3[rank]",
+      "weights": {
+        "int_gp_assets": 2,
+        "rd_mktcap": 2,
+        "shareholder_yield": 3
+      },
+      "rd_mode": "rank",
+      "n": 32,
+      "excess_6m_mean_pct": 6.88,
+      "excess_6m_sharpe": 1.36,
+      "avg_max_sector_in_top8": 3.28
+    },
+    {
+      "label": "int_gp_assets3·rd_mktcap3·shareholder_yield2[rank]",
+      "weights": {
+        "int_gp_assets": 3,
+        "rd_mktcap": 3,
+        "shareholder_yield": 2
+      },
+      "rd_mode": "rank",
+      "n": 32,
+      "excess_6m_mean_pct": 8.74,
+      "excess_6m_sharpe": 1.36,
+      "avg_max_sector_in_top8": 3.41
+    },
+    {
+      "label": "int_gp_assets3·rd_mktcap2·shareholder_yield2[qgate]",
+      "weights": {
+        "int_gp_assets": 3,
+        "rd_mktcap": 2,
+        "shareholder_yield": 2
+      },
+      "rd_mode": "qgate",
+      "n": 32,
+      "excess_6m_mean_pct": 10.47,
+      "excess_6m_sharpe": 1.35,
+      "avg_max_sector_in_top8": 4.5
+    },
+    {
+      "label": "rd_mktcap2·shareholder_yield3[raw]",
+      "weights": {
+        "int_gp_assets": 0,
+        "rd_mktcap": 2,
+        "shareholder_yield": 3
+      },
+      "rd_mode": "raw",
+      "n": 32,
+      "excess_6m_mean_pct": 10.61,
+      "excess_6m_sharpe": 1.34,
+      "avg_max_sector_in_top8": 3.69
+    },
+    {
+      "label": "int_gp_assets1·rd_mktcap1·shareholder_yield1[raw]",
+      "weights": {
+        "int_gp_assets": 1,
+        "rd_mktcap": 1,
+        "shareholder_yield": 1
+      },
+      "rd_mode": "raw",
+      "n": 32,
+      "excess_6m_mean_pct": 11.12,
+      "excess_6m_sharpe": 1.34,
+      "avg_max_sector_in_top8": 3.91
+    },
+    {
+      "label": "int_gp_assets3·rd_mktcap3·shareholder_yield1[qgate]",
+      "weights": {
+        "int_gp_assets": 3,
+        "rd_mktcap": 3,
+        "shareholder_yield": 1
+      },
+      "rd_mode": "qgate",
+      "n": 32,
+      "excess_6m_mean_pct": 14.47,
+      "excess_6m_sharpe": 1.34,
+      "avg_max_sector_in_top8": 5.06
+    },
+    {
+      "label": "rd_mktcap1·shareholder_yield1[rank]",
+      "weights": {
+        "int_gp_assets": 0,
+        "rd_mktcap": 1,
+        "shareholder_yield": 1
+      },
+      "rd_mode": "rank",
+      "n": 32,
+      "excess_6m_mean_pct": 6.54,
+      "excess_6m_sharpe": 1.33,
+      "avg_max_sector_in_top8": 3.31
+    },
+    {
+      "label": "int_gp_assets3·rd_mktcap2·shareholder_yield2[raw]",
+      "weights": {
+        "int_gp_assets": 3,
+        "rd_mktcap": 2,
+        "shareholder_yield": 2
+      },
+      "rd_mode": "raw",
+      "n": 32,
+      "excess_6m_mean_pct": 10.4,
+      "excess_6m_sharpe": 1.33,
+      "avg_max_sector_in_top8": 4.5
+    },
+    {
+      "label": "int_gp_assets1·rd_mktcap2·shareholder_yield2[raw]",
+      "weights": {
+        "int_gp_assets": 1,
+        "rd_mktcap": 2,
+        "shareholder_yield": 2
+      },
+      "rd_mode": "raw",
+      "n": 32,
+      "excess_6m_mean_pct": 10.49,
+      "excess_6m_sharpe": 1.32,
+      "avg_max_sector_in_top8": 3.94
+    },
+    {
+      "label": "int_gp_assets2·rd_mktcap3·shareholder_yield1[qgate]",
+      "weights": {
+        "int_gp_assets": 2,
+        "rd_mktcap": 3,
+        "shareholder_yield": 1
+      },
+      "rd_mode": "qgate",
+      "n": 32,
+      "excess_6m_mean_pct": 13.78,
+      "excess_6m_sharpe": 1.32,
+      "avg_max_sector_in_top8": 5.44
+    },
+    {
+      "label": "int_gp_assets1·shareholder_yield3[raw]",
+      "weights": {
+        "int_gp_assets": 1,
+        "rd_mktcap": 0,
+        "shareholder_yield": 3
+      },
+      "rd_mode": "raw",
+      "n": 32,
+      "excess_6m_mean_pct": 8.58,
+      "excess_6m_sharpe": 1.31,
+      "avg_max_sector_in_top8": 3.19
+    },
+    {
+      "label": "int_gp_assets1·shareholder_yield3[rank]",
+      "weights": {
+        "int_gp_assets": 1,
+        "rd_mktcap": 0,
+        "shareholder_yield": 3
+      },
+      "rd_mode": "rank",
+      "n": 32,
+      "excess_6m_mean_pct": 8.58,
+      "excess_6m_sharpe": 1.31,
+      "avg_max_sector_in_top8": 3.19
+    },
+    {
+      "label": "int_gp_assets1·shareholder_yield3[qgate]",
+      "weights": {
+        "int_gp_assets": 1,
+        "rd_mktcap": 0,
+        "shareholder_yield": 3
+      },
+      "rd_mode": "qgate",
+      "n": 32,
+      "excess_6m_mean_pct": 8.58,
+      "excess_6m_sharpe": 1.31,
+      "avg_max_sector_in_top8": 3.19
+    },
+    {
+      "label": "int_gp_assets1·rd_mktcap3·shareholder_yield2[qgate]",
+      "weights": {
+        "int_gp_assets": 1,
+        "rd_mktcap": 3,
+        "shareholder_yield": 2
+      },
+      "rd_mode": "qgate",
+      "n": 32,
+      "excess_6m_mean_pct": 12.5,
+      "excess_6m_sharpe": 1.31,
+      "avg_max_sector_in_top8": 4.5
+    },
+    {
+      "label": "rd_mktcap1·shareholder_yield1[raw]",
+      "weights": {
+        "int_gp_assets": 0,
+        "rd_mktcap": 1,
+        "shareholder_yield": 1
+      },
+      "rd_mode": "raw",
+      "n": 32,
+      "excess_6m_mean_pct": 10.57,
+      "excess_6m_sharpe": 1.3,
+      "avg_max_sector_in_top8": 3.69
+    },
+    {
+      "label": "int_gp_assets1·rd_mktcap1[qgate]",
+      "weights": {
+        "int_gp_assets": 1,
+        "rd_mktcap": 1,
+        "shareholder_yield": 0
+      },
+      "rd_mode": "qgate",
+      "n": 32,
+      "excess_6m_mean_pct": 14.37,
+      "excess_6m_sharpe": 1.3,
+      "avg_max_sector_in_top8": 4.94
+    },
+    {
+      "label": "int_gp_assets2·rd_mktcap3·shareholder_yield1[raw]",
+      "weights": {
+        "int_gp_assets": 2,
+        "rd_mktcap": 3,
+        "shareholder_yield": 1
+      },
+      "rd_mode": "raw",
+      "n": 32,
+      "excess_6m_mean_pct": 15.05,
+      "excess_6m_sharpe": 1.3,
+      "avg_max_sector_in_top8": 5.25
+    },
+    {
+      "label": "int_gp_assets3·rd_mktcap2·shareholder_yield1[raw]",
+      "weights": {
+        "int_gp_assets": 3,
+        "rd_mktcap": 2,
+        "shareholder_yield": 1
+      },
+      "rd_mode": "raw",
+      "n": 32,
+      "excess_6m_mean_pct": 10.76,
+      "excess_6m_sharpe": 1.29,
+      "avg_max_sector_in_top8": 4.47
+    },
+    {
+      "label": "int_gp_assets3·rd_mktcap3·shareholder_yield2[raw]",
+      "weights": {
+        "int_gp_assets": 3,
+        "rd_mktcap": 3,
+        "shareholder_yield": 2
+      },
+      "rd_mode": "raw",
+      "n": 32,
+      "excess_6m_mean_pct": 13.01,
+      "excess_6m_sharpe": 1.29,
+      "avg_max_sector_in_top8": 5.19
+    },
+    {
+      "label": "int_gp_assets3·rd_mktcap1·shareholder_yield3[rank]",
+      "weights": {
+        "int_gp_assets": 3,
+        "rd_mktcap": 1,
+        "shareholder_yield": 3
+      },
+      "rd_mode": "rank",
+      "n": 32,
+      "excess_6m_mean_pct": 8.95,
+      "excess_6m_sharpe": 1.28,
+      "avg_max_sector_in_top8": 3.19
+    },
+    {
+      "label": "int_gp_assets3·rd_mktcap2[qgate]",
+      "weights": {
+        "int_gp_assets": 3,
+        "rd_mktcap": 2,
+        "shareholder_yield": 0
+      },
+      "rd_mode": "qgate",
+      "n": 32,
+      "excess_6m_mean_pct": 12.42,
+      "excess_6m_sharpe": 1.28,
+      "avg_max_sector_in_top8": 4.53
+    },
+    {
+      "label": "int_gp_assets3·rd_mktcap2·shareholder_yield1[qgate]",
+      "weights": {
+        "int_gp_assets": 3,
+        "rd_mktcap": 2,
+        "shareholder_yield": 1
+      },
+      "rd_mode": "qgate",
+      "n": 32,
+      "excess_6m_mean_pct": 11.24,
+      "excess_6m_sharpe": 1.28,
+      "avg_max_sector_in_top8": 4.5
+    },
+    {
+      "label": "rd_mktcap3·shareholder_yield1[qgate]",
+      "weights": {
+        "int_gp_assets": 0,
+        "rd_mktcap": 3,
+        "shareholder_yield": 1
+      },
+      "rd_mode": "qgate",
+      "n": 32,
+      "excess_6m_mean_pct": 12.56,
+      "excess_6m_sharpe": 1.27,
+      "avg_max_sector_in_top8": 5.06
+    },
+    {
+      "label": "int_gp_assets1·rd_mktcap2[qgate]",
+      "weights": {
+        "int_gp_assets": 1,
+        "rd_mktcap": 2,
+        "shareholder_yield": 0
+      },
+      "rd_mode": "qgate",
+      "n": 32,
+      "excess_6m_mean_pct": 14.43,
+      "excess_6m_sharpe": 1.27,
+      "avg_max_sector_in_top8": 5.41
+    },
+    {
+      "label": "int_gp_assets1·rd_mktcap3[qgate]",
+      "weights": {
+        "int_gp_assets": 1,
+        "rd_mktcap": 3,
+        "shareholder_yield": 0
+      },
+      "rd_mode": "qgate",
+      "n": 32,
+      "excess_6m_mean_pct": 14.23,
+      "excess_6m_sharpe": 1.27,
+      "avg_max_sector_in_top8": 5.38
+    },
+    {
+      "label": "int_gp_assets2·rd_mktcap2·shareholder_yield1[raw]",
+      "weights": {
+        "int_gp_assets": 2,
+        "rd_mktcap": 2,
+        "shareholder_yield": 1
+      },
+      "rd_mode": "raw",
+      "n": 32,
+      "excess_6m_mean_pct": 12.8,
+      "excess_6m_sharpe": 1.26,
+      "avg_max_sector_in_top8": 5.06
+    },
+    {
+      "label": "int_gp_assets2·rd_mktcap3[qgate]",
+      "weights": {
+        "int_gp_assets": 2,
+        "rd_mktcap": 3,
+        "shareholder_yield": 0
+      },
+      "rd_mode": "qgate",
+      "n": 32,
+      "excess_6m_mean_pct": 13.4,
+      "excess_6m_sharpe": 1.26,
+      "avg_max_sector_in_top8": 5.31
+    },
+    {
+      "label": "int_gp_assets3·rd_mktcap2[raw]",
+      "weights": {
+        "int_gp_assets": 3,
+        "rd_mktcap": 2,
+        "shareholder_yield": 0
+      },
+      "rd_mode": "raw",
+      "n": 32,
+      "excess_6m_mean_pct": 12.69,
+      "excess_6m_sharpe": 1.26,
+      "avg_max_sector_in_top8": 4.59
+    },
+    {
+      "label": "int_gp_assets1·rd_mktcap3·shareholder_yield1[qgate]",
+      "weights": {
+        "int_gp_assets": 1,
+        "rd_mktcap": 3,
+        "shareholder_yield": 1
+      },
+      "rd_mode": "qgate",
+      "n": 32,
+      "excess_6m_mean_pct": 14.33,
+      "excess_6m_sharpe": 1.25,
+      "avg_max_sector_in_top8": 5.22
+    },
+    {
+      "label": "int_gp_assets3·rd_mktcap3·shareholder_yield1[rank]",
+      "weights": {
+        "int_gp_assets": 3,
+        "rd_mktcap": 3,
+        "shareholder_yield": 1
+      },
+      "rd_mode": "rank",
+      "n": 32,
+      "excess_6m_mean_pct": 7.93,
+      "excess_6m_sharpe": 1.25,
+      "avg_max_sector_in_top8": 3.31
+    },
+    {
+      "label": "int_gp_assets2·rd_mktcap1·shareholder_yield1[rank]",
+      "weights": {
+        "int_gp_assets": 2,
+        "rd_mktcap": 1,
+        "shareholder_yield": 1
+      },
+      "rd_mode": "rank",
+      "n": 32,
+      "excess_6m_mean_pct": 8.52,
+      "excess_6m_sharpe": 1.24,
+      "avg_max_sector_in_top8": 3.12
+    },
+    {
+      "label": "int_gp_assets2·rd_mktcap3[raw]",
+      "weights": {
+        "int_gp_assets": 2,
+        "rd_mktcap": 3,
+        "shareholder_yield": 0
+      },
+      "rd_mode": "raw",
+      "n": 32,
+      "excess_6m_mean_pct": 15.17,
+      "excess_6m_sharpe": 1.24,
+      "avg_max_sector_in_top8": 5.09
+    },
+    {
+      "label": "int_gp_assets2·rd_mktcap3·shareholder_yield2[raw]",
+      "weights": {
+        "int_gp_assets": 2,
+        "rd_mktcap": 3,
+        "shareholder_yield": 2
+      },
+      "rd_mode": "raw",
+      "n": 32,
+      "excess_6m_mean_pct": 14.08,
+      "excess_6m_sharpe": 1.24,
+      "avg_max_sector_in_top8": 4.88
+    },
+    {
+      "label": "int_gp_assets1·rd_mktcap1[raw]",
+      "weights": {
+        "int_gp_assets": 1,
+        "rd_mktcap": 1,
+        "shareholder_yield": 0
+      },
+      "rd_mode": "raw",
+      "n": 32,
+      "excess_6m_mean_pct": 14.21,
+      "excess_6m_sharpe": 1.22,
+      "avg_max_sector_in_top8": 4.91
+    },
+    {
+      "label": "int_gp_assets2·rd_mktcap3[rank]",
+      "weights": {
+        "int_gp_assets": 2,
+        "rd_mktcap": 3,
+        "shareholder_yield": 0
+      },
+      "rd_mode": "rank",
+      "n": 32,
+      "excess_6m_mean_pct": 9.92,
+      "excess_6m_sharpe": 1.22,
+      "avg_max_sector_in_top8": 4.12
+    },
+    {
+      "label": "int_gp_assets1·shareholder_yield2[raw]",
+      "weights": {
+        "int_gp_assets": 1,
+        "rd_mktcap": 0,
+        "shareholder_yield": 2
+      },
+      "rd_mode": "raw",
+      "n": 32,
+      "excess_6m_mean_pct": 8.36,
+      "excess_6m_sharpe": 1.21,
+      "avg_max_sector_in_top8": 3.09
+    },
+    {
+      "label": "int_gp_assets1·shareholder_yield2[rank]",
+      "weights": {
+        "int_gp_assets": 1,
+        "rd_mktcap": 0,
+        "shareholder_yield": 2
+      },
+      "rd_mode": "rank",
+      "n": 32,
+      "excess_6m_mean_pct": 8.36,
+      "excess_6m_sharpe": 1.21,
+      "avg_max_sector_in_top8": 3.09
+    },
+    {
+      "label": "int_gp_assets1·shareholder_yield2[qgate]",
+      "weights": {
+        "int_gp_assets": 1,
+        "rd_mktcap": 0,
+        "shareholder_yield": 2
+      },
+      "rd_mode": "qgate",
+      "n": 32,
+      "excess_6m_mean_pct": 8.36,
+      "excess_6m_sharpe": 1.21,
+      "avg_max_sector_in_top8": 3.09
+    },
+    {
+      "label": "int_gp_assets1·rd_mktcap3·shareholder_yield1[raw]",
+      "weights": {
+        "int_gp_assets": 1,
+        "rd_mktcap": 3,
+        "shareholder_yield": 1
+      },
+      "rd_mode": "raw",
+      "n": 32,
+      "excess_6m_mean_pct": 14.85,
+      "excess_6m_sharpe": 1.21,
+      "avg_max_sector_in_top8": 5.09
+    },
+    {
+      "label": "int_gp_assets3·rd_mktcap3·shareholder_yield1[raw]",
+      "weights": {
+        "int_gp_assets": 3,
+        "rd_mktcap": 3,
+        "shareholder_yield": 1
+      },
+      "rd_mode": "raw",
+      "n": 32,
+      "excess_6m_mean_pct": 14.01,
+      "excess_6m_sharpe": 1.21,
+      "avg_max_sector_in_top8": 5.03
+    },
+    {
+      "label": "rd_mktcap3·shareholder_yield2[raw]",
+      "weights": {
+        "int_gp_assets": 0,
+        "rd_mktcap": 3,
+        "shareholder_yield": 2
+      },
+      "rd_mode": "raw",
+      "n": 32,
+      "excess_6m_mean_pct": 14.8,
+      "excess_6m_sharpe": 1.2,
+      "avg_max_sector_in_top8": 4.5
+    },
+    {
+      "label": "int_gp_assets1·rd_mktcap3·shareholder_yield2[raw]",
+      "weights": {
+        "int_gp_assets": 1,
+        "rd_mktcap": 3,
+        "shareholder_yield": 2
+      },
+      "rd_mode": "raw",
+      "n": 32,
+      "excess_6m_mean_pct": 14.42,
+      "excess_6m_sharpe": 1.2,
+      "avg_max_sector_in_top8": 4.62
+    },
+    {
+      "label": "rd_mktcap1[qgate]",
+      "weights": {
+        "int_gp_assets": 0,
+        "rd_mktcap": 1,
+        "shareholder_yield": 0
+      },
+      "rd_mode": "qgate",
+      "n": 32,
+      "excess_6m_mean_pct": 12.75,
+      "excess_6m_sharpe": 1.19,
+      "avg_max_sector_in_top8": 5.19
+    },
+    {
+      "label": "rd_mktcap2·shareholder_yield1[rank]",
+      "weights": {
+        "int_gp_assets": 0,
+        "rd_mktcap": 2,
+        "shareholder_yield": 1
+      },
+      "rd_mode": "rank",
+      "n": 32,
+      "excess_6m_mean_pct": 6.35,
+      "excess_6m_sharpe": 1.19,
+      "avg_max_sector_in_top8": 3.47
+    },
+    {
+      "label": "int_gp_assets1·rd_mktcap2[raw]",
+      "weights": {
+        "int_gp_assets": 1,
+        "rd_mktcap": 2,
+        "shareholder_yield": 0
+      },
+      "rd_mode": "raw",
+      "n": 32,
+      "excess_6m_mean_pct": 14.4,
+      "excess_6m_sharpe": 1.18,
+      "avg_max_sector_in_top8": 5.16
+    },
+    {
+      "label": "int_gp_assets2·rd_mktcap1·shareholder_yield1[raw]",
+      "weights": {
+        "int_gp_assets": 2,
+        "rd_mktcap": 1,
+        "shareholder_yield": 1
+      },
+      "rd_mode": "raw",
+      "n": 32,
+      "excess_6m_mean_pct": 9.84,
+      "excess_6m_sharpe": 1.16,
+      "avg_max_sector_in_top8": 4.22
+    },
+    {
+      "label": "int_gp_assets2·rd_mktcap1·shareholder_yield1[qgate]",
+      "weights": {
+        "int_gp_assets": 2,
+        "rd_mktcap": 1,
+        "shareholder_yield": 1
+      },
+      "rd_mode": "qgate",
+      "n": 32,
+      "excess_6m_mean_pct": 9.84,
+      "excess_6m_sharpe": 1.16,
+      "avg_max_sector_in_top8": 4.22
+    },
+    {
+      "label": "int_gp_assets1·rd_mktcap2·shareholder_yield1[raw]",
+      "weights": {
+        "int_gp_assets": 1,
+        "rd_mktcap": 2,
+        "shareholder_yield": 1
+      },
+      "rd_mode": "raw",
+      "n": 32,
+      "excess_6m_mean_pct": 14.36,
+      "excess_6m_sharpe": 1.15,
+      "avg_max_sector_in_top8": 5.06
+    },
+    {
+      "label": "int_gp_assets1·rd_mktcap3[raw]",
+      "weights": {
+        "int_gp_assets": 1,
+        "rd_mktcap": 3,
+        "shareholder_yield": 0
+      },
+      "rd_mode": "raw",
+      "n": 32,
+      "excess_6m_mean_pct": 14.33,
+      "excess_6m_sharpe": 1.15,
+      "avg_max_sector_in_top8": 5.06
+    },
+    {
+      "label": "rd_mktcap2·shareholder_yield1[qgate]",
+      "weights": {
+        "int_gp_assets": 0,
+        "rd_mktcap": 2,
+        "shareholder_yield": 1
+      },
+      "rd_mode": "qgate",
+      "n": 32,
+      "excess_6m_mean_pct": 11.78,
+      "excess_6m_sharpe": 1.14,
+      "avg_max_sector_in_top8": 4.69
+    },
+    {
+      "label": "int_gp_assets1·rd_mktcap1[rank]",
+      "weights": {
+        "int_gp_assets": 1,
+        "rd_mktcap": 1,
+        "shareholder_yield": 0
+      },
+      "rd_mode": "rank",
+      "n": 32,
+      "excess_6m_mean_pct": 9.01,
+      "excess_6m_sharpe": 1.14,
+      "avg_max_sector_in_top8": 3.97
+    },
+    {
+      "label": "int_gp_assets3·rd_mktcap1·shareholder_yield2[rank]",
+      "weights": {
+        "int_gp_assets": 3,
+        "rd_mktcap": 1,
+        "shareholder_yield": 2
+      },
+      "rd_mode": "rank",
+      "n": 32,
+      "excess_6m_mean_pct": 8.52,
+      "excess_6m_sharpe": 1.14,
+      "avg_max_sector_in_top8": 3.03
+    },
+    {
+      "label": "rd_mktcap2·shareholder_yield1[raw]",
+      "weights": {
+        "int_gp_assets": 0,
+        "rd_mktcap": 2,
+        "shareholder_yield": 1
+      },
+      "rd_mode": "raw",
+      "n": 32,
+      "excess_6m_mean_pct": 14.77,
+      "excess_6m_sharpe": 1.13,
+      "avg_max_sector_in_top8": 4.69
+    },
+    {
+      "label": "rd_mktcap3·shareholder_yield2[rank]",
+      "weights": {
+        "int_gp_assets": 0,
+        "rd_mktcap": 3,
+        "shareholder_yield": 2
+      },
+      "rd_mode": "rank",
+      "n": 32,
+      "excess_6m_mean_pct": 6.49,
+      "excess_6m_sharpe": 1.13,
+      "avg_max_sector_in_top8": 3.41
+    },
+    {
+      "label": "rd_mktcap1[raw]",
+      "weights": {
+        "int_gp_assets": 0,
+        "rd_mktcap": 1,
+        "shareholder_yield": 0
+      },
+      "rd_mode": "raw",
+      "n": 32,
+      "excess_6m_mean_pct": 14.25,
+      "excess_6m_sharpe": 1.12,
+      "avg_max_sector_in_top8": 4.78
+    },
+    {
+      "label": "int_gp_assets2·rd_mktcap1[raw]",
+      "weights": {
+        "int_gp_assets": 2,
+        "rd_mktcap": 1,
+        "shareholder_yield": 0
+      },
+      "rd_mode": "raw",
+      "n": 32,
+      "excess_6m_mean_pct": 10.85,
+      "excess_6m_sharpe": 1.12,
+      "avg_max_sector_in_top8": 4.09
+    },
+    {
+      "label": "int_gp_assets2·rd_mktcap1[qgate]",
+      "weights": {
+        "int_gp_assets": 2,
+        "rd_mktcap": 1,
+        "shareholder_yield": 0
+      },
+      "rd_mode": "qgate",
+      "n": 32,
+      "excess_6m_mean_pct": 10.85,
+      "excess_6m_sharpe": 1.12,
+      "avg_max_sector_in_top8": 4.09
+    },
+    {
+      "label": "int_gp_assets1·shareholder_yield1[raw]",
+      "weights": {
+        "int_gp_assets": 1,
+        "rd_mktcap": 0,
+        "shareholder_yield": 1
+      },
+      "rd_mode": "raw",
+      "n": 32,
+      "excess_6m_mean_pct": 7.76,
+      "excess_6m_sharpe": 1.1,
+      "avg_max_sector_in_top8": 2.84
+    },
+    {
+      "label": "int_gp_assets1·shareholder_yield1[rank]",
+      "weights": {
+        "int_gp_assets": 1,
+        "rd_mktcap": 0,
+        "shareholder_yield": 1
+      },
+      "rd_mode": "rank",
+      "n": 32,
+      "excess_6m_mean_pct": 7.76,
+      "excess_6m_sharpe": 1.1,
+      "avg_max_sector_in_top8": 2.84
+    },
+    {
+      "label": "int_gp_assets1·shareholder_yield1[qgate]",
+      "weights": {
+        "int_gp_assets": 1,
+        "rd_mktcap": 0,
+        "shareholder_yield": 1
+      },
+      "rd_mode": "qgate",
+      "n": 32,
+      "excess_6m_mean_pct": 7.76,
+      "excess_6m_sharpe": 1.1,
+      "avg_max_sector_in_top8": 2.84
+    },
+    {
+      "label": "rd_mktcap3·shareholder_yield1[raw]",
+      "weights": {
+        "int_gp_assets": 0,
+        "rd_mktcap": 3,
+        "shareholder_yield": 1
+      },
+      "rd_mode": "raw",
+      "n": 32,
+      "excess_6m_mean_pct": 14.37,
+      "excess_6m_sharpe": 1.09,
+      "avg_max_sector_in_top8": 4.94
+    },
+    {
+      "label": "int_gp_assets3·rd_mktcap1·shareholder_yield2[raw]",
+      "weights": {
+        "int_gp_assets": 3,
+        "rd_mktcap": 1,
+        "shareholder_yield": 2
+      },
+      "rd_mode": "raw",
+      "n": 32,
+      "excess_6m_mean_pct": 8.27,
+      "excess_6m_sharpe": 1.07,
+      "avg_max_sector_in_top8": 3.28
+    },
+    {
+      "label": "int_gp_assets3·rd_mktcap1·shareholder_yield2[qgate]",
+      "weights": {
+        "int_gp_assets": 3,
+        "rd_mktcap": 1,
+        "shareholder_yield": 2
+      },
+      "rd_mode": "qgate",
+      "n": 32,
+      "excess_6m_mean_pct": 8.09,
+      "excess_6m_sharpe": 1.04,
+      "avg_max_sector_in_top8": 3.28
+    },
+    {
+      "label": "rd_mktcap3·shareholder_yield1[rank]",
+      "weights": {
+        "int_gp_assets": 0,
+        "rd_mktcap": 3,
+        "shareholder_yield": 1
+      },
+      "rd_mode": "rank",
+      "n": 32,
+      "excess_6m_mean_pct": 5.69,
+      "excess_6m_sharpe": 1.02,
+      "avg_max_sector_in_top8": 3.69
+    },
+    {
+      "label": "int_gp_assets3·rd_mktcap2[rank]",
+      "weights": {
+        "int_gp_assets": 3,
+        "rd_mktcap": 2,
+        "shareholder_yield": 0
+      },
+      "rd_mode": "rank",
+      "n": 32,
+      "excess_6m_mean_pct": 9.17,
+      "excess_6m_sharpe": 0.97,
+      "avg_max_sector_in_top8": 3.84
+    },
+    {
+      "label": "int_gp_assets3·rd_mktcap1·shareholder_yield1[raw]",
+      "weights": {
+        "int_gp_assets": 3,
+        "rd_mktcap": 1,
+        "shareholder_yield": 1
+      },
+      "rd_mode": "raw",
+      "n": 32,
+      "excess_6m_mean_pct": 8.24,
+      "excess_6m_sharpe": 0.96,
+      "avg_max_sector_in_top8": 3.38
+    },
+    {
+      "label": "int_gp_assets3·rd_mktcap1·shareholder_yield1[qgate]",
+      "weights": {
+        "int_gp_assets": 3,
+        "rd_mktcap": 1,
+        "shareholder_yield": 1
+      },
+      "rd_mode": "qgate",
+      "n": 32,
+      "excess_6m_mean_pct": 8.24,
+      "excess_6m_sharpe": 0.96,
+      "avg_max_sector_in_top8": 3.38
+    },
+    {
+      "label": "int_gp_assets2·rd_mktcap1[rank]",
+      "weights": {
+        "int_gp_assets": 2,
+        "rd_mktcap": 1,
+        "shareholder_yield": 0
+      },
+      "rd_mode": "rank",
+      "n": 32,
+      "excess_6m_mean_pct": 8.31,
+      "excess_6m_sharpe": 0.95,
+      "avg_max_sector_in_top8": 3.66
+    },
+    {
+      "label": "int_gp_assets3·shareholder_yield2[raw]",
+      "weights": {
+        "int_gp_assets": 3,
+        "rd_mktcap": 0,
+        "shareholder_yield": 2
+      },
+      "rd_mode": "raw",
+      "n": 32,
+      "excess_6m_mean_pct": 7.14,
+      "excess_6m_sharpe": 0.92,
+      "avg_max_sector_in_top8": 2.91
+    },
+    {
+      "label": "int_gp_assets3·shareholder_yield2[rank]",
+      "weights": {
+        "int_gp_assets": 3,
+        "rd_mktcap": 0,
+        "shareholder_yield": 2
+      },
+      "rd_mode": "rank",
+      "n": 32,
+      "excess_6m_mean_pct": 7.14,
+      "excess_6m_sharpe": 0.92,
+      "avg_max_sector_in_top8": 2.91
+    },
+    {
+      "label": "int_gp_assets3·shareholder_yield2[qgate]",
+      "weights": {
+        "int_gp_assets": 3,
+        "rd_mktcap": 0,
+        "shareholder_yield": 2
+      },
+      "rd_mode": "qgate",
+      "n": 32,
+      "excess_6m_mean_pct": 7.14,
+      "excess_6m_sharpe": 0.92,
+      "avg_max_sector_in_top8": 2.91
+    },
+    {
+      "label": "int_gp_assets3·rd_mktcap1[raw]",
+      "weights": {
+        "int_gp_assets": 3,
+        "rd_mktcap": 1,
+        "shareholder_yield": 0
+      },
+      "rd_mode": "raw",
+      "n": 32,
+      "excess_6m_mean_pct": 7.87,
+      "excess_6m_sharpe": 0.84,
+      "avg_max_sector_in_top8": 3.31
+    },
+    {
+      "label": "int_gp_assets3·rd_mktcap1[qgate]",
+      "weights": {
+        "int_gp_assets": 3,
+        "rd_mktcap": 1,
+        "shareholder_yield": 0
+      },
+      "rd_mode": "qgate",
+      "n": 32,
+      "excess_6m_mean_pct": 7.87,
+      "excess_6m_sharpe": 0.84,
+      "avg_max_sector_in_top8": 3.31
+    },
+    {
+      "label": "int_gp_assets3·rd_mktcap1[rank]",
+      "weights": {
+        "int_gp_assets": 3,
+        "rd_mktcap": 1,
+        "shareholder_yield": 0
+      },
+      "rd_mode": "rank",
+      "n": 32,
+      "excess_6m_mean_pct": 7.49,
+      "excess_6m_sharpe": 0.81,
+      "avg_max_sector_in_top8": 3.16
+    },
+    {
+      "label": "int_gp_assets3·rd_mktcap1·shareholder_yield1[rank]",
+      "weights": {
+        "int_gp_assets": 3,
+        "rd_mktcap": 1,
+        "shareholder_yield": 1
+      },
+      "rd_mode": "rank",
+      "n": 32,
+      "excess_6m_mean_pct": 7.22,
+      "excess_6m_sharpe": 0.76,
+      "avg_max_sector_in_top8": 3.31
+    },
+    {
+      "label": "int_gp_assets2·shareholder_yield1[raw]",
+      "weights": {
+        "int_gp_assets": 2,
+        "rd_mktcap": 0,
+        "shareholder_yield": 1
+      },
+      "rd_mode": "raw",
+      "n": 32,
+      "excess_6m_mean_pct": 6.36,
+      "excess_6m_sharpe": 0.69,
+      "avg_max_sector_in_top8": 3.03
+    },
+    {
+      "label": "int_gp_assets2·shareholder_yield1[rank]",
+      "weights": {
+        "int_gp_assets": 2,
+        "rd_mktcap": 0,
+        "shareholder_yield": 1
+      },
+      "rd_mode": "rank",
+      "n": 32,
+      "excess_6m_mean_pct": 6.36,
+      "excess_6m_sharpe": 0.69,
+      "avg_max_sector_in_top8": 3.03
+    },
+    {
+      "label": "int_gp_assets2·shareholder_yield1[qgate]",
+      "weights": {
+        "int_gp_assets": 2,
+        "rd_mktcap": 0,
+        "shareholder_yield": 1
+      },
+      "rd_mode": "qgate",
+      "n": 32,
+      "excess_6m_mean_pct": 6.36,
+      "excess_6m_sharpe": 0.69,
+      "avg_max_sector_in_top8": 3.03
+    },
+    {
+      "label": "int_gp_assets3·shareholder_yield1[raw]",
+      "weights": {
+        "int_gp_assets": 3,
+        "rd_mktcap": 0,
+        "shareholder_yield": 1
+      },
+      "rd_mode": "raw",
+      "n": 32,
+      "excess_6m_mean_pct": 6.06,
+      "excess_6m_sharpe": 0.68,
+      "avg_max_sector_in_top8": 3.03
+    },
+    {
+      "label": "int_gp_assets3·shareholder_yield1[rank]",
+      "weights": {
+        "int_gp_assets": 3,
+        "rd_mktcap": 0,
+        "shareholder_yield": 1
+      },
+      "rd_mode": "rank",
+      "n": 32,
+      "excess_6m_mean_pct": 6.06,
+      "excess_6m_sharpe": 0.68,
+      "avg_max_sector_in_top8": 3.03
+    },
+    {
+      "label": "int_gp_assets3·shareholder_yield1[qgate]",
+      "weights": {
+        "int_gp_assets": 3,
+        "rd_mktcap": 0,
+        "shareholder_yield": 1
+      },
+      "rd_mode": "qgate",
+      "n": 32,
+      "excess_6m_mean_pct": 6.06,
+      "excess_6m_sharpe": 0.68,
+      "avg_max_sector_in_top8": 3.03
+    },
+    {
+      "label": "int_gp_assets1[raw]",
+      "weights": {
+        "int_gp_assets": 1,
+        "rd_mktcap": 0,
+        "shareholder_yield": 0
+      },
+      "rd_mode": "raw",
+      "n": 32,
+      "excess_6m_mean_pct": 5.41,
+      "excess_6m_sharpe": 0.6,
+      "avg_max_sector_in_top8": 2.91
+    },
+    {
+      "label": "int_gp_assets1[rank]",
+      "weights": {
+        "int_gp_assets": 1,
+        "rd_mktcap": 0,
+        "shareholder_yield": 0
+      },
+      "rd_mode": "rank",
+      "n": 32,
+      "excess_6m_mean_pct": 5.41,
+      "excess_6m_sharpe": 0.6,
+      "avg_max_sector_in_top8": 2.91
+    },
+    {
+      "label": "int_gp_assets1[qgate]",
+      "weights": {
+        "int_gp_assets": 1,
+        "rd_mktcap": 0,
+        "shareholder_yield": 0
+      },
+      "rd_mode": "qgate",
+      "n": 32,
+      "excess_6m_mean_pct": 5.41,
+      "excess_6m_sharpe": 0.6,
+      "avg_max_sector_in_top8": 2.91
+    },
+    {
+      "label": "int_gp_assets1·rd_mktcap2[rank]",
+      "weights": {
+        "int_gp_assets": 1,
+        "rd_mktcap": 2,
+        "shareholder_yield": 0
+      },
+      "rd_mode": "rank",
+      "n": 32,
+      "excess_6m_mean_pct": 3.31,
+      "excess_6m_sharpe": 0.4,
+      "avg_max_sector_in_top8": 2.53
+    },
+    {
+      "label": "int_gp_assets1·rd_mktcap3[rank]",
+      "weights": {
+        "int_gp_assets": 1,
+        "rd_mktcap": 3,
+        "shareholder_yield": 0
+      },
+      "rd_mode": "rank",
+      "n": 32,
+      "excess_6m_mean_pct": -0.88,
+      "excess_6m_sharpe": -0.13,
+      "avg_max_sector_in_top8": 2.62
+    },
+    {
+      "label": "rd_mktcap1[rank]",
+      "weights": {
+        "int_gp_assets": 0,
+        "rd_mktcap": 1,
+        "shareholder_yield": 0
+      },
+      "rd_mode": "rank",
+      "n": 32,
+      "excess_6m_mean_pct": -2.05,
+      "excess_6m_sharpe": -0.31,
+      "avg_max_sector_in_top8": 2.5
+    }
+  ],
+  "live_config_label": "int_gp_assets1·rd_mktcap2·shareholder_yield2[raw]",
+  "live_rank": 69,
+  "pbo": 0.4123,
+  "pbo_verdict": "중간(주의)",
+  "dsr": 0.9814,
+  "dsr_verdict": "95% 신뢰수준 통과",
+  "passed": true,
+  "note": "판정 프레임(Fable 5 자문): 수익 개선이 아니라 섹터쏠림 개선+성과 비열등성 — 섹터중립화는 2026-07-10 backtest_sector_neutral.py에서 이미 시행·기각(OOS 붕괴)돼 재등록하지 않음."
+}

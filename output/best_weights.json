@@ -1,8 +1,8 @@
 {
   "weights": {
-    "int_gp_assets": 1,
-    "rd_mktcap": 2,
-    "shareholder_yield": 2
+    "int_gp_assets": 3,
+    "rd_mktcap": 4,
+    "shareholder_yield": 5
   },
   "metrics": {
     "turnover": 12.7,

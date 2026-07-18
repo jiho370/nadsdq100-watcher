@@ -350,15 +350,39 @@ def _is_analysis_headline(title: str, publisher: str) -> bool:
     return bool(_ANALYSIS_TITLE_RE.search(title or ""))
 
 
-def fetch_news_headlines(symbols: list[str], yf_module, max_items: int = 5) -> dict[str, list[str]]:
+def _is_relevant_headline(title: str, symbol: str, name: str = "") -> bool:
+    """yfinance Ticker(sym).news는 그 종목 '전용' 피드가 아니다 — 기사 본문에 종목명이
+    스치기만 해도 태깅되는 사례가 실측 확인됨(2026-07-17, 지호 님 리포트: HPQ 후보에
+    "Domino's adds 2 board members" 기사가 붙음 — 실제로는 HP 임원 한 명이 도미노피자
+    이사회에 합류한다는 내용이라 HP 주가와 무관한데 "HP Inc." 언급만으로 태깅됨).
+    제목 자체에 티커나 회사명이 안 나오면(=본문에서만 스쳐 지나가는 언급일 가능성 높음)
+    걸러낸다 — "확인 안 된 내용은 쓰지 않는다" 원칙의 연장."""
+    t = (title or "").lower()
+    base_sym = (symbol or "").split(".")[0].strip().lower()
+    if base_sym and len(base_sym) >= 2 and base_sym in t:
+        return True
+    nm = (name or "").strip().lower()
+    if nm:
+        # 회사명 첫 단어(사명의 법인격 표기 Inc/Corp/Co 등은 헤드라인에 잘 안 나오므로 제외)
+        first_word = re.split(r"[\s,]+", nm)[0]
+        if len(first_word) >= 3 and first_word not in {"the"} and first_word in t:
+            return True
+    return False
+
+
+def fetch_news_headlines(symbols: list[str], yf_module, max_items: int = 5,
+                         names: dict[str, str] | None = None) -> dict[str, list[str]]:
     """AI 입력용: 종목별 '최근 뉴스 제목' 리스트를 반환.
     기존 fetch_news_flags(True/False)와 달리 실제 제목을 모아 AI 가 호재/악재를 판단하게 한다.
     yfinance 신·구 스키마(title / content.title) 모두 처리. 실패는 조용히 빈 리스트.
-    분석·의견성 기사(발행처 블록리스트 + 제목 패턴)는 제외 — "속보"만 남긴다.
+    분석·의견성 기사(발행처 블록리스트 + 제목 패턴)와, 제목에 티커·회사명이 없어 그 종목과
+    무관할 가능성이 높은 기사(_is_relevant_headline)를 제외 — "속보"만 남긴다.
+    names={symbol: 회사명}이 있으면 회사명 매칭도 같이 쓴다(없으면 티커 매칭만).
     (호출부에서 from ai_commentary import fetch_news_headlines; fetch_news_headlines(syms, yf))"""
     out: dict[str, list[str]] = {}
     if yf_module is None:
         return {s: [] for s in symbols}
+    names = names or {}
     for sym in symbols:
         titles: list[str] = []
         try:
@@ -372,7 +396,8 @@ def fetch_news_headlines(symbols: list[str], yf_module, max_items: int = 5) -> d
                         t = t or content.get("title")
                         pub = pub or ((content.get("provider") or {}).get("displayName")
                                       if isinstance(content.get("provider"), dict) else None)
-                if t and not _is_analysis_headline(str(t), pub):
+                if t and not _is_analysis_headline(str(t), pub) \
+                        and _is_relevant_headline(str(t), sym, names.get(sym, "")):
                     titles.append(str(t))
                 if len(titles) >= max_items:
                     break

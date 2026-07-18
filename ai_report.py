@@ -60,7 +60,9 @@ MODEL_WRITE  = _no_opus(os.environ.get("REPORT_MODEL_WRITE", "claude-haiku-4-5")
 
 # 최종 채택 수(코드가 확정) — 관찰 폐지(2026-07-13): 관찰 슬롯을 매수 후보로 전환.
 # 미국 4+4 → 매수 8, 한국 3+2 → 매수 5. AI 강등분은 관찰 대신 '제외된 후보' 박스에 사유 표기.
-FINAL_BUY      = int(os.environ.get("REPORT_FINAL_BUY", "8"))
+# 2026-07-17(지호 님 요청): 미국 추천폭을 8→10으로 확대(판단의 폭을 넓히기 위해) — 보유
+# 상한(daily_ai_report.py US_MAX_HOLD)은 8로 그대로 둠, 추천(추천풀)과 실제 편입은 별개.
+FINAL_BUY      = int(os.environ.get("REPORT_FINAL_BUY", "10"))
 FINAL_WATCH    = int(os.environ.get("REPORT_FINAL_WATCH", "0"))
 KR_FINAL_BUY   = int(os.environ.get("KR_FINAL_BUY", "5"))
 KR_FINAL_WATCH = int(os.environ.get("KR_FINAL_WATCH", "0"))
@@ -311,9 +313,11 @@ def verify_stage(groups, market) -> dict:
 _W_SYSTEM = (
     "당신은 한국 개인투자자(수신자: 투자에 관심 있는 아버지)용 아침 주식 보고서의 서술을 쓰는 애널리스트다.\n"
     "규칙:\n"
-    "1) 제공된 JSON의 수치·사실만 사용한다. 새 숫자·뉴스를 만들지 않는다. verified가 비어 있으면 headlines만 근거로 쓴다.\n"
-    "2) points는 정확히 4개, 순서대로 ①추세(지표 수치 인용) ②펀더멘털·사업(profile 요약+재무 수치) "
-    "③뉴스(verified.news/headlines 근거) ④촉매 또는 리스크(verified.catalyst, 없으면 주의점).\n"
+    "1) 제공된 JSON의 수치·사실만 사용한다. 새 숫자·뉴스를 만들지 않는다.\n"
+    "2) points는 정확히 3개, 순서대로 ①추세(지표 수치 인용) ②펀더멘털·사업(profile 요약+재무 수치) "
+    "③촉매 또는 리스크(verified.catalyst, 없으면 주의점). 뉴스 항목은 넣지 않는다"
+    "(2026-07-17부로 카드에서 뉴스 섹션 제외 — 관련 없는 기사가 붙는 문제로 보유종목 전용"
+    " 별도 메일을 새로 설계할 때까지 보류).\n"
     "각 point는 구체 수치를 포함한 완결된 한 문장.\n"
     "2-1) summary는 '이 회사가 무슨 사업을 하는 회사인지'만 쓰는 회사 소개 문장이다. "
     "RSI·PE·ROE·수익률·%, '조정/급락/저평가/과열/바닥/반등/진입' 같은 시세·투자판단 표현은 "
@@ -333,7 +337,7 @@ _W_SCHEMA = (
     '{"market_overview":"(요청된 경우만) 전일 시장 1-2문장","macro":"(요청된 경우만) 한 줄",\n'
     ' "signal_note":"(요청된 경우만) 1-2문장","risks":"(요청된 경우만) 1-2문장",\n'
     ' "stocks":[{"symbol":"AAA","name":"회사명","category":"세부분류(반도체는 팹리스·파운드리·메모리·장비 등)",\n'
-    '   "summary":"무슨 사업을 하는 회사인지 1-2문장(투자 근거는 쓰지 말 것)","points":["①","②","③","④"],\n'
+    '   "summary":"무슨 사업을 하는 회사인지 1-2문장(투자 근거는 쓰지 말 것)","points":["①","②","③"],\n'
     '   "comment":"계획에 덧붙일 실행 조언 한 줄"}],\n'
     ' "sells":[{"symbol":"CCC","comment":"왜 지금 정리인지 한 줄(reason+뉴스 결합)"}]}'
 )
@@ -353,8 +357,9 @@ def _w_stock(c, kind, vmap):
          "roe": c.get("roe"), "rev_growth": c.get("rev_growth"),
          "profit_margin": c.get("profit_margin"),
          "profile": _profiles().get(str(c.get("symbol")), ""),
-         "headlines": (c.get("headlines") or [])[:4],
-         "verified": {k: v.get(k) for k in ("news", "catalyst", "flag") if v.get(k)},
+         # 2026-07-17: headlines·verified.news 제외(뉴스 섹션 전체 보류) — catalyst/flag만
+         # 남김(호재·악재 색상칩·촉매 문구는 뉴스와 별개 용도).
+         "verified": {k: v.get(k) for k in ("catalyst", "flag") if v.get(k)},
          "plan": c.get("plan_text") or ""}
     if kind == "watch":
         d["trigger"] = c.get("trigger") or ""
@@ -553,7 +558,9 @@ def _mk_item(c, kind, vmap, wmap):
             "category": (w.get("category") or c.get("industry") or c.get("sector") or "").strip(),
             "summary": (w.get("summary") or c.get("score_reason") or "").strip(),
             "points": pts, "flag": flag,
-            "news": (v.get("news") or "").strip(),
+            # 2026-07-17: 카드의 별도 뉴스 줄(📰)도 points의 ③뉴스와 같은 이유로 보류 —
+            # v.get("news")는 verify_stage가 여전히 채우지만(검증 판정용) 카드엔 안 보여준다.
+            "news": "",
             "catalyst": (v.get("catalyst") or "").strip(),
             "comment": (w.get("comment") or "").strip(),
             "verdict_reason": (v.get("verdict_reason") or "").strip(),
@@ -796,8 +803,10 @@ def _auto_fields(c) -> dict:
     one_liner, detail = _profile_parts().get(sym, ("", ""))
     if detail:
         pts.append("②사업: " + _smart_truncate(detail, 140))
-    if c.get("headlines"):
-        pts.append("③뉴스: " + _smart_truncate(str(c["headlines"][0]), 120))
+    # 2026-07-17 지호 님 지시로 뉴스 포인트 일단 제외(HPQ에 무관한 "Domino's..." 기사가
+    # 붙던 사례 — 관련성 필터로 근본 원인은 고쳤지만, 보유종목만 모아 보내는 별도 뉴스
+    # 메일을 새로 설계할 때까지는 카드에서 뉴스 자체를 빼두기로 함). headlines 수집·
+    # fetch_news_headlines 관련성 필터는 그대로 유지 — 그 별도 메일에서 재사용할 것.
     # 요약 라인(=종목 설명): one_liner(브랜드 인지용) 우선 — ②사업(detail)과 겹치지 않게
     # 서로 다른 소스로 분리(2026-07-15, 지호 님 피드백: 둘이 같은 문장을 반복하고 있었음).
     # one_liner도 없으면(구프로필 과도기) detail 첫 문장으로, 그마저 없으면 내부 라벨 폴백.
@@ -903,7 +912,10 @@ def _card(i, r, metrics_by_sym, kind, is_kr=False):
     flag_chip = _chip(fl, flag_color.get(fl, "#6b7280"), True) if fl else ""
     cat_chip = _chip(_esc(r.get("category")), "#7c3aed") if r.get("category") else ""
     hot_chip = _chip("과열·분할", "#c2410c", True) if (kind == "buy" and r.get("hot")) else ""
-    held_chip = _chip("보유중", "#0369a1", True) if r.get("already_held") else ""
+    # 2026-07-17(지호 님 요청): 보유중/신규를 둘 다 명시적으로 표기해 구별되게 — 국장은
+    # already_held를 이미 쓰고 있었는데 미장엔 안 켜져 있었음(daily_ai_report.run_us에서 신규 배선).
+    held_chip = (_chip("보유중", "#0369a1", True) if r.get("already_held")
+                else _chip("신규", "#15803d", True)) if kind == "buy" else ""
     pts = "".join(f'<li style="margin:1px 0">{_esc(p)}</li>' for p in r.get("points", []))
     pts_html = (f'<ul style="margin:6px 0 0;padding-left:16px;font-size:12px;color:#374151;'
                 f'line-height:1.55">{pts}</ul>') if pts else ""
