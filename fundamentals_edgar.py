@@ -48,6 +48,13 @@ CONCEPTS = {
     "debt":    [("us-gaap", "LongTermDebtNoncurrent"), ("us-gaap", "LongTermDebt")],
     "opinc":   [("us-gaap", "OperatingIncomeLoss")],
     "gross":   [("us-gaap", "GrossProfit")],
+    # 2026-07-18(지호 님 지적 — REGN 등 실측): GrossProfit 단일 태그만 쓰면 협업매출·복합
+    # 매출구조 기업(GOOGL·LLY·ABBV·MRK·CAT 등 다수, 전체 유니버스의 54.3% 실측)이 전부
+    # 누락돼 gp_assets/int_gp_assets가 조용히 z=0(중립)으로 빠짐 — "수익성이 안 좋다"가
+    # 아니라 "안 보인다"인데 구분이 안 됐음. 매출원가 태그로 역산하는 폴백 추가
+    # (factor_values에서 gross 없으면 revenue-cost_of_revenue로 대체).
+    "cost_of_revenue": [("us-gaap", "CostOfRevenue"), ("us-gaap", "CostOfGoodsAndServicesSold"),
+                        ("us-gaap", "CostOfGoodsSold"), ("us-gaap", "CostOfServices")],
     "cash":    [("us-gaap", "CashAndCashEquivalentsAtCarryingValue")],
     "divs":    [("us-gaap", "PaymentsOfDividendsCommonStock"), ("us-gaap", "PaymentsOfDividends")],
     "dep":     [("us-gaap", "DepreciationDepletionAndAmortization"),
@@ -63,7 +70,10 @@ CONCEPTS = {
                 ("us-gaap", "IncreaseDecreaseInAccountsPayableTrade")],
     # 무형자산 투자 — 무형조정 가치·수익성 팩터용 (Eisfeldt et al.; Berkin et al. 2024 JOI:
     # R&D 전액 + SG&A 30%를 자본화, R&D 상각 15%/년). 캐시에 없으면 증분 수집됨.
-    "rnd":     [("us-gaap", "ResearchAndDevelopmentExpense")],
+    # 2026-07-18: 제약·바이오 다수(ABBV·AMGN 등 실측 확인)가 표준 태그 대신 아래 변형
+    # (인수 진행중 R&D 비용 제외분)을 씀 — 첫 태그 없으면 이걸로 폴백.
+    "rnd":     [("us-gaap", "ResearchAndDevelopmentExpense"),
+               ("us-gaap", "ResearchAndDevelopmentExpenseExcludingAcquiredInProcessCost")],
     "sga":     [("us-gaap", "SellingGeneralAndAdministrativeExpense"),
                 ("us-gaap", "GeneralAndAdministrativeExpense")],
 }
@@ -211,6 +221,20 @@ def asof_pair(points: list, date_iso: str):
     return seen[-1], (seen[-2] if len(seen) >= 2 else None)
 
 
+def asof_end(points: list, date_iso: str):
+    """date_iso 시점의 최근값 + 그 회계기간 종료일(end). 2026-07-18: gross_profit 폴백
+    (revenue-cost_of_revenue)이 회계기간이 다른 두 값을 섞지 않도록 기간매칭용으로 추가
+    (REGN처럼 cost_of_revenue 태그가 몇 년째 갱신 안 된 케이스에서 옛 값을 최신인 것처럼
+    잘못 쓰는 걸 방지)."""
+    v, e = None, None
+    for p in points or []:
+        if p["filed"] <= date_iso:
+            v, e = p["val"], p["end"]
+        else:
+            break
+    return v, e
+
+
 # 팩터 이름(모두 '높을수록 좋다' 방향으로 정의) — 백테스트·라이브 공용
 # (학술 리포트 반영: gp_assets=Novy-Marx 품질, ebitda_ev·fcf_ev=자본구조 반영 가치, asset_growth=과잉투자 배제)
 FUND_FACTOR_NAMES = ["value", "sales_yield", "roe", "roa", "net_margin", "op_margin",
@@ -245,6 +269,14 @@ def factor_values(rec: dict, date_iso: str, price: float) -> dict:
     eps, ni, eq = g("eps"), g("ni"), g("equity")
     assets, debt, cash = g("assets"), g("debt"), g("cash")
     rev, opinc, gross = g("revenue"), g("opinc"), g("gross")
+    if gross is None and rev is not None:
+        # 2026-07-18: GrossProfit 미태깅 기업(협업매출·복합매출구조) 폴백 — 매출원가로 역산.
+        # 회계기간(end)이 revenue와 정확히 같은 값만 사용 — REGN처럼 cost_of_revenue 태그가
+        # 몇 년째 갱신 안 된 경우 옛 값을 최신처럼 잘못 섞어 쓰는 걸 방지(지호 님 지적).
+        _, rev_end = asof_end(rec.get("revenue"), date_iso)
+        cor, cor_end = asof_end(rec.get("cost_of_revenue"), date_iso)
+        if cor is not None and rev_end is not None and cor_end == rev_end:
+            gross = rev - cor
     ocf, capex, divs, dep = g("ocf"), g("capex"), g("divs"), g("dep")
     buyback, issuance = g("buyback"), g("issuance")
     ar_chg, inv_chg, ap_chg = g("ar_chg"), g("inv_chg"), g("ap_chg")
