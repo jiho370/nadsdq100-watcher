@@ -1168,3 +1168,33 @@ KRX 로그인 완료.
   로그인 시간: 2026-07-22 22:00:17
   만료 시간: 2026-07-22 23:00:17
 2026-07-22 22:01:00 [kr] pregen.py 실패(rc=1) — Actions 가 API 폴백. 종료.
+2026-07-23 07:50:57 [kr] === pregen 시작 ===
+git : error: cannot pull with rebase: You have unstaged changes.
+At C:\Users\JH\Documents\GitHub\nadsdq100-watcher\run_pregen.ps1:45 char:1
++ git pull --rebase 2>&1 | Out-File -Append -Encoding utf8 $log
++ ~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (error: cannot p...staged changes.:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+error: Please commit or stash them.
+2026-07-23 07:50:58 [kr] [경고] git pull 실패 — 로컬에 커밋 안 된 변경이 있으면 여기서 막힘. 아래 push도 실패할 수 있음.
+2026-07-23 07:50:58 [kr]         해결: 저장소 폴더에서 'git add -A; git commit -m sync; git push' 한 번 수동 실행.
+python : [KR] 20260723 �繫������ �̹���/�ڸ�ǥ���� �ǽ�(��ȿ 200/200, PER>0 ���� 0%) �� �Ϸ� �� �ұ�
+At C:\Users\JH\Documents\GitHub\nadsdq100-watcher\run_pregen.ps1:52 char:1
++ python pregen.py --$Mode 2>&1 | Out-File -Append -Encoding utf8 $log
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: ([KR] 20260723 �...) �� �Ϸ� �� �ұ�:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+[KR] �ݴ���Ż ��� 170/200���� (EPS>0��ROE>0)
+[KR] AI ���� Ǯ 8(���� ä���� AI ���� �� ���� 5��) �� ���� 0 (�ĺ� 170)
+[REPORT] ���� 1�� ����(RuntimeError) �� ���˻� ���� ��õ�
+[REPORT] ���� ����(RuntimeError: claude CLI rc=1: Your organization has disabled Claude subscription access for Claude 
+Code �� Use an Anthropic API key instead, or ask your admin to enable access)
+[PREGEN] ���� ���� \u2014 ���� �̻���(��ħ�� API ����)
+KRX �α��� �õ�...
+  �α��� ID: jiho370
+KRX �α��� �Ϸ�.
+  �α��� �ð�: 2026-07-23 07:51:05
+  ���� �ð�: 2026-07-23 08:51:05
+2026-07-23 07:51:35 [kr] pregen.py 실패(rc=1) — Actions 가 API 폴백. 종료.
