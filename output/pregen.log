@@ -1266,3 +1266,12 @@ At C:\Users\JH\Documents\GitHub\nadsdq100-watcher\run_pregen.ps1:69 char:5
  
    d4622c8..321640c  main -> main
 2026-07-23 08:17:40 [us] === pregen 완료 ===
+2026-07-23 08:24:33 [kr] === pregen ?쒖옉 ===
+Already up to date.
+python : [PREGEN] �ѱ��� pregen �� 16�� ���� �Ǵ� 08�� �������� ��ȿ �� ��ŵ
+At C:\Users\JH\Documents\GitHub\nadsdq100-watcher\run_pregen.ps1:56 char:1
++ python pregen.py --$Mode 2>&1 | Out-File -Append -Encoding utf8 $log
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: ([PREGEN] �ѱ��� ...���� ��ȿ �� ��ŵ:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
