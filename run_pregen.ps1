@@ -22,6 +22,25 @@ function Log($msg) { "$(Get-Date -Format 'yyyy-MM-dd HH:mm:ss') [$Mode] $msg" | 
 
 Log "=== pregen 시작 ==="
 
+# 0) main 브랜치 강제(2026-07-23 발견: 이 스크립트가 브랜치 지정 없이 pull/push 하다 보니
+#    로컬이 다른 브랜치(예: 작업용 chore/* 브랜치)에 체크아웃된 채로 몇 주째 그 브랜치로만
+#    push되고 있었다 — GitHub Actions 스케줄 워크플로(.github/workflows/report.yml)는
+#    schedule 트리거상 항상 default 브랜치(main)에서만 도는데 그 변경을 한 번도 못 봐서,
+#    전략 코드·가중치 변경이 실제 발송 파이프라인에 반영 안 되는 사고로 이어졌다(STRATEGY.md
+#    §6 저장소 상태 참고). 매 실행마다 main인지 확인하고 아니면 강제 전환.
+$branch = git rev-parse --abbrev-ref HEAD
+if ($branch -ne "main") {
+    Log "[경고] 현재 브랜치가 main이 아님($branch) — main으로 전환 시도."
+    git checkout main 2>&1 | Out-File -Append -Encoding utf8 $log
+    if ($LASTEXITCODE -ne 0) {
+        Log "[경고] main 전환 실패(미커밋 변경 등 — 아래 로그 참고) — 이번 실행은 $branch에서 "
+        Log "        진행하지만 GitHub Actions엔 반영 안 될 수 있음. 저장소 폴더에서 수동으로"
+        Log "        'git status' 확인 후 커밋/정리 필요."
+    } else {
+        Log "main으로 전환 완료."
+    }
+}
+
 # 1) 최신 상태로 (보유목록 등 상태파일이 Actions 에서 커밋되므로 pull 필수)
 git pull --rebase 2>&1 | Out-File -Append -Encoding utf8 $log
 if ($LASTEXITCODE -ne 0) {
