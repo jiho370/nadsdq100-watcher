@@ -1198,3 +1198,33 @@ KRX �α��� �Ϸ�.
   �α��� �ð�: 2026-07-23 07:51:05
   ���� �ð�: 2026-07-23 08:51:05
 2026-07-23 07:51:35 [kr] pregen.py 실패(rc=1) — Actions 가 API 폴백. 종료.
+2026-07-23 07:53:13 [us] === pregen 시작 ===
+git : error: cannot pull with rebase: You have unstaged changes.
+At C:\Users\JH\Documents\GitHub\nadsdq100-watcher\run_pregen.ps1:45 char:1
++ git pull --rebase 2>&1 | Out-File -Append -Encoding utf8 $log
++ ~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (error: cannot p...staged changes.:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+error: Please commit or stash them.
+2026-07-23 07:53:14 [us] [경고] git pull 실패 — 로컬에 커밋 안 된 변경이 있으면 여기서 막힘. 아래 push도 실패할 수 있음.
+2026-07-23 07:53:14 [us]         해결: 저장소 폴더에서 'git add -A; git commit -m sync; git push' 한 번 수동 실행.
+python : [����] SPY �������� 503�� �ε�
+At C:\Users\JH\Documents\GitHub\nadsdq100-watcher\run_pregen.ps1:52 char:1
++ python pregen.py --$Mode 2>&1 | Out-File -Append -Encoding utf8 $log
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: ([����] SPY �������� 503�� �ε�:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+[����] ��Ű���� 503���� GICS ���� Ȯ�� (Sub-Industry 503����)
+[Ž������] 43 (����)
+[������] 503���� �ε� (���� 2026-06-20)
+C:\Users\JH\Documents\GitHub\nadsdq100-watcher\tech_factors.py:26: FutureWarning: The default fill_method='pad' in Data
+Frame.pct_change is deprecated and will be removed in a future version. Either fill in any non-leading NA values prior 
+to calling pct_change or specify 'fill_method=None' to not fill NA values.
+  mret = panel.pct_change()
+[REPORT] ���� 1�� ����(RuntimeError) �� ���˻� ���� ��õ�
+[REPORT] ���� ����(RuntimeError: claude CLI rc=1: Your organization has disabled Claude subscription access for Claude 
+Code �� Use an Anthropic API key instead, or ask your admin to enable access)
+[PREGEN] ���� ���� \u2014 ���� �̻���(���Ŀ� API ����)
+2026-07-23 07:54:58 [us] pregen.py 실패(rc=1) — Actions 가 API 폴백. 종료.
