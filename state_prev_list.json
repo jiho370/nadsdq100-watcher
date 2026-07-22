@@ -1,44 +1,48 @@
 {
-  "date": "2026-07-03",
+  "date": "2026-07-19",
   "holdings": {
-    "MRNA": {
-      "since": "2026-07-03",
+    "CHRW": {
+      "since": "2026-07-19",
       "exit_streak": 0
     },
-    "AMAT": {
-      "since": "2026-07-03",
+    "GOOG": {
+      "since": "2026-07-19",
       "exit_streak": 0
     },
-    "FTNT": {
-      "since": "2026-07-03",
+    "ROST": {
+      "since": "2026-07-19",
       "exit_streak": 0
     },
-    "SPG": {
-      "since": "2026-06-25",
+    "APA": {
+      "since": "2026-07-19",
       "exit_streak": 0
     },
-    "MAS": {
-      "since": "2026-06-26",
+    "JBHT": {
+      "since": "2026-07-19",
       "exit_streak": 0
     },
-    "DVA": {
-      "since": "2026-07-03",
+    "VLO": {
+      "since": "2026-07-19",
       "exit_streak": 0
     },
-    "SNDK": {
-      "since": "2026-06-23",
+    "EXPD": {
+      "since": "2026-07-19",
       "exit_streak": 0
     },
-    "KLAC": {
-      "since": "2026-07-02",
+    "AAPL": {
+      "since": "2026-07-19",
       "exit_streak": 0
     },
-    "GLW": {
-      "since": "2026-07-02",
+    "BKR": {
+      "since": "2026-07-19",
+      "exit_streak": 0
+    },
+    "GS": {
+      "since": "2026-07-19",
       "exit_streak": 0
     }
   },
-  "last_data_date": "2026-07-02",
+  "last_data_date": "2026-07-17",
   "holiday_streak": 0,
-  "last_run_kst": "2026-07-03"
+  "last_run_kst": "2026-07-19"
 }

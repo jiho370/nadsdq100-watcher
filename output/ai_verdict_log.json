@@ -233,6 +233,186 @@
       "verdict": "매수유지",
       "reason": "",
       "price": 80300.0
+    },
+    {
+      "date": "2026-07-17",
+      "market": "us",
+      "symbol": "BKNG",
+      "name": "Booking Holdings Inc.",
+      "verdict": "매수유지",
+      "severity": "",
+      "reason": "",
+      "price": 181.68
+    },
+    {
+      "date": "2026-07-17",
+      "market": "us",
+      "symbol": "INCY",
+      "name": "Incyte Corporation",
+      "verdict": "매수유지",
+      "severity": "",
+      "reason": "",
+      "price": 117.25
+    },
+    {
+      "date": "2026-07-17",
+      "market": "us",
+      "symbol": "GM",
+      "name": "General Motors Company",
+      "verdict": "매수유지",
+      "severity": "",
+      "reason": "",
+      "price": 76.07
+    },
+    {
+      "date": "2026-07-17",
+      "market": "us",
+      "symbol": "MRNA",
+      "name": "Moderna, Inc.",
+      "verdict": "매수유지",
+      "severity": "",
+      "reason": "",
+      "price": 61.82
+    },
+    {
+      "date": "2026-07-17",
+      "market": "us",
+      "symbol": "SWKS",
+      "name": "Skyworks Solutions, Inc.",
+      "verdict": "매수유지",
+      "severity": "",
+      "reason": "",
+      "price": 59.35
+    },
+    {
+      "date": "2026-07-17",
+      "market": "us",
+      "symbol": "WDAY",
+      "name": "Workday, Inc.",
+      "verdict": "매수유지",
+      "severity": "",
+      "reason": "",
+      "price": 144.78
+    },
+    {
+      "date": "2026-07-17",
+      "market": "us",
+      "symbol": "TTD",
+      "name": "The Trade Desk, Inc.",
+      "verdict": "제외",
+      "severity": "일시적",
+      "reason": "올해 CFO가 설명 없이 두 차례 교체됐고, 최대 고객 퍼블리시스가 수수료·청구 관행 및 AI툴 'Kokai' 이상 정황을 감사에서 발견해 3월 자사 플랫폼 추천을 중단(6월 중 합의로 봉합)한 이력이 있어 거버넌스·매출 성장 둔화 우려가 매수 논거를 약화시킴",
+      "price": 18.59
+    },
+    {
+      "date": "2026-07-17",
+      "market": "us",
+      "symbol": "XYZ",
+      "name": "Block, Inc.",
+      "verdict": "매수유지",
+      "severity": "",
+      "reason": "",
+      "price": 79.94
+    },
+    {
+      "date": "2026-07-17",
+      "market": "us",
+      "symbol": "META",
+      "name": "Meta Platforms, Inc.",
+      "verdict": "매수유지",
+      "severity": "",
+      "reason": "",
+      "price": 646.01
+    },
+    {
+      "date": "2026-07-17",
+      "market": "us",
+      "symbol": "DD",
+      "name": "DuPont de Nemours, Inc.",
+      "verdict": "매수유지",
+      "severity": "",
+      "reason": "",
+      "price": 135.29
+    },
+    {
+      "date": "2026-07-22",
+      "market": "kr",
+      "symbol": "071320",
+      "name": "지역난방공사",
+      "verdict": "매수유지",
+      "severity": "",
+      "reason": "",
+      "price": 64000.0
+    },
+    {
+      "date": "2026-07-22",
+      "market": "kr",
+      "symbol": "015760",
+      "name": "한국전력",
+      "verdict": "매수유지",
+      "severity": "",
+      "reason": "",
+      "price": 33900.0
+    },
+    {
+      "date": "2026-07-22",
+      "market": "kr",
+      "symbol": "002380",
+      "name": "KCC",
+      "verdict": "매수유지",
+      "severity": "",
+      "reason": "",
+      "price": 419500.0
+    },
+    {
+      "date": "2026-07-22",
+      "market": "kr",
+      "symbol": "006040",
+      "name": "동원산업",
+      "verdict": "매수유지",
+      "severity": "",
+      "reason": "",
+      "price": 33450.0
+    },
+    {
+      "date": "2026-07-22",
+      "market": "kr",
+      "symbol": "003030",
+      "name": "세아제강지주",
+      "verdict": "매수유지",
+      "severity": "",
+      "reason": "",
+      "price": 98500.0
+    },
+    {
+      "date": "2026-07-22",
+      "market": "kr",
+      "symbol": "002030",
+      "name": "아세아",
+      "verdict": "매수유지",
+      "severity": "",
+      "reason": "",
+      "price": 176100.0
+    },
+    {
+      "date": "2026-07-22",
+      "market": "kr",
+      "symbol": "024110",
+      "name": "기업은행",
+      "verdict": "매수유지",
+      "severity": "",
+      "reason": "",
+      "price": 20700.0
+    },
+    {
+      "date": "2026-07-22",
+      "market": "kr",
+      "symbol": "139480",
+      "name": "이마트",
+      "verdict": "매수유지",
+      "severity": "",
+      "reason": "",
+      "price": 81700.0
     }
   ]
 }

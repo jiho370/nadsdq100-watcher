@@ -519,9 +519,15 @@ def _apply_verdicts(buy_pool, watch_pool, vmap, n_buy, n_watch):
     2026-07-16 2차 수정(지호 님 피드백 — KCC 사례: 실적 부진+자사주 소각 기대를 저버린 거버넌스
     이슈를 '관찰강등'으로 분류해 매수 목록에 그대로 남긴 게 부적절했음, "관찰 없어졌으니 강등이면
     빠지는 게 맞다"). 관찰(watch) 슬롯이 폐지된 지금은 '강등'이 갈 곳이 없다 — verdict가
-    '매수유지'가 아니면(제외든 구버전 캐시의 관찰강등이든) 전부 빼고, 넓힌 풀(kr_stocks.N_BUY=8
-    등)에서 팩터 랭킹 순으로 결정론적으로 채운다(AI가 고르는 게 아니라 팩터 랭킹이 그대로 채움).
-    반환 4번째 값은 shortfall — 풀 전체가 제외로 소진돼 n_buy에 못 미치면 양수(그 경우 억지로
+    '매수유지'가 아니면(제외든 구버전 캐시의 관찰강등이든) 전부 빼고, 넓힌 풀(watch_pool =
+    buy_pool 다음 순위 예비군)에서 팩터 랭킹 순으로 결정론적으로 채운다(AI가 고르는 게 아니라
+    팩터 랭킹이 그대로 채움).
+    2026-07-19 버그 수정(지호 님 지적 — "후보풀 60개인데 왜 10종목이 안 채워지나"): 이 백필
+    로직은 문서에만 있고 실제로는 구현이 안 돼 있었다(watch_pool도 daily_ai_report.py에서
+    항상 빈 리스트로 넘어옴) — final_buy가 그냥 survivors[:n_buy]라 제외분만큼 그대로
+    shortfall이 되던 버그. watch_pool을 실제 예비군으로 채워 넘기고, 여기서 부족분을
+    watch_keep에서 랭킹순으로 채운다.
+    반환 4번째 값은 shortfall — 예비군까지 다 써도 n_buy에 못 미치면 양수(그 경우 억지로
     더 아래 순위까지 끌어오지 않는다 — 그런 날은 이례적인 상황이니 경보로 다루는 게 숫자를
     맞추는 것보다 유용)."""
     survivors, excluded = [], []
@@ -538,7 +544,11 @@ def _apply_verdicts(buy_pool, watch_pool, vmap, n_buy, n_watch):
             excluded.append(c)
         else:
             watch_keep.append(c)
-    final_buy = survivors[:n_buy]
+    final_buy = list(survivors[:n_buy])
+    if len(final_buy) < n_buy:                    # 부족분을 예비군에서 랭킹순으로 백필
+        need = n_buy - len(final_buy)
+        final_buy.extend(watch_keep[:need])
+        watch_keep = watch_keep[need:]
     shortfall = max(0, n_buy - len(final_buy))
     used = {c["symbol"] for c in final_buy}
     final_watch = [c for c in watch_keep if c["symbol"] not in used][:n_watch]
@@ -1113,6 +1123,7 @@ def render_report_html(report, as_of="", metrics_by_sym=None, market_html="", si
     head = _esc(title) if title else "&#128200; 데일리 시장 점검 · 매수·매도 후보"
     # 2026-07-15: 차트+추천종목을 지수·코인 추세 신호보다 위로(지호 님 요청) — KR 전용 호출은
     # spy/us_sec가 원래 빈 문자열이라 이 순서 변경으로 KR 레이아웃엔 영향 없음.
+    # 2026-07-19: AI 제외 후보도 지수·코인 추세보다 위로, 추천종목 바로 아래로(지호 님 요청).
     return (
         f'<div style="font-family:-apple-system,BlinkMacSystemFont,\'Segoe UI\',\'Malgun Gothic\',sans-serif;'
         f'max-width:700px;margin:0 auto;color:#111">'
@@ -1124,9 +1135,9 @@ def render_report_html(report, as_of="", metrics_by_sym=None, market_html="", si
         f'<b>&#127760; 환율·한국·코인</b> {_esc(report.get("macro"))}</div>'
         f'{spy}'
         f'{us_sec}'
+        f'{_excluded_html(report.get("ai_excluded"), is_kr=is_kr)}'
         f'{market_sec}'
         f'{signals_sec}'
-        f'{_excluded_html(report.get("ai_excluded"), is_kr=is_kr)}'
         f'{sell_html}'
         f'{kr_sec}'
         f'{kr_sell_html}'
