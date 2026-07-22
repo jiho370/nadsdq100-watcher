@@ -1,0 +1,51 @@
+{
+  "as_of": "2026-07-22",
+  "years": 9.0,
+  "n_months": 107,
+  "cost_assumption": "0bp(수수료·슬리피지 전부 0 — 지호 님 지시. 신호갱신빈도 효과를 거래비용과 분리하기 위함)",
+  "config_common": {
+    "topn": 8,
+    "weights_source": "best_weights.json(1:2:2, 라이브)",
+    "sector_cap": 2,
+    "ma200_backup": false
+  },
+  "A_existing": {
+    "cagr_pct": 36.14,
+    "excess_cagr_pct": 21.19,
+    "vol_pct": 26.7,
+    "sharpe": 1.29,
+    "mdd_pct": -34.9,
+    "bench_cagr_pct": 14.94,
+    "bench_mdd_pct": -33.7,
+    "years": 9.0,
+    "decision_freq": "월간(21거래일)",
+    "sell_rule": "후보풀(60) 이탈 + 180일 경과(끈적한 보유, 현행 라이브)",
+    "trades_per_year": {
+      "buy": 2.6,
+      "sell": 1.7
+    }
+  },
+  "B_daily_top8": {
+    "cagr_pct": 28.74,
+    "excess_cagr_pct": 13.8,
+    "vol_pct": 26.1,
+    "sharpe": 1.1,
+    "mdd_pct": -31.8,
+    "bench_cagr_pct": 14.94,
+    "bench_mdd_pct": -33.7,
+    "years": 9.0,
+    "decision_freq": "매일",
+    "sell_rule": "당일 top8 이탈 시 즉시 교체",
+    "trades_per_year": {
+      "buy": 54.3,
+      "sell": 53.4
+    }
+  },
+  "paired_ttest_monthly_excess": {
+    "t": -1.289,
+    "p": 0.1975,
+    "n": 107,
+    "verdict": "유의한 차이 없음"
+  },
+  "note": "단일 비교(그리드 탐색 아님, PBO/DSR 다중검정 게이트 대상 아님) — 회전율이 극단적으로 높아지는 B는 수수료=0 가정 하의 상한선(best-case) 추정치다. 실제 왕복비용(현재 US CostModel 기준 편도 5bp·왕복 약 10bp)을 반영하면 B의 연간 매매건수만큼 그 비용이 그대로 수익을 깎아먹는다 — 위 trades_per_year 비율이 그 영향의 대략적인 크기를 보여준다."
+}

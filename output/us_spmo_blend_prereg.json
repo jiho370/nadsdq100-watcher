@@ -1,0 +1,71 @@
+{
+  "as_of": "2026-07-22",
+  "n_months": 107,
+  "cost": "us: 매수 5.0bp + 매도 5.28bp (왕복 10.28bp)",
+  "prereg": {
+    "hypothesis": "algo(topn8 라이브)70% + SPMO30% 월간리밸 블렌드가 순수(100:0)보다 유의하게 낫다",
+    "single_ratio_tested": 0.7,
+    "decision_rule": "①CAGR차이 95%CI 하한>0 AND ②paired t>=+1.96 AND ③서브기간 둘 다 블렌드우위 — 셋 다 충족해야 채택후보(전부 가설방향 기준)"
+  },
+  "full_period": {
+    "pure": {
+      "cagr_pct": 31.97,
+      "sharpe": 1.13,
+      "mdd_pct": -34.9
+    },
+    "blend": {
+      "cagr_pct": 28.82,
+      "sharpe": 1.13,
+      "mdd_pct": -33.7
+    }
+  },
+  "paired_ttest": {
+    "t": -2.049,
+    "p": 0.0405,
+    "n": 107
+  },
+  "cagr_diff_bootstrap": {
+    "mean": -3.61,
+    "ci95_lo": -7.62,
+    "ci95_hi": -0.2,
+    "pct_positive": 2.0,
+    "n_boot": 5000,
+    "block_months": 6
+  },
+  "sharpe_diff_bootstrap": {
+    "mean": 0.002,
+    "ci95_lo": -0.087,
+    "ci95_hi": 0.099,
+    "n_boot": 5000,
+    "block_months": 6
+  },
+  "subperiods": [
+    {
+      "period": "2018-2023",
+      "pure_cagr": 25.84,
+      "blend_cagr": 22.49,
+      "cagr_diff": -3.35,
+      "pure_sharpe": 1.03,
+      "blend_sharpe": 0.98,
+      "sharpe_diff": -0.05
+    },
+    {
+      "period": "2024+",
+      "pure_cagr": 49.85,
+      "blend_cagr": 47.22,
+      "cagr_diff": -2.63,
+      "pure_sharpe": 1.36,
+      "blend_sharpe": 1.45,
+      "sharpe_diff": 0.09
+    }
+  ],
+  "gates": {
+    "g1_ci_lo_positive": false,
+    "g2_ttest_significant_favorable": false,
+    "g3_subperiod_consistent_favorable": false
+  },
+  "direction": "순수(현행) 우위",
+  "passed": false,
+  "verdict": "가설 기각(유의하게 반대방향)",
+  "note": "단일 사전등록 시행(그리드 재탐색 없음) — PBO/DSR 다중검정 게이트 적용 대상 아님. 판정 게이트는 전부 '블렌드가 순수를 이긴다'는 가설 방향으로 정의 — 유의하되 반대방향이면 채택이 아니라 기각."
+}
