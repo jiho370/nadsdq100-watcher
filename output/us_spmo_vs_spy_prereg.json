@@ -1,0 +1,78 @@
+{
+  "as_of": "2026-07-22",
+  "n_months": 128,
+  "prereg": {
+    "hypothesis": "SPMO(모멘텀ETF) buy&hold가 SPY buy&hold보다 CAGR이 유의하게 낫다",
+    "decision_rule": "①CAGR차이 95%CI 하한>0 AND ②paired t>=+1.96 AND ③서브기간 3개 전부 SPMO우위"
+  },
+  "full_period": {
+    "spy": {
+      "cagr_pct": 14.85,
+      "sharpe": 0.87,
+      "mdd_pct": -33.7
+    },
+    "spmo": {
+      "cagr_pct": 19.48,
+      "sharpe": 0.98,
+      "mdd_pct": -30.9
+    }
+  },
+  "paired_ttest": {
+    "t": 1.736,
+    "p": 0.0825,
+    "n": 128
+  },
+  "cagr_diff_bootstrap": {
+    "mean": 3.75,
+    "ci95_lo": -2.13,
+    "ci95_hi": 10.25,
+    "pct_positive": 88.6,
+    "n_boot": 5000,
+    "block_months": 6
+  },
+  "sharpe_diff_bootstrap": {
+    "mean": 0.055,
+    "ci95_lo": -0.26,
+    "ci95_hi": 0.313,
+    "n_boot": 5000,
+    "block_months": 6
+  },
+  "subperiods": [
+    {
+      "period": "~2019",
+      "spy_cagr": 13.99,
+      "spmo_cagr": 14.28,
+      "cagr_diff": 0.29,
+      "spy_sharpe": 1.08,
+      "spmo_sharpe": 1.0,
+      "sharpe_diff": -0.08
+    },
+    {
+      "period": "2020-2023",
+      "spy_cagr": 11.75,
+      "spmo_cagr": 13.17,
+      "cagr_diff": 1.42,
+      "spy_sharpe": 0.61,
+      "spmo_sharpe": 0.64,
+      "sharpe_diff": 0.03
+    },
+    {
+      "period": "2024+",
+      "spy_cagr": 21.24,
+      "spmo_cagr": 40.28,
+      "cagr_diff": 19.04,
+      "spy_sharpe": 1.3,
+      "spmo_sharpe": 1.62,
+      "sharpe_diff": 0.32
+    }
+  ],
+  "gates": {
+    "g1_ci_lo_positive": false,
+    "g2_ttest_significant_favorable": false,
+    "g3_subperiod_consistent_favorable": true
+  },
+  "direction": "SPMO 우위",
+  "passed": false,
+  "verdict": "판정 보류(유의한 차이 없음)",
+  "note": "단일 사전등록 시행 — PBO/DSR 다중검정 게이트 적용 대상 아님. 게이트는 전부 'SPMO가 SPY를 이긴다'는 가설 방향으로 정의(반대로 유의해도 채택 아님)."
+}

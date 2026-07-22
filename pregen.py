@@ -161,11 +161,13 @@ def run_us():
     data = R.gather_universe_data(with_volume=True)
     scored, info, _m = E.select_pool(data, int(os.environ.get("REPORT_MAX_CANDIDATES", "60")))
     cands = E.build_candidates(data, info, scored, 60)
-    # 관찰 폐지(2026-07-13, daily_ai_report.run_us와 동일): 풀 전체가 매수 후보
+    # 관찰(watch) 섹션은 화면엔 안 보이지만(2026-07-13), AI 제외 시 백필 예비군 검증 캐시로
+    # 씀(2026-07-19, daily_ai_report.run_us와 동일 수정 — pregen 캐시에도 예비군 verdict가
+    # 있어야 발송 시점에 API 재호출 없이 백필 가능).
     pool_k = int(os.environ.get("REPORT_POOL", "10")) + POOL_BUFFER
-    buy, _ = E.split_by_entry(cands, k=pool_k)
-    _headlines(buy)
-    groups = {"buy_now": buy, "watch": [],
+    buy, watch = E.split_by_entry(cands, k=pool_k)
+    _headlines(buy + watch)
+    groups = {"buy_now": buy, "watch": watch,
               "sells": _holding_syms("output/ai_holdings.json")}
     market = {"as_of": R._last_data_date(data["hist"]), **E.build_market(data)}
     ver = AR.verify_stage(groups, market)

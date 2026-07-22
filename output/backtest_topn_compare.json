@@ -1,5 +1,5 @@
 {
-  "as_of": "2026-07-13",
+  "as_of": "2026-07-17",
   "weights_used": {
     "int_gp_assets": 1,
     "rd_mktcap": 2,
@@ -12,50 +12,50 @@
   "rows": [
     {
       "topn": 5,
-      "net_pct": 16.28,
+      "net_pct": 14.19,
       "stop_rate_pct": 0.0,
-      "mdd_pct": -12.2,
-      "turnover_pct": 16.8,
+      "mdd_pct": -13.2,
+      "turnover_pct": 18.1,
       "n_events": 32
     },
     {
       "topn": 8,
-      "net_pct": 16.2,
+      "net_pct": 13.44,
       "stop_rate_pct": 0.0,
-      "mdd_pct": -12.4,
-      "turnover_pct": 14.9,
+      "mdd_pct": -13.0,
+      "turnover_pct": 12.9,
       "n_events": 32
     },
     {
       "topn": 10,
-      "net_pct": 15.84,
+      "net_pct": 13.24,
       "stop_rate_pct": 0.0,
-      "mdd_pct": -12.4,
-      "turnover_pct": 15.2,
+      "mdd_pct": -13.4,
+      "turnover_pct": 15.5,
       "n_events": 32
     },
     {
       "topn": 12,
-      "net_pct": 15.51,
+      "net_pct": 13.7,
       "stop_rate_pct": 0.0,
-      "mdd_pct": -12.4,
-      "turnover_pct": 18.0,
+      "mdd_pct": -13.6,
+      "turnover_pct": 15.9,
       "n_events": 32
     },
     {
       "topn": 15,
-      "net_pct": 14.81,
+      "net_pct": 13.7,
       "stop_rate_pct": 0.0,
-      "mdd_pct": -12.8,
-      "turnover_pct": 16.3,
+      "mdd_pct": -13.6,
+      "turnover_pct": 17.4,
       "n_events": 32
     },
     {
       "topn": 20,
-      "net_pct": 14.12,
+      "net_pct": 11.85,
       "stop_rate_pct": 0.0,
-      "mdd_pct": -12.7,
-      "turnover_pct": 16.0,
+      "mdd_pct": -14.3,
+      "turnover_pct": 17.1,
       "n_events": 32
     }
   ],

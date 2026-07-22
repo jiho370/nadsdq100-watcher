@@ -264,7 +264,10 @@ def select_by_weights(weights: dict, ind_map: dict, n: int, funds: dict | None =
     def z(col):
         sd = df[col].std()
         zz = (df[col] - df[col].mean()) / sd if sd and not _np.isnan(sd) else df[col] * 0.0
-        return zz.clip(-3, 3).fillna(0.0)
+        # shareholder_yield는 ±3 대신 ±5(2026-07-18 클립 완화 검증: 극단치 종목단위 재검정
+        # t=2.83 유의, topn8+cap2 라이브조건 재테스트 +0.68%p 개선 — 지호 님 반영 결정)
+        clip = (-5, 5) if col == "shareholder_yield" else (-3, 3)
+        return zz.clip(*clip).fillna(0.0)
     active = [f for f in weights if weights.get(f) and f in df.columns]
     comp = sum(float(weights[f]) * z(f) for f in active) if active else _pd.Series(0.0, index=df.index)
     valid = df["mom6"].notna() | df["mom12_1"].notna()   # 모멘텀 결측 종목 제외
@@ -276,11 +279,15 @@ def select_by_weights(weights: dict, ind_map: dict, n: int, funds: dict | None =
     return scored_all[:n]
 
 
-def split_by_entry(candidates: list, k: int = 5):
+def split_by_entry(candidates: list, k: int = 5, sector_cap: int | None = 2):
     """후보(점수순)를 분할 (STRATEGY.md §2 진입 필터 반영):
        지금매수 = 200일선 위 & 52주 고점 -25% 이내 & 상승 지속 — 과열은 hot=True 표시.
        관찰     = 점수 상위지만 지금 하락·조정 중(눌림목) 또는 진입 필터 미달.
-    조정 판정: 1주 수익률 -2% 이하 이거나 종가가 20일선 아래(-2% 넘게)."""
+    조정 판정: 1주 수익률 -2% 이하 이거나 종가가 20일선 아래(-2% 넘게).
+    sector_cap(2026-07-19): select_pool의 60개 후보풀 자체는 무제한(select_by_weights
+    sector_cap=None)으로 바꿔 AI가 볼 재료를 넉넉히 남기고, 최종 매수 k종목을 여기서
+    뽑을 때만 섹터당 cap개로 제한 — 지호 님 지적("후보풀이 왜 이렇게 적나") 반영, 원래
+    섹터캡 취지(최종 추천 쏠림 방지)를 후보풀 단계가 아니라 여기로 이동."""
     def hot(c):   # 과열(지금 사되 분할 권고 대상)
         rsi = c.get("rsi"); price = c.get("price"); ma50 = c.get("ma50")
         gap50 = ((price / ma50 - 1) * 100) if (price and ma50) else 0
@@ -306,9 +313,25 @@ def split_by_entry(candidates: list, k: int = 5):
     # 2026-07 재검증(backtest_entry_gate.py): entry_ok(200일선·52주고점)·조정중 분류를 포함한
     # 기술 게이트 후보 6종 전부가 검증된 팩터 바스켓의 성과를 깎는 것으로 확인
     # (현행 게이트 6M -3.85%p t=-2.1 유의, 스윕 6종 전부 diff<0) → 게이트 폐지.
-    # 매수 = 팩터 순위 상위 k, 관찰 = 다음 k. hot(과열)은 분할매수 계획 표기용으로만 유지.
-    # entry_ok/pulling_back은 정보 표시용으로 남긴다(카드에 근거 표기 가능).
-    return candidates[:k], candidates[k:2 * k]
+    # 매수 = 팩터 순위 상위 k(섹터캡 적용), 관찰 = 그 다음 k(점수순, 캡 없음).
+    # hot(과열)은 분할매수 계획 표기용으로만 유지. entry_ok/pulling_back은 정보 표시용으로
+    # 남긴다(카드에 근거 표기 가능).
+    if sector_cap is None:
+        return candidates[:k], candidates[k:2 * k]
+    buy, rest, per_sec = [], [], {}
+    for c in candidates:
+        sec = c.get("sector") or "(기타)"
+        if len(buy) < k and per_sec.get(sec, 0) < sector_cap:
+            buy.append(c)
+            per_sec[sec] = per_sec.get(sec, 0) + 1
+        else:
+            rest.append(c)
+    # 예비군(AI 제외 시 백필용) 순서: 아직 섹터캡 여유가 있는 종목을 먼저 — 매수 종목이
+    # 하나 빠지면 그 섹터에 자리가 생기므로, 캡을 이미 채운 섹터보다 여유 섹터 후보를
+    # 앞세워야 백필해도 쏠림이 재발할 확률이 낮다(2026-07-19).
+    roomy = [c for c in rest if per_sec.get(c.get("sector") or "(기타)", 0) < sector_cap]
+    full = [c for c in rest if c not in roomy]
+    return buy, (roomy + full)[:k]
 
 
 def select_pool(data: dict, n: int):
@@ -323,8 +346,11 @@ def select_pool(data: dict, n: int):
             cross = _T.latest_by_sym(data.get("hist") or {})
         except Exception:
             cross = None
+        # 2026-07-19: 후보풀(n개, 보통 60) 단계는 섹터캡 없이 넉넉하게 — 섹터캡은
+        # split_by_entry에서 최종 매수 k종목을 뽑을 때만 적용(지호 님 지적: 캡이 후보풀
+        # 자체를 22개로 눌러버려 AI가 볼 재료가 부족해지던 문제).
         scored = select_by_weights(w, data["ind_map"], n, funds=funds, cross=cross,
-                                   sector_map=data.get("sector_map"))
+                                   sector_map=data.get("sector_map"), sector_cap=None)
         label = ("weights " + "·".join(f"{k}{v}" for k, v in w.items() if v)
                  + ("" if funds else " [펀더멘탈캐시 없음:모멘텀만]"))
     else:

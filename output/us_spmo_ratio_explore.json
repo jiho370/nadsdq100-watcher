@@ -1,0 +1,102 @@
+{
+  "as_of": "2026-07-22",
+  "kind": "탐색적 스윕(사전등록 아님)",
+  "rows": [
+    {
+      "algo_pct": 100,
+      "spmo_pct": 0,
+      "cagr_pct": 31.98,
+      "sharpe": 1.13,
+      "mdd_pct": -34.9
+    },
+    {
+      "algo_pct": 90,
+      "spmo_pct": 10,
+      "cagr_pct": 30.95,
+      "sharpe": 1.13,
+      "mdd_pct": -34.5
+    },
+    {
+      "algo_pct": 80,
+      "spmo_pct": 20,
+      "cagr_pct": 29.9,
+      "sharpe": 1.13,
+      "mdd_pct": -34.1
+    },
+    {
+      "algo_pct": 70,
+      "spmo_pct": 30,
+      "cagr_pct": 28.83,
+      "sharpe": 1.13,
+      "mdd_pct": -33.7
+    },
+    {
+      "algo_pct": 60,
+      "spmo_pct": 40,
+      "cagr_pct": 27.75,
+      "sharpe": 1.12,
+      "mdd_pct": -33.3
+    },
+    {
+      "algo_pct": 50,
+      "spmo_pct": 50,
+      "cagr_pct": 26.65,
+      "sharpe": 1.11,
+      "mdd_pct": -32.9
+    },
+    {
+      "algo_pct": 40,
+      "spmo_pct": 60,
+      "cagr_pct": 25.54,
+      "sharpe": 1.1,
+      "mdd_pct": -32.5
+    },
+    {
+      "algo_pct": 30,
+      "spmo_pct": 70,
+      "cagr_pct": 24.41,
+      "sharpe": 1.08,
+      "mdd_pct": -32.2
+    },
+    {
+      "algo_pct": 20,
+      "spmo_pct": 80,
+      "cagr_pct": 23.27,
+      "sharpe": 1.05,
+      "mdd_pct": -31.8
+    },
+    {
+      "algo_pct": 10,
+      "spmo_pct": 90,
+      "cagr_pct": 22.11,
+      "sharpe": 1.02,
+      "mdd_pct": -31.3
+    },
+    {
+      "algo_pct": 0,
+      "spmo_pct": 100,
+      "cagr_pct": 20.94,
+      "sharpe": 0.98,
+      "mdd_pct": -30.9
+    }
+  ],
+  "baseline": "algo100(현행 라이브, 순수)",
+  "best_by_sharpe": {
+    "algo_pct": 100,
+    "spmo_pct": 0,
+    "sharpe": 1.13
+  },
+  "algo80_spmo20": {
+    "algo_pct": 80,
+    "spmo_pct": 20,
+    "cagr_pct": 29.9,
+    "sharpe": 1.13,
+    "mdd_pct": -34.1
+  },
+  "pbo": 0.7229,
+  "pbo_verdict": "높음(IS 1등이 운일 확률 높음 — 채택 보류 권장)",
+  "dsr": 0.9975,
+  "dsr_verdict": "95% 신뢰수준 통과",
+  "passed": false,
+  "note": "탐색적(사전등록 아님) — 여기서 뭘 발견해도 그 자체를 근거로 라이브에 반영하면 안 되고, 발견한 지점을 다시 사전등록해 별도 표본으로 재검증해야 함(§4 원칙과 동일). PBO/DSR 미통과면 '어느 비율이 나은지 이 표본으로는 못 가린다'는 뜻."
+}

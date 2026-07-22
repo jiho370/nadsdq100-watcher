@@ -12,88 +12,88 @@
     "rows": [
       {
         "label": "기준(gp1·rd2·sy2[raw])",
-        "mean_excess_6m_pct": 6.38,
+        "mean_excess_6m_pct": 5.09,
         "avg_max_sector": 2.0
       },
       {
         "label": "C1(gp1·rd2·sy2[rank])",
-        "mean_excess_6m_pct": 3.55,
+        "mean_excess_6m_pct": 3.72,
         "avg_max_sector": 2.0,
-        "paired_diff_vs_baseline_pct": -2.83,
-        "paired_tstat": -1.74,
+        "paired_diff_vs_baseline_pct": -1.37,
+        "paired_tstat": -0.92,
         "bonferroni_significant": false
       },
       {
         "label": "C2(gp1·rd2·sy2[qgate])",
-        "mean_excess_6m_pct": 5.56,
+        "mean_excess_6m_pct": 4.33,
         "avg_max_sector": 2.0,
-        "paired_diff_vs_baseline_pct": -0.82,
-        "paired_tstat": -0.88,
+        "paired_diff_vs_baseline_pct": -0.76,
+        "paired_tstat": -1.13,
         "bonferroni_significant": false
       },
       {
         "label": "C3(gp1·rd1·sy2[raw])",
-        "mean_excess_6m_pct": 7.11,
+        "mean_excess_6m_pct": 4.98,
         "avg_max_sector": 2.0,
-        "paired_diff_vs_baseline_pct": 0.74,
-        "paired_tstat": 0.89,
+        "paired_diff_vs_baseline_pct": -0.12,
+        "paired_tstat": -0.19,
         "bonferroni_significant": false
       },
       {
         "label": "C4(gp1·rd0·sy2[raw])",
-        "mean_excess_6m_pct": 4.69,
+        "mean_excess_6m_pct": 1.98,
         "avg_max_sector": 2.0,
-        "paired_diff_vs_baseline_pct": -1.69,
-        "paired_tstat": -1.08,
+        "paired_diff_vs_baseline_pct": -3.12,
+        "paired_tstat": -1.82,
         "bonferroni_significant": false
       }
     ],
-    "pbo": 0.4221,
-    "dsr": 0.9948,
-    "passed": true
+    "pbo": 0.7565,
+    "dsr": 0.9552,
+    "passed": false
   },
   "robust_top30_nocap": {
     "rows": [
       {
         "label": "기준(gp1·rd2·sy2[raw])",
-        "mean_excess_6m_pct": 4.21,
-        "avg_max_sector": 11.68
+        "mean_excess_6m_pct": 4.18,
+        "avg_max_sector": 12.62
       },
       {
         "label": "C1(gp1·rd2·sy2[rank])",
-        "mean_excess_6m_pct": 1.25,
-        "avg_max_sector": 6.71,
-        "paired_diff_vs_baseline_pct": -2.97,
-        "paired_tstat": -3.04,
+        "mean_excess_6m_pct": 1.02,
+        "avg_max_sector": 6.85,
+        "paired_diff_vs_baseline_pct": -3.16,
+        "paired_tstat": -2.94,
         "bonferroni_significant": true
       },
       {
         "label": "C2(gp1·rd2·sy2[qgate])",
-        "mean_excess_6m_pct": 4.16,
-        "avg_max_sector": 12.26,
-        "paired_diff_vs_baseline_pct": -0.05,
-        "paired_tstat": -0.1,
+        "mean_excess_6m_pct": 3.67,
+        "avg_max_sector": 11.71,
+        "paired_diff_vs_baseline_pct": -0.51,
+        "paired_tstat": -0.98,
         "bonferroni_significant": false
       },
       {
         "label": "C3(gp1·rd1·sy2[raw])",
-        "mean_excess_6m_pct": 3.68,
-        "avg_max_sector": 11.15,
-        "paired_diff_vs_baseline_pct": -0.53,
-        "paired_tstat": -1.8,
+        "mean_excess_6m_pct": 3.32,
+        "avg_max_sector": 11.59,
+        "paired_diff_vs_baseline_pct": -0.85,
+        "paired_tstat": -1.75,
         "bonferroni_significant": false
       },
       {
         "label": "C4(gp1·rd0·sy2[raw])",
-        "mean_excess_6m_pct": 1.8,
-        "avg_max_sector": 10.35,
-        "paired_diff_vs_baseline_pct": -2.42,
-        "paired_tstat": -2.64,
-        "bonferroni_significant": false
+        "mean_excess_6m_pct": 1.87,
+        "avg_max_sector": 10.62,
+        "paired_diff_vs_baseline_pct": -2.31,
+        "paired_tstat": -3.04,
+        "bonferroni_significant": true
       }
     ],
-    "pbo": 0.4199,
-    "dsr": 0.976,
+    "pbo": 0.368,
+    "dsr": 0.9896,
     "passed": true
   },
   "note": "펀더멘탈 사전 백필(과거 편입 후 제외 종목 EDGAR 조회) 완료 후 실행. 판정: 페어드 비교(본페로니 보정, 도전자 4개) + 섹터쏠림 비열등."

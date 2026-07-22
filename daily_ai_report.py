@@ -89,13 +89,16 @@ def _stock_chart_png(closes, ticker, big=False):
     return b.getvalue()
 
 
-def _holdings_compare_chart_png(series: dict, index_name: str, extra_line: dict | None = None):
+def _holdings_compare_chart_png(series: dict, index_name: str, extra_line: dict | None = None,
+                                blend_line: dict | None = None):
     """포트폴리오(각 종목 진입일에 동일 금액 투입 가정) 누적수익률 vs 같은 날짜에 같은 금액을
-    지수에 넣었을 때의 누적수익률 — 2선 비교. extra_line={"values","label"}(series['dates']와
-    길이 동일)을 주면 3번째 선 추가(2026-07-17, 지호 님 요청 — 미장은 코어65:새틀35 참고선
-    대신 나스닥100 비교선. 그 혼합선은 §2 검증에서 0%(코어 없음)가 통계적으로 유의하게
-    이긴다고 나와 "권장 비율"처럼 보이는 게 오해 소지가 있었음 — 그냥 지수 하나 더
-    보여주는 게 나음)."""
+    지수에 넣었을 때의 누적수익률. extra_line={"values","label"}(series['dates']와 길이 동일)을
+    주면 지수 비교선 추가(2026-07-17, 지호 님 요청 — 미장은 나스닥100). blend_line도 같은
+    형식으로, 알고리즘+모멘텀ETF 블렌드 참고선(2026-07-19, 지호 님 요청 — SPMO 블렌드 검증
+    결과 반영, 밸류전략과 지수는 실선(지수=연한색·알고리즘=진한색), 블렌드만 진한 점선으로
+    구분).
+    색상: 지수(연한 회색)·나스닥(연한 파랑) 실선 vs 알고리즘(진한 파랑) 실선 vs
+    블렌드(진한 파랑 점선, 알고리즘과 같은 계열임을 표시)."""
     dates = series.get("dates") or []
     if not dates:
         return None
@@ -104,9 +107,11 @@ def _holdings_compare_chart_png(series: dict, index_name: str, extra_line: dict 
     x = np.arange(len(dates))
     fig, ax = plt.subplots(figsize=(7.6, 3.0), dpi=150)
     ax.plot(x, bench, lw=1.4, color="#9ca3af", label=f"{index_name} {_BENCH_SUFFIX}")
-    ax.plot(x, port, lw=1.8, color="#2563eb", label=_PORT_LABEL)
     if extra_line and extra_line.get("values"):
-        ax.plot(x, extra_line["values"], lw=1.4, color="#059669", linestyle="--", label=extra_line["label"])
+        ax.plot(x, extra_line["values"], lw=1.4, color="#93c5fd", label=extra_line["label"])
+    ax.plot(x, port, lw=1.8, color="#2563eb", label=_PORT_LABEL)
+    if blend_line and blend_line.get("values"):
+        ax.plot(x, blend_line["values"], lw=1.6, color="#2563eb", linestyle="--", label=blend_line["label"])
     ax.axhline(0, color="#111827", lw=0.8)
     ticks = np.linspace(0, len(dates) - 1, min(6, len(dates))).astype(int)
     ax.set_xticks(ticks); ax.set_xticklabels([dates[i][5:] for i in ticks], fontsize=8)
@@ -130,11 +135,14 @@ def _bench_series(signals, key):
 
 
 def _holdings_section(hstate, ind_map, price_map, bench_dates, bench_closes, index_name, krw=False,
-                      name_map=None, extra_index=None):
+                      name_map=None, extra_index=None, blend_index=None):
     """holdings.py 보유현황 표+포트폴리오 비교차트를 조립. (html, images) — 데이터 없으면 ("", []).
-    extra_index={"label","dates","closes"}(선택) — 3번째 비교선(2026-07-17, 지호 님 요청 —
-    미장은 나스닥100). 같은 summary/price_map으로 두 번째 portfolio_series를 구해 그 'bench'
-    (같은 시점·같은 금액을 그 지수에 넣었을 때 수익률)만 뽑아 주선의 dates에 맞춰 정렬."""
+    extra_index={"label","dates","closes"}(선택) — 지수 비교선(2026-07-17, 지호 님 요청 —
+    미장은 나스닥100). blend_index={"label","dates","closes","ratio"}(선택, 2026-07-19,
+    지호 님 요청) — 알고리즘 실제 수익률과 그 지수의 같은 시점 수익률을 ratio:1-ratio로
+    섞은 참고선(예: 알고리즘70%+SPMO30%). 둘 다 같은 summary/price_map으로 두 번째
+    portfolio_series를 구해 그 'bench'(같은 시점·같은 금액을 그 지수에 넣었을 때 수익률)만
+    뽑아 주선의 dates에 맞춰 정렬."""
     import holdings as H
     summary = H.live_summary(hstate, ind_map)
     if not summary:
@@ -150,7 +158,19 @@ def _holdings_section(hstate, ind_map, price_map, bench_dates, bench_closes, ind
                 vals = [by_date.get(d) for d in series["dates"]]
                 if any(v is not None for v in vals):
                     extra_line = {"label": extra_index["label"], "values": vals}
-        png = _holdings_compare_chart_png(series, index_name, extra_line)
+        blend_line = None
+        if blend_index and blend_index.get("dates") and blend_index.get("closes"):
+            series3 = H.portfolio_series(summary, price_map, blend_index["dates"], blend_index["closes"])
+            if series3:
+                by_date3 = dict(zip(series3["dates"], series3["bench"]))
+                ratio = blend_index.get("ratio", 0.7)
+                vals = []
+                for d, p in zip(series["dates"], series["portfolio"]):
+                    sv = by_date3.get(d)
+                    vals.append(ratio * p + (1 - ratio) * sv if (p is not None and sv is not None) else None)
+                if any(v is not None for v in vals):
+                    blend_line = {"label": blend_index["label"], "values": vals}
+        png = _holdings_compare_chart_png(series, index_name, extra_line, blend_line)
         if png:
             chart_cid = "holdings_cmp"
             images.append((chart_cid, png))
@@ -440,10 +460,11 @@ def run_us(no_email: bool = False, force: bool = False):
     candidates = {"as_of": as_of, "candidates": E.build_candidates(data, info, scored, MAX_CANDIDATES)}
     market = {"as_of": as_of, **E.build_market(data)}
 
-    # 관찰 폐지(2026-07-13): 풀 전체를 매수 후보로 — split_by_entry는 hot 태그 부여용으로만 호출
+    # 관찰(watch) 섹션은 화면에 안 보여주지만(2026-07-13 결정 유지), AI 검증에서 매수후보가
+    # 제외될 때 백필할 예비군으로는 씀(2026-07-19 버그수정 — 후보풀 60개인데 예비군이 없어서
+    # 제외분만큼 최종 매수가 목표치에 못 미치던 문제, 지호 님 지적).
     pool_k = int(os.environ.get("REPORT_POOL", "10"))
-    buy_now, _ = E.split_by_entry(candidates["candidates"], k=pool_k)
-    watch = []
+    buy_now, watch = E.split_by_entry(candidates["candidates"], k=pool_k)
 
     import holdings as H
     hstate = H.load()
@@ -496,9 +517,19 @@ def run_us(no_email: bool = False, force: bool = False):
                               "closes": [float(v) for v in hs.tolist()]}
     ndx_dates, ndx_closes = _bench_series(signals, "NDX")
     ndx_label = "나스닥100" if _KFONT else "NASDAQ100"
+    # 2026-07-19(지호 님 요청): 알고리즘70%+SPMO(모멘텀ETF)30% 블렌드 참고선 — SPMO 블렌드
+    # 검증(t=1.95, 부트스트랩 95%CI 거의 0 안 걸림) 결과 반영, 확정 채택은 아니라 참고선만.
+    spmo_hist = R.download_histories(["SPMO"], period="5y").get("SPMO")
+    spmo_dates, spmo_closes = [], []
+    if spmo_hist is not None and not spmo_hist.empty:
+        sp = spmo_hist.dropna()
+        spmo_dates = [d.date().isoformat() for d in sp.index]
+        spmo_closes = [float(v) for v in sp.tolist()]
+    blend_label = "알고리즘70+SPMO30" if _KFONT else "Algo70+SPMO30"
     holdings_html, holdings_images = _holdings_section(
         hstate, data["ind_map"], price_map, bench_dates, bench_closes, "S&P500",
-        extra_index={"label": ndx_label, "dates": ndx_dates, "closes": ndx_closes})
+        extra_index={"label": ndx_label, "dates": ndx_dates, "closes": ndx_closes},
+        blend_index={"label": blend_label, "dates": spmo_dates, "closes": spmo_closes, "ratio": 0.7})
 
     # 차트: SPY(큰 차트) + 종목 + 신호
     images, metrics = list(holdings_images), {}
