@@ -23,7 +23,20 @@
 | **금·비트코인 추세필터** | 금 200일선·±1%·확인3일 / 코인 120일선·±3%·확인3일 | `market_signals.PARAMS` | §1 (변경 없음, 단 §6-F 참고) |
 | 매도 규칙(미·한 공통) | 6개월 정기 재평가 + 200일선 -3% 백업(기본 비활성) | `holdings.py` | §2 |
 
-**저장소 상태**: 브랜치 `chore/kr-flows-mktcap-backfill`(2026-07-23 main에 병합, fast-forward).
+**저장소 상태**: 2026-07-23 `chore/kr-flows-mktcap-backfill`(PR #30 이후 17커밋 밀려 있던
+전략 코드·문서)을 `main`에 병합 완료. **main은 PR #30 이후 자체 GitHub Actions 자동커밋
+("chore: update report state")으로 별도로 갈라져 있었다** — 스케줄 트리거 워크플로는
+항상 default 브랜치(main)에서만 도니(`.github/workflows/report.yml`), `output/ai_holdings.json`·
+`kr_holdings.json`·`kospi200_cache.json`·`last_sent.json`은 **그동안 main 쪽이 실제
+발송 이력을 반영한 유일한 진본**이었다(chore 브랜치의 로컬 pregen 테스트 실행분과는
+별개). 병합 시 이 4개 상태파일은 전부 main 버전을 유지, 나머지(코드·STRATEGY.md·
+백테스트 output)는 chore 버전을 채택. **중요한 뒷이야기**: 이 병합 전까지 실제
+GitHub Actions 발송(이메일)은 PR #30 시점의 옛 코드로 계속 돌고 있었다 — §2/§6 전체의
+가중치 결정·버그 수정·섹터캡 등은 로컬 dev 브랜치에만 있었고 라이브 발송에는 반영된
+적이 없었다(로컬에서 수동/pregen.ps1로 리포트를 만들 때만 최신 로직이 쓰였을 가능성).
+이번 병합으로 처음 실제 발송 파이프라인에 반영됨 — 다음 스케줄 실행(§5 발송시간표) 후
+정상 발송되는지 확인 권장.
+
 매일 자동 pregen(`run_pregen.ps1`)이 `output/*.json`·`pregen.log`를 계속 커밋하므로
 미커밋 변경이 자주 쌓인다(정상). 단 커밋 안 된 변경이 있으면 pregen의 `git pull --rebase`가
 막히니, 작업 시작 전 `git status` 확인 습관 권장.
