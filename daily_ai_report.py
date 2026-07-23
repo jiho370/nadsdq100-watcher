@@ -94,11 +94,13 @@ def _holdings_compare_chart_png(series: dict, index_name: str, extra_line: dict 
     """포트폴리오(각 종목 진입일에 동일 금액 투입 가정) 누적수익률 vs 같은 날짜에 같은 금액을
     지수에 넣었을 때의 누적수익률. extra_line={"values","label"}(series['dates']와 길이 동일)을
     주면 지수 비교선 추가(2026-07-17, 지호 님 요청 — 미장은 나스닥100). blend_line도 같은
-    형식으로, 알고리즘+모멘텀ETF 블렌드 참고선(2026-07-19, 지호 님 요청 — SPMO 블렌드 검증
-    결과 반영, 밸류전략과 지수는 실선(지수=연한색·알고리즘=진한색), 블렌드만 진한 점선으로
-    구분).
+    형식으로, 지수·알고리즘 블렌드 참고선(미장: 알고리즘70+SPMO30, 국장: 코스피70+알고리즘30 —
+    둘 다 라이브 배분 아닌 시각적 참고선일 뿐).
+    2026-07-23(지호 님 색상 배열 검토 — 5안 중 "클래식 블루" 채택): 지수·나스닥·포트폴리오는
+    기존 색 그대로 유지(다른 리포트 섹션과 색상 언어 일관성), 블렌드선만 연한 회색 점선으로
+    낮춰 "있지만 안 튀는" 참고선으로 만듦.
     색상: 지수(연한 회색)·나스닥(연한 파랑) 실선 vs 알고리즘(진한 파랑) 실선 vs
-    블렌드(진한 파랑 점선, 알고리즘과 같은 계열임을 표시)."""
+    블렌드(연한 회색 점선, 눈에 띄지 않는 참고선)."""
     dates = series.get("dates") or []
     if not dates:
         return None
@@ -111,7 +113,7 @@ def _holdings_compare_chart_png(series: dict, index_name: str, extra_line: dict 
         ax.plot(x, extra_line["values"], lw=1.4, color="#93c5fd", label=extra_line["label"])
     ax.plot(x, port, lw=1.8, color="#2563eb", label=_PORT_LABEL)
     if blend_line and blend_line.get("values"):
-        ax.plot(x, blend_line["values"], lw=1.6, color="#2563eb", linestyle="--", label=blend_line["label"])
+        ax.plot(x, blend_line["values"], lw=1.1, color="#cbd5e1", linestyle=(0, (4, 2)), label=blend_line["label"])
     ax.axhline(0, color="#111827", lw=0.8)
     ticks = np.linspace(0, len(dates) - 1, min(6, len(dates))).astype(int)
     ax.set_xticks(ticks); ax.set_xticklabels([dates[i][5:] for i in ticks], fontsize=8)
@@ -400,9 +402,15 @@ def run_kr(no_email: bool = False, force: bool = False):
                             name_map[s] = n
                 except Exception:
                     pass
+            # 2026-07-23(지호 님 요청): 국장도 미장의 알고리즘+ETF 블렌드 참고선과 대칭되는
+            # 코스피70+알고리즘30 참고선 추가(라이브 배분 아닌 시각적 참고선일 뿐 — 미장과
+            # 동일 원칙). bench_dates/closes(코스피)를 그대로 blend_index 소스로 재사용.
+            kr_blend_label = "코스피70+알고리즘30" if _KFONT else "KOSPI70+Algo30"
             holdings_html, holdings_images = _holdings_section(
                 kr_state, kr["ind_map"], price_map, bench_dates, bench_closes, "코스피", krw=True,
-                name_map=name_map)
+                name_map=name_map,
+                blend_index={"label": kr_blend_label, "dates": bench_dates, "closes": bench_closes,
+                            "ratio": 0.3})
         except Exception as e:
             print(f"[경고] 한국 보유목록 갱신 실패({e})", file=sys.stderr)
 

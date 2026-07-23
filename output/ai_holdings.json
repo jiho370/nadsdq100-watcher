@@ -1,44 +1,52 @@
 {
   "holdings": {
-    "GM": {
-      "since": "2026-07-14",
-      "entry_price": 76.30000305175781,
-      "peak": 82.12999725341797
-    },
-    "BKNG": {
-      "since": "2026-07-14",
-      "entry_price": 176.33999633789062,
-      "peak": 184.61000061035156
-    },
-    "MRNA": {
-      "since": "2026-07-14",
-      "entry_price": 67.5,
-      "peak": 68.27999877929688
-    },
-    "BMY": {
-      "since": "2026-07-14",
-      "entry_price": 58.1349983215332,
-      "peak": 60.93000030517578
-    },
     "SWKS": {
-      "since": "2026-07-14",
-      "entry_price": 58.150001525878906,
-      "peak": 63.15999984741211
-    },
-    "INCY": {
-      "since": "2026-07-14",
-      "entry_price": 115.08000183105469,
-      "peak": 117.38999938964844
-    },
-    "REGN": {
-      "since": "2026-07-14",
-      "entry_price": 658.864990234375,
-      "peak": 678.9400024414062
+      "since": "2026-07-16",
+      "entry_price": 57.83,
+      "peak": 63.16,
+      "armed": true
     },
     "APTV": {
-      "since": "2026-07-14",
-      "entry_price": 57.9900016784668,
-      "peak": 59.2599983215332
+      "since": "2026-07-16",
+      "entry_price": 58.57,
+      "peak": 59.26,
+      "armed": true
+    },
+    "GM": {
+      "since": "2026-07-16",
+      "entry_price": 77.09,
+      "peak": 82.13,
+      "armed": true
+    },
+    "INCY": {
+      "since": "2026-07-16",
+      "entry_price": 115.63,
+      "peak": 117.39,
+      "armed": true
+    },
+    "MRNA": {
+      "since": "2026-07-16",
+      "entry_price": 67.71,
+      "peak": 67.71,
+      "armed": true
+    },
+    "BKNG": {
+      "since": "2026-07-16",
+      "entry_price": 179.93,
+      "peak": 184.61,
+      "armed": true
+    },
+    "WDAY": {
+      "since": "2026-07-22",
+      "entry_price": 146.65,
+      "peak": 146.65,
+      "armed": true
+    },
+    "META": {
+      "since": "2026-07-22",
+      "entry_price": 648.64,
+      "peak": 648.64,
+      "armed": true
     }
   },
   "last_run": "2026-07-22"

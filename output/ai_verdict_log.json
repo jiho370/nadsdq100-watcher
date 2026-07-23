@@ -413,6 +413,186 @@
       "severity": "",
       "reason": "",
       "price": 81700.0
+    },
+    {
+      "date": "2026-07-23",
+      "market": "kr",
+      "symbol": "071320",
+      "name": "지역난방공사",
+      "verdict": "매수유지",
+      "severity": "",
+      "reason": "",
+      "price": 65400.0
+    },
+    {
+      "date": "2026-07-23",
+      "market": "kr",
+      "symbol": "015760",
+      "name": "한국전력",
+      "verdict": "매수유지",
+      "severity": "",
+      "reason": "",
+      "price": 35600.0
+    },
+    {
+      "date": "2026-07-23",
+      "market": "kr",
+      "symbol": "002380",
+      "name": "KCC",
+      "verdict": "매수유지",
+      "severity": "",
+      "reason": "",
+      "price": 440500.0
+    },
+    {
+      "date": "2026-07-23",
+      "market": "kr",
+      "symbol": "006040",
+      "name": "동원산업",
+      "verdict": "매수유지",
+      "severity": "",
+      "reason": "",
+      "price": 34350.0
+    },
+    {
+      "date": "2026-07-23",
+      "market": "kr",
+      "symbol": "002030",
+      "name": "아세아",
+      "verdict": "매수유지",
+      "severity": "",
+      "reason": "",
+      "price": 182300.0
+    },
+    {
+      "date": "2026-07-23",
+      "market": "kr",
+      "symbol": "003030",
+      "name": "세아제강지주",
+      "verdict": "매수유지",
+      "severity": "",
+      "reason": "",
+      "price": 112000.0
+    },
+    {
+      "date": "2026-07-23",
+      "market": "kr",
+      "symbol": "024110",
+      "name": "기업은행",
+      "verdict": "매수유지",
+      "severity": "",
+      "reason": "",
+      "price": 21050.0
+    },
+    {
+      "date": "2026-07-23",
+      "market": "kr",
+      "symbol": "139480",
+      "name": "이마트",
+      "verdict": "제외",
+      "severity": "일시적",
+      "reason": "자회사 SCK컴퍼니(스타벅스코리아) '5·18 탱크데이' 마케팅 논란(5/20)으로 대표이사 경질, 불매운동 확산 — 후속 여파로 2분기 연결 영업이익 컨센서스가 3개월 전 대비 19.6% 하향(611억원, 7월 기준), SCK 수익성 악화가 주원인으로 명시됨",
+      "price": 83400.0
+    },
+    {
+      "date": "2026-07-22",
+      "market": "us",
+      "symbol": "BKNG",
+      "name": "Booking Holdings Inc.",
+      "verdict": "매수유지",
+      "severity": "",
+      "reason": "",
+      "price": 177.86
+    },
+    {
+      "date": "2026-07-22",
+      "market": "us",
+      "symbol": "INCY",
+      "name": "Incyte Corporation",
+      "verdict": "매수유지",
+      "severity": "",
+      "reason": "",
+      "price": 115.79
+    },
+    {
+      "date": "2026-07-22",
+      "market": "us",
+      "symbol": "GM",
+      "name": "General Motors Company",
+      "verdict": "매수유지",
+      "severity": "",
+      "reason": "",
+      "price": 82.13
+    },
+    {
+      "date": "2026-07-22",
+      "market": "us",
+      "symbol": "MRNA",
+      "name": "Moderna, Inc.",
+      "verdict": "매수유지",
+      "severity": "",
+      "reason": "",
+      "price": 58.07
+    },
+    {
+      "date": "2026-07-22",
+      "market": "us",
+      "symbol": "SWKS",
+      "name": "Skyworks Solutions, Inc.",
+      "verdict": "매수유지",
+      "severity": "",
+      "reason": "",
+      "price": 63.16
+    },
+    {
+      "date": "2026-07-22",
+      "market": "us",
+      "symbol": "WDAY",
+      "name": "Workday, Inc.",
+      "verdict": "매수유지",
+      "severity": "",
+      "reason": "",
+      "price": 132.42
+    },
+    {
+      "date": "2026-07-22",
+      "market": "us",
+      "symbol": "TTD",
+      "name": "The Trade Desk, Inc.",
+      "verdict": "제외",
+      "severity": "일시적",
+      "reason": "올해 CFO 두 차례 교체 및 최대고객 퍼블리시스 감사발 플랫폼 추천 중단 이력(6월 합의로 봉합)에 더해 성장둔화·경쟁심화 우려 지속, 거버넌스·매출성장 논거 훼손",
+      "price": 17.58
+    },
+    {
+      "date": "2026-07-22",
+      "market": "us",
+      "symbol": "XYZ",
+      "name": "Block, Inc.",
+      "verdict": "매수유지",
+      "severity": "",
+      "reason": "",
+      "price": 77.46
+    },
+    {
+      "date": "2026-07-22",
+      "market": "us",
+      "symbol": "META",
+      "name": "Meta Platforms, Inc.",
+      "verdict": "매수유지",
+      "severity": "",
+      "reason": "",
+      "price": 627.17
+    },
+    {
+      "date": "2026-07-22",
+      "market": "us",
+      "symbol": "DD",
+      "name": "DuPont de Nemours, Inc.",
+      "verdict": "매수유지",
+      "severity": "",
+      "reason": "",
+      "price": 139.64
     }
   ]
 }

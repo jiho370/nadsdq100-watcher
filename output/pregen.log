@@ -1395,3 +1395,21 @@ KRX 로그인 시도...
 KRX 로그인 완료.
   로그인 시간: 2026-07-23 19:00:10
   만료 시간: 2026-07-23 20:00:10
+[main f8ac299] chore: pregen kr [skip ci]
+ 3 files changed, 107 insertions(+), 68 deletions(-)
+git : To https://github.com/jiho370/nadsdq100-watcher.git
+위치 C:\Users\JH\Documents\GitHub\nadsdq100-watcher\run_pregen.ps1:78 문자:5
++     git push 2>&1 | Out-File -Append -Encoding utf8 $log
++     ~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (To https://gith...100-watcher.git:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+ ! [rejected]        main -> main (fetch first)
+error: failed to push some refs to 'https://github.com/jiho370/nadsdq100-watcher.git'
+hint: Updates were rejected because the remote contains work that you do not
+hint: have locally. This is usually caused by another repository pushing to
+hint: the same ref. If you want to integrate the remote changes, use
+hint: 'git pull' before pushing again.
+hint: See the 'Note about fast-forwards' in 'git push --help' for details.
+2026-07-23 19:24:21 [kr] [寃쎄퀬] git push ?ㅽ뙣 ??蹂댄넻 濡쒖뺄??origin蹂대떎 ?ㅼ쿂???덉쓣 ??諛쒖깮. ??pull 寃쎄퀬 李멸퀬.
+2026-07-23 19:24:21 [kr] === pregen ?꾨즺 ===
