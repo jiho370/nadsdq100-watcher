@@ -1,0 +1,37 @@
+{
+  "barbell_standalone": {
+    "cagr_pct": 2.54,
+    "sharpe": 0.35,
+    "mdd_pct": -28.7
+  },
+  "blend40_ief": {
+    "cagr_pct": 8.24,
+    "sharpe": 0.77,
+    "mdd_pct": -32.0
+  },
+  "blend40_barbell": {
+    "cagr_pct": 7.99,
+    "sharpe": 0.75,
+    "mdd_pct": -32.6
+  },
+  "crisis": {
+    "2008 GFC": {
+      "ief_mdd": -6.2,
+      "ief_ret": 22.2,
+      "barbell_mdd": -9.2,
+      "barbell_ret": 18.1
+    },
+    "2020 코로나": {
+      "ief_mdd": -4.7,
+      "ief_ret": 6.4,
+      "barbell_mdd": -8.7,
+      "barbell_ret": 8.1
+    },
+    "2022 금리인상": {
+      "ief_mdd": -16.2,
+      "ief_ret": -16.2,
+      "barbell_mdd": -18.5,
+      "barbell_ret": -18.5
+    }
+  }
+}

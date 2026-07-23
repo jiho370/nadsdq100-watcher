@@ -44,6 +44,12 @@ WORLD_ASSETS = [
 PARAMS = {
     "equity": {"trend_ma": 200, "band": 0.01, "confirm": 3, "mom": "12_1", "dip_ma": 20, "vol_target": 0.15},
     "crypto": {"trend_ma": 120, "band": 0.03, "confirm": 3, "mom": "3m",   "dip_ma": 50, "vol_target": 0.40},
+    # 2026-07-23(지호 님 요청): 채권(IEF) 전용 — bond_trend_filter_grid.py 100조합 그리드 검증
+    # 결과 채택(150일선·밴드0%·확인3일, score 0.476, Ulcer -47.6%). 모멘텀·눌림선·변동성타깃은
+    # 검증 안 됨(트렌드 필터만 검증) — equity 기본값을 그대로 물려받되 표시용일 뿐,
+    # weekly_report.py의 실제 컷 판단은 regime(ON/OFF)만 쓴다(모멘텀 조건 없음, 백테스트가
+    # 이진 노출로만 검증됐기 때문). 통계적으로 완전히 증명된 값은 아님 — STRATEGY.md 참고.
+    "bond":   {"trend_ma": 150, "band": 0.0,  "confirm": 3, "mom": "12_1", "dip_ma": 20, "vol_target": 0.15},
 }
 
 STATE_META = {

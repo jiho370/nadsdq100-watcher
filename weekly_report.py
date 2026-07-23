@@ -8,6 +8,10 @@ weekly_report.py — 일요일 발송용 '주간 자산배분 리포트' (STRATE
     (기존 '1주 ±5% 등락' 규칙은 소음 기반·미검증이라 폐기 — Daryanani 2008 밴드 방식 채택)
   · 방어 컷(추세 오버레이): 자산이 레짐 OFF(200일선 히스테리시스) + 12개월 수익률 음수
     → 목표 비중의 절반만 유지, 컷분은 채권·현금. 일일 신호 엔진(market_signals)과 동일 규칙.
+  · 채권(IEF) 전용 추세필터(2026-07-23 라이브 반영, bond_trend_filter_grid.py 100조합
+    그리드 검증 — 150일선·밴드0%·확인3일): 레짐 OFF면 모멘텀 조건 없이 전량 현금 전환
+    (다른 자산의 절반컷과 다름 — 백테스트가 이진노출로만 검증됨). ⚠ 100개 조합 중 1등이나
+    무필터 대비 통계적 유의성(부트스트랩 90%CI)은 증명 안 됨 — 지호 님 결정으로 반영.
   · AI 실패 시 deterministic 해설로 무조건 발송(누락 방지).
 
 자산군: 미국 주식(SPY) · 한국 주식(^KS11) · 코인(BTC-USD) · 미국 국채(IEF) · 금(GLD) · 현금성
@@ -201,8 +205,9 @@ def gather() -> dict:
             continue
         c = closes.get(tic)
         if c:
-            kind = "crypto" if key == "COIN" else "equity"
-            ms = MS.analyze(c, kind)   # 일일 신호 엔진과 동일 규칙(레짐 히스테리시스+모멘텀)
+            kind = "crypto" if key == "COIN" else ("bond" if key == "BOND" else "equity")
+            ms = MS.analyze(c, kind)   # 일일 신호 엔진과 동일 규칙(레짐 히스테리시스+모멘텀,
+                                       # 채권은 전용 파라미터 — market_signals.PARAMS["bond"])
             meta = MS.STATE_META.get(ms["signal"], ("", "", "#6b7280", ""))
             assets[key] = {"key": key, "name": name, "ticker": tic, "howto": howto,
                            "closes": c, **_signals(c, trend_n),
@@ -271,6 +276,10 @@ def build_ai(ctx: dict) -> dict:
         "trend·ret_1w·gap200·signal_kr(코드가 확정한 추세 신호)을 근거로, web_search 로 배경 뉴스 보강. "
         "action은 신호와 일치시킨다: 방어 컷 대상(레짐 OFF+12개월 음수)은 '비중 절반 유지', "
         "레짐 ON+눌림은 '분할 매수 후보', 그 외는 '목표 비중 유지(밴드 이탈 시에만 매매)'. "
+        "단, key='BOND'(채권)는 다른 자산과 규칙이 다르다 — 모멘텀 조건 없이 레짐만 보고, "
+        "레짐 OFF면 '전량 현금 전환'(절반이 아니라 전량), 레짐 ON이면 '목표 비중 유지'다. "
+        "채권 action은 반드시 이 이진 규칙만 따르고 '일부 축소'·'절반' 같은 표현을 쓰지 않는다"
+        "(코드가 이 필드를 최종 덮어쓰므로 여기서 안 맞으면 다음 실행 때 바로잡힘).\n"
         "특정 주의 등락만으로 사고팔라는 표현 금지. 배분이 매주 바뀌는 것처럼 보이는 표현도 금지.\n"
         "- global_notes: 유럽(EU)·일본(JP)·중국(CN) 각 한 줄. buy_signal=true 인 지역은 "
         "'추세·모멘텀상 매수 신호'임을 언급.\n"
@@ -303,7 +312,7 @@ def defense_cuts(ctx: dict) -> list[dict]:
     cuts = []
     for key, name, tic, _ in ASSETS:
         if key in ("CASH", "BOND") or tic is None:
-            continue   # 도피처 자산은 컷 대상 아님
+            continue   # 도피처 자산은 컷 대상 아님(채권은 아래 bond_regime_cut()이 별도 처리)
         a = ctx.get("assets", {}).get(key) or {}
         y = a.get("ret_1y")
         if a.get("regime") == "OFF" and y is not None and y < 0:
@@ -311,8 +320,23 @@ def defense_cuts(ctx: dict) -> list[dict]:
     return cuts
 
 
-def adjusted_weights(weights: dict, cuts: list[dict]) -> dict:
-    """방어 컷 적용 배분: 컷 자산은 절반, 컷분은 현금성으로."""
+def bond_regime_cut(ctx: dict) -> bool:
+    """채권(IEF) 전용 추세필터(2026-07-23 라이브 반영 — bond_trend_filter_grid.py 100조합
+    그리드 검증: 150일선·밴드0%·확인3일, score 0.476·Ulcer -47.6%·MDD -10.0% vs 매수후보유
+    -23.9%). 다른 자산의 defense_cuts(레짐OFF+12개월음수 → 절반만 축소)와 다르게 두 가지
+    차이가 있다: ①모멘텀 조건 없이 레짐(ON/OFF)만 본다(백테스트가 이진 노출로만 검증됨)
+    ②절반이 아니라 전량 현금 전환(백테스트가 ON=100%/OFF=0% 이진으로 검증됨, 절반 컷은
+    검증 범위 밖).
+    ⚠ 정직한 한계: 100개 조합 그리드에서 이 파라미터가 1등이었지만, 무필터 대비 짝지은
+    부트스트랩 90%CI가 Ulcer·CAGR 둘 다 0을 포함해 통계적으로 완전히 증명된 값은 아니다
+    (STRATEGY.md 참고). 지호 님 결정으로 라이브 반영."""
+    a = ctx.get("assets", {}).get("BOND") or {}
+    return a.get("regime") == "OFF"
+
+
+def adjusted_weights(weights: dict, cuts: list[dict], bond_off: bool = False) -> dict:
+    """방어 컷 적용 배분: 컷 자산은 절반, 컷분은 현금성으로. bond_off=True면 채권은 전량
+    현금 전환(bond_regime_cut 참고 — 절반이 아니라 전량인 이유는 그 함수 docstring 참고)."""
     adj = dict(weights)
     freed = 0.0
     for c in cuts:
@@ -321,6 +345,9 @@ def adjusted_weights(weights: dict, cuts: list[dict]) -> dict:
             half = adj[k] / 2.0
             freed += adj[k] - half
             adj[k] = half
+    if bond_off and "BOND" in adj:
+        freed += adj["BOND"]
+        adj["BOND"] = 0
     adj["CASH"] = adj.get("CASH", 0) + freed
     return adj
 
@@ -340,23 +367,29 @@ def dip_buy_candidates(ctx: dict) -> list[str]:
 def _rebalance_strategy_text(ctx: dict) -> str:
     cuts = defense_cuts(ctx)
     dips = dip_buy_candidates(ctx)
+    bond_off = bond_regime_cut(ctx)
     cut_txt = ", ".join(f'{c["name"]}(12개월 {c["ret_1y"]:+.1f}%)' for c in cuts) or "없음"
     dip_txt = ", ".join(dips) or "없음"
-    return (f"방어 컷(비중 절반): {cut_txt} / 눌림목 분할 매수 후보: {dip_txt} / "
+    bond_txt = " / 채권 추세필터: 레짐 OFF → 전량 현금 전환" if bond_off else ""
+    return (f"방어 컷(비중 절반): {cut_txt} / 눌림목 분할 매수 후보: {dip_txt}{bond_txt} / "
             f"차익실현·저점매수는 '보유 비중이 목표의 1.2배 초과 → 초과분 매도, 0.8배 미만 → 부족분 매수' 밴드 규칙으로.")
 
 
 def _strategy_html(ctx: dict) -> str:
     cuts = defense_cuts(ctx)
     dips = dip_buy_candidates(ctx)
+    bond_off = bond_regime_cut(ctx)
     def box(title, txt, color):
         return (f'<span style="display:inline-block;background:{color}12;color:{color};border:1px solid {color}33;'
                 f'border-radius:8px;padding:5px 9px;margin:2px 6px 2px 0;font-size:12px;font-weight:700">'
                 f'{title}: {_esc(txt)}</span>')
     cut_txt = ", ".join(c["name"] for c in cuts) or "없음"
     dip_txt = ", ".join(dips) or "없음"
-    return (box("🛡 방어 컷(비중 절반)", cut_txt, "#b91c1c")
+    boxes = (box("🛡 방어 컷(비중 절반)", cut_txt, "#b91c1c")
             + box("🔵 눌림목 분할 매수", dip_txt, "#2563eb"))
+    if bond_off:
+        boxes += box("🛡 채권 추세필터(전량 현금)", "레짐 OFF", "#b91c1c")
+    return boxes
 
 
 def _band_rule_html() -> str:
@@ -390,6 +423,7 @@ def _market_overview(ctx: dict) -> str:
 def deterministic_ai(ctx: dict) -> dict:
     """AI 실패 시 지표만으로 해설 구성."""
     cut_keys = {c["key"] for c in defense_cuts(ctx)}
+    bond_off = bond_regime_cut(ctx)
     def cmt(a):
         r = a.get("ret_1w")
         base = a.get("trend", "")
@@ -402,6 +436,8 @@ def deterministic_ai(ctx: dict) -> dict:
     def act(a):
         if a.get("key") == "CASH":
             return "리밸런싱 실탄 — 방어 컷 발생 시 이 비중이 늘어남."
+        if a.get("key") == "BOND" and bond_off:
+            return "채권 추세필터: 레짐 OFF(150일선 이탈) → 전량 현금 전환. 레짐 복귀 시 원상복구."
         if a.get("key") in cut_keys:
             return "방어 컷: 목표 비중의 절반만 유지(레짐 OFF + 12개월 음수). 레짐 복귀 시 원상복구."
         if a.get("regime") == "ON" and (a.get("gap20") is not None) and a["gap20"] < 0:
@@ -559,22 +595,26 @@ def _global_rows(ctx, notes):
 
 
 def _adjusted_line(ctx) -> str:
-    """방어 컷이 있을 때 '이번 주 적용 배분'을 표 아래 한 줄로."""
+    """방어 컷·채권 추세필터가 있을 때 '이번 주 적용 배분'을 표 아래 한 줄로."""
     cuts = defense_cuts(ctx)
-    if not cuts:
-        return ('<div style="font-size:11px;color:#6b7280;margin:6px 0 0">이번 주 방어 컷 대상 없음 — '
-                '표준 배분 그대로 적용.</div>')
+    bond_off = bond_regime_cut(ctx)
+    if not cuts and not bond_off:
+        return ('<div style="font-size:11px;color:#6b7280;margin:6px 0 0">이번 주 방어 컷·채권 필터 '
+                '대상 없음 — 표준 배분 그대로 적용.</div>')
     names = {key: name for key, name, _, _ in ASSETS}
     lines = ""
     for pk in PROFILE_ORDER:
         p = ctx["portfolios"][pk]
-        adj = adjusted_weights(p["weights"], cuts)
+        adj = adjusted_weights(p["weights"], cuts, bond_off=bond_off)
         txt = " · ".join(f"{names.get(k, k)} {v:g}%" for k, v in adj.items())
         lines += f'<div>{_esc(p["name"])}(적용): {_esc(txt)}</div>'
-    cut_names = ", ".join(c["name"] for c in cuts)
+    parts = []
+    if cuts:
+        parts.append(f'방어 컷({", ".join(c["name"] for c in cuts)} — 레짐 OFF + 12개월 음수 → 절반)')
+    if bond_off:
+        parts.append("채권 추세필터(레짐 OFF → 전량 현금)")
     return (f'<div style="font-size:11px;color:#b91c1c;margin:6px 0 0;line-height:1.6">'
-            f'🛡 방어 컷 적용({_esc(cut_names)} — 레짐 OFF + 12개월 음수 → 절반, 컷분은 현금성으로):'
-            f'{lines}</div>')
+            f'🛡 {_esc(" · ".join(parts))}, 컷분은 현금성으로:{lines}</div>')
 
 
 def _rule_desc(ctx) -> str:
@@ -625,15 +665,24 @@ def run(no_email: bool = False):
         _log("자산 데이터 수집 실패 → 발송 중단.")
         return
     cuts = defense_cuts(ctx)
+    bond_off = bond_regime_cut(ctx)
     _log(f"자산 {len(ctx['assets'])} · 참고지역 {len(ctx['global_sub'])} · "
          f"표준 배분 안정형 {STABLE_WEIGHTS} · 공격형 {AGGRESSIVE_WEIGHTS} · "
-         f"방어 컷 {[c['name'] for c in cuts] or '없음'}")
+         f"방어 컷 {[c['name'] for c in cuts] or '없음'} · "
+         f"채권 추세필터 {'OFF(전량현금)' if bond_off else 'ON(정상보유)'}")
     d = build_ai(ctx) or deterministic_ai(ctx)
     # 자산 comment 누락분은 지표 해설로 메꿈
     det = deterministic_ai(ctx)
     dmap = {a.get("key"): a for a in (d.get("assets") or []) if isinstance(a, dict)}
     detmap = {a["key"]: a for a in det["assets"]}
     d["assets"] = [dmap.get(k) or detmap[k] for k in ctx["assets"]]
+    # 채권 action은 AI 문구에 맡기지 않고 코드가 최종 확정(다른 판정 시스템과 동일 철학) —
+    # AI가 프롬프트를 놓쳐 '일부 축소' 같은 문구를 내면 실제 적용(전량 현금)과 안 맞아
+    # 혼선을 준다. bond_off일 때만 덮어써서 AI 코멘터리(comment) 자체는 그대로 둔다.
+    if bond_off:
+        for a in d["assets"]:
+            if a.get("key") == "BOND":
+                a["action"] = detmap["BOND"]["action"]
     for f in ("overview", "strategy", "risks"):
         if not (d.get(f) or "").strip():
             d[f] = det[f]

@@ -1,0 +1,80 @@
+{
+  "2008 GFC": {
+    "SHY": {
+      "mdd_pct": -2.2,
+      "period_return_pct": 9.3
+    },
+    "IEF": {
+      "mdd_pct": -6.2,
+      "period_return_pct": 22.2
+    },
+    "TLT": {
+      "mdd_pct": -17.0,
+      "period_return_pct": 26.4
+    },
+    "AGG": {
+      "mdd_pct": -12.8,
+      "period_return_pct": 9.1
+    },
+    "BND": {
+      "mdd_pct": -9.3,
+      "period_return_pct": 9.2
+    },
+    "SPY": {
+      "mdd_pct": -55.2,
+      "period_return_pct": -46.6
+    }
+  },
+  "2020 코로나": {
+    "SHY": {
+      "mdd_pct": -0.6,
+      "period_return_pct": 2.1
+    },
+    "IEF": {
+      "mdd_pct": -4.7,
+      "period_return_pct": 6.4
+    },
+    "TLT": {
+      "mdd_pct": -15.7,
+      "period_return_pct": 14.2
+    },
+    "AGG": {
+      "mdd_pct": -9.6,
+      "period_return_pct": -1.3
+    },
+    "BND": {
+      "mdd_pct": -8.7,
+      "period_return_pct": -1.4
+    },
+    "SPY": {
+      "mdd_pct": -33.7,
+      "period_return_pct": -33.7
+    }
+  },
+  "2022 금리인상": {
+    "SHY": {
+      "mdd_pct": -4.8,
+      "period_return_pct": -4.7
+    },
+    "IEF": {
+      "mdd_pct": -16.2,
+      "period_return_pct": -16.2
+    },
+    "TLT": {
+      "mdd_pct": -30.6,
+      "period_return_pct": -30.6
+    },
+    "AGG": {
+      "mdd_pct": -15.1,
+      "period_return_pct": -15.1
+    },
+    "BND": {
+      "mdd_pct": -15.2,
+      "period_return_pct": -15.2
+    },
+    "SPY": {
+      "mdd_pct": -24.5,
+      "period_return_pct": -24.3
+    }
+  }
+}

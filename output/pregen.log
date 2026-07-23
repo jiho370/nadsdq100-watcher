@@ -1413,3 +1413,13 @@ hint: 'git pull' before pushing again.
 hint: See the 'Note about fast-forwards' in 'git push --help' for details.
 2026-07-23 19:24:21 [kr] [寃쎄퀬] git push ?ㅽ뙣 ??蹂댄넻 濡쒖뺄??origin蹂대떎 ?ㅼ쿂???덉쓣 ??諛쒖깮. ??pull 寃쎄퀬 李멸퀬.
 2026-07-23 19:24:21 [kr] === pregen ?꾨즺 ===
+2026-07-23 22:00:04 [kr] === pregen ?쒖옉 ===
+Already up to date.
+python : [KR] 펀더멘탈 통과 170/200종목 (EPS>0·ROE>0)
+위치 C:\Users\JH\Documents\GitHub\nadsdq100-watcher\run_pregen.ps1:56 문자:1
++ python pregen.py --$Mode 2>&1 | Out-File -Append -Encoding utf8 $log
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: ([KR] 펀더멘탈 통과 170/200종목 (EPS>0·ROE>0):String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+[KR] AI 검증 풀 8(최종 채택은 AI 검증 후 상위 5명) · 관찰 0 (후보 170)

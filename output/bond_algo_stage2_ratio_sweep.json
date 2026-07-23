@@ -1,0 +1,467 @@
+{
+  "SHY": {
+    "rows": [
+      {
+        "bond_pct": 0,
+        "stock_pct": 100,
+        "cagr_pct": 10.88,
+        "sharpe": 0.62,
+        "mdd_pct": -55.2
+      },
+      {
+        "bond_pct": 10,
+        "stock_pct": 90,
+        "cagr_pct": 10.1,
+        "sharpe": 0.63,
+        "mdd_pct": -50.6
+      },
+      {
+        "bond_pct": 20,
+        "stock_pct": 80,
+        "cagr_pct": 9.29,
+        "sharpe": 0.65,
+        "mdd_pct": -45.7
+      },
+      {
+        "bond_pct": 30,
+        "stock_pct": 70,
+        "cagr_pct": 8.45,
+        "sharpe": 0.67,
+        "mdd_pct": -40.5
+      },
+      {
+        "bond_pct": 40,
+        "stock_pct": 60,
+        "cagr_pct": 7.58,
+        "sharpe": 0.69,
+        "mdd_pct": -34.8
+      },
+      {
+        "bond_pct": 50,
+        "stock_pct": 50,
+        "cagr_pct": 6.69,
+        "sharpe": 0.73,
+        "mdd_pct": -28.7
+      },
+      {
+        "bond_pct": 60,
+        "stock_pct": 40,
+        "cagr_pct": 5.76,
+        "sharpe": 0.78,
+        "mdd_pct": -22.3
+      },
+      {
+        "bond_pct": 70,
+        "stock_pct": 30,
+        "cagr_pct": 4.82,
+        "sharpe": 0.87,
+        "mdd_pct": -16.1
+      },
+      {
+        "bond_pct": 80,
+        "stock_pct": 20,
+        "cagr_pct": 3.85,
+        "sharpe": 1.03,
+        "mdd_pct": -9.8
+      },
+      {
+        "bond_pct": 90,
+        "stock_pct": 10,
+        "cagr_pct": 2.85,
+        "sharpe": 1.36,
+        "mdd_pct": -6.9
+      },
+      {
+        "bond_pct": 100,
+        "stock_pct": 0,
+        "cagr_pct": 1.83,
+        "sharpe": 1.2,
+        "mdd_pct": -5.7
+      }
+    ],
+    "best_by_sharpe": {
+      "bond_pct": 90,
+      "stock_pct": 10,
+      "cagr_pct": 2.85,
+      "sharpe": 1.36,
+      "mdd_pct": -6.9
+    },
+    "pbo": 0.0022,
+    "pbo_verdict": "낮음(과최적화 가능성 작음)",
+    "dsr": 0.1083,
+    "dsr_verdict": "통과 실패(다중검정 감안 시 샤프가 유의하지 않음)",
+    "passed": false
+  },
+  "IEF": {
+    "rows": [
+      {
+        "bond_pct": 0,
+        "stock_pct": 100,
+        "cagr_pct": 10.88,
+        "sharpe": 0.62,
+        "mdd_pct": -55.2
+      },
+      {
+        "bond_pct": 10,
+        "stock_pct": 90,
+        "cagr_pct": 10.28,
+        "sharpe": 0.65,
+        "mdd_pct": -50.1
+      },
+      {
+        "bond_pct": 20,
+        "stock_pct": 80,
+        "cagr_pct": 9.64,
+        "sharpe": 0.68,
+        "mdd_pct": -44.5
+      },
+      {
+        "bond_pct": 30,
+        "stock_pct": 70,
+        "cagr_pct": 8.96,
+        "sharpe": 0.72,
+        "mdd_pct": -38.5
+      },
+      {
+        "bond_pct": 40,
+        "stock_pct": 60,
+        "cagr_pct": 8.24,
+        "sharpe": 0.77,
+        "mdd_pct": -32.0
+      },
+      {
+        "bond_pct": 50,
+        "stock_pct": 50,
+        "cagr_pct": 7.48,
+        "sharpe": 0.83,
+        "mdd_pct": -25.4
+      },
+      {
+        "bond_pct": 60,
+        "stock_pct": 40,
+        "cagr_pct": 6.69,
+        "sharpe": 0.89,
+        "mdd_pct": -19.7
+      },
+      {
+        "bond_pct": 70,
+        "stock_pct": 30,
+        "cagr_pct": 5.86,
+        "sharpe": 0.93,
+        "mdd_pct": -19.3
+      },
+      {
+        "bond_pct": 80,
+        "stock_pct": 20,
+        "cagr_pct": 5.0,
+        "sharpe": 0.88,
+        "mdd_pct": -19.0
+      },
+      {
+        "bond_pct": 90,
+        "stock_pct": 10,
+        "cagr_pct": 4.11,
+        "sharpe": 0.7,
+        "mdd_pct": -19.5
+      },
+      {
+        "bond_pct": 100,
+        "stock_pct": 0,
+        "cagr_pct": 3.18,
+        "sharpe": 0.49,
+        "mdd_pct": -23.9
+      }
+    ],
+    "best_by_sharpe": {
+      "bond_pct": 70,
+      "stock_pct": 30,
+      "cagr_pct": 5.86,
+      "sharpe": 0.93,
+      "mdd_pct": -19.3
+    },
+    "pbo": 0.0563,
+    "pbo_verdict": "낮음(과최적화 가능성 작음)",
+    "dsr": 0.1719,
+    "dsr_verdict": "통과 실패(다중검정 감안 시 샤프가 유의하지 않음)",
+    "passed": false
+  },
+  "TLT": {
+    "rows": [
+      {
+        "bond_pct": 0,
+        "stock_pct": 100,
+        "cagr_pct": 10.88,
+        "sharpe": 0.62,
+        "mdd_pct": -55.2
+      },
+      {
+        "bond_pct": 10,
+        "stock_pct": 90,
+        "cagr_pct": 10.33,
+        "sharpe": 0.66,
+        "mdd_pct": -49.8
+      },
+      {
+        "bond_pct": 20,
+        "stock_pct": 80,
+        "cagr_pct": 9.72,
+        "sharpe": 0.7,
+        "mdd_pct": -43.9
+      },
+      {
+        "bond_pct": 30,
+        "stock_pct": 70,
+        "cagr_pct": 9.05,
+        "sharpe": 0.74,
+        "mdd_pct": -37.4
+      },
+      {
+        "bond_pct": 40,
+        "stock_pct": 60,
+        "cagr_pct": 8.33,
+        "sharpe": 0.77,
+        "mdd_pct": -30.7
+      },
+      {
+        "bond_pct": 50,
+        "stock_pct": 50,
+        "cagr_pct": 7.55,
+        "sharpe": 0.76,
+        "mdd_pct": -28.8
+      },
+      {
+        "bond_pct": 60,
+        "stock_pct": 40,
+        "cagr_pct": 6.71,
+        "sharpe": 0.7,
+        "mdd_pct": -30.1
+      },
+      {
+        "bond_pct": 70,
+        "stock_pct": 30,
+        "cagr_pct": 5.82,
+        "sharpe": 0.6,
+        "mdd_pct": -33.2
+      },
+      {
+        "bond_pct": 80,
+        "stock_pct": 20,
+        "cagr_pct": 4.89,
+        "sharpe": 0.47,
+        "mdd_pct": -36.8
+      },
+      {
+        "bond_pct": 90,
+        "stock_pct": 10,
+        "cagr_pct": 3.91,
+        "sharpe": 0.36,
+        "mdd_pct": -42.8
+      },
+      {
+        "bond_pct": 100,
+        "stock_pct": 0,
+        "cagr_pct": 2.88,
+        "sharpe": 0.26,
+        "mdd_pct": -48.4
+      }
+    ],
+    "best_by_sharpe": {
+      "bond_pct": 40,
+      "stock_pct": 60,
+      "cagr_pct": 8.33,
+      "sharpe": 0.77,
+      "mdd_pct": -30.7
+    },
+    "pbo": 0.2035,
+    "pbo_verdict": "중간(주의)",
+    "dsr": 0.2269,
+    "dsr_verdict": "통과 실패(다중검정 감안 시 샤프가 유의하지 않음)",
+    "passed": false
+  },
+  "AGG": {
+    "rows": [
+      {
+        "bond_pct": 0,
+        "stock_pct": 100,
+        "cagr_pct": 10.88,
+        "sharpe": 0.62,
+        "mdd_pct": -55.2
+      },
+      {
+        "bond_pct": 10,
+        "stock_pct": 90,
+        "cagr_pct": 10.2,
+        "sharpe": 0.64,
+        "mdd_pct": -50.8
+      },
+      {
+        "bond_pct": 20,
+        "stock_pct": 80,
+        "cagr_pct": 9.5,
+        "sharpe": 0.66,
+        "mdd_pct": -46.0
+      },
+      {
+        "bond_pct": 30,
+        "stock_pct": 70,
+        "cagr_pct": 8.78,
+        "sharpe": 0.68,
+        "mdd_pct": -40.9
+      },
+      {
+        "bond_pct": 40,
+        "stock_pct": 60,
+        "cagr_pct": 8.02,
+        "sharpe": 0.71,
+        "mdd_pct": -35.4
+      },
+      {
+        "bond_pct": 50,
+        "stock_pct": 50,
+        "cagr_pct": 7.24,
+        "sharpe": 0.75,
+        "mdd_pct": -29.4
+      },
+      {
+        "bond_pct": 60,
+        "stock_pct": 40,
+        "cagr_pct": 6.43,
+        "sharpe": 0.79,
+        "mdd_pct": -23.3
+      },
+      {
+        "bond_pct": 70,
+        "stock_pct": 30,
+        "cagr_pct": 5.6,
+        "sharpe": 0.82,
+        "mdd_pct": -20.0
+      },
+      {
+        "bond_pct": 80,
+        "stock_pct": 20,
+        "cagr_pct": 4.74,
+        "sharpe": 0.83,
+        "mdd_pct": -17.7
+      },
+      {
+        "bond_pct": 90,
+        "stock_pct": 10,
+        "cagr_pct": 3.87,
+        "sharpe": 0.75,
+        "mdd_pct": -17.5
+      },
+      {
+        "bond_pct": 100,
+        "stock_pct": 0,
+        "cagr_pct": 2.97,
+        "sharpe": 0.57,
+        "mdd_pct": -18.4
+      }
+    ],
+    "best_by_sharpe": {
+      "bond_pct": 80,
+      "stock_pct": 20,
+      "cagr_pct": 4.74,
+      "sharpe": 0.83,
+      "mdd_pct": -17.7
+    },
+    "pbo": 0.0065,
+    "pbo_verdict": "낮음(과최적화 가능성 작음)",
+    "dsr": 0.1276,
+    "dsr_verdict": "통과 실패(다중검정 감안 시 샤프가 유의하지 않음)",
+    "passed": false
+  },
+  "BND": {
+    "rows": [
+      {
+        "bond_pct": 0,
+        "stock_pct": 100,
+        "cagr_pct": 10.88,
+        "sharpe": 0.62,
+        "mdd_pct": -55.2
+      },
+      {
+        "bond_pct": 10,
+        "stock_pct": 90,
+        "cagr_pct": 10.21,
+        "sharpe": 0.64,
+        "mdd_pct": -50.8
+      },
+      {
+        "bond_pct": 20,
+        "stock_pct": 80,
+        "cagr_pct": 9.51,
+        "sharpe": 0.66,
+        "mdd_pct": -46.0
+      },
+      {
+        "bond_pct": 30,
+        "stock_pct": 70,
+        "cagr_pct": 8.78,
+        "sharpe": 0.68,
+        "mdd_pct": -40.8
+      },
+      {
+        "bond_pct": 40,
+        "stock_pct": 60,
+        "cagr_pct": 8.03,
+        "sharpe": 0.71,
+        "mdd_pct": -35.3
+      },
+      {
+        "bond_pct": 50,
+        "stock_pct": 50,
+        "cagr_pct": 7.25,
+        "sharpe": 0.75,
+        "mdd_pct": -29.3
+      },
+      {
+        "bond_pct": 60,
+        "stock_pct": 40,
+        "cagr_pct": 6.44,
+        "sharpe": 0.79,
+        "mdd_pct": -23.2
+      },
+      {
+        "bond_pct": 70,
+        "stock_pct": 30,
+        "cagr_pct": 5.61,
+        "sharpe": 0.83,
+        "mdd_pct": -18.2
+      },
+      {
+        "bond_pct": 80,
+        "stock_pct": 20,
+        "cagr_pct": 4.75,
+        "sharpe": 0.85,
+        "mdd_pct": -17.8
+      },
+      {
+        "bond_pct": 90,
+        "stock_pct": 10,
+        "cagr_pct": 3.87,
+        "sharpe": 0.78,
+        "mdd_pct": -17.6
+      },
+      {
+        "bond_pct": 100,
+        "stock_pct": 0,
+        "cagr_pct": 2.97,
+        "sharpe": 0.59,
+        "mdd_pct": -18.6
+      }
+    ],
+    "best_by_sharpe": {
+      "bond_pct": 80,
+      "stock_pct": 20,
+      "cagr_pct": 4.75,
+      "sharpe": 0.85,
+      "mdd_pct": -17.8
+    },
+    "pbo": 0.0087,
+    "pbo_verdict": "낮음(과최적화 가능성 작음)",
+    "dsr": 0.1288,
+    "dsr_verdict": "통과 실패(다중검정 감안 시 샤프가 유의하지 않음)",
+    "passed": false
+  }
+}

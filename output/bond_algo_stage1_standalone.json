@@ -1,0 +1,53 @@
+{
+  "rows": [
+    {
+      "sym": "SHY",
+      "cagr_pct": 1.83,
+      "sharpe": 1.2,
+      "mdd_pct": -5.7,
+      "corr_vs_spy": -0.229,
+      "corr_vs_spy_down_days": -0.235
+    },
+    {
+      "sym": "IEF",
+      "cagr_pct": 3.18,
+      "sharpe": 0.49,
+      "mdd_pct": -23.9,
+      "corr_vs_spy": -0.297,
+      "corr_vs_spy_down_days": -0.282
+    },
+    {
+      "sym": "TLT",
+      "cagr_pct": 2.88,
+      "sharpe": 0.26,
+      "mdd_pct": -48.4,
+      "corr_vs_spy": -0.309,
+      "corr_vs_spy_down_days": -0.278
+    },
+    {
+      "sym": "AGG",
+      "cagr_pct": 2.97,
+      "sharpe": 0.57,
+      "mdd_pct": -18.4,
+      "corr_vs_spy": -0.0,
+      "corr_vs_spy_down_days": -0.022
+    },
+    {
+      "sym": "BND",
+      "cagr_pct": 2.97,
+      "sharpe": 0.59,
+      "mdd_pct": -18.6,
+      "corr_vs_spy": -0.003,
+      "corr_vs_spy_down_days": -0.001
+    },
+    {
+      "sym": "SPY",
+      "cagr_pct": 10.88,
+      "sharpe": 0.62,
+      "mdd_pct": -55.2,
+      "corr_vs_spy": 1.0,
+      "corr_vs_spy_down_days": 1.0
+    }
+  ],
+  "note": "corr_vs_spy_down_days<0이면 '위기 시 완충' 역할 — 주식이 빠질 때 반대로 움직인다는 뜻"
+}

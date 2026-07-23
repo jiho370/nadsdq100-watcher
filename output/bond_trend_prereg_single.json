@@ -1,0 +1,95 @@
+{
+  "ief": {
+    "candidate": {
+      "trend_ma": 200,
+      "band": 0.0,
+      "confirm": 1
+    },
+    "filtered": {
+      "cagr": 1.47,
+      "ulcer": 7.36,
+      "mdd": -18.4
+    },
+    "buyhold": {
+      "cagr": 3.53,
+      "ulcer": 7.69,
+      "mdd": -23.9
+    },
+    "delta_ulcer_ci95": [
+      -10.16,
+      4.578
+    ],
+    "delta_ulcer_pct_positive": 31.1,
+    "delta_cagr_ci95": [
+      -3.803,
+      -0.29
+    ],
+    "delta_sharpe_ci95": [
+      -0.522,
+      0.023
+    ],
+    "paired_t_daily": -2.48
+  },
+  "tlt": {
+    "candidate": {
+      "trend_ma": 200,
+      "band": 0.0,
+      "confirm": 1
+    },
+    "filtered": {
+      "cagr": -0.33,
+      "ulcer": 19.69,
+      "mdd": -48.4
+    },
+    "buyhold": {
+      "cagr": 3.58,
+      "ulcer": 19.09,
+      "mdd": -48.4
+    },
+    "delta_ulcer_ci95": [
+      -28.228,
+      10.618
+    ],
+    "delta_ulcer_pct_positive": 21.6,
+    "delta_cagr_ci95": [
+      -7.852,
+      0.251
+    ],
+    "delta_sharpe_ci95": [
+      -0.606,
+      0.014
+    ],
+    "paired_t_daily": -2.27
+  },
+  "shy": {
+    "candidate": {
+      "trend_ma": 200,
+      "band": 0.0,
+      "confirm": 1
+    },
+    "filtered": {
+      "cagr": 1.66,
+      "ulcer": 0.84,
+      "mdd": -2.4
+    },
+    "buyhold": {
+      "cagr": 1.98,
+      "ulcer": 1.1,
+      "mdd": -5.7
+    },
+    "delta_ulcer_ci95": [
+      -0.489,
+      0.566
+    ],
+    "delta_ulcer_pct_positive": 56.3,
+    "delta_cagr_ci95": [
+      -0.63,
+      0.037
+    ],
+    "delta_sharpe_ci95": [
+      -0.317,
+      0.179
+    ],
+    "paired_t_daily": -2.17
+  }
+}

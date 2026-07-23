@@ -1,0 +1,26 @@
+{
+  "bond_sym": "IEF",
+  "w_bond": 0.4,
+  "static_hold": {
+    "cagr_pct": 8.24,
+    "sharpe": 0.77,
+    "mdd_pct": -32.0
+  },
+  "trend_timed": {
+    "cagr_pct": 8.03,
+    "sharpe": 0.76,
+    "mdd_pct": -32.0
+  },
+  "paired_ttest": {
+    "t": -0.599,
+    "p": 0.5491,
+    "n": 231
+  },
+  "cagr_diff_bootstrap": {
+    "mean": -0.21,
+    "ci95_lo": -0.98,
+    "ci95_hi": 0.59,
+    "pct_positive": 28.6
+  },
+  "note": "가설: 채권에도 추세필터 적용이 유의하게 낫다. 방향 기준 게이트: CI 하한>0 AND t>=+1.96 이어야 채택."
+}
