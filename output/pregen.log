@@ -1455,3 +1455,13 @@ to calling pct_change or specify 'fill_method=None' to not fill NA values.
 [REPORT] 검증 실패(RuntimeError: claude CLI rc=1: You've hit your session limit · resets 11:10am (Asia/Seoul))
 [PREGEN] 검증 실패 \u2014 파일 미생성(오후에 API 폴백)
 2026-07-24 09:33:23 [us] pregen.py ?ㅽ뙣(rc=1) ??Actions 媛 API ?대갚. 醫낅즺.
+2026-07-24 19:37:10 [us] === pregen ?쒖옉 ===
+git : fatal: unable to access 'https://github.com/jiho370/nadsdq100-watcher.git/': Could not resolve host: github.com
+위치 C:\Users\JH\Documents\GitHub\nadsdq100-watcher\run_pregen.ps1:44 문자:1
++ git pull --rebase 2>&1 | Tee-Object -Variable pullOutput | Out-Null
++ ~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (fatal: unable t...ost: github.com:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+2026-07-24 19:37:10 [us] [寃쎄퀬] git pull ?ㅽ뙣 ??濡쒖뺄??而ㅻ컠 ????蹂寃쎌씠 ?덉쑝硫??ш린??留됲옒. ?꾨옒 push???ㅽ뙣?????덉쓬.
+2026-07-24 19:37:10 [us]         ?닿껐: ??μ냼 ?대뜑?먯꽌 'git add -A; git commit -m sync; git push' ??踰??섎룞 ?ㅽ뻾.
