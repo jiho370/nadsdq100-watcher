@@ -1423,3 +1423,35 @@ python : [KR] 펀더멘탈 통과 170/200종목 (EPS>0·ROE>0)
     + FullyQualifiedErrorId : NativeCommandError
  
 [KR] AI 검증 풀 8(최종 채택은 AI 검증 후 상위 5명) · 관찰 0 (후보 170)
+2026-07-24 09:30:06 [us] === pregen ?쒖옉 ===
+git : From https://github.com/jiho370/nadsdq100-watcher
+위치 C:\Users\JH\Documents\GitHub\nadsdq100-watcher\run_pregen.ps1:44 문자:1
++ git pull --rebase 2>&1 | Tee-Object -Variable pullOutput | Out-Null
++ ~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (From https://gi...dsdq100-watcher:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+   af2f085..5a6c2e3  main       -> origin/main
+Updating af2f085..5a6c2e3
+Fast-forward
+ output/kr_holdings.json | 2 +-
+ output/last_sent.json   | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
+python : [정보] SPY 보유종목 503개 로드
+위치 C:\Users\JH\Documents\GitHub\nadsdq100-watcher\run_pregen.ps1:56 문자:1
++ python pregen.py --$Mode 2>&1 | Out-File -Append -Encoding utf8 $log
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: ([정보] SPY 보유종목 503개 로드:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+[섹터] 위키에서 503종목 GICS 섹터 확보 (Sub-Industry 503종목)
+[탐욕지수] 40 (공포)
+[프로필] 503종목 로드 (생성 2026-06-20)
+C:\Users\JH\Documents\GitHub\nadsdq100-watcher\tech_factors.py:26: FutureWarning: The default fill_method='pad' in Data
+Frame.pct_change is deprecated and will be removed in a future version. Either fill in any non-leading NA values prior 
+to calling pct_change or specify 'fill_method=None' to not fill NA values.
+  mret = panel.pct_change()
+[REPORT] 검증 1차 실패(RuntimeError) → 웹검색 없이 재시도
+[REPORT] 검증 실패(RuntimeError: claude CLI rc=1: You've hit your session limit · resets 11:10am (Asia/Seoul))
+[PREGEN] 검증 실패 \u2014 파일 미생성(오후에 API 폴백)
+2026-07-24 09:33:23 [us] pregen.py ?ㅽ뙣(rc=1) ??Actions 媛 API ?대갚. 醫낅즺.
