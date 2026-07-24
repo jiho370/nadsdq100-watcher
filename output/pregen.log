@@ -1465,3 +1465,10 @@ git : fatal: unable to access 'https://github.com/jiho370/nadsdq100-watcher.git/
  
 2026-07-24 19:37:10 [us] [寃쎄퀬] git pull ?ㅽ뙣 ??濡쒖뺄??而ㅻ컠 ????蹂寃쎌씠 ?덉쑝硫??ш린??留됲옒. ?꾨옒 push???ㅽ뙣?????덉쓬.
 2026-07-24 19:37:10 [us]         ?닿껐: ??μ냼 ?대뜑?먯꽌 'git add -A; git commit -m sync; git push' ??踰??섎룞 ?ㅽ뻾.
+python : [PREGEN] 미국장 pregen 은 06~16시(KST)에만 유효 → 스킵
+위치 C:\Users\JH\Documents\GitHub\nadsdq100-watcher\run_pregen.ps1:56 문자:1
++ python pregen.py --$Mode 2>&1 | Out-File -Append -Encoding utf8 $log
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: ([PREGEN] 미국장 pr...(KST)에만 유효 → 스킵:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
