@@ -11,10 +11,15 @@ market_signals.py — 지수·코인·금 핵심 자산의 추세 신호 엔진 
 신호는 전부 '종가 시계열만으로' 상태를 복원(stateless)하므로 상태파일이 필요 없다.
 
 메일 2통 분리(2026-07-09) 반영: 핵심 자산 추세신호 카드는 시장별로 나눠 보여준다
-(코스피·코스닥·금 = 국장 장전 메일 / 나스닥100·S&P500·비트코인 = 미장 마감 메일,
+(코스피·코스닥·금·미국채10년 = 국장 장전 메일 / 나스닥100·S&P500·비트코인 = 미장 마감 메일,
 CORE_ASSETS 의 5번째 필드 "when"으로 구분). '전일 시장 요약' 표는 국장 메일에만
 붙고(추세신호와 겹치지 않는 별도 자산 — 나스닥·다우존스·닛케이·유럽·글로벌·비트코인·환율)
 전일(1일) 등락만 보여준다(추세·모멘텀 상태는 추세신호 카드 쪽에만 표기).
+
+2026-07-27(지호 님 요청): 미국채10년(IEF)을 국장 메일 추세신호 카드에 추가. 단 채권은
+PARAMS["bond"](150일선·밴드0%·확인3일)만 그리드 검증됐고(§6, bond_trend_filter_grid.py),
+모멘텀·눌림목·5단계 매수신호는 equity 기본값을 표시용으로 물려받은 것뿐 — weekly_report.py의
+실제 컷 판단도 regime(ON/OFF)만 쓴다. 이 카드의 5단계 라벨(적극매수 등)도 참고용으로만 볼 것.
 """
 from __future__ import annotations
 import math
@@ -25,6 +30,7 @@ CORE_ASSETS = [
     ("KOSPI",  "코스피",     "^KS11",   "equity", "kr"),
     ("KOSDAQ", "코스닥",     "^KQ11",   "equity", "kr"),
     ("GOLD",   "금",         "GLD",     "equity", "kr"),
+    ("BOND",   "미국채 10년", "IEF",    "bond",   "kr"),
     ("NDX",    "나스닥 100", "^NDX",    "equity", "us"),
     ("SPX",    "S&P 500",    "^GSPC",   "equity", "us"),
     ("BTC",    "비트코인",   "BTC-USD", "crypto", "us"),
@@ -318,5 +324,7 @@ def signal_cards_html(sig: dict, chart_cids: dict | None = None, when: str | Non
     legend = ('<div style="font-size:10px;color:#9ca3af;margin-top:4px;line-height:1.5">'
               '신호 규칙: 주식 지수 = 200일선 ±1% 히스테리시스(3일 확인) + 12-1 모멘텀 · '
               '코인 = 120일선 ±3% + 3개월 모멘텀. 눌림목 = 상승 레짐 속 20일선(코인 50일선) 아래. '
+              '미국채10년 = 150일선(밴드 없음, 3일 확인) — 이 추세선만 검증됐고 모멘텀/눌림목/'
+              '5단계 라벨은 참고용(주식 파라미터를 표시용으로 물려받음). '
               '자세한 근거는 STRATEGY.md.</div>')
     return cards + legend

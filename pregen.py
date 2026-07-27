@@ -10,9 +10,12 @@ pregen.py — 로컬 PC에서 Pro 구독 CLI(claude -p)로 AI 검증+서술을 '
          포함"을 노려 발송 시점 경량 API 콜 1회가 남아있었으나, 그 정도 내용까지는 필요 없다고
          판단해 국장 데이터만으로 19시에 전부 끝내도록 단순화함).
          → output/pregen_kr.json (for_kst = 다음 08:00 발송일)
-  --us : 미국장 메일(당일 17:00)용. 실행 창 = 06시(미국장 마감 후)~16시(발송 전).
+  --us : 미국장 메일(당일 17:00, 월~금)용. 실행 창 = 06시(미국장 마감 후)~16시(발송 전).
          이 시점엔 해당 세션이 이미 마감 확정이라 검증+서술+시황 총평까지 전부 미리 씀.
-         그 외 시각엔 이미 발송됐거나 데이터 미확정이라 스킵. → output/pregen_us.json (for_kst = 오늘)
+         그 외 시각엔 이미 발송됐거나 데이터 미확정이라 스킵. → output/pregen_us.json
+         (for_kst = 오늘, 단 토요일 실행분은 for_kst = 다음 월요일 — 2026-07-27부터 미국장
+         메일이 토요일→월요일로 이관됨. 주말엔 신규 메일이 없고 월요일 메일이 금요일 마감
+         그대로를 다루므로, 토요일에 미리 끝낸 검증을 월요일 발송이 그대로 재사용한다.)
 
 아침/오후 GitHub Actions 는 pregen_{kr,us}.json 의 for_kst 가 발송일과 일치하면
 검증 단계(웹검색)를 생략하고, written(사전서술)까지 있으면 서술 단계(haiku)도 생략한다
@@ -156,7 +159,13 @@ def run_us():
     now = datetime.datetime.now(R.KST)
     if not (6 <= now.hour < 16):             # 미국장 마감(새벽)~발송(17시) 사이만 유효
         _log("미국장 pregen 은 06~16시(KST)에만 유효 → 스킵"); return
-    for_kst = now.date().isoformat()
+    # 2026-07-27: 미장 메일 토→월 이관(report.yml 참고). 토요일 실행분은 금요일 마감 데이터를
+    # 다루는데(주말 내내 안 바뀜) 그 결과를 쓸 발송일은 다음 월요일이므로, for_kst를 앞당겨
+    # 찍어야 월요일 GHA(daily_ai_report._load_pregen)가 오늘 날짜로 이 캐시를 찾아 쓴다.
+    if now.weekday() == 5:                   # 토요일
+        for_kst = (now + datetime.timedelta(days=2)).date().isoformat()
+    else:
+        for_kst = now.date().isoformat()
     R._require_yf()
     data = R.gather_universe_data(with_volume=True)
     scored, info, _m = E.select_pool(data, int(os.environ.get("REPORT_MAX_CANDIDATES", "60")))

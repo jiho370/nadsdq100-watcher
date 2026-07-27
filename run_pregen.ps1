@@ -67,6 +67,17 @@ if ($LASTEXITCODE -ne 0) {
     exit 0
 }
 
+# 2.5) 커밋 직전 재-pull — pregen.py(최대 20분, AI_TIMEOUT)가 도는 동안 GitHub Actions의
+#    "update report state" 커밋이 origin에 새로 얹힐 수 있다(2026-07-27 발견: 로컬이 origin과
+#    11커밋 앞서면서 동시에 3커밋 뒤처진 상태로 갈라져 매번 push가 non-fast-forward로 거부됨).
+#    맨 처음 pull이 실패했더라도(작업트리가 dirty해서) 그사이 dirty 원인이 해소됐을 수 있으니
+#    한 번 더 시도 — 실패해도(여전히 dirty 등) 조용히 넘어간다, 아래 push 실패 로그가 원인을
+#    말해준다. 이 재-pull은 아직 아무것도 add 안 한 시점에 해야 한다(그래야 rebase가 막히지 않음).
+git pull --rebase 2>&1 | Out-File -Append -Encoding utf8 $log
+if ($LASTEXITCODE -ne 0) {
+    Log "[경고] 커밋 직전 재-pull도 실패 — 작업트리가 여전히 dirty하거나 충돌. 아래 push도 실패 가능."
+}
+
 # 3) 결과 푸시 — pregen 파일 + pregen.log(이 실행이 방금 쓴 로그 자체 — 커밋 안 하면 다음
 #    실행의 git pull이 또 막힘, 위 2026-07-23 수정 참고) + (한국장만) kospi200_cache.json.
 #    캐시를 같이 올리는 이유: Actions 러너가 KRX에 직접 접속 못 해도(로그인 정책 전환 이후
