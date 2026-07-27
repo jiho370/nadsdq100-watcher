@@ -1,0 +1,582 @@
+{
+  "as_of": "2026-07-24",
+  "kind": "탐색적 3자산 격자 스윕(사전등록 아님)",
+  "grid_step": 0.1,
+  "n_combos": 66,
+  "rows": [
+    {
+      "algo": 0.0,
+      "spy": 0.0,
+      "brka": 1.0,
+      "cagr_pct": 12.47,
+      "sharpe": 0.7,
+      "mdd_pct": -30.4
+    },
+    {
+      "algo": 0.0,
+      "spy": 0.1,
+      "brka": 0.9,
+      "cagr_pct": 12.81,
+      "sharpe": 0.73,
+      "mdd_pct": -30.6
+    },
+    {
+      "algo": 0.0,
+      "spy": 0.2,
+      "brka": 0.8,
+      "cagr_pct": 13.12,
+      "sharpe": 0.76,
+      "mdd_pct": -30.9
+    },
+    {
+      "algo": 0.0,
+      "spy": 0.3,
+      "brka": 0.7,
+      "cagr_pct": 13.41,
+      "sharpe": 0.79,
+      "mdd_pct": -31.3
+    },
+    {
+      "algo": 0.0,
+      "spy": 0.4,
+      "brka": 0.6,
+      "cagr_pct": 13.68,
+      "sharpe": 0.81,
+      "mdd_pct": -31.6
+    },
+    {
+      "algo": 0.0,
+      "spy": 0.5,
+      "brka": 0.5,
+      "cagr_pct": 13.92,
+      "sharpe": 0.83,
+      "mdd_pct": -32.0
+    },
+    {
+      "algo": 0.0,
+      "spy": 0.6,
+      "brka": 0.4,
+      "cagr_pct": 14.13,
+      "sharpe": 0.84,
+      "mdd_pct": -32.3
+    },
+    {
+      "algo": 0.0,
+      "spy": 0.7,
+      "brka": 0.3,
+      "cagr_pct": 14.32,
+      "sharpe": 0.85,
+      "mdd_pct": -32.7
+    },
+    {
+      "algo": 0.0,
+      "spy": 0.8,
+      "brka": 0.2,
+      "cagr_pct": 14.49,
+      "sharpe": 0.85,
+      "mdd_pct": -33.0
+    },
+    {
+      "algo": 0.0,
+      "spy": 0.9,
+      "brka": 0.1,
+      "cagr_pct": 14.63,
+      "sharpe": 0.84,
+      "mdd_pct": -33.4
+    },
+    {
+      "algo": 0.0,
+      "spy": 1.0,
+      "brka": 0.0,
+      "cagr_pct": 14.74,
+      "sharpe": 0.83,
+      "mdd_pct": -33.7
+    },
+    {
+      "algo": 0.1,
+      "spy": 0.0,
+      "brka": 0.9,
+      "cagr_pct": 14.57,
+      "sharpe": 0.81,
+      "mdd_pct": -30.7
+    },
+    {
+      "algo": 0.1,
+      "spy": 0.1,
+      "brka": 0.8,
+      "cagr_pct": 14.88,
+      "sharpe": 0.84,
+      "mdd_pct": -31.1
+    },
+    {
+      "algo": 0.1,
+      "spy": 0.2,
+      "brka": 0.7,
+      "cagr_pct": 15.16,
+      "sharpe": 0.87,
+      "mdd_pct": -31.4
+    },
+    {
+      "algo": 0.1,
+      "spy": 0.3,
+      "brka": 0.6,
+      "cagr_pct": 15.42,
+      "sharpe": 0.89,
+      "mdd_pct": -31.8
+    },
+    {
+      "algo": 0.1,
+      "spy": 0.4,
+      "brka": 0.5,
+      "cagr_pct": 15.66,
+      "sharpe": 0.9,
+      "mdd_pct": -32.1
+    },
+    {
+      "algo": 0.1,
+      "spy": 0.5,
+      "brka": 0.4,
+      "cagr_pct": 15.87,
+      "sharpe": 0.91,
+      "mdd_pct": -32.5
+    },
+    {
+      "algo": 0.1,
+      "spy": 0.6,
+      "brka": 0.3,
+      "cagr_pct": 16.05,
+      "sharpe": 0.91,
+      "mdd_pct": -32.8
+    },
+    {
+      "algo": 0.1,
+      "spy": 0.7,
+      "brka": 0.2,
+      "cagr_pct": 16.21,
+      "sharpe": 0.91,
+      "mdd_pct": -33.2
+    },
+    {
+      "algo": 0.1,
+      "spy": 0.8,
+      "brka": 0.1,
+      "cagr_pct": 16.34,
+      "sharpe": 0.9,
+      "mdd_pct": -33.5
+    },
+    {
+      "algo": 0.1,
+      "spy": 0.9,
+      "brka": 0.0,
+      "cagr_pct": 16.45,
+      "sharpe": 0.89,
+      "mdd_pct": -33.8
+    },
+    {
+      "algo": 0.2,
+      "spy": 0.0,
+      "brka": 0.8,
+      "cagr_pct": 16.63,
+      "sharpe": 0.91,
+      "mdd_pct": -31.2
+    },
+    {
+      "algo": 0.2,
+      "spy": 0.1,
+      "brka": 0.7,
+      "cagr_pct": 16.91,
+      "sharpe": 0.94,
+      "mdd_pct": -31.5
+    },
+    {
+      "algo": 0.2,
+      "spy": 0.2,
+      "brka": 0.6,
+      "cagr_pct": 17.17,
+      "sharpe": 0.95,
+      "mdd_pct": -31.9
+    },
+    {
+      "algo": 0.2,
+      "spy": 0.3,
+      "brka": 0.5,
+      "cagr_pct": 17.4,
+      "sharpe": 0.97,
+      "mdd_pct": -32.2
+    },
+    {
+      "algo": 0.2,
+      "spy": 0.4,
+      "brka": 0.4,
+      "cagr_pct": 17.6,
+      "sharpe": 0.97,
+      "mdd_pct": -32.6
+    },
+    {
+      "algo": 0.2,
+      "spy": 0.5,
+      "brka": 0.3,
+      "cagr_pct": 17.78,
+      "sharpe": 0.97,
+      "mdd_pct": -32.9
+    },
+    {
+      "algo": 0.2,
+      "spy": 0.6,
+      "brka": 0.2,
+      "cagr_pct": 17.93,
+      "sharpe": 0.97,
+      "mdd_pct": -33.3
+    },
+    {
+      "algo": 0.2,
+      "spy": 0.7,
+      "brka": 0.1,
+      "cagr_pct": 18.06,
+      "sharpe": 0.95,
+      "mdd_pct": -33.6
+    },
+    {
+      "algo": 0.2,
+      "spy": 0.8,
+      "brka": 0.0,
+      "cagr_pct": 18.16,
+      "sharpe": 0.94,
+      "mdd_pct": -34.0
+    },
+    {
+      "algo": 0.3,
+      "spy": 0.0,
+      "brka": 0.7,
+      "cagr_pct": 18.67,
+      "sharpe": 1.0,
+      "mdd_pct": -31.7
+    },
+    {
+      "algo": 0.3,
+      "spy": 0.1,
+      "brka": 0.6,
+      "cagr_pct": 18.92,
+      "sharpe": 1.01,
+      "mdd_pct": -32.0
+    },
+    {
+      "algo": 0.3,
+      "spy": 0.2,
+      "brka": 0.5,
+      "cagr_pct": 19.15,
+      "sharpe": 1.02,
+      "mdd_pct": -32.4
+    },
+    {
+      "algo": 0.3,
+      "spy": 0.3,
+      "brka": 0.4,
+      "cagr_pct": 19.35,
+      "sharpe": 1.03,
+      "mdd_pct": -32.7
+    },
+    {
+      "algo": 0.3,
+      "spy": 0.4,
+      "brka": 0.3,
+      "cagr_pct": 19.52,
+      "sharpe": 1.02,
+      "mdd_pct": -33.0
+    },
+    {
+      "algo": 0.3,
+      "spy": 0.5,
+      "brka": 0.2,
+      "cagr_pct": 19.66,
+      "sharpe": 1.01,
+      "mdd_pct": -33.4
+    },
+    {
+      "algo": 0.3,
+      "spy": 0.6,
+      "brka": 0.1,
+      "cagr_pct": 19.78,
+      "sharpe": 1.0,
+      "mdd_pct": -33.7
+    },
+    {
+      "algo": 0.3,
+      "spy": 0.7,
+      "brka": -0.0,
+      "cagr_pct": 19.88,
+      "sharpe": 0.98,
+      "mdd_pct": -34.1
+    },
+    {
+      "algo": 0.4,
+      "spy": 0.0,
+      "brka": 0.6,
+      "cagr_pct": 20.68,
+      "sharpe": 1.06,
+      "mdd_pct": -32.1
+    },
+    {
+      "algo": 0.4,
+      "spy": 0.1,
+      "brka": 0.5,
+      "cagr_pct": 20.9,
+      "sharpe": 1.07,
+      "mdd_pct": -32.5
+    },
+    {
+      "algo": 0.4,
+      "spy": 0.2,
+      "brka": 0.4,
+      "cagr_pct": 21.09,
+      "sharpe": 1.07,
+      "mdd_pct": -32.8
+    },
+    {
+      "algo": 0.4,
+      "spy": 0.3,
+      "brka": 0.3,
+      "cagr_pct": 21.26,
+      "sharpe": 1.06,
+      "mdd_pct": -33.2
+    },
+    {
+      "algo": 0.4,
+      "spy": 0.4,
+      "brka": 0.2,
+      "cagr_pct": 21.4,
+      "sharpe": 1.05,
+      "mdd_pct": -33.5
+    },
+    {
+      "algo": 0.4,
+      "spy": 0.5,
+      "brka": 0.1,
+      "cagr_pct": 21.51,
+      "sharpe": 1.04,
+      "mdd_pct": -33.9
+    },
+    {
+      "algo": 0.4,
+      "spy": 0.6,
+      "brka": -0.0,
+      "cagr_pct": 21.59,
+      "sharpe": 1.02,
+      "mdd_pct": -34.2
+    },
+    {
+      "algo": 0.5,
+      "spy": 0.0,
+      "brka": 0.5,
+      "cagr_pct": 22.66,
+      "sharpe": 1.11,
+      "mdd_pct": -32.6
+    },
+    {
+      "algo": 0.5,
+      "spy": 0.1,
+      "brka": 0.4,
+      "cagr_pct": 22.84,
+      "sharpe": 1.1,
+      "mdd_pct": -32.9
+    },
+    {
+      "algo": 0.5,
+      "spy": 0.2,
+      "brka": 0.3,
+      "cagr_pct": 23.0,
+      "sharpe": 1.1,
+      "mdd_pct": -33.3
+    },
+    {
+      "algo": 0.5,
+      "spy": 0.3,
+      "brka": 0.2,
+      "cagr_pct": 23.13,
+      "sharpe": 1.08,
+      "mdd_pct": -33.6
+    },
+    {
+      "algo": 0.5,
+      "spy": 0.4,
+      "brka": 0.1,
+      "cagr_pct": 23.24,
+      "sharpe": 1.07,
+      "mdd_pct": -34.0
+    },
+    {
+      "algo": 0.5,
+      "spy": 0.5,
+      "brka": 0.0,
+      "cagr_pct": 23.31,
+      "sharpe": 1.05,
+      "mdd_pct": -34.3
+    },
+    {
+      "algo": 0.6,
+      "spy": 0.0,
+      "brka": 0.4,
+      "cagr_pct": 24.59,
+      "sharpe": 1.13,
+      "mdd_pct": -33.1
+    },
+    {
+      "algo": 0.6,
+      "spy": 0.1,
+      "brka": 0.3,
+      "cagr_pct": 24.75,
+      "sharpe": 1.12,
+      "mdd_pct": -33.4
+    },
+    {
+      "algo": 0.6,
+      "spy": 0.2,
+      "brka": 0.2,
+      "cagr_pct": 24.87,
+      "sharpe": 1.11,
+      "mdd_pct": -33.7
+    },
+    {
+      "algo": 0.6,
+      "spy": 0.3,
+      "brka": 0.1,
+      "cagr_pct": 24.97,
+      "sharpe": 1.09,
+      "mdd_pct": -34.1
+    },
+    {
+      "algo": 0.6,
+      "spy": 0.4,
+      "brka": -0.0,
+      "cagr_pct": 25.04,
+      "sharpe": 1.07,
+      "mdd_pct": -34.4
+    },
+    {
+      "algo": 0.7,
+      "spy": 0.0,
+      "brka": 0.3,
+      "cagr_pct": 26.49,
+      "sharpe": 1.15,
+      "mdd_pct": -33.5
+    },
+    {
+      "algo": 0.7,
+      "spy": 0.1,
+      "brka": 0.2,
+      "cagr_pct": 26.61,
+      "sharpe": 1.13,
+      "mdd_pct": -33.9
+    },
+    {
+      "algo": 0.7,
+      "spy": 0.2,
+      "brka": 0.1,
+      "cagr_pct": 26.7,
+      "sharpe": 1.11,
+      "mdd_pct": -34.2
+    },
+    {
+      "algo": 0.7,
+      "spy": 0.3,
+      "brka": -0.0,
+      "cagr_pct": 26.76,
+      "sharpe": 1.09,
+      "mdd_pct": -34.5
+    },
+    {
+      "algo": 0.8,
+      "spy": 0.0,
+      "brka": 0.2,
+      "cagr_pct": 28.35,
+      "sharpe": 1.15,
+      "mdd_pct": -34.0
+    },
+    {
+      "algo": 0.8,
+      "spy": 0.1,
+      "brka": 0.1,
+      "cagr_pct": 28.44,
+      "sharpe": 1.13,
+      "mdd_pct": -34.3
+    },
+    {
+      "algo": 0.8,
+      "spy": 0.2,
+      "brka": -0.0,
+      "cagr_pct": 28.49,
+      "sharpe": 1.11,
+      "mdd_pct": -34.7
+    },
+    {
+      "algo": 0.9,
+      "spy": 0.0,
+      "brka": 0.1,
+      "cagr_pct": 30.17,
+      "sharpe": 1.14,
+      "mdd_pct": -34.4
+    },
+    {
+      "algo": 0.9,
+      "spy": 0.1,
+      "brka": -0.0,
+      "cagr_pct": 30.22,
+      "sharpe": 1.12,
+      "mdd_pct": -34.8
+    },
+    {
+      "algo": 1.0,
+      "spy": 0.0,
+      "brka": 0.0,
+      "cagr_pct": 31.94,
+      "sharpe": 1.13,
+      "mdd_pct": -34.9
+    }
+  ],
+  "baseline": {
+    "algo": 1.0,
+    "spy": 0.0,
+    "brka": 0.0,
+    "cagr_pct": 31.94,
+    "sharpe": 1.13,
+    "mdd_pct": -34.9
+  },
+  "best_by_sharpe": {
+    "algo": 0.7,
+    "spy": 0.0,
+    "brka": 0.3,
+    "cagr_pct": 26.49,
+    "sharpe": 1.15,
+    "mdd_pct": -33.5
+  },
+  "best_by_cagr": {
+    "algo": 1.0,
+    "spy": 0.0,
+    "brka": 0.0,
+    "cagr_pct": 31.94,
+    "sharpe": 1.13,
+    "mdd_pct": -34.9
+  },
+  "best_by_mdd": {
+    "algo": 0.0,
+    "spy": 0.0,
+    "brka": 1.0,
+    "cagr_pct": 12.47,
+    "sharpe": 0.7,
+    "mdd_pct": -30.4
+  },
+  "best_by_calmar": {
+    "algo": 1.0,
+    "spy": 0.0,
+    "brka": 0.0,
+    "cagr_pct": 31.94,
+    "sharpe": 1.13,
+    "mdd_pct": -34.9
+  },
+  "pbo": 0.0022,
+  "pbo_verdict": "낮음(과최적화 가능성 작음)",
+  "dsr": 0.4715,
+  "dsr_verdict": "통과 실패(다중검정 감안 시 샤프가 유의하지 않음)",
+  "passed": false,
+  "note": "탐색적 스윕 — PBO/DSR 미통과면 이 격자의 '최고점'이 노이즈와 구분 안 됨. 채택하려면 발견한 지점을 별도 사전등록으로 재검증 필요."
+}

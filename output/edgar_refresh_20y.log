@@ -1,0 +1,13 @@
+[EDGAR] 대상 919종목 · 갱신필요 283 · 워커 6개 · 수집 항목 ['eps', 'ni', 'equity', 'ocf', 'capex', 'revenue', 'assets', 'liab', 'debt', 'opinc', 'gross', 'cost_of_revenue', 'cash', 'divs', 'dep', 'buyback', 'issuance', 'ar_chg', 'inv_chg', 'ap_chg', 'rnd', 'sga']
+  ...25/283 수집, 중간 저장
+  ...50/283 수집, 중간 저장
+  ...75/283 수집, 중간 저장
+  ...100/283 수집, 중간 저장
+  ...125/283 수집, 중간 저장
+  ...150/283 수집, 중간 저장
+  ...175/283 수집, 중간 저장
+  ...200/283 수집, 중간 저장
+  ...225/283 수집, 중간 저장
+  ...250/283 수집, 중간 저장
+  ...275/283 수집, 중간 저장
+[EDGAR] 저장 완료: output/fundamentals_cache.json (919종목, browse-edgar 폴백으로 16종목 추가 복구)

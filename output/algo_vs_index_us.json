@@ -1,0 +1,55 @@
+{
+  "label": "미장(topn8 vs SPY)",
+  "n_months": 107,
+  "full_period": {
+    "algo": {
+      "cagr_pct": 33.0,
+      "sharpe": 1.18,
+      "mdd_pct": -34.9
+    },
+    "bench": {
+      "cagr_pct": 14.74,
+      "sharpe": 0.83,
+      "mdd_pct": -33.7
+    }
+  },
+  "paired_ttest_monthly": {
+    "t": 3.844,
+    "p": 0.0001,
+    "n": 107
+  },
+  "monthly_win_rate_pct": 65.4,
+  "cagr_diff_bootstrap": {
+    "mean": 18.53,
+    "ci95_lo": 9.02,
+    "ci95_hi": 29.69,
+    "pct_positive": 100.0
+  },
+  "sharpe_diff_bootstrap": {
+    "ci95_lo": 0.101,
+    "ci95_hi": 0.668
+  },
+  "subperiods": [
+    {
+      "period": "2018-2021",
+      "algo_cagr": 32.6,
+      "bench_cagr": 17.91,
+      "algo_beats": true
+    },
+    {
+      "period": "2022-2023",
+      "algo_cagr": 16.17,
+      "bench_cagr": 1.32,
+      "algo_beats": true
+    },
+    {
+      "period": "2024+",
+      "algo_cagr": 49.17,
+      "bench_cagr": 20.56,
+      "algo_beats": true
+    }
+  ],
+  "subperiod_win_count": "3/3",
+  "verdict_lenient": "지수 우위 확인(관대한 기준)",
+  "note": "관대한 기준: PBO/DSR(다중검정) 대신 페어드 t검정·부트스트랩CI·월간승률·서브기간승패로 판단 — '이미 확정된 라이브 설정 하나가 지수보다 나은가'라는 단일 질문에 맞는 통계(다중검정 벌점 없음)."
+}

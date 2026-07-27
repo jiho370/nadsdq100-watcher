@@ -1,0 +1,73 @@
+{
+  "as_of": "2026-07-23",
+  "n_days": 2261,
+  "kind": "서술 비교(가설검정 아님)",
+  "full_period": {
+    "알고리즘(topn8)": {
+      "cagr_pct": 32.12,
+      "sharpe": 1.14,
+      "mdd_pct": -34.9
+    },
+    "SPY": {
+      "cagr_pct": 14.74,
+      "sharpe": 0.83,
+      "mdd_pct": -33.7
+    },
+    "SPMO": {
+      "cagr_pct": 20.85,
+      "sharpe": 0.98,
+      "mdd_pct": -30.9
+    },
+    "BRK-A": {
+      "cagr_pct": 12.34,
+      "sharpe": 0.69,
+      "mdd_pct": -30.4
+    }
+  },
+  "subperiods": {
+    "2018-2023": {
+      "알고리즘(topn8)": {
+        "cagr_pct": 25.85,
+        "sharpe": 1.03,
+        "mdd_pct": -34.9
+      },
+      "SPY": {
+        "cagr_pct": 12.61,
+        "sharpe": 0.7,
+        "mdd_pct": -33.7
+      },
+      "SPMO": {
+        "cagr_pct": 14.21,
+        "sharpe": 0.73,
+        "mdd_pct": -30.9
+      },
+      "BRK-A": {
+        "cagr_pct": 12.17,
+        "sharpe": 0.66,
+        "mdd_pct": -30.4
+      }
+    },
+    "2024+": {
+      "알고리즘(topn8)": {
+        "cagr_pct": 50.42,
+        "sharpe": 1.4,
+        "mdd_pct": -25.9
+      },
+      "SPY": {
+        "cagr_pct": 20.56,
+        "sharpe": 1.26,
+        "mdd_pct": -18.8
+      },
+      "SPMO": {
+        "cagr_pct": 39.91,
+        "sharpe": 1.61,
+        "mdd_pct": -20.1
+      },
+      "BRK-A": {
+        "cagr_pct": 12.19,
+        "sharpe": 0.79,
+        "mdd_pct": -14.4
+      }
+    }
+  }
+}

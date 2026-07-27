@@ -1,0 +1,58 @@
+{
+  "as_of": "2026-07-24",
+  "kind": "후보 스크리닝(서술, 가설검정 아님)",
+  "brka_reference": "corr_vs_algo_full 0.445 · down_days 0.37 (§6-J-2 기준점)",
+  "gold_reference": "gld는 §6-P에서 이미 상위권 확인됨(비교 스크리닝 대상 아님)",
+  "rows": [
+    {
+      "ticker": "JNJ",
+      "n_days": 2262,
+      "start": "2017-07-25",
+      "cagr_pct": 11.02,
+      "sharpe": 0.64,
+      "mdd_pct": -27.4,
+      "corr_vs_algo_full": 0.191,
+      "corr_vs_algo_down_days": 0.145
+    },
+    {
+      "ticker": "DBMF",
+      "n_days": 1813,
+      "start": "2019-05-08",
+      "cagr_pct": 9.48,
+      "sharpe": 0.79,
+      "mdd_pct": -20.4,
+      "corr_vs_algo_full": 0.202,
+      "corr_vs_algo_down_days": 0.217
+    },
+    {
+      "ticker": "XLP",
+      "n_days": 2262,
+      "start": "2017-07-25",
+      "cagr_pct": 7.65,
+      "sharpe": 0.56,
+      "mdd_pct": -24.5,
+      "corr_vs_algo_full": 0.389,
+      "corr_vs_algo_down_days": 0.337
+    },
+    {
+      "ticker": "XLU",
+      "n_days": 2262,
+      "start": "2017-07-25",
+      "cagr_pct": 9.93,
+      "sharpe": 0.58,
+      "mdd_pct": -36.1,
+      "corr_vs_algo_full": 0.364,
+      "corr_vs_algo_down_days": 0.351
+    },
+    {
+      "ticker": "EFA",
+      "n_days": 2262,
+      "start": "2017-07-25",
+      "cagr_pct": 8.24,
+      "sharpe": 0.54,
+      "mdd_pct": -34.2,
+      "corr_vs_algo_full": 0.692,
+      "corr_vs_algo_down_days": 0.604
+    }
+  ]
+}

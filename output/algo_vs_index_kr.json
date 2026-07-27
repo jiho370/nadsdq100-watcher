@@ -1,0 +1,49 @@
+{
+  "label": "국장(valuediv topn5 vs 코스피200)",
+  "n_months": 93,
+  "full_period": {
+    "algo": {
+      "cagr_pct": 19.93,
+      "sharpe": 0.87,
+      "mdd_pct": -52.7
+    },
+    "bench": {
+      "cagr_pct": 19.56,
+      "sharpe": 0.83,
+      "mdd_pct": -36.1
+    }
+  },
+  "paired_ttest_monthly": {
+    "t": -0.187,
+    "p": 0.852,
+    "n": 93
+  },
+  "monthly_win_rate_pct": 44.1,
+  "cagr_diff_bootstrap": {
+    "mean": 3.21,
+    "ci95_lo": -20.31,
+    "ci95_hi": 23.23,
+    "pct_positive": 63.0
+  },
+  "sharpe_diff_bootstrap": {
+    "ci95_lo": -0.408,
+    "ci95_hi": 1.058
+  },
+  "subperiods": [
+    {
+      "period": "전반",
+      "algo_cagr": -13.68,
+      "bench_cagr": -3.29,
+      "algo_beats": false
+    },
+    {
+      "period": "후반",
+      "algo_cagr": 33.53,
+      "bench_cagr": 28.14,
+      "algo_beats": true
+    }
+  ],
+  "subperiod_win_count": "1/2",
+  "verdict_lenient": "판정 보류",
+  "note": "관대한 기준: PBO/DSR(다중검정) 대신 페어드 t검정·부트스트랩CI·월간승률·서브기간승패로 판단 — '이미 확정된 라이브 설정 하나가 지수보다 나은가'라는 단일 질문에 맞는 통계(다중검정 벌점 없음)."
+}

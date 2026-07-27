@@ -1,0 +1,146 @@
+{
+  "as_of": "2026-07-24",
+  "kind": "가상 시나리오 스트레스 테스트(사전등록 아님) — 알고리즘+SPMO 동반 alpha 축소, BRK-A는 실제경로 유지",
+  "assumption": "알고리즘·SPMO는 둘 다 '팩터 레짐 의존' 베팅이라 공통 팩터리스크 실현 시 같이 타격받는다고 가정(하락일 상관 0.767 근거). BRK-A는 상관 낮아(0.37) 열외.",
+  "alpha_algo_annualized_approx_pct": 16.1,
+  "alpha_spmo_annualized_approx_pct": 5.6,
+  "rows": [
+    {
+      "degrade_s": 1.0,
+      "label": "엣지 100%",
+      "순수(100:0)": {
+        "cagr_pct": 31.94,
+        "sharpe": 1.13,
+        "mdd_pct": -34.9
+      },
+      "SPMO 70:30(동반열화)": {
+        "cagr_pct": 28.67,
+        "sharpe": 1.13,
+        "mdd_pct": -33.7
+      },
+      "BRK-A 70:30(그대로)": {
+        "cagr_pct": 26.49,
+        "sharpe": 1.15,
+        "mdd_pct": -33.5
+      },
+      "BRK-A 90:10(그대로)": {
+        "cagr_pct": 30.17,
+        "sharpe": 1.14,
+        "mdd_pct": -34.4
+      }
+    },
+    {
+      "degrade_s": 0.75,
+      "label": "엣지 75%",
+      "순수(100:0)": {
+        "cagr_pct": 26.73,
+        "sharpe": 0.99,
+        "mdd_pct": -35.1
+      },
+      "SPMO 70:30(동반열화)": {
+        "cagr_pct": 24.57,
+        "sharpe": 1.0,
+        "mdd_pct": -33.9
+      },
+      "BRK-A 70:30(그대로)": {
+        "cagr_pct": 22.96,
+        "sharpe": 1.02,
+        "mdd_pct": -33.7
+      },
+      "BRK-A 90:10(그대로)": {
+        "cagr_pct": 25.53,
+        "sharpe": 1.0,
+        "mdd_pct": -34.7
+      }
+    },
+    {
+      "degrade_s": 0.5,
+      "label": "엣지 50%",
+      "순수(100:0)": {
+        "cagr_pct": 21.72,
+        "sharpe": 0.84,
+        "mdd_pct": -35.4
+      },
+      "SPMO 70:30(동반열화)": {
+        "cagr_pct": 20.6,
+        "sharpe": 0.87,
+        "mdd_pct": -34.1
+      },
+      "BRK-A 70:30(그대로)": {
+        "cagr_pct": 19.54,
+        "sharpe": 0.9,
+        "mdd_pct": -33.9
+      },
+      "BRK-A 90:10(그대로)": {
+        "cagr_pct": 21.05,
+        "sharpe": 0.86,
+        "mdd_pct": -34.9
+      }
+    },
+    {
+      "degrade_s": 0.25,
+      "label": "엣지 25%",
+      "순수(100:0)": {
+        "cagr_pct": 16.91,
+        "sharpe": 0.7,
+        "mdd_pct": -36.5
+      },
+      "SPMO 70:30(동반열화)": {
+        "cagr_pct": 16.75,
+        "sharpe": 0.74,
+        "mdd_pct": -34.3
+      },
+      "BRK-A 70:30(그대로)": {
+        "cagr_pct": 16.21,
+        "sharpe": 0.77,
+        "mdd_pct": -34.0
+      },
+      "BRK-A 90:10(그대로)": {
+        "cagr_pct": 16.74,
+        "sharpe": 0.72,
+        "mdd_pct": -35.1
+      }
+    },
+    {
+      "degrade_s": 0.0,
+      "label": "엣지 0%",
+      "순수(100:0)": {
+        "cagr_pct": 12.29,
+        "sharpe": 0.55,
+        "mdd_pct": -38.7
+      },
+      "SPMO 70:30(동반열화)": {
+        "cagr_pct": 13.03,
+        "sharpe": 0.61,
+        "mdd_pct": -34.5
+      },
+      "BRK-A 70:30(그대로)": {
+        "cagr_pct": 12.97,
+        "sharpe": 0.65,
+        "mdd_pct": -34.2
+      },
+      "BRK-A 90:10(그대로)": {
+        "cagr_pct": 12.58,
+        "sharpe": 0.58,
+        "mdd_pct": -35.8
+      }
+    }
+  ],
+  "cushion_at_full_degradation": {
+    "SPMO 70:30(동반열화)": {
+      "sharpe_diff_vs_pure": 0.06,
+      "mdd_diff_vs_pure_pp": 4.2,
+      "cagr_diff_vs_pure_pp": 0.74
+    },
+    "BRK-A 70:30(그대로)": {
+      "sharpe_diff_vs_pure": 0.1,
+      "mdd_diff_vs_pure_pp": 4.5,
+      "cagr_diff_vs_pure_pp": 0.68
+    },
+    "BRK-A 90:10(그대로)": {
+      "sharpe_diff_vs_pure": 0.03,
+      "mdd_diff_vs_pure_pp": 2.9,
+      "cagr_diff_vs_pure_pp": 0.29
+    }
+  }
+}

@@ -1,0 +1,68 @@
+{
+  "as_of": "2026-07-24",
+  "kind": "서술비교 + 70:30 단일비율 CAGR비용 사전등록",
+  "caveat": "꼬리위험 지표는 같은 과거 데이터의 알고리즘 자체 위기구간 재생 — 미래 과최적화 방어의 증거 아님. 상관계수·CAGR비용은 통계적 근거 있음(부트스트랩).",
+  "correlation_vs_algo": {
+    "spmo_full": 0.815,
+    "spmo_algo_down_days": 0.767,
+    "brka_full": 0.445,
+    "brka_algo_down_days": 0.37
+  },
+  "algo_worst_drawdown_window": {
+    "peak": "2020-02-19",
+    "trough": "2020-03-23"
+  },
+  "tail_metrics": {
+    "순수(100:0)": {
+      "cagr_pct": 32.02,
+      "sharpe": 1.13,
+      "crash_window_return_pct": -34.9,
+      "worst_rolling_12m_pct": -21.7,
+      "cvar95_monthly_pct": -12.45
+    },
+    "SPMO 70:30": {
+      "cagr_pct": 28.76,
+      "sharpe": 1.13,
+      "crash_window_return_pct": -33.7,
+      "worst_rolling_12m_pct": -19.0,
+      "cvar95_monthly_pct": -11.53
+    },
+    "SPMO 80:20": {
+      "cagr_pct": 29.86,
+      "sharpe": 1.13,
+      "crash_window_return_pct": -34.1,
+      "worst_rolling_12m_pct": -19.9,
+      "cvar95_monthly_pct": -11.84
+    },
+    "BRK-A 70:30": {
+      "cagr_pct": 26.51,
+      "sharpe": 1.15,
+      "crash_window_return_pct": -33.5,
+      "worst_rolling_12m_pct": -18.9,
+      "cvar95_monthly_pct": -10.76
+    },
+    "BRK-A 80:20": {
+      "cagr_pct": 28.39,
+      "sharpe": 1.15,
+      "crash_window_return_pct": -34.0,
+      "worst_rolling_12m_pct": -18.8,
+      "cvar95_monthly_pct": -11.18
+    }
+  },
+  "cagr_cost_70_30": {
+    "SPMO": {
+      "t": -2.055,
+      "p": 0.0399,
+      "cagr_diff_mean": -3.68,
+      "ci95_lo": -7.52,
+      "ci95_hi": -0.39
+    },
+    "BRK-A": {
+      "t": -2.169,
+      "p": 0.0301,
+      "cagr_diff_mean": -5.68,
+      "ci95_lo": -11.81,
+      "ci95_hi": -0.45
+    }
+  }
+}

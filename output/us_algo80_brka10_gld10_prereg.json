@@ -1,0 +1,64 @@
+{
+  "as_of": "2026-07-24",
+  "n_months": 119,
+  "years": 11.0,
+  "ratio": {
+    "algo": 0.8,
+    "brka": 0.1,
+    "gld": 0.1
+  },
+  "prereg": {
+    "hypothesis": "algo0.8:brka0.1:gld0.1 블렌드 샤프가 순수(100:0:0)보다 유의하게 낫다",
+    "decision_rule": "①샤프차이 95%CI 하한>0 AND ②서브기간 전부 블렌드우위"
+  },
+  "full_period": {
+    "pure": {
+      "cagr_pct": 38.39,
+      "sharpe": 1.17,
+      "mdd_pct": -39.8
+    },
+    "blend": {
+      "cagr_pct": 33.63,
+      "sharpe": 1.22,
+      "mdd_pct": -33.8
+    }
+  },
+  "sharpe_diff_bootstrap": {
+    "mean": 0.081,
+    "ci95_lo": 0.009,
+    "ci95_hi": 0.165,
+    "pct_positive": 98.8
+  },
+  "cagr_diff_bootstrap": {
+    "mean": -4.75,
+    "ci95_lo": -10.09,
+    "ci95_hi": -0.17,
+    "pct_positive": 1.9
+  },
+  "subperiods": [
+    {
+      "period": "2018-2023",
+      "pure_sharpe": 1.1,
+      "blend_sharpe": 1.13,
+      "sharpe_diff": 0.03,
+      "pure_mdd": -39.8,
+      "blend_mdd": -33.8
+    },
+    {
+      "period": "2024+",
+      "pure_sharpe": 1.37,
+      "blend_sharpe": 1.47,
+      "sharpe_diff": 0.1,
+      "pure_mdd": -31.2,
+      "blend_mdd": -24.0
+    }
+  ],
+  "gates": {
+    "g1_sharpe_ci_lo_positive": true,
+    "g2_subperiod_consistent": true
+  },
+  "direction": "블렌드 우위",
+  "passed": true,
+  "verdict": "채택 후보",
+  "note": "단일 사전등록 시행(격자 재탐색 아님) — PBO/DSR 대상 아님."
+}

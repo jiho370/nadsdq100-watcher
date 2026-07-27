@@ -1,0 +1,62 @@
+{
+  "as_of": "2026-07-24",
+  "years_requested": 11,
+  "n_days": 2513,
+  "algo_full_period": {
+    "cagr_pct": 38.39,
+    "sharpe": 1.17,
+    "mdd_pct": -39.8
+  },
+  "spy_benchmark": {
+    "cagr_pct": 14.92,
+    "sharpe": 0.87,
+    "mdd_pct": -33.7
+  },
+  "yearly_returns": [
+    {
+      "year": 2016,
+      "return_pct": 9.3
+    },
+    {
+      "year": 2017,
+      "return_pct": 35.9
+    },
+    {
+      "year": 2018,
+      "return_pct": -10.1
+    },
+    {
+      "year": 2019,
+      "return_pct": 47.6
+    },
+    {
+      "year": 2020,
+      "return_pct": 56.2
+    },
+    {
+      "year": 2021,
+      "return_pct": 77.5
+    },
+    {
+      "year": 2022,
+      "return_pct": -28.9
+    },
+    {
+      "year": 2023,
+      "return_pct": 97.5
+    },
+    {
+      "year": 2024,
+      "return_pct": 105.0
+    },
+    {
+      "year": 2025,
+      "return_pct": 33.5
+    },
+    {
+      "year": 2026,
+      "return_pct": 14.4
+    }
+  ],
+  "note": "EDGAR 11년 커버리지가 100%가 아니므로(직전 세션 커버리지 분석 참고) 결측 종목은 해당 팩터 z=0(중립) 처리됨 — 완전한 PIT 표본은 아님."
+}

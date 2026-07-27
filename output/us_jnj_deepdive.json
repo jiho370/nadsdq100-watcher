@@ -1,0 +1,69 @@
+{
+  "as_of": "2026-07-24",
+  "ticker": "JNJ",
+  "ratio": 0.7,
+  "years": 11.0,
+  "n_months": 119,
+  "prereg": {
+    "hypothesis": "algo70:JNJ30 블렌드 샤프가 순수(100:0)보다 유의하게 낫다",
+    "decision_rule": "①샤프차이 95%CI 하한>0 AND ②서브기간 전부 블렌드우위"
+  },
+  "correlation_vs_algo": {
+    "full": 0.145,
+    "algo_down_days": 0.127
+  },
+  "full_period": {
+    "pure": {
+      "cagr_pct": 38.39,
+      "sharpe": 1.17,
+      "mdd_pct": -39.8
+    },
+    "blend": {
+      "cagr_pct": 30.77,
+      "sharpe": 1.24,
+      "mdd_pct": -32.6
+    }
+  },
+  "tail_metrics": {
+    "algo_worst_drawdown_window": {
+      "peak": "2021-11-29",
+      "trough": "2022-10-14"
+    },
+    "crash_window_return_pct": -27.8,
+    "worst_rolling_12m_pct": -20.8,
+    "cvar95_monthly_pct": -11.12
+  },
+  "cagr_diff_bootstrap": {
+    "mean": -8.17,
+    "ci95_lo": -17.98,
+    "ci95_hi": -0.1
+  },
+  "sharpe_diff_bootstrap": {
+    "mean": 0.076,
+    "ci95_lo": -0.091,
+    "ci95_hi": 0.265,
+    "pct_positive": 81.0
+  },
+  "subperiods": [
+    {
+      "period": "2018-2023",
+      "pure_sharpe": 1.1,
+      "blend_sharpe": 1.08,
+      "sharpe_diff": -0.02
+    },
+    {
+      "period": "2024+",
+      "pure_sharpe": 1.37,
+      "blend_sharpe": 1.66,
+      "sharpe_diff": 0.29
+    }
+  ],
+  "gates": {
+    "g1_sharpe_ci_lo_positive": false,
+    "g2_subperiod_consistent": false
+  },
+  "direction": "블렌드 우위",
+  "passed": false,
+  "verdict": "판정 보류(유의한 차이 없음)",
+  "note": "단일 사전등록 시행 — PBO/DSR 대상 아님. 꼬리위험 지표는 같은 과거데이터 재생(§6-H-5 한계 동일)."
+}
