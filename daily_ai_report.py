@@ -137,7 +137,7 @@ def _bench_series(signals, key):
 
 
 def _holdings_section(hstate, ind_map, price_map, bench_dates, bench_closes, index_name, krw=False,
-                      name_map=None, extra_index=None, blend_index=None):
+                      name_map=None, extra_index=None, blend_index=None, market="US"):
     """holdings.py 보유현황 표+포트폴리오 비교차트를 조립. (html, images) — 데이터 없으면 ("", []).
     extra_index={"label","dates","closes"}(선택) — 지수 비교선(2026-07-17, 지호 님 요청 —
     미장은 나스닥100). blend_index={"label","dates","closes","ratio"}(선택, 2026-07-19,
@@ -188,7 +188,8 @@ def _holdings_section(hstate, ind_map, price_map, bench_dates, bench_closes, ind
         print(f"[경고] {index_name} 보유현황 그래프 생략(series 없음) — "
               f"보유종목 최소편입일={since_min}, 벤치마크 마지막날짜={bench_dates[-1] if bench_dates else None}",
               file=sys.stderr)
-    return AR.holdings_table_html(summary, krw=krw, chart_cid=chart_cid, totals=totals,
+    realized = H.realized_summary(market=market)
+    return AR.holdings_table_html(summary, krw=krw, chart_cid=chart_cid, totals=totals, realized=realized,
                                   name_map=name_map), images
 
 
@@ -365,7 +366,7 @@ def run_kr(no_email: bool = False, force: bool = False):
                            if x.get("severity") == "구조적"}
         if ai_excluded_map:
             try:
-                ai_sells = KR.sell_ai_excluded(ai_excluded_map, kr["ind_map"])
+                ai_sells = KR.sell_ai_excluded(ai_excluded_map, kr["ind_map"], today_kst)
                 if ai_sells:
                     name_map_ai = {c["symbol"]: c.get("name") for c in kr_cands if c.get("name")}
                     for s in ai_sells:
@@ -408,7 +409,7 @@ def run_kr(no_email: bool = False, force: bool = False):
             kr_blend_label = "코스피70+알고리즘30" if _KFONT else "KOSPI70+Algo30"
             holdings_html, holdings_images = _holdings_section(
                 kr_state, kr["ind_map"], price_map, bench_dates, bench_closes, "코스피", krw=True,
-                name_map=name_map,
+                name_map=name_map, market="KR",
                 blend_index={"label": kr_blend_label, "dates": bench_dates, "closes": bench_closes,
                             "ratio": 0.3})
         except Exception as e:

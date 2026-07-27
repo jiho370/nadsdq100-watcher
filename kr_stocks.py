@@ -217,7 +217,7 @@ def update_holdings(buy_syms: list, ind_map: dict, today: str, pool_syms=None) -
     import holdings as H
     state = H.load(KR_HOLDINGS)
     sells = H.update(state, buy_syms, ind_map, today,
-                     pool_syms=set(pool_syms) if pool_syms else None)
+                     pool_syms=set(pool_syms) if pool_syms else None, market="KR")
     H.save(state, KR_HOLDINGS)
     return sells
 
@@ -230,11 +230,11 @@ def add_holdings(buy_syms: list, ind_map: dict, today: str):
     H.save(state, KR_HOLDINGS)
 
 
-def sell_ai_excluded(excluded: dict, ind_map: dict) -> list:
+def sell_ai_excluded(excluded: dict, ind_map: dict, today: str) -> list:
     """오늘 AI가 '제외' 판정한 종목 중 보유 중인 게 있으면 매도 처리. excluded={symbol: reason}."""
     import holdings as H
     state = H.load(KR_HOLDINGS)
-    sells = H.remove_excluded(state, excluded, ind_map)
+    sells = H.remove_excluded(state, excluded, ind_map, today, market="KR")
     if sells:
         H.save(state, KR_HOLDINGS)
     return sells

@@ -1010,9 +1010,13 @@ def _excluded_html(items, is_kr=False):
 
 
 def holdings_table_html(summary: list, krw: bool = False, chart_cid: str | None = None,
-                        totals: dict | None = None, name_map: dict | None = None) -> str:
+                        totals: dict | None = None, name_map: dict | None = None,
+                        realized: dict | None = None) -> str:
     """holdings.live_summary() 결과를 보유현황 표로. summary 없으면 빈 문자열(섹션 자체 생략).
-    totals={"strategy","bench","index_name"} — 전체 투입자산 기준 누적수익률 vs 지수(있으면 표기).
+    totals={"strategy","bench","index_name"} — 현재 보유 중인 자산(미실현) 기준 누적수익률 vs 지수.
+    realized={"n","avg_pct"}(holdings.realized_summary()) — 이미 청산된 매매의 평균 실현수익률.
+    2026-07-26(지호 님 지적 — "수익률에 예전에 사고 판 것도 포함되는거지?"): 아니었다 — totals는
+    지금 보유 중인 바스켓만의 스냅샷이라 별도로 청산분을 표시해 혼동을 줄인다.
     name_map={symbol:name} — 한국은 종목코드(숫자)만으론 못 알아보므로 이름으로 치환
     (2026-07-15, 지호 님 피드백). 없으면 symbol 그대로(미국은 티커 자체가 읽을 만해 그대로 둠)."""
     if not summary:
@@ -1034,10 +1038,15 @@ def holdings_table_html(summary: list, krw: bool = False, chart_cid: str | None 
         sc = "#15803d" if totals["strategy"] >= 0 else "#b91c1c"
         bc = "#15803d" if totals["bench"] >= 0 else "#b91c1c"
         totals_html = (
-            f'<div style="font-size:13px;margin:2px 0 6px">전체 투입자산 기준 '
+            f'<div style="font-size:13px;margin:2px 0 2px">보유 중인 자산 기준(미실현) '
             f'<b style="color:{sc}">{totals["strategy"]:+.1f}%</b>'
             f' <span style="color:#9ca3af">vs</span> {_esc(totals["index_name"])}(동일시점·동일금액) '
             f'<b style="color:{bc}">{totals["bench"]:+.1f}%</b></div>')
+    if realized:
+        rc = "#15803d" if realized["avg_pct"] >= 0 else "#b91c1c"
+        totals_html += (
+            f'<div style="font-size:13px;margin:0 0 6px;color:#6b7280">청산 완료 {realized["n"]}건 '
+            f'평균 실현수익률 <b style="color:{rc}">{realized["avg_pct"]:+.1f}%</b></div>')
     return (
         '<h3 style="margin:18px 0 4px">&#128202; 보유현황</h3>' + totals_html +
         '<table role="presentation" style="border-collapse:collapse;font-size:12px;width:100%;max-width:640px">'

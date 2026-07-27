@@ -52,6 +52,12 @@ MA200_BACKUP = os.environ.get("SELL_MA200_BACKUP", "0") == "1"
 # 재이탈 시 매도. "unconditional" = 예전 무조건 규칙(버그 재현용, 쓰지 말 것).
 MA_STOP_MODE = os.environ.get("SELL_MA_STOP_MODE", "state_gated")
 REEVAL_DAYS = int(os.environ.get("SELL_REEVAL_DAYS", "180"))  # ≈6개월(달력일) — 검증된 보유기간
+# 2026-07-26(지호 님 지적 — "보유현황 수익률에 예전에 사고 판 것도 포함되는거지?"): 아니었다.
+# update()/remove_excluded()는 매도 종목을 state에서 지우기만 하고 어디에도 남기지 않아,
+# live_summary()/portfolio_series() 기반의 '전체 투입자산 기준' 수익률은 항상 "지금 보유 중인
+# 바스켓의 평균 수익률" 스냅샷일 뿐 — 전략 시작 이후 실현손익 누적을 보여주지 못했다.
+# 매도가 날 때마다 그 종목의 손익 기록을 여기에 append해 실현손익을 별도로 추적한다.
+TRADE_LOG = os.environ.get("HOLDINGS_TRADE_LOG", "output/trade_log.json")
 
 
 def load(path=STATE) -> dict:
@@ -72,11 +78,45 @@ def _isnan(x):
     return x is None or (isinstance(x, float) and x != x)
 
 
-def update(state: dict, buy_now_syms: list, ind_map: dict, today: str, pool_syms=None):
+def _load_trade_log(path=TRADE_LOG) -> list:
+    try:
+        with open(path, encoding="utf-8") as f:
+            return json.load(f) or []
+    except Exception:
+        return []
+
+
+def _append_trade_log(sells: list, market: str, until: str, path=TRADE_LOG):
+    """청산된 매매를 원장(output/trade_log.json)에 append. sells는 update()/remove_excluded()가
+    만드는 그 리스트(symbol/since/entry/price/ret_pct/reason) 그대로 재사용."""
+    if not sells:
+        return
+    log = _load_trade_log(path)
+    for s in sells:
+        log.append({"symbol": s["symbol"], "market": market, "since": s.get("since"), "until": until,
+                    "entry": s.get("entry"), "exit": s.get("price"), "ret_pct": s.get("ret_pct"),
+                    "reason": s.get("reason")})
+    os.makedirs(os.path.dirname(path) or ".", exist_ok=True)
+    with open(path, "w", encoding="utf-8") as f:
+        json.dump(log, f, ensure_ascii=False, indent=2)
+
+
+def realized_summary(market: str | None = None, path=TRADE_LOG) -> dict | None:
+    """청산 완료된 매매의 실현손익 요약(건수·평균 수익률). market="US"/"KR"로 필터,
+    None이면 전체. 표본 없으면 None(호출부가 섹션 자체를 생략하도록)."""
+    trades = [t for t in _load_trade_log(path) if t.get("ret_pct") is not None
+              and (market is None or t.get("market") == market)]
+    if not trades:
+        return None
+    return {"n": len(trades), "avg_pct": sum(t["ret_pct"] for t in trades) / len(trades)}
+
+
+def update(state: dict, buy_now_syms: list, ind_map: dict, today: str, pool_syms=None, market: str = "US"):
     """보유 갱신 + 매도 시그널 산출. 반환: sells[list].  state 는 제자리 수정.
     매도 규칙(2026-07-15 재검증 반영): ①200일선 -3% 이탈은 기본 비활성(SELL_MA200_BACKUP=1
     이어야 켜짐 — 근거는 모듈 docstring) ②보유 ≈6개월 경과 후 현재 후보풀(pool_syms) 밖이면
-    정기 재평가 매도(현재 유일한 활성 트리거) ③트레일링은 SELL_TRAIL>0일 때만."""
+    정기 재평가 매도(현재 유일한 활성 트리거) ③트레일링은 SELL_TRAIL>0일 때만.
+    market("US"/"KR")은 청산분을 trade_log에 기록할 때 태그로 쓴다(realized_summary 참고)."""
     import datetime as _dt
     holdings = state.setdefault("holdings", {})
     sells = []
@@ -113,13 +153,15 @@ def update(state: dict, buy_now_syms: list, ind_map: dict, today: str, pool_syms
                           "entry": h.get("entry_price"), "price": price, "ret_pct": ret,
                           "peak": h.get("peak")})
             del holdings[sym]
+    if sells:
+        _append_trade_log(sells, market, today)
     # 신규 매수 종목 자동 편입(이미 보유면 유지)
     add(state, buy_now_syms, ind_map, today)
     state["last_run"] = today
     return sells
 
 
-def remove_excluded(state: dict, excluded: dict, ind_map: dict) -> list:
+def remove_excluded(state: dict, excluded: dict, ind_map: dict, today: str, market: str = "US") -> list:
     """AI가 오늘 '제외' 판정한 종목 중 보유 중인 게 있으면 즉시 매도 처리(보유목록에서 제거).
     excluded={symbol: reason}. 2026-07-16(지호 님 피드백 — 한국전력 사례): 매수후보 알고리즘이
     AI 제외로 걸러낸 종목을 계속 보유하는 건 앞뒤가 안 맞음 — 기존 매도 트리거(6개월 재평가/
@@ -139,6 +181,8 @@ def remove_excluded(state: dict, excluded: dict, ind_map: dict) -> list:
                       "since": h.get("since"), "entry": entry, "price": price,
                       "ret_pct": ret, "peak": h.get("peak")})
         del holdings[sym]
+    if sells:
+        _append_trade_log(sells, market, today)
     return sells
 
 
@@ -220,7 +264,7 @@ def portfolio_series(summary: list, price_map: dict, bench_dates: list, bench_cl
     # clamp한다(dates[0]로 당기면 원래 유효했던 최근 편입일까지 왜곡되므로 dates[-1] 사용).
     dlast = dates[-1]
     since_capped = {r["symbol"]: (dlast if r["since"] > dlast else r["since"]) for r in entries}
-    aligned, anchor = {}, {}
+    aligned = {}
     for r in entries:
         pm = price_map.get(r["symbol"]) or {}
         d, c = pm.get("dates") or [], pm.get("closes") or []
@@ -232,20 +276,14 @@ def portfolio_series(summary: list, price_map: dict, bench_dates: list, bench_cl
                 lastv = c[j]; j += 1
             arr.append(lastv)
         aligned[r["symbol"]] = arr
-        # 2026-07-17(지호 님 피드백 — "0으로 그냥 보정하면 수치오류 아니냐"): 맞는 지적이라
-        # 근본 수정. entry_price는 편입 시점에 저장된 값인데, arr는 이후(오늘) 재조회한
-        # 시계열이다 — yfinance가 auto_adjust=True(수정주가)라 배당락 등이 생길 때마다
-        # 과거 시세 전체가 소급 조정돼, 저장된 entry_price와 재조회 시계열이 시간이 갈수록
-        # 계속 어긋난다(0일차만이 아니라 이후 날짜도 전부 같은 방향으로 살짝 밀림). "0으로
-        # 고정"은 0일차 증상만 가릴 뿐 근본 원인은 그대로였다 — 진짜 수정은 분모(기준가)를
-        # entry_price 대신 같은 재조회 시계열 안에서 시작일에 해당하는 값으로 통일하는 것
-        # (전 구간이 같은 소스·같은 조정기준이 되어 데이터가 실제로 동기화됨).
-        since = since_capped[r["symbol"]]
-        a0 = None
-        for k2, day2 in enumerate(dates):
-            if day2 >= since and arr[k2]:
-                a0 = arr[k2]; break
-        anchor[r["symbol"]] = a0 if a0 else r["entry"]   # 재조회 시계열에 값이 없으면만 폴백
+    # 2026-07-26(지호 님 발견 — 개별 종목 표와 상단 합계가 안 맞음): 한때(2026-07-17) 기준가를
+    # entry_price 대신 재조회 시계열의 '매수일 종가'로 바꿔 썼었다(배당락 조정 드리프트 보정
+    # 목적). 그런데 매수 당일 장중 체결가와 그날 종가가 크게 벌어지는 경우(예: 당일 급락한
+    # WDAY -9.7%)엔 기준가=오늘 종가가 되어버려 그 손익이 통째로 0%로 지워지는 부작용이 있었다
+    # — 개별 종목 표(entry_price 기준)와 상단 합계가 어긋나던 원인. entry_price를 그대로 쓰는
+    # 쪽으로 되돌림: 배당 드리프트는 보유기간이 최대 ~180일(6개월 재평가)로 제한돼 오차가
+    # 작고 완만하지만, 매수일 체결가 괴리는 크고 즉각적이라 이쪽을 막는 게 더 중요하다. 이제
+    # 상단 합계는 항상 개별 종목 표의 평균과 정확히 일치한다.
     port, bench = [], []
     for k, day in enumerate(dates):
         rs, bs = [], []
@@ -254,7 +292,7 @@ def portfolio_series(summary: list, price_map: dict, bench_dates: list, bench_cl
             if since > day:
                 continue
             arr = aligned.get(r["symbol"])
-            base = anchor.get(r["symbol"]) or r["entry"]
+            base = r["entry"]
             if arr and arr[k] and base:
                 rs.append((arr[k] / base - 1) * 100)
             bi = bisect.bisect_right(bench_dates, since) - 1
