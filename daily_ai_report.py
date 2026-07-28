@@ -2,12 +2,21 @@
 """
 daily_ai_report.py — 메일 2통 분리 러너 (2026-07-09 개편).
 
-  · 한국장 메일 (--kr) : 월~금 KST 08:00 발송(장전). 전날 한국장 마감 데이터 기준.
+  · 한국장 메일 (--kr) : 월~금 KST 10:00 발송(개장 1시간 후, 2026-07-28 08:00→10:00 이관 —
+        개장 직후 변동성 구간 회피 + 개장 1시간치 실제 시세 반영 목적). 종목 선정에 쓰이는
+        펀더멘탈(PER/PBR/배당)은 KRX가 장중에 당일치를 안 올려 여전히 전일 기준(kr_stocks.py
+        참고), 개별 종목 가격·보유현황 평가액(yfinance)만 10:00 시점 시세로 갱신됨.
         내용 = 전일 세계시장 요약(밤사이 미국 마감 포함, 코드 생성) + 지수·코인 신호
                + 코스피200 매수/관찰/매도. AI 검증은 전날 저녁 pregen_kr.json(구독 CLI)
                이 있으면 재사용(검색 0회), 없으면 API 폴백.
-  · 미국장 메일 (--us) : 화~토 KST 17:00 발송(미국장 개장 전). 그날 새벽 마감 데이터 기준.
-        내용 = 미국 시황 + S&P500 매수/관찰/매도. 당일 아침~오후 pregen_us.json 재사용.
+  · 미국장 메일 (--us) : 화~토 KST 00:00대 발송(2026-07-28 마감→개장 기준 이관 — 종가 대신
+        개장 30분~90분 후 시가 기준, 근거는 STRATEGY.md §7). 미국 동부 서머타임 때문에 KST
+        자정을 넘나드는 cron이라(report.yml 참고) "그날 개장" 리포트가 다음날 00:00대에
+        도착한다 — 예: 월요일 개장 리포트는 화요일 00:00대 도착. 지호 님이 이 자정 교차를
+        그대로 수용하기로 결정(2026-07-28) — 금요일 개장분은 토요일 00:00대 도착, 월요일
+        고유의 "월요일 아침 도착" 메일은 구조상 없음(월요일 개장 자체가 화요일에 보고됨).
+        내용 = 미국 시황 + S&P500 매수/관찰/매도. pregen_us.json은 그 전날 낮에 미리 생성돼
+        for_kst가 "다음날"로 찍힘(pregen.py run_us 참고 — 자정 교차와 동일한 이유).
   · 주간   (--weekly) : 일요일 자산배분 리포트(기존 weekly_report).
 
 실행:  python daily_ai_report.py --kr [--no-email]
@@ -284,7 +293,7 @@ def _preview_and_send(html, images, subject, out_name, no_email, sent_update):
             _save_last_sent(sent_update)   # 발송 성공 시에만 기록(실패하면 다음 실행 때 재시도)
 
 
-# ------------------------- 한국장 메일 (장전 08:00) -------------------------
+# ------------------------- 한국장 메일 (개장후 10:00) -------------------------
 def run_kr(no_email: bool = False, force: bool = False):
     import datetime as _dt
     R._require_yf()
@@ -439,14 +448,14 @@ def run_kr(no_email: bool = False, force: bool = False):
                                  market_html=market_html, signals_html=signals_html,
                                  banner=banner, show_spy=False, is_kr=True,
                                  market_label=("전주" if is_monday else "전일"),
-                                 title="🇰🇷 장전 시장 점검 · 코스피200 매수·매도 후보",
+                                 title="🇰🇷 장중 시장 점검 · 코스피200 매수·매도 후보",
                                  holdings_html=holdings_html)
-    _preview_and_send(html, images, f"[장전] {today_kst} 한국 시장 점검 · 매수·매도 후보",
+    _preview_and_send(html, images, f"[개장후] {today_kst} 한국 시장 점검 · 매수·매도 후보",
                       "kr_report.html", no_email,
                       {"sent_kr_kst": today_kst, "kr_as_of": kr.get("as_of")})
 
 
-# ------------------------- 미국장 메일 (마감 후 17:00) -------------------------
+# ------------------------- 미국장 메일 (개장 30분~90분 후, KST 자정대) -------------------------
 def run_us(no_email: bool = False, force: bool = False):
     import datetime as _dt
     R._require_yf()
@@ -566,17 +575,17 @@ def run_us(no_email: bool = False, force: bool = False):
     html = AR.render_report_html(report, as_of, metrics,
                                  market_html="", signals_html=signals_html,
                                  banner=banner, show_spy=bool(spy_closes),
-                                 title="🇺🇸 미국장 마감 점검 · S&P500 매수·매도 후보",
+                                 title="🇺🇸 미국장 개장 점검 · S&P500 매수·매도 후보",
                                  holdings_html=holdings_html)
-    _preview_and_send(html, images, f"[미국 마감] {today_kst} 시장 점검 · 매수·매도 후보",
+    _preview_and_send(html, images, f"[미국 개장] {today_kst} 시장 점검 · 매수·매도 후보",
                       "us_report.html", no_email,
                       {"sent_us_kst": today_kst, "us_as_of": as_of})
 
 
 if __name__ == "__main__":
-    ap = argparse.ArgumentParser(description="AI 종목추천 보고서 — 메일 2통(한국 장전/미국 마감)")
-    ap.add_argument("--kr", action="store_true", help="한국장 장전 메일")
-    ap.add_argument("--us", action="store_true", help="미국장 마감 메일")
+    ap = argparse.ArgumentParser(description="AI 종목추천 보고서 — 메일 2통(한국 개장후/미국 개장후)")
+    ap.add_argument("--kr", action="store_true", help="한국장 메일(개장후 10:00)")
+    ap.add_argument("--us", action="store_true", help="미국장 개장 메일(개장 30분~90분 후)")
     ap.add_argument("--weekly", action="store_true", help="주간 자산배분 리포트")
     ap.add_argument("--daily", action="store_true", help="(수동) 한국+미국 둘 다 실행")
     ap.add_argument("--no-email", action="store_true")

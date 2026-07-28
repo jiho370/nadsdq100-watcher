@@ -2,20 +2,28 @@
 """
 pregen.py — 로컬 PC에서 Pro 구독 CLI(claude -p)로 AI 검증+서술을 '미리' 생성 (메일 2통 체계).
 
-  --kr : 한국장 메일(다음날 08:00)용. 실행 창 = 저녁 16시 이후(장 마감 확정) 또는
-         다음날 새벽 08시 이전(부팅 보충). 장중(08~16시)엔 데이터가 애매해 스킵.
+  --kr : 한국장 메일(다음날 10:00, 2026-07-28부터 08:00→10:00 이관)용. 실행 창 = 저녁 16시
+         이후(장 마감 확정) 또는 다음날 새벽 10시 이전(부팅 보충 — 발송 10:00보다 여유 둠).
+         장중(10~16시)엔 데이터가 애매해 스킵.
          검증+종목별 서술+시황 총평까지 전부 미리 씀. 시황 총평은 **전일 한국장 기준만**
          (코스피·코스닥 등락·추세신호) 다루도록 범위를 좁혀서 — 19시 시점에 이미 확정된
          데이터라 미국장 마감을 기다릴 필요가 없다(2026-07-10: 이전엔 "밤사이 미국 마감까지
          포함"을 노려 발송 시점 경량 API 콜 1회가 남아있었으나, 그 정도 내용까지는 필요 없다고
-         판단해 국장 데이터만으로 19시에 전부 끝내도록 단순화함).
-         → output/pregen_kr.json (for_kst = 다음 08:00 발송일)
-  --us : 미국장 메일(당일 17:00, 월~금)용. 실행 창 = 06시(미국장 마감 후)~16시(발송 전).
-         이 시점엔 해당 세션이 이미 마감 확정이라 검증+서술+시황 총평까지 전부 미리 씀.
-         그 외 시각엔 이미 발송됐거나 데이터 미확정이라 스킵. → output/pregen_us.json
-         (for_kst = 오늘, 단 토요일 실행분은 for_kst = 다음 월요일 — 2026-07-27부터 미국장
-         메일이 토요일→월요일로 이관됨. 주말엔 신규 메일이 없고 월요일 메일이 금요일 마감
-         그대로를 다루므로, 토요일에 미리 끝낸 검증을 월요일 발송이 그대로 재사용한다.)
+         판단해 국장 데이터만으로 19시에 전부 끝내도록 단순화함). 발송 시각이 10:00으로
+         밀려도 이 pregen의 AI 검증(전일 데이터 기반) 자체는 그대로 유효 — 10:00에 달라지는
+         건 daily_ai_report.py가 그때 새로 조회하는 개별 종목 가격(yfinance, 개장 1시간치
+         반영)뿐이고 pregen 캐시(어제 저녁 검증)와는 무관하다.
+         → output/pregen_kr.json (for_kst = 다음 10:00 발송일)
+  --us : 미국장 메일(그날 저녁 개장 30분~90분 후, KST 자정 넘어 화~토 00:00대 도착)용.
+         2026-07-28 마감→개장 기준 이관(STRATEGY.md §7) — 발송이 그날 저녁 미국장 개장
+         직후로 당겨지면서, "검증에 필요한 최근 완결 종가"와 "발송 시각"의 관계가 국장
+         (§--kr)과 똑같은 모양이 됐다: 발송 몇 시간 전, 이미 확정된 지난 세션 종가로
+         미리 검증해두고, 발송 시점엔 daily_ai_report.py가 그때 막 열린 장의 실시간
+         시세(yfinance)만 새로 얹는다. 실행 창 = 06시(전날 세션 마감 확정 후)~21시(그날
+         저녁 개장 전 — 21시 이후는 개장이 임박/이미 진행 중이라 스킵, 다음날 재시도로
+         자연 대체). 이 창 안 실행분은 **for_kst = 다음날**로 찍는다(예: 월요일 낮에
+         실행 → for_kst=화요일 — 월요일 저녁 개장 리포트는 자정을 넘겨 화요일 00:00대에
+         발송되므로). → output/pregen_us.json
 
 아침/오후 GitHub Actions 는 pregen_{kr,us}.json 의 for_kst 가 발송일과 일치하면
 검증 단계(웹검색)를 생략하고, written(사전서술)까지 있으면 서술 단계(haiku)도 생략한다
@@ -119,10 +127,12 @@ def run_kr():
     now = datetime.datetime.now(R.KST)
     if now.hour >= 16:                       # 저녁 실행(정상) → 내일 아침 메일용
         for_kst = (now + datetime.timedelta(days=1)).date().isoformat()
-    elif now.hour < 8:                       # 새벽 보충 실행(부팅 시) → 오늘 아침 메일용
+    elif now.hour < 10:                      # 새벽 보충 실행(부팅 시) → 오늘 10:00 발송용
+        # 2026-07-28: 발송이 08:00→09:30→10:00(개장 1시간 후)로 이관되면서 보충 창도
+        # 8시→9시→10시로 늘림(그래야 10:00 발송 전에 pregen이 끝날 여유가 생김).
         for_kst = now.date().isoformat()
     else:
-        _log("한국장 pregen 은 16시 이후 또는 08시 이전에만 유효 → 스킵"); return
+        _log("한국장 pregen 은 16시 이후 또는 10시 이전에만 유효 → 스킵"); return
     R._require_yf()
     import kr_stocks as KR
     kr = KR.select(R.yf) or {}
@@ -157,15 +167,15 @@ def run_kr():
 
 def run_us():
     now = datetime.datetime.now(R.KST)
-    if not (6 <= now.hour < 16):             # 미국장 마감(새벽)~발송(17시) 사이만 유효
-        _log("미국장 pregen 은 06~16시(KST)에만 유효 → 스킵"); return
-    # 2026-07-27: 미장 메일 토→월 이관(report.yml 참고). 토요일 실행분은 금요일 마감 데이터를
-    # 다루는데(주말 내내 안 바뀜) 그 결과를 쓸 발송일은 다음 월요일이므로, for_kst를 앞당겨
-    # 찍어야 월요일 GHA(daily_ai_report._load_pregen)가 오늘 날짜로 이 캐시를 찾아 쓴다.
-    if now.weekday() == 5:                   # 토요일
-        for_kst = (now + datetime.timedelta(days=2)).date().isoformat()
-    else:
-        for_kst = now.date().isoformat()
+    # 2026-07-28 재설계(STRATEGY.md §7) — 발송이 "다음날 종가 분석"에서 "그날 저녁 개장
+    # 30분~90분 후"로 이관됨(report.yml 참고, KST 자정을 넘겨 화~토 00:00대 도착). 검증에
+    # 쓸 '이미 확정된 최근 종가'는 전날 세션 마감(06시경) 이후 계속 유효하고, 그날 저녁
+    # 개장(22:30~23:30경) 전까지가 실행 유효 창 — run_kr()의 "저녁 실행 → for_kst=다음날"과
+    # 정확히 같은 이유로, 이 창 안 실행분은 전부 for_kst를 다음날로 찍는다(오늘 낮에 검증한
+    # 내용이 쓰이는 발송은 자정을 넘겨 "내일" 날짜로 나가므로).
+    if not (6 <= now.hour < 21):
+        _log("미국장 pregen 은 06~21시(KST, 그날 저녁 개장 전)에만 유효 → 스킵"); return
+    for_kst = (now + datetime.timedelta(days=1)).date().isoformat()
     R._require_yf()
     data = R.gather_universe_data(with_volume=True)
     scored, info, _m = E.select_pool(data, int(os.environ.get("REPORT_MAX_CANDIDATES", "60")))
@@ -195,16 +205,18 @@ def run_us():
 
 if __name__ == "__main__":
     ap = argparse.ArgumentParser(description="구독 CLI 사전 검증(메일 2통 체계)")
-    ap.add_argument("--kr", action="store_true", help="한국장(다음 08:00)용")
-    ap.add_argument("--us", action="store_true", help="미국장(당일 17:00)용")
+    ap.add_argument("--kr", action="store_true", help="한국장(다음 10:00)용")
+    ap.add_argument("--us", action="store_true", help="미국장(그날 저녁 개장 30분~90분 후)용")
     a = ap.parse_args()
     if a.kr:
         run_kr()
     elif a.us:
         run_us()
-    else:   # 플래그 없으면 시간 창에 맞는 쪽을 자동 선택(둘 다 가능하면 둘 다)
+    else:   # 플래그 없으면 시간 창에 맞는 쪽을 자동 선택(둘 다 가능하면 둘 다) — 각 run_*()가
+            # 자체적으로도 창을 재검증하므로 여기선 대략만 걸러도 됨(2026-07-28: US 창이
+            # 6~16시→6~21시로, KR 창이 16시/8시→16시/10시 기준으로 넓어진 것 반영).
         h = datetime.datetime.now(R.KST).hour
-        if 6 <= h < 16:
+        if 6 <= h < 21:
             run_us()
-        if h >= 16 or h < 8:
+        if h >= 16 or h < 10:
             run_kr()

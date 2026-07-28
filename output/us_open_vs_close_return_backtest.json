@@ -1,0 +1,55 @@
+{
+  "as_of": "2026-07-27",
+  "years": 9,
+  "n_months": 95,
+  "cost": "us: 매수 5.0bp + 매도 5.28bp (왕복 10.28bp)",
+  "scope_note": "종목 선정(팩터 랭킹)은 종가 기준 고정 — 매매체결가·200일선 계산만 시가로 교체",
+  "full_period": {
+    "close_baseline": {
+      "cagr_pct": 29.43,
+      "sharpe": 1.02,
+      "mdd_pct": -37.4
+    },
+    "open_variant": {
+      "cagr_pct": 29.72,
+      "sharpe": 1.06,
+      "mdd_pct": -37.3
+    }
+  },
+  "paired_ttest": {
+    "t": -0.133,
+    "p": 0.8945,
+    "n": 95
+  },
+  "cagr_diff_bootstrap": {
+    "mean": -0.23,
+    "ci95_lo": -3.07,
+    "ci95_hi": 2.39,
+    "pct_positive": 43.7,
+    "n_boot": 5000,
+    "block_months": 6
+  },
+  "sharpe_diff_bootstrap": {
+    "mean": 0.037,
+    "ci95_lo": -0.049,
+    "ci95_hi": 0.135,
+    "n_boot": 5000,
+    "block_months": 6
+  },
+  "subperiods": [
+    {
+      "period": "2018-2023",
+      "close_cagr": 22.91,
+      "open_cagr": 22.67,
+      "cagr_diff": -0.24
+    },
+    {
+      "period": "2024+",
+      "close_cagr": 45.5,
+      "open_cagr": 46.67,
+      "cagr_diff": 1.17
+    }
+  ],
+  "significant_difference": false,
+  "note": "+30분/+1시간/+2시간은 야후 인트라데이 한도(60일/2년)로 이 규모(PIT 유니버스 다년간)의 수익률 백테스트가 데이터상 불가능 — us_intraday_timing_*.py의 신호값 민감도(시가>=30분후>=1시간후>=2시간후 오차 크기)로 방향만 추정."
+}

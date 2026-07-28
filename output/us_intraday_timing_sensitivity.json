@@ -1,0 +1,181 @@
+{
+  "generated": "2026-07-28T10:02",
+  "universe": {
+    "index": [
+      "^GSPC",
+      "^NDX"
+    ],
+    "stocks": [
+      "AAPL",
+      "MSFT",
+      "NVDA",
+      "AMZN",
+      "GOOGL",
+      "META",
+      "TSLA",
+      "JPM",
+      "XOM",
+      "UNH",
+      "JNJ",
+      "PG",
+      "HD",
+      "V",
+      "MA",
+      "KO",
+      "PEP",
+      "WMT",
+      "DIS",
+      "NFLX",
+      "CRM",
+      "ADBE",
+      "INTC",
+      "CSCO",
+      "PFE",
+      "MRK",
+      "ABBV",
+      "COST",
+      "MCD",
+      "NKE"
+    ]
+  },
+  "data_limitation": "yfinance 30분봉 최대 60일 — 다년간 수익률 백테스트가 아니라 같은 날 시각별 신호값 페어드 비교(측정 민감도 검정)",
+  "summary": {
+    "open": {
+      "index": {
+        "n_daypairs": 120,
+        "gap_trend_pct": {
+          "n": 120,
+          "mean_abs_diff": 0.686,
+          "mean_signed_diff": -0.017,
+          "t_stat": -0.207
+        },
+        "rsi": {
+          "n": 120,
+          "mean_abs_diff": 2.374,
+          "mean_signed_diff": 0.244,
+          "t_stat": 0.768
+        },
+        "regime_flip_rate_pct": 0.0
+      },
+      "stock": {
+        "n_daypairs": 1800,
+        "gap200_pct": {
+          "n": 1800,
+          "mean_abs_diff": 1.516,
+          "mean_signed_diff": 0.301,
+          "t_stat": 5.506
+        },
+        "rsi": {
+          "n": 1800,
+          "mean_abs_diff": 3.246,
+          "mean_signed_diff": 0.958,
+          "t_stat": 9.898
+        },
+        "hot_flip_rate_pct": 2.1
+      }
+    },
+    "p30m": {
+      "index": {
+        "n_daypairs": 120,
+        "gap_trend_pct": {
+          "n": 120,
+          "mean_abs_diff": 0.618,
+          "mean_signed_diff": -0.001,
+          "t_stat": -0.009
+        },
+        "rsi": {
+          "n": 120,
+          "mean_abs_diff": 2.102,
+          "mean_signed_diff": 0.166,
+          "t_stat": 0.633
+        },
+        "regime_flip_rate_pct": 0.0
+      },
+      "stock": {
+        "n_daypairs": 1800,
+        "gap200_pct": {
+          "n": 1800,
+          "mean_abs_diff": 1.255,
+          "mean_signed_diff": 0.286,
+          "t_stat": 6.351
+        },
+        "rsi": {
+          "n": 1800,
+          "mean_abs_diff": 2.679,
+          "mean_signed_diff": 0.948,
+          "t_stat": 11.848
+        },
+        "hot_flip_rate_pct": 1.7
+      }
+    },
+    "p1h": {
+      "index": {
+        "n_daypairs": 120,
+        "gap_trend_pct": {
+          "n": 120,
+          "mean_abs_diff": 0.58,
+          "mean_signed_diff": 0.03,
+          "t_stat": 0.411
+        },
+        "rsi": {
+          "n": 120,
+          "mean_abs_diff": 2.032,
+          "mean_signed_diff": 0.276,
+          "t_stat": 1.04
+        },
+        "regime_flip_rate_pct": 0.0
+      },
+      "stock": {
+        "n_daypairs": 1800,
+        "gap200_pct": {
+          "n": 1800,
+          "mean_abs_diff": 1.131,
+          "mean_signed_diff": 0.299,
+          "t_stat": 7.228
+        },
+        "rsi": {
+          "n": 1800,
+          "mean_abs_diff": 2.405,
+          "mean_signed_diff": 0.999,
+          "t_stat": 13.846
+        },
+        "hot_flip_rate_pct": 1.4
+      }
+    },
+    "p2h": {
+      "index": {
+        "n_daypairs": 120,
+        "gap_trend_pct": {
+          "n": 120,
+          "mean_abs_diff": 0.489,
+          "mean_signed_diff": 0.012,
+          "t_stat": 0.192
+        },
+        "rsi": {
+          "n": 120,
+          "mean_abs_diff": 1.773,
+          "mean_signed_diff": 0.093,
+          "t_stat": 0.384
+        },
+        "regime_flip_rate_pct": 0.0
+      },
+      "stock": {
+        "n_daypairs": 1800,
+        "gap200_pct": {
+          "n": 1800,
+          "mean_abs_diff": 0.923,
+          "mean_signed_diff": 0.305,
+          "t_stat": 9.158
+        },
+        "rsi": {
+          "n": 1800,
+          "mean_abs_diff": 1.989,
+          "mean_signed_diff": 0.967,
+          "t_stat": 16.045
+        },
+        "hot_flip_rate_pct": 1.4
+      }
+    }
+  },
+  "raw_rows_n": 7680
+}
