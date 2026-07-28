@@ -537,8 +537,18 @@ def run_us(no_email: bool = False, force: bool = False):
             hs = hs.dropna()
             price_map[sym] = {"dates": [d.date().isoformat() for d in hs.index],
                               "closes": [float(v) for v in hs.tolist()]}
-    ndx_dates, ndx_closes = _bench_series(signals, "NDX")
-    ndx_label = "나스닥100" if _KFONT else "NASDAQ100"
+    # 2026-07-28(지호 님 지적 — "왜 나스닥 차트가 끊겨있냐"): market_signals의 ^NDX(지수
+    # 자체, 계산값)는 SPY(실거래 ETF)보다 야후 파이낸스 당일 시세 반영이 늦다 — 예전엔
+    # 마감 몇 시간 뒤 발송이라 이 지연이 이미 해소된 뒤였지만, 개장 직후 발송으로 바뀌며
+    # 처음 드러남. SPY와 동일한 방식(실거래 ETF, download_histories 개별조회)인 QQQ로
+    # 교체해 두 비교선의 데이터 신선도를 맞춘다.
+    ndx_dates, ndx_closes = [], []
+    qqq_series = R.download_histories(["QQQ"]).get("QQQ")
+    if qqq_series is not None and not qqq_series.empty:
+        qs = qqq_series.dropna()
+        ndx_dates = [d.date().isoformat() for d in qs.index]
+        ndx_closes = [float(v) for v in qs.tolist()]
+    ndx_label = "나스닥100(QQQ)" if _KFONT else "NASDAQ100(QQQ)"
     # 2026-07-19 추가했던 "알고리즘70+SPMO30" 참고선은 2026-07-28 제거(지호 님 결정) — §6-C의
     # 원 근거(t=1.95)가 이후 §6-H 사전등록 재검증에서 기각됨(CAGR차이 95%CI가 완전히 음수,
     # 위기 동시발생 시 순수 알고리즘보다 오히려 더 나쁨 — STRATEGY.md §6-H·§6-K 참고).
