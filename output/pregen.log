@@ -1964,3 +1964,54 @@ git : error: cannot pull with rebase: You have unstaged changes.
 error: additionally, your index contains uncommitted changes.
 error: Please commit or stash them.
 2026-07-28 16:38:50 [us] [寃쎄퀬] 而ㅻ컠 吏곸쟾 ??pull???ㅽ뙣 ???묒뾽?몃━媛 ?ъ쟾??dirty?섍굅??異⑸룎. ?꾨옒 push???ㅽ뙣 媛??
+[main 0974075] chore: pregen us [skip ci]
+ 11 files changed, 1245 insertions(+), 178 deletions(-)
+ create mode 100644 output/us_intraday_timing_sensitivity.json
+ create mode 100644 output/us_open_vs_close_return_backtest.json
+ create mode 100644 us_intraday_timing_longterm.py
+ create mode 100644 us_intraday_timing_sensitivity.py
+ create mode 100644 us_open_vs_close_return_backtest.py
+git : To https://github.com/jiho370/nadsdq100-watcher.git
+위치 C:\Users\JH\Documents\GitHub\nadsdq100-watcher\run_pregen.ps1:93 문자:5
++     git push 2>&1 | Out-File -Append -Encoding utf8 $log
++     ~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (To https://gith...100-watcher.git:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+   9ae6d9a..0974075  main -> main
+2026-07-28 16:38:55 [us] === pregen ?꾨즺 ===
+2026-07-28 22:33:26 [kr] === pregen ?쒖옉 ===
+git : error: cannot pull with rebase: You have unstaged changes.
+위치 C:\Users\JH\Documents\GitHub\nadsdq100-watcher\run_pregen.ps1:48 문자:1
++ git pull --rebase 2>&1 | Tee-Object -Variable pullOutput | Out-Null
++ ~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (error: cannot p...staged changes.:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+error: Please commit or stash them.
+2026-07-28 22:33:27 [kr] [寃쎄퀬] git pull ?ㅽ뙣 ??濡쒖뺄??而ㅻ컠 ????蹂寃쎌씠 ?덉쑝硫??ш린??留됲옒. ?꾨옒 push???ㅽ뙣?????덉쓬.
+2026-07-28 22:33:27 [kr]         ?닿껐: ??μ냼 ?대뜑?먯꽌 'git add -A; git commit -m sync; git push' ??踰??섎룞 ?ㅽ뻾.
+python : [KR] 펀더멘탈 통과 170/200종목 (EPS>0·ROE>0)
+위치 C:\Users\JH\Documents\GitHub\nadsdq100-watcher\run_pregen.ps1:60 문자:1
++ python pregen.py --$Mode 2>&1 | Out-File -Append -Encoding utf8 $log
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: ([KR] 펀더멘탈 통과 170/200종목 (EPS>0·ROE>0):String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+[KR] AI 검증 풀 8(최종 채택은 AI 검증 후 상위 5명) · 관찰 0 (후보 170)
+[PREGEN] 서술 사전생성 5종목
+[PREGEN] 저장: output/pregen_kr.json (대상일 2026-07-29 · 종목 9 · 서술캐시 5건)
+KRX 로그인 시도...
+  로그인 ID: jiho370
+KRX 로그인 완료.
+  로그인 시간: 2026-07-28 22:34:20
+  만료 시간: 2026-07-28 23:34:20
+git : error: cannot pull with rebase: You have unstaged changes.
+위치 C:\Users\JH\Documents\GitHub\nadsdq100-watcher\run_pregen.ps1:76 문자:1
++ git pull --rebase 2>&1 | Out-File -Append -Encoding utf8 $log
++ ~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (error: cannot p...staged changes.:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+error: Please commit or stash them.
+2026-07-28 22:40:51 [kr] [寃쎄퀬] 而ㅻ컠 吏곸쟾 ??pull???ㅽ뙣 ???묒뾽?몃━媛 ?ъ쟾??dirty?섍굅??異⑸룎. ?꾨옒 push???ㅽ뙣 媛??
