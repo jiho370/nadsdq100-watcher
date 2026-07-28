@@ -124,8 +124,12 @@ def _holdings_compare_chart_png(series: dict, index_name: str, extra_line: dict 
     if blend_line and blend_line.get("values"):
         ax.plot(x, blend_line["values"], lw=1.1, color="#cbd5e1", linestyle=(0, (4, 2)), label=blend_line["label"])
     ax.axhline(0, color="#111827", lw=0.8)
-    ticks = np.linspace(0, len(dates) - 1, min(6, len(dates))).astype(int)
-    ax.set_xticks(ticks); ax.set_xticklabels([dates[i][5:] for i in ticks], fontsize=8)
+    # 2026-07-28(지호 님 지적 — "날짜 공백이 너무 많다, 거래일 다 있어야지"): 예전엔
+    # np.linspace로 최대 6개 라벨만 골라 보여줘서 실제 거래일 데이터는 다 있는데 라벨만
+    # 듬성듬성했다. 거래일(주말 제외) 전부를 라벨로 표시 — 겹침 방지로 45도 회전 + 작은 폰트.
+    ticks = np.arange(len(dates))
+    ax.set_xticks(ticks)
+    ax.set_xticklabels([dates[i][5:] for i in ticks], fontsize=6, rotation=45, ha="right")
     ax.set_ylabel(_CUM_RET_LABEL, fontsize=9)
     ax.legend(fontsize=8, frameon=False, loc="upper left")
     ax.grid(True, axis="y", alpha=0.15, lw=0.5)
@@ -535,19 +539,12 @@ def run_us(no_email: bool = False, force: bool = False):
                               "closes": [float(v) for v in hs.tolist()]}
     ndx_dates, ndx_closes = _bench_series(signals, "NDX")
     ndx_label = "나스닥100" if _KFONT else "NASDAQ100"
-    # 2026-07-19(지호 님 요청): 알고리즘70%+SPMO(모멘텀ETF)30% 블렌드 참고선 — SPMO 블렌드
-    # 검증(t=1.95, 부트스트랩 95%CI 거의 0 안 걸림) 결과 반영, 확정 채택은 아니라 참고선만.
-    spmo_hist = R.download_histories(["SPMO"], period="5y").get("SPMO")
-    spmo_dates, spmo_closes = [], []
-    if spmo_hist is not None and not spmo_hist.empty:
-        sp = spmo_hist.dropna()
-        spmo_dates = [d.date().isoformat() for d in sp.index]
-        spmo_closes = [float(v) for v in sp.tolist()]
-    blend_label = "알고리즘70+SPMO30" if _KFONT else "Algo70+SPMO30"
+    # 2026-07-19 추가했던 "알고리즘70+SPMO30" 참고선은 2026-07-28 제거(지호 님 결정) — §6-C의
+    # 원 근거(t=1.95)가 이후 §6-H 사전등록 재검증에서 기각됨(CAGR차이 95%CI가 완전히 음수,
+    # 위기 동시발생 시 순수 알고리즘보다 오히려 더 나쁨 — STRATEGY.md §6-H·§6-K 참고).
     holdings_html, holdings_images = _holdings_section(
         hstate, data["ind_map"], price_map, bench_dates, bench_closes, "S&P500",
-        extra_index={"label": ndx_label, "dates": ndx_dates, "closes": ndx_closes},
-        blend_index={"label": blend_label, "dates": spmo_dates, "closes": spmo_closes, "ratio": 0.7})
+        extra_index={"label": ndx_label, "dates": ndx_dates, "closes": ndx_closes})
 
     # 차트: SPY(큰 차트) + 종목 + 신호
     images, metrics = list(holdings_images), {}

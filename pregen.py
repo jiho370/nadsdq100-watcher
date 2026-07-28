@@ -31,9 +31,13 @@ pregen.py — 로컬 PC에서 Pro 구독 CLI(claude -p)로 AI 검증+서술을 '
 PC가 꺼져 있어 파일이 없으면(또는 2026-07-10부터 AI_ENABLED=0 이라 API 폴백 자체가 꺼져
 있으면) 그 부분은 지표 기반(deterministic_report)으로 조용히 대체 — 발송엔 지장 없음.
 
-작업 스케줄러(register_pregen_task.ps1): KR=19:00+22:00(재시도), US=09:30+12:30(재시도),
-전부 StartWhenAvailable(놓치면 다음 부팅 시 실행 — 시간 창 가드가 유효성 판단, 재시도는
-이미 성공한 날엔 최신 결과로 덮어쓰기만 함 — 멱등).
+작업 스케줄러(register_pregen_task.ps1, 2026-07-28부터 15분 간격 재시도): KR=16:00부터,
+US=06:00부터, 각자 유효 창이 끝날 때까지 15분마다 반복 트리거(지호 님 요청 — "처음에
+생성 안되면 15분 간격으로 계속 시도"). run_*() 자체의 시간창 가드가 무효 시각엔 즉시
+반환하고, _already_done()이 이미 그날 몫이 채워졌으면 재검증(웹검색)을 건너뛰어 — 실패한
+경우에만 사실상 재시도되고, 성공한 뒤엔 반복 트리거가 계속 와도 매번 즉시 스킵돼 구독
+사용량이 낭비되지 않는다. 전부 StartWhenAvailable(PC가 꺼져있다 부팅되면 놓친 트리거 중
+가장 최근 것부터 실행).
 """
 from __future__ import annotations
 import os, sys, json, argparse, datetime
@@ -95,6 +99,19 @@ def _save(name: str, for_kst: str, ver: dict, now, written=None, sells_written=N
     _log(f"저장: {path} (대상일 {for_kst} · 종목 {len(ver['by_sym'])} · 서술캐시 {len(written or {})}건)")
 
 
+def _already_done(name: str, for_kst: str) -> bool:
+    """output/pregen_{name}.json 이 이미 이 for_kst로, 내용까지(by_sym 존재) 채워져 있으면 True.
+    2026-07-28(지호 님 요청 — "처음에 생성 안되면 15분 간격으로 계속 시도"): 작업 스케줄러가
+    이제 15분마다 반복 트리거되므로, 이미 성공한 뒤에도 매번 웹검색을 다시 태우면 구독 사용량만
+    낭비된다 — 오늘 몫이 이미 있으면 조용히 스킵(재시도는 '실패했을 때만' 의미가 있어야 함)."""
+    try:
+        with open(f"output/pregen_{name}.json", encoding="utf-8") as f:
+            pg = json.load(f)
+        return pg.get("for_kst") == for_kst and bool(pg.get("by_sym"))
+    except Exception:
+        return False
+
+
 def _write_ahead(groups: dict, market: dict, vmap: dict, n_buy: int, n_watch: int,
                 kr_n_buy: int, kr_n_watch: int, need_market: bool):
     """verify_stage 성공 뒤 write_stage까지 미리 실행 — 종목별 서술을 캐시한다(구독 CLI, $0).
@@ -133,6 +150,8 @@ def run_kr():
         for_kst = now.date().isoformat()
     else:
         _log("한국장 pregen 은 16시 이후 또는 10시 이전에만 유효 → 스킵"); return
+    if _already_done("kr", for_kst):
+        _log(f"이미 {for_kst}치 생성 완료 — 재시도 스킵"); return
     R._require_yf()
     import kr_stocks as KR
     kr = KR.select(R.yf) or {}
@@ -176,6 +195,8 @@ def run_us():
     if not (6 <= now.hour < 21):
         _log("미국장 pregen 은 06~21시(KST, 그날 저녁 개장 전)에만 유효 → 스킵"); return
     for_kst = (now + datetime.timedelta(days=1)).date().isoformat()
+    if _already_done("us", for_kst):
+        _log(f"이미 {for_kst}치 생성 완료 — 재시도 스킵"); return
     R._require_yf()
     data = R.gather_universe_data(with_volume=True)
     scored, info, _m = E.select_pool(data, int(os.environ.get("REPORT_MAX_CANDIDATES", "60")))
