@@ -2592,3 +2592,14 @@ C:\Users\JH\Documents\GitHub\nadsdq100-watcher\tech_factors.py:26: FutureWarning
 Frame.pct_change is deprecated and will be removed in a future version. Either fill in any non-leading NA values prior 
 to calling pct_change or specify 'fill_method=None' to not fill NA values.
   mret = panel.pct_change()
+[PREGEN] 서술 사전생성 10종목
+[PREGEN] 저장: output/pregen_us.json (대상일 2026-07-30 · 종목 26 · 서술캐시 10건)
+git : error: cannot pull with rebase: You have unstaged changes.
+위치 C:\Users\JH\Documents\GitHub\nadsdq100-watcher\run_pregen.ps1:76 문자:1
++ git pull --rebase 2>&1 | Out-File -Append -Encoding utf8 $log
++ ~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (error: cannot p...staged changes.:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+error: Please commit or stash them.
+2026-07-29 08:21:53 [us] [寃쎄퀬] 而ㅻ컠 吏곸쟾 ??pull???ㅽ뙣 ???묒뾽?몃━媛 ?ъ쟾??dirty?섍굅??異⑸룎. ?꾨옒 push???ㅽ뙣 媛??
