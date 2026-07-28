@@ -2527,3 +2527,32 @@ git : error: cannot pull with rebase: You have unstaged changes.
  
 error: Please commit or stash them.
 2026-07-29 02:01:17 [kr] [寃쎄퀬] 而ㅻ컠 吏곸쟾 ??pull???ㅽ뙣 ???묒뾽?몃━媛 ?ъ쟾??dirty?섍굅??異⑸룎. ?꾨옒 push???ㅽ뙣 媛??
+[main ec21660] chore: pregen kr [skip ci]
+ 1 file changed, 38 insertions(+)
+2026-07-29 08:07:29 [kr] === pregen ?쒖옉 ===
+git : error: cannot pull with rebase: You have unstaged changes.
+위치 C:\Users\JH\Documents\GitHub\nadsdq100-watcher\run_pregen.ps1:48 문자:1
++ git pull --rebase 2>&1 | Tee-Object -Variable pullOutput | Out-Null
++ ~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (error: cannot p...staged changes.:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+error: Please commit or stash them.
+2026-07-29 08:07:30 [kr] [寃쎄퀬] git pull ?ㅽ뙣 ??濡쒖뺄??而ㅻ컠 ????蹂寃쎌씠 ?덉쑝硫??ш린??留됲옒. ?꾨옒 push???ㅽ뙣?????덉쓬.
+2026-07-29 08:07:30 [kr]         ?닿껐: ??μ냼 ?대뜑?먯꽌 'git add -A; git commit -m sync; git push' ??踰??섎룞 ?ㅽ뻾.
+python : [PREGEN] 이미 2026-07-29치 생성 완료 \u2014 재시도 스킵
+위치 C:\Users\JH\Documents\GitHub\nadsdq100-watcher\run_pregen.ps1:60 문자:1
++ python pregen.py --$Mode 2>&1 | Out-File -Append -Encoding utf8 $log
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: ([PREGEN] 이미 202...료 \u2014 재시도 스킵:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+git : error: cannot pull with rebase: You have unstaged changes.
+위치 C:\Users\JH\Documents\GitHub\nadsdq100-watcher\run_pregen.ps1:76 문자:1
++ git pull --rebase 2>&1 | Out-File -Append -Encoding utf8 $log
++ ~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (error: cannot p...staged changes.:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+error: Please commit or stash them.
+2026-07-29 08:07:44 [kr] [寃쎄퀬] 而ㅻ컠 吏곸쟾 ??pull???ㅽ뙣 ???묒뾽?몃━媛 ?ъ쟾??dirty?섍굅??異⑸룎. ?꾨옒 push???ㅽ뙣 媛??
