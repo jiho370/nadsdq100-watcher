@@ -2937,3 +2937,42 @@ git : error: cannot pull with rebase: You have unstaged changes.
  
 error: Please commit or stash them.
 2026-07-29 09:28:31 [us] [寃쎄퀬] 而ㅻ컠 吏곸쟾 ??pull ?ㅽ뙣 ???묒뾽?몃━媛 ?ъ쟾??dirty?섍굅??異⑸룎. ?꾨옒 push???ㅽ뙣 媛??
+[main 83cf620] chore: pregen us [skip ci]
+ 1 file changed, 19 insertions(+)
+git : To https://github.com/jiho370/nadsdq100-watcher.git
+위치 C:\Users\JH\Documents\GitHub\nadsdq100-watcher\run_pregen.ps1:56 문자:9
++         git push 2>&1 | Out-File -Append -Encoding utf8 $log
++         ~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (To https://gith...100-watcher.git:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+   5a7522c..83cf620  main -> main
+2026-07-29 09:28:35 [us] === pregen ?꾨즺 ===
+2026-07-29 09:30:02 [kr] === pregen ?쒖옉(?ъ떆??猷⑦봽, 理쒕? 18?쒓컙) ===
+git : error: cannot pull with rebase: You have unstaged changes.
+위치 C:\Users\JH\Documents\GitHub\nadsdq100-watcher\run_pregen.ps1:77 문자:1
++ git pull --rebase 2>&1 | Tee-Object -Variable pullOutput | Out-Null
++ ~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (error: cannot p...staged changes.:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+error: Please commit or stash them.
+2026-07-29 09:30:02 [kr] [寃쎄퀬] git pull ?ㅽ뙣 ??濡쒖뺄??而ㅻ컠 ????蹂寃쎌씠 ?덉쑝硫??ш린??留됲옒. ?꾨옒 ?ъ떆?꾩뿉?쒕룄 怨꾩냽 ?ㅽ뙣?????덉쓬.
+2026-07-29 09:30:02 [kr]         ?닿껐: ??μ냼 ?대뜑?먯꽌 'git add -A; git commit -m sync; git push' ??踰??섎룞 ?ㅽ뻾.
+python : [PREGEN] 이미 2026-07-29치 생성 완료 \u2014 재시도 스킵
+위치 C:\Users\JH\Documents\GitHub\nadsdq100-watcher\run_pregen.ps1:95 문자:5
++     python pregen.py --$Mode 2>&1 | Out-File -Append -Encoding utf8 $ ...
++     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: ([PREGEN] 이미 202...료 \u2014 재시도 스킵:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+2026-07-29 09:30:06 [kr] ?깃났(?먮뒗 ?대? ?꾨즺) ???ъ떆??猷⑦봽 醫낅즺(?쒕룄 1?뚯㎏)
+git : error: cannot pull with rebase: You have unstaged changes.
+위치 C:\Users\JH\Documents\GitHub\nadsdq100-watcher\run_pregen.ps1:44 문자:5
++     git pull --rebase 2>&1 | Out-File -Append -Encoding utf8 $log
++     ~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (error: cannot p...staged changes.:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+error: Please commit or stash them.
+2026-07-29 09:30:06 [kr] [寃쎄퀬] 而ㅻ컠 吏곸쟾 ??pull ?ㅽ뙣 ???묒뾽?몃━媛 ?ъ쟾??dirty?섍굅??異⑸룎. ?꾨옒 push???ㅽ뙣 媛??
