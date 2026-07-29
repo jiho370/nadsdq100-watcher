@@ -33,13 +33,13 @@
     "BKNG": {
       "since": "2026-07-16",
       "entry_price": 179.93,
-      "peak": 196.8000030517578,
+      "peak": 201.08999633789062,
       "armed": true
     },
     "WDAY": {
       "since": "2026-07-22",
       "entry_price": 146.65,
-      "peak": 159.83999633789062,
+      "peak": 168.375,
       "armed": true
     },
     "META": {
@@ -49,5 +49,5 @@
       "armed": true
     }
   },
-  "last_run": "2026-07-28"
+  "last_run": "2026-07-29"
 }
