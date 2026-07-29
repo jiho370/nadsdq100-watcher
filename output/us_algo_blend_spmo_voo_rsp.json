@@ -1,0 +1,324 @@
+{
+  "as_of": "2026-07-28",
+  "years": 9,
+  "ratio": 0.7,
+  "full_period": {
+    "pure": {
+      "cagr_pct": 30.08,
+      "sharpe": 1.08,
+      "mdd_pct": -36.9
+    },
+    "SPMO": {
+      "cagr_pct": 26.98,
+      "sharpe": 1.06,
+      "mdd_pct": -35.2
+    },
+    "VOO": {
+      "cagr_pct": 25.49,
+      "sharpe": 1.04,
+      "mdd_pct": -36.0
+    },
+    "RSP": {
+      "cagr_pct": 24.57,
+      "sharpe": 1.03,
+      "mdd_pct": -37.5
+    }
+  },
+  "vs_pure": {
+    "SPMO": {
+      "n": 95,
+      "paired_ttest": {
+        "t": -1.809,
+        "p": 0.0704
+      },
+      "cagr_diff_bootstrap": {
+        "mean": -3.54,
+        "ci95_lo": -8.08,
+        "ci95_hi": 0.04,
+        "pct_positive": 2.8
+      },
+      "sharpe_diff_bootstrap": {
+        "mean": -0.006,
+        "ci95_lo": -0.091,
+        "ci95_hi": 0.076
+      },
+      "by_regime": {
+        "long_12m": {
+          "bull": {
+            "n_months": 33,
+            "mean_excess_monthly_pct": 0.021,
+            "pct_positive": 57.6
+          },
+          "bear": {
+            "n_months": 8,
+            "mean_excess_monthly_pct": -1.238,
+            "pct_positive": 37.5
+          },
+          "sideways": {
+            "n_months": 42,
+            "mean_excess_monthly_pct": -0.332,
+            "pct_positive": 35.7
+          },
+          "unknown": {
+            "n_months": 12,
+            "mean_excess_monthly_pct": -0.015,
+            "pct_positive": 58.3
+          }
+        },
+        "short_3m": {
+          "bull": {
+            "n_months": 23,
+            "mean_excess_monthly_pct": -0.102,
+            "pct_positive": 47.8
+          },
+          "bear": {
+            "n_months": 8,
+            "mean_excess_monthly_pct": -0.125,
+            "pct_positive": 62.5
+          },
+          "sideways": {
+            "n_months": 52,
+            "mean_excess_monthly_pct": -0.381,
+            "pct_positive": 40.4
+          },
+          "unknown": {
+            "n_months": 12,
+            "mean_excess_monthly_pct": -0.015,
+            "pct_positive": 58.3
+          }
+        }
+      }
+    },
+    "VOO": {
+      "n": 95,
+      "paired_ttest": {
+        "t": -3.314,
+        "p": 0.0009
+      },
+      "cagr_diff_bootstrap": {
+        "mean": -5.13,
+        "ci95_lo": -8.96,
+        "ci95_hi": -2.0,
+        "pct_positive": 0.0
+      },
+      "sharpe_diff_bootstrap": {
+        "mean": -0.049,
+        "ci95_lo": -0.104,
+        "ci95_hi": 0.014
+      },
+      "by_regime": {
+        "long_12m": {
+          "bull": {
+            "n_months": 33,
+            "mean_excess_monthly_pct": -0.297,
+            "pct_positive": 42.4
+          },
+          "bear": {
+            "n_months": 8,
+            "mean_excess_monthly_pct": -1.243,
+            "pct_positive": 12.5
+          },
+          "sideways": {
+            "n_months": 42,
+            "mean_excess_monthly_pct": -0.364,
+            "pct_positive": 33.3
+          },
+          "unknown": {
+            "n_months": 12,
+            "mean_excess_monthly_pct": -0.039,
+            "pct_positive": 41.7
+          }
+        },
+        "short_3m": {
+          "bull": {
+            "n_months": 23,
+            "mean_excess_monthly_pct": -0.334,
+            "pct_positive": 39.1
+          },
+          "bear": {
+            "n_months": 8,
+            "mean_excess_monthly_pct": -0.63,
+            "pct_positive": 25.0
+          },
+          "sideways": {
+            "n_months": 52,
+            "mean_excess_monthly_pct": -0.429,
+            "pct_positive": 34.6
+          },
+          "unknown": {
+            "n_months": 12,
+            "mean_excess_monthly_pct": -0.039,
+            "pct_positive": 41.7
+          }
+        }
+      }
+    },
+    "RSP": {
+      "n": 95,
+      "paired_ttest": {
+        "t": -3.167,
+        "p": 0.0015
+      },
+      "cagr_diff_bootstrap": {
+        "mean": -6.2,
+        "ci95_lo": -11.14,
+        "ci95_hi": -2.24,
+        "pct_positive": 0.0
+      },
+      "sharpe_diff_bootstrap": {
+        "mean": -0.077,
+        "ci95_lo": -0.186,
+        "ci95_hi": 0.033
+      },
+      "by_regime": {
+        "long_12m": {
+          "bull": {
+            "n_months": 33,
+            "mean_excess_monthly_pct": -0.403,
+            "pct_positive": 42.4
+          },
+          "bear": {
+            "n_months": 8,
+            "mean_excess_monthly_pct": -1.055,
+            "pct_positive": 37.5
+          },
+          "sideways": {
+            "n_months": 42,
+            "mean_excess_monthly_pct": -0.474,
+            "pct_positive": 35.7
+          },
+          "unknown": {
+            "n_months": 12,
+            "mean_excess_monthly_pct": -0.1,
+            "pct_positive": 50.0
+          }
+        },
+        "short_3m": {
+          "bull": {
+            "n_months": 23,
+            "mean_excess_monthly_pct": -0.402,
+            "pct_positive": 34.8
+          },
+          "bear": {
+            "n_months": 8,
+            "mean_excess_monthly_pct": -0.72,
+            "pct_positive": 37.5
+          },
+          "sideways": {
+            "n_months": 52,
+            "mean_excess_monthly_pct": -0.512,
+            "pct_positive": 40.4
+          },
+          "unknown": {
+            "n_months": 12,
+            "mean_excess_monthly_pct": -0.1,
+            "pct_positive": 50.0
+          }
+        }
+      }
+    }
+  },
+  "cross_blend": {
+    "SPMO_vs_VOO": {
+      "n": 95,
+      "paired_ttest": {
+        "t": 1.538,
+        "p": 0.124
+      },
+      "cagr_diff_bootstrap": {
+        "mean": 1.59,
+        "ci95_lo": -0.9,
+        "ci95_hi": 4.17,
+        "pct_positive": 89.1
+      },
+      "sharpe_diff_bootstrap": {
+        "mean": 0.044,
+        "ci95_lo": -0.032,
+        "ci95_hi": 0.111
+      }
+    },
+    "SPMO_vs_RSP": {
+      "n": 95,
+      "paired_ttest": {
+        "t": 1.679,
+        "p": 0.0931
+      },
+      "cagr_diff_bootstrap": {
+        "mean": 2.66,
+        "ci95_lo": -0.76,
+        "ci95_hi": 6.21,
+        "pct_positive": 93.8
+      },
+      "sharpe_diff_bootstrap": {
+        "mean": 0.072,
+        "ci95_lo": -0.053,
+        "ci95_hi": 0.178
+      }
+    },
+    "VOO_vs_RSP": {
+      "n": 95,
+      "paired_ttest": {
+        "t": 1.254,
+        "p": 0.2098
+      },
+      "cagr_diff_bootstrap": {
+        "mean": 1.07,
+        "ci95_lo": -0.6,
+        "ci95_hi": 2.86,
+        "pct_positive": 88.6
+      },
+      "sharpe_diff_bootstrap": {
+        "mean": 0.028,
+        "ci95_lo": -0.04,
+        "ci95_hi": 0.097
+      }
+    }
+  },
+  "subperiods": [
+    {
+      "period": "2018-2023",
+      "pure_cagr": 24.89,
+      "pure_sharpe": 0.97,
+      "SPMO_cagr": 21.14,
+      "SPMO_sharpe": 0.91,
+      "VOO_cagr": 21.06,
+      "VOO_sharpe": 0.91,
+      "RSP_cagr": 20.36,
+      "RSP_sharpe": 0.88
+    },
+    {
+      "period": "2024+",
+      "pure_cagr": 42.72,
+      "pure_sharpe": 1.3,
+      "SPMO_cagr": 41.07,
+      "SPMO_sharpe": 1.38,
+      "VOO_cagr": 36.13,
+      "VOO_sharpe": 1.33,
+      "RSP_cagr": 34.57,
+      "RSP_sharpe": 1.34
+    }
+  ],
+  "regime_classification": {
+    "long_12m": {
+      "method": "SPY 12개월 추이수익률+고점대비낙폭(하락:낙폭<=-15%또는 추이<=-10% / 상승:추이>=+20%이고 낙폭>-7.5% / 횡보:나머지)",
+      "counts": {
+        "bull": 33,
+        "bear": 8,
+        "sideways": 42,
+        "unknown": 12
+      },
+      "current_regime": "bull"
+    },
+    "short_3m": {
+      "method": "SPY 3개월 추이수익률+고점대비낙폭(하락:낙폭<=-10%또는 추이<=-8% / 상승:추이>=+8%이고 낙폭>-5% / 횡보:나머지)",
+      "counts": {
+        "bull": 23,
+        "bear": 8,
+        "sideways": 52,
+        "unknown": 12
+      },
+      "current_regime": "bull"
+    }
+  },
+  "note": "SPMO=S&P500모멘텀ETF, VOO=S&P500시총가중ETF, RSP=S&P500동일가중ETF. 블렌드는 월간리밸(core_satellite_kr.mix_nav), 알고리즘=topn8 라이브 (1:2:2·섹터캡2·ma200_backup=False)."
+}
