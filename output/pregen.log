@@ -2907,3 +2907,14 @@ git : error: cannot pull with rebase: You have unstaged changes.
  
 error: Please commit or stash them.
 2026-07-29 09:15:08 [kr] [寃쎄퀬] 而ㅻ컠 吏곸쟾 ??pull???ㅽ뙣 ???묒뾽?몃━媛 ?ъ쟾??dirty?섍굅??異⑸룎. ?꾨옒 push???ㅽ뙣 媛??
+[main 8d7a6f9] chore: pregen kr [skip ci]
+ 1 file changed, 38 insertions(+)
+git : To https://github.com/jiho370/nadsdq100-watcher.git
+위치 C:\Users\JH\Documents\GitHub\nadsdq100-watcher\run_pregen.ps1:93 문자:5
++     git push 2>&1 | Out-File -Append -Encoding utf8 $log
++     ~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (To https://gith...100-watcher.git:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+   2ec1aa5..8d7a6f9  main -> main
+2026-07-29 09:15:11 [kr] === pregen ?꾨즺 ===

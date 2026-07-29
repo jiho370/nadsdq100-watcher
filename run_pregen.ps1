@@ -1,10 +1,19 @@
 # run_pregen.ps1 — 작업 스케줄러가 실행하는 사전 검증(구독 CLI, 과금 없음).
-# 사용: run_pregen.ps1 -Mode kr   (저녁 — 다음날 08:00 한국장 메일용)
-#       run_pregen.ps1 -Mode us   (아침 — 당일 17:00 미국장 메일용)
-# 흐름: git pull → pregen.py --Mode → output/pregen_{Mode}.json(+한국장은 kospi200_cache.json)
-#       +output/pregen.log 커밋·푸시.
+# 사용: run_pregen.ps1 -Mode kr   (저녁 — 다음날 10:00 한국장 메일용)
+#       run_pregen.ps1 -Mode us   (아침 — 그날 저녁 개장 30분~90분 후 미국장 메일용)
+# 흐름: git pull → [pregen.py --Mode 성공할 때까지 15분 간격 반복] → output/pregen_{Mode}.json
+#       (+한국장은 kospi200_cache.json) +output/pregen.log 커밋·푸시.
 # 실패해도 조용히 종료 — Actions 가 API 로 자동 폴백하므로 발송엔 지장 없음.
 # 로그: output\pregen.log
+#
+# 2026-07-29 개편(지호 님 지적 — "pregen 한번 생성되면 파워쉘이 또 안 열려도 되는거 아냐"):
+#   예전엔 작업 스케줄러가 15분마다 이 스크립트 자체를 새로 실행해(하루 최대 70여회) 매번
+#   PowerShell 프로세스가 새로 뜨는 게 눈에 띄게 잦았다. 이제 작업 스케줄러는 유효 창이
+#   시작되는 시각에 딱 한 번만 이 스크립트를 실행하고, "성공(또는 이미 완료)할 때까지
+#   15분 간격으로 재시도"는 이 스크립트 자신의 내부 루프(Start-Sleep)로 옮겼다 — 창 하나가
+#   유효 창이 끝날 때까지 계속 떠 있긴 하지만(-WindowStyle Hidden), 새 프로세스가 반복
+#   생성되는 일 자체가 없어져 눈에 덜 띈다. pregen.py의 exit code로 종료 여부 판단:
+#   0=성공/이미완료(루프 종료) · 2=시간창 밖(루프 종료, 재시도 의미 없음) · 1=실패(재시도).
 #
 # 2026-07-10 수정: (1) git pull이 로컬 미커밋 변경 때문에 실패하면 이후 push까지 줄줄이
 #   막힐 수 있어 pull 실패를 로그에 굵게 남김(원인 파악용 — 이 저장소를 직접 수정한 뒤
@@ -30,6 +39,31 @@ New-Item -ItemType Directory -Force -Path (Join-Path $PSScriptRoot "output") | O
 
 function Log($msg) { "$(Get-Date -Format 'yyyy-MM-dd HH:mm:ss') [$Mode] $msg" | Out-File -Append -Encoding utf8 $log }
 
+function Push-Result {
+    # pregen 파일 + pregen.log(이 실행이 방금 쓴 로그 자체 — 커밋 안 하면 다음 실행의 git
+    # pull이 또 막힘, 2026-07-23 수정 참고) + (한국장만) kospi200_cache.json. 커밋 직전
+    # 재-pull(2026-07-27 발견 — pregen.py 실행 중 GitHub Actions의 상태 커밋이 origin에
+    # 새로 얹혀 push가 non-fast-forward로 거부되는 경우 완화).
+    param([string]$CommitMsg)
+    git pull --rebase 2>&1 | Out-File -Append -Encoding utf8 $log
+    if ($LASTEXITCODE -ne 0) {
+        Log "[경고] 커밋 직전 재-pull 실패 — 작업트리가 여전히 dirty하거나 충돌. 아래 push도 실패 가능."
+    }
+    $files = @("output/pregen_$Mode.json", "output/pregen.log")
+    if ($Mode -eq "kr" -and (Test-Path "output/kospi200_cache.json")) {
+        $files += "output/kospi200_cache.json"
+    }
+    $existing = $files | Where-Object { Test-Path $_ }
+    if ($existing.Count -gt 0) {
+        git add -f $existing 2>&1 | Out-File -Append -Encoding utf8 $log
+        git commit -m $CommitMsg 2>&1 | Out-File -Append -Encoding utf8 $log
+        git push 2>&1 | Out-File -Append -Encoding utf8 $log
+        if ($LASTEXITCODE -ne 0) {
+            Log "[경고] git push 실패 — 보통 로컬이 origin보다 뒤처져 있을 때 발생. 위 pull 경고 참고."
+        }
+    }
+}
+
 # 0)+1) 브랜치 확인/전환 + git pull — 로그 파일(추적 대상)에 아무것도 쓰기 전에 먼저 수행
 #    해야 한다. 순서를 바꾸면 이 실행 자체가 로그를 써서 자신을 dirty하게 만들고 pull이
 #    막힌다(2026-07-23 발견). 결과는 변수에 담아뒀다가 "=== pregen 시작 ===" 이후에 로그.
@@ -48,51 +82,43 @@ if ($branch -ne "main") {
 git pull --rebase 2>&1 | Tee-Object -Variable pullOutput | Out-Null
 $pullFailed = ($LASTEXITCODE -ne 0)
 
-Log "=== pregen 시작 ==="
+# 유효 창 길이 — register_pregen_task.ps1의 트리거 시각(KR 16:00 / US 06:00)에서부터
+# 몇 시간 동안 15분 간격으로 재시도할지(pregen.py 자체의 시간창 가드와 맞춰둠).
+$maxHours = if ($Mode -eq "kr") { 18 } else { 15 }
+$deadline = (Get-Date).AddHours($maxHours)
+
+Log "=== pregen 시작(재시도 루프, 최대 ${maxHours}시간) ==="
 if ($branchSwitchMsg) { Log $branchSwitchMsg }
 $pullOutput | Out-File -Append -Encoding utf8 $log
 if ($pullFailed) {
-    Log "[경고] git pull 실패 — 로컬에 커밋 안 된 변경이 있으면 여기서 막힘. 아래 push도 실패할 수 있음."
+    Log "[경고] git pull 실패 — 로컬에 커밋 안 된 변경이 있으면 여기서 막힘. 아래 재시도에서도 계속 실패할 수 있음."
     Log "        해결: 저장소 폴더에서 'git add -A; git commit -m sync; git push' 한 번 수동 실행."
 }
 
-# 2) 사전 검증 (pregen.py 가 AI_BACKEND=cli 강제 + 시간 창 스스로 판단)
-python pregen.py --$Mode 2>&1 | Out-File -Append -Encoding utf8 $log
-if ($LASTEXITCODE -ne 0) {
-    Log "pregen.py 실패(rc=$LASTEXITCODE) — Actions 가 API 폴백. 종료."
-    # 실패해도 이번 실행이 로그에 남긴 내용은 커밋해서 다음 실행의 pull이 안 막히게 한다.
-    git add "output/pregen.log" 2>&1 | Out-Null
-    git commit -m "chore: pregen $Mode 실패 로그 [skip ci]" 2>&1 | Out-Null
-    git push 2>&1 | Out-Null
-    exit 0
-}
+$attempt = 0
+while ($true) {
+    $attempt++
+    python pregen.py --$Mode 2>&1 | Out-File -Append -Encoding utf8 $log
+    $rc = $LASTEXITCODE
 
-# 2.5) 커밋 직전 재-pull — pregen.py(최대 20분, AI_TIMEOUT)가 도는 동안 GitHub Actions의
-#    "update report state" 커밋이 origin에 새로 얹힐 수 있다(2026-07-27 발견: 로컬이 origin과
-#    11커밋 앞서면서 동시에 3커밋 뒤처진 상태로 갈라져 매번 push가 non-fast-forward로 거부됨).
-#    맨 처음 pull이 실패했더라도(작업트리가 dirty해서) 그사이 dirty 원인이 해소됐을 수 있으니
-#    한 번 더 시도 — 실패해도(여전히 dirty 등) 조용히 넘어간다, 아래 push 실패 로그가 원인을
-#    말해준다. 이 재-pull은 아직 아무것도 add 안 한 시점에 해야 한다(그래야 rebase가 막히지 않음).
-git pull --rebase 2>&1 | Out-File -Append -Encoding utf8 $log
-if ($LASTEXITCODE -ne 0) {
-    Log "[경고] 커밋 직전 재-pull도 실패 — 작업트리가 여전히 dirty하거나 충돌. 아래 push도 실패 가능."
-}
-
-# 3) 결과 푸시 — pregen 파일 + pregen.log(이 실행이 방금 쓴 로그 자체 — 커밋 안 하면 다음
-#    실행의 git pull이 또 막힘, 위 2026-07-23 수정 참고) + (한국장만) kospi200_cache.json.
-#    캐시를 같이 올리는 이유: Actions 러너가 KRX에 직접 접속 못 해도(로그인 정책 전환 이후
-#    빈번) 이 캐시로 코스피200 선정을 계속할 수 있게 하기 위함(kr_stocks._cached_universe).
-$files = @("output/pregen_$Mode.json", "output/pregen.log")
-if ($Mode -eq "kr" -and (Test-Path "output/kospi200_cache.json")) {
-    $files += "output/kospi200_cache.json"
-}
-$existing = $files | Where-Object { Test-Path $_ }
-if ($existing.Count -gt 0) {
-    git add -f $existing 2>&1 | Out-File -Append -Encoding utf8 $log
-    git commit -m "chore: pregen $Mode [skip ci]" 2>&1 | Out-File -Append -Encoding utf8 $log
-    git push 2>&1 | Out-File -Append -Encoding utf8 $log
-    if ($LASTEXITCODE -ne 0) {
-        Log "[경고] git push 실패 — 보통 로컬이 origin보다 뒤처져 있을 때 발생. 위 pull 경고 참고."
+    if ($rc -eq 0) {
+        Log "성공(또는 이미 완료) — 재시도 루프 종료(시도 ${attempt}회째)"
+        Push-Result -CommitMsg "chore: pregen $Mode [skip ci]"
+        break
     }
+    if ($rc -eq 2) {
+        Log "이번 실행 시각은 유효 시간창 밖 — 재시도 의미 없어 종료(시도 ${attempt}회째)"
+        break
+    }
+    # rc == 1(검증 실패) 또는 그 외(예외) — 재시도 가치 있음
+    if ((Get-Date) -ge $deadline) {
+        Log "최대 ${maxHours}시간 초과 — 재시도 중단(시도 ${attempt}회 전부 실패). Actions가 API 폴백."
+        Push-Result -CommitMsg "chore: pregen $Mode 실패 로그 [skip ci]"
+        break
+    }
+    Log "실패(rc=$rc, 시도 ${attempt}회째) — 15분 후 재시도. 지금까지 로그만 우선 커밋."
+    Push-Result -CommitMsg "chore: pregen $Mode 재시도 로그 [skip ci]"
+    Start-Sleep -Seconds 900
 }
+
 Log "=== pregen 완료 ==="

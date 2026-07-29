@@ -1,0 +1,78 @@
+{
+  "as_of": "2026-07-28",
+  "years": 9,
+  "full_period": {
+    "algo": {
+      "cagr_pct": 30.08,
+      "sharpe": 1.08,
+      "mdd_pct": -36.9
+    },
+    "spy": {
+      "cagr_pct": 14.66,
+      "sharpe": 0.8,
+      "mdd_pct": -33.7
+    },
+    "rsp": {
+      "cagr_pct": 11.53,
+      "sharpe": 0.65,
+      "mdd_pct": -39.0
+    }
+  },
+  "algo_vs_spy": {
+    "n": 95,
+    "paired_ttest": {
+      "t": 3.323,
+      "p": 0.0009
+    },
+    "cagr_diff_bootstrap": {
+      "mean": 17.06,
+      "ci95_lo": 7.18,
+      "ci95_hi": 28.8,
+      "pct_positive": 100.0
+    },
+    "sharpe_diff_bootstrap": {
+      "mean": 0.319,
+      "ci95_lo": 0.093,
+      "ci95_hi": 0.548
+    }
+  },
+  "algo_vs_rsp": {
+    "n": 95,
+    "paired_ttest": {
+      "t": 3.167,
+      "p": 0.0015
+    },
+    "cagr_diff_bootstrap": {
+      "mean": 20.56,
+      "ci95_lo": 8.16,
+      "ci95_hi": 35.22,
+      "pct_positive": 100.0
+    },
+    "sharpe_diff_bootstrap": {
+      "mean": 0.52,
+      "ci95_lo": 0.127,
+      "ci95_hi": 0.929
+    }
+  },
+  "subperiods": [
+    {
+      "period": "2018-2023",
+      "algo_cagr": 24.89,
+      "spy_cagr": 12.06,
+      "rsp_cagr": 9.82,
+      "algo_sharpe": 0.97,
+      "spy_sharpe": 0.65,
+      "rsp_sharpe": 0.54
+    },
+    {
+      "period": "2024+",
+      "algo_cagr": 42.72,
+      "spy_cagr": 20.62,
+      "rsp_cagr": 15.23,
+      "algo_sharpe": 1.3,
+      "spy_sharpe": 1.27,
+      "rsp_sharpe": 1.08
+    }
+  ],
+  "note": "SPY=시총가중 S&P500(buy&hold, 레짐타이밍 없음), RSP=Invesco S&P500 동일가중 ETF(buy&hold). 알고리즘=topn8 라이브(1:2:2·섹터캡2·ma200_backup=False)."
+}

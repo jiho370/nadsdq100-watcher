@@ -140,7 +140,11 @@ def _write_ahead(groups: dict, market: dict, vmap: dict, n_buy: int, n_watch: in
         return {}, {}, {}
 
 
-def run_kr():
+def run_kr() -> str:
+    """반환값은 run_pregen.ps1의 재시도 루프가 종료 여부를 판단하는 데 쓴다(2026-07-29,
+    지호 님 지적 — "pregen 한 번 생성됐으면 파워쉘이 또 안 열려도 되는거 아냐"):
+    "done"(성공/이미 완료/오늘 후보 없음 — 재시도 의미 없음) · "outside_window"(시간창 밖 —
+    다음 창까지 재시도 의미 없음) · "failed"(시간창 안인데 검증 실패 — 재시도 가치 있음)."""
     now = datetime.datetime.now(R.KST)
     if now.hour >= 16:                       # 저녁 실행(정상) → 내일 아침 메일용
         for_kst = (now + datetime.timedelta(days=1)).date().isoformat()
@@ -149,14 +153,14 @@ def run_kr():
         # 8시→9시→10시로 늘림(그래야 10:00 발송 전에 pregen이 끝날 여유가 생김).
         for_kst = now.date().isoformat()
     else:
-        _log("한국장 pregen 은 16시 이후 또는 10시 이전에만 유효 → 스킵"); return
+        _log("한국장 pregen 은 16시 이후 또는 10시 이전에만 유효 → 스킵"); return "outside_window"
     if _already_done("kr", for_kst):
-        _log(f"이미 {for_kst}치 생성 완료 — 재시도 스킵"); return
+        _log(f"이미 {for_kst}치 생성 완료 — 재시도 스킵"); return "done"
     R._require_yf()
     import kr_stocks as KR
     kr = KR.select(R.yf) or {}
     if not (kr.get("buy") or kr.get("watch")):
-        _log("한국 후보 없음 → 스킵"); return
+        _log("한국 후보 없음 → 스킵"); return "done"
     _headlines((kr.get("buy") or []) + (kr.get("watch") or []), suffix=".KS")
     groups = {"kr_buy": kr.get("buy") or [], "kr_watch": kr.get("watch") or [],
               "sells": _holding_syms("output/kr_holdings.json")}
@@ -173,7 +177,7 @@ def run_kr():
         _log(f"지수 신호 수집 생략({e})")
     ver = AR.verify_stage(groups, market)
     if not ver.get("by_sym"):
-        _log("검증 실패 — 파일 미생성(아침에 API 폴백)"); sys.exit(1)
+        _log("검증 실패 — 파일 미생성(아침에 API 폴백)"); return "failed"
     # 시황 총평도 지금 다 쓴다(need_market=True) — 전일 국장 데이터만 다루므로 19시에 이미 완결.
     written, sells_written, market_written = _write_ahead(
         groups, market, ver["by_sym"],
@@ -182,9 +186,11 @@ def run_kr():
         need_market=not bool(ver.get("market_overview")))
     _save("kr", for_kst, ver, now, written=written, sells_written=sells_written,
           market_written=market_written)
+    return "done"
 
 
-def run_us():
+def run_us() -> str:
+    """반환값 의미는 run_kr() 참고("done"/"outside_window"/"failed")."""
     now = datetime.datetime.now(R.KST)
     # 2026-07-28 재설계(STRATEGY.md §7) — 발송이 "다음날 종가 분석"에서 "그날 저녁 개장
     # 30분~90분 후"로 이관됨(report.yml 참고, KST 자정을 넘겨 화~토 00:00대 도착). 검증에
@@ -193,10 +199,10 @@ def run_us():
     # 정확히 같은 이유로, 이 창 안 실행분은 전부 for_kst를 다음날로 찍는다(오늘 낮에 검증한
     # 내용이 쓰이는 발송은 자정을 넘겨 "내일" 날짜로 나가므로).
     if not (6 <= now.hour < 21):
-        _log("미국장 pregen 은 06~21시(KST, 그날 저녁 개장 전)에만 유효 → 스킵"); return
+        _log("미국장 pregen 은 06~21시(KST, 그날 저녁 개장 전)에만 유효 → 스킵"); return "outside_window"
     for_kst = (now + datetime.timedelta(days=1)).date().isoformat()
     if _already_done("us", for_kst):
-        _log(f"이미 {for_kst}치 생성 완료 — 재시도 스킵"); return
+        _log(f"이미 {for_kst}치 생성 완료 — 재시도 스킵"); return "done"
     R._require_yf()
     data = R.gather_universe_data(with_volume=True)
     scored, info, _m = E.select_pool(data, int(os.environ.get("REPORT_MAX_CANDIDATES", "60")))
@@ -212,7 +218,7 @@ def run_us():
     market = {"as_of": R._last_data_date(data["hist"]), **E.build_market(data)}
     ver = AR.verify_stage(groups, market)
     if not ver.get("by_sym"):
-        _log("검증 실패 — 파일 미생성(오후에 API 폴백)"); sys.exit(1)
+        _log("검증 실패 — 파일 미생성(오후에 API 폴백)"); return "failed"
     # 09:30엔 미국장이 이미 마감 확정이라 시황 총평까지 지금 다 쓸 수 있다 → need_market=True.
     # verify_stage가 이미 market_overview 등을 냈으면 write_stage가 자동으로 빈 값 처리(중복 방지).
     written, sells_written, market_written = _write_ahead(
@@ -222,17 +228,23 @@ def run_us():
         need_market=not bool(ver.get("market_overview")))
     _save("us", for_kst, ver, now, written=written, sells_written=sells_written,
           market_written=market_written)
+    return "done"
 
+
+_EXIT_CODE = {"done": 0, "outside_window": 2, "failed": 1}
 
 if __name__ == "__main__":
     ap = argparse.ArgumentParser(description="구독 CLI 사전 검증(메일 2통 체계)")
     ap.add_argument("--kr", action="store_true", help="한국장(다음 10:00)용")
     ap.add_argument("--us", action="store_true", help="미국장(그날 저녁 개장 30분~90분 후)용")
     a = ap.parse_args()
+    # 2026-07-29(지호 님 지적 — "pregen 한 번 생성됐으면 파워쉘이 또 안 열려도 되는거 아냐"):
+    # run_pregen.ps1이 이제 프로세스를 반복 실행하는 대신 자기 안에서 15분 간격으로 sleep하며
+    # 재시도하고, 이 exit code로 "더 재시도할 가치가 있는지"를 판단한다(0/2=끝, 1=재시도).
     if a.kr:
-        run_kr()
+        raise SystemExit(_EXIT_CODE[run_kr()])
     elif a.us:
-        run_us()
+        raise SystemExit(_EXIT_CODE[run_us()])
     else:   # 플래그 없으면 시간 창에 맞는 쪽을 자동 선택(둘 다 가능하면 둘 다) — 각 run_*()가
             # 자체적으로도 창을 재검증하므로 여기선 대략만 걸러도 됨(2026-07-28: US 창이
             # 6~16시→6~21시로, KR 창이 16시/8시→16시/10시 기준으로 넓어진 것 반영).

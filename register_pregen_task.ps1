@@ -1,45 +1,34 @@
-# 2026-07-28 개편(지호 님 요청 — "처음에 생성 안되면 15분 간격으로 계속 시도"): 고정
-# 2회 재시도 대신, 각 모드의 pregen.py 유효 창(run_kr=16:00~다음날10:00, run_us=06:00~21:00)
-# 전체를 15분 간격으로 반복 트리거한다. 실패했을 때만 사실상 재시도되는 이유: pregen.py의
-# _already_done()이 그날 몫이 이미 채워져 있으면 반복 트리거가 계속 와도 웹검색 없이
-# 즉시 스킵한다(구독 사용량 낭비 방지) — pregen.py 모듈 docstring 참고.
+# 2026-07-29 개편(지호 님 지적 — "파워쉘이 너무 자주 열린다, 한 번 생성되면 또 안 열려도
+# 되는거 아냐"): 15분마다 프로세스를 새로 띄우던 반복 트리거를 걷어내고, 유효 창이 시작되는
+# 시각에 딱 한 번만 실행한다 — 그 안에서 15분 간격 재시도는 run_pregen.ps1 자신의 내부
+# 루프(Start-Sleep)가 담당한다(pregen.py의 done/outside_window/failed exit code로 판단).
+# 그래서 ExecutionTimeLimit을 각 모드의 최대 루프 길이(KR 18시간·US 15시간)보다 넉넉히 잡아야
+# Task Scheduler가 재시도 도중 프로세스를 강제 종료하지 않는다.
 $script = Join-Path $PSScriptRoot "run_pregen.ps1"
-
-$settings = New-ScheduledTaskSettingsSet `
-    -StartWhenAvailable `
-    -AllowStartIfOnBatteries `
-    -DontStopIfGoingOnBatteries `
-    -ExecutionTimeLimit (New-TimeSpan -Hours 1)
-
-function New-DailyRepeatingTrigger([string]$At, [int]$IntervalMinutes, [double]$DurationHours) {
-    # Daily 트리거는 매일 반복되지만 그 자체론 하루 안에서 또 반복하지 않는다. Once 트리거로
-    # 만든 Repetition(간격·지속시간) 설정을 Daily 트리거에 이식해 "매일 + 그날 안에서 15분마다"
-    # 두 가지를 동시에 만족시킨다(PowerShell ScheduledTasks 모듈의 잘 알려진 조합 방법).
-    $daily = New-ScheduledTaskTrigger -Daily -At $At
-    $once  = New-ScheduledTaskTrigger -Once -At $At `
-        -RepetitionInterval (New-TimeSpan -Minutes $IntervalMinutes) `
-        -RepetitionDuration (New-TimeSpan -Hours $DurationHours)
-    $daily.Repetition = $once.Repetition
-    return $daily
-}
 
 foreach ($t in @(
     # KR 유효 창(pregen.py run_kr): 16:00(저녁, 정상 경로)부터 다음날 10:00(발송 10:00 직전)
-    # 까지 18시간 — 15분 간격이면 최대 72회/일 트리거(대부분 _already_done으로 즉시 스킵).
-    @{Name="StockPregenKR"; Mode="kr"; At="16:00"; DurationHours=18; Desc="KR stock pregen retry (15min interval, 16:00~10:00)"},
+    # 까지 18시간.
+    @{Name="StockPregenKR"; Mode="kr"; At="16:00"; MaxHours=18; Desc="KR stock pregen (single trigger, internal 15min retry loop)"},
     # US 유효 창(pregen.py run_us): 06:00(전날 세션 마감 확정 후)부터 21:00(그날 저녁 개장
     # 전)까지 15시간.
-    @{Name="StockPregenUS"; Mode="us"; At="06:00"; DurationHours=15; Desc="US stock pregen retry (15min interval, 06:00~21:00)"}
+    @{Name="StockPregenUS"; Mode="us"; At="06:00"; MaxHours=15; Desc="US stock pregen (single trigger, internal 15min retry loop)"}
 )) {
     $action = New-ScheduledTaskAction -Execute "powershell.exe" `
         -Argument "-NoProfile -ExecutionPolicy Bypass -WindowStyle Hidden -File `"$script`" -Mode $($t.Mode)"
 
-    $trigger = New-DailyRepeatingTrigger -At $t.At -IntervalMinutes 15 -DurationHours $t.DurationHours
+    $trigger = New-ScheduledTaskTrigger -Daily -At $t.At
+
+    $settings = New-ScheduledTaskSettingsSet `
+        -StartWhenAvailable `
+        -AllowStartIfOnBatteries `
+        -DontStopIfGoingOnBatteries `
+        -ExecutionTimeLimit (New-TimeSpan -Hours ($t.MaxHours + 1))
 
     Register-ScheduledTask -TaskName $t.Name -Action $action -Trigger $trigger `
         -Settings $settings -Description $t.Desc -Force
 
-    Write-Host "Registered: $($t.Name) daily at $($t.At), every 15min for $($t.DurationHours)h, start when available"
+    Write-Host "Registered: $($t.Name) daily at $($t.At), single launch (internal 15min retry up to $($t.MaxHours)h), start when available"
 }
 
 Write-Host "Check:"
