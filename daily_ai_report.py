@@ -399,6 +399,16 @@ def run_kr(no_email: bool = False, force: bool = False):
             import holdings as H
             kr_state = H.load(KR.KR_HOLDINGS)
             bench_dates, bench_closes = _bench_series(signals, "KOSPI")
+            # 2026-07-29(지호 님 "국장도" — 미장과 같은 원인): signals의 ^KS11은 run_kr()
+            # 최상단 일괄(핵심+세계 13종목) 다운로드 결과라 개장 직후 실행 시 그날치 봉이
+            # 아직 없을 수 있다(위 run_us SPY 재조회와 동일 조치). 차트 직전에 단일종목으로
+            # 다시 조회해 신선도를 맞춘다 — 실패해도 위 signals 기반 값으로 조용히 폴백.
+            try:
+                fresh_kospi = MS.fetch_closes(R.yf, ["^KS11"]).get("^KS11")
+                if fresh_kospi and fresh_kospi.get("dates"):
+                    bench_dates, bench_closes = fresh_kospi["dates"], fresh_kospi["closes"]
+            except Exception:
+                pass
             price_map = {sym: {"dates": (kr["ind_map"].get(sym) or {}).get("dates") or [],
                                "closes": (kr["ind_map"].get(sym) or {}).get("closes") or []}
                          for sym in kr_state.get("holdings", {})}
@@ -524,7 +534,12 @@ def run_us(no_email: bool = False, force: bool = False):
     H.save(hstate)
 
     # 보유현황(라이브 트래킹): 전체 투입자산 기준 누적수익률 vs SPY(동일시점·동일금액) 시계열
-    spy_series = data.get("spy")
+    # 2026-07-29(지호 님 "28일치 데이터 빠짐" 재현 확인): data["spy"]는 run_us() 최상단의
+    # 대량(500+종목) 일괄 download_histories 결과라, 개장 직후 실행되면 이 일괄요청이
+    # 그날치 봉을 아직 못 받아온 채로 굳어 있을 수 있다(2026-07-28 NDX 지연과 같은 근본
+    # 원인 — 그땐 참고선만 영향받았지만 이번엔 bench 자체가 밀려 그 날짜가 x축에서 통째로
+    # 빠지는 더 심한 증상). 차트 직전에 SPY만 다시 단일조회해 QQQ와 신선도를 맞춘다.
+    spy_series = R.download_histories(["SPY"]).get("SPY")
     bench_dates, bench_closes = [], []
     if spy_series is not None and not spy_series.empty:
         s = spy_series.dropna()
