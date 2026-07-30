@@ -1,0 +1,102 @@
+{
+  "currency": "brl",
+  "reer_series": "RBBRBIS",
+  "date_range": [
+    "2003-12-01",
+    "2026-07-29"
+  ],
+  "n_days": 5700,
+  "avg_exposure": 0.6158,
+  "per_ratio_exposure": [
+    0.5414,
+    0.5665,
+    0.6335,
+    0.6698,
+    0.6675
+  ],
+  "gate1": {
+    "n_rep": 2000,
+    "n_combo_used": 5,
+    "cost_bps": 10.0,
+    "baseline": {
+      "cagr": 14.053,
+      "ulcer": 20.133,
+      "mdd": -53.42
+    },
+    "real_filter": {
+      "cagr": 17.133,
+      "ulcer": 20.652,
+      "mdd": -57.21,
+      "delta_ulcer": -0.5195,
+      "delta_cagr": 3.0793,
+      "avg_exposure": 0.6158
+    },
+    "random_control": {
+      "delta_ulcer_mean": 8.4119,
+      "delta_ulcer_p50": 8.9041,
+      "delta_ulcer_p95": 11.3821,
+      "delta_cagr_mean": 2.9959,
+      "delta_cagr_p50": 2.9959
+    },
+    "real_filter_percentile_vs_random": {
+      "delta_ulcer": 0.05,
+      "delta_cagr": 53.1
+    },
+    "verdict_ulcer": "미달 — §8 사전확약대로 전체 중단"
+  },
+  "gate2": {
+    "block21": {
+      "delta_ulcer_ci95": [
+        -1.4026,
+        9.4732
+      ],
+      "delta_ulcer_excludes_zero": false,
+      "delta_ulcer_mean": 2.7329,
+      "delta_cagr_ci95": [
+        -1.1854,
+        7.3004
+      ],
+      "delta_cagr_excludes_zero": false,
+      "delta_cagr_mean": 3.0538
+    },
+    "block63": {
+      "delta_ulcer_ci95": [
+        -1.2458,
+        9.2702
+      ],
+      "delta_ulcer_excludes_zero": false,
+      "delta_ulcer_mean": 2.7249,
+      "delta_cagr_ci95": [
+        -1.5937,
+        7.5874
+      ],
+      "delta_cagr_excludes_zero": false,
+      "delta_cagr_mean": 3.0459
+    },
+    "block126": {
+      "delta_ulcer_ci95": [
+        -1.8814,
+        9.3384
+      ],
+      "delta_ulcer_excludes_zero": false,
+      "delta_ulcer_mean": 2.5281,
+      "delta_cagr_ci95": [
+        -1.7335,
+        7.9621
+      ],
+      "delta_cagr_excludes_zero": false,
+      "delta_cagr_mean": 3.0737
+    },
+    "n_rep": 10000,
+    "cost_bps": 10.0,
+    "point_estimate": {
+      "delta_ulcer": -0.5195,
+      "delta_cagr": 3.0793
+    },
+    "verdict": "미달 — CI가 0을 포함하거나 블록길이에 따라 결과가 뒤집힘(그 자체가 경고, §4 Gate2)",
+    "block_length_sensitivity_flip": false
+  },
+  "gate1_pass": false,
+  "gate2_pass": false,
+  "overall_pass": false
+}

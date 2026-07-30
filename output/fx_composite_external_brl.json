@@ -1,0 +1,106 @@
+{
+  "currency": "brl",
+  "config": {
+    "fx_ticker": "BRL=X",
+    "rate_series": "IRSTCI01BRM156N",
+    "note": "브라질 즉시금리(Selic류) 근사 — 정확한 3개월물 FRED 미제공"
+  },
+  "date_range": [
+    "2003-12-01",
+    "2026-07-29"
+  ],
+  "n_days": 5700,
+  "avg_exposure": 0.6081,
+  "per_ratio_exposure": [
+    0.6763,
+    0.6719,
+    0.6463,
+    0.5525,
+    0.4937
+  ],
+  "gate1": {
+    "n_rep": 2000,
+    "n_combo_used": 5,
+    "cost_bps": 10.0,
+    "baseline": {
+      "cagr": 14.053,
+      "ulcer": 20.133,
+      "mdd": -53.42
+    },
+    "real_filter": {
+      "cagr": 19.431,
+      "ulcer": 15.561,
+      "mdd": -48.1,
+      "delta_ulcer": 4.5718,
+      "delta_cagr": 5.3779,
+      "avg_exposure": 0.6081
+    },
+    "random_control": {
+      "delta_ulcer_mean": 8.2233,
+      "delta_ulcer_p50": 8.5828,
+      "delta_ulcer_p95": 11.0433,
+      "delta_cagr_mean": 2.2556,
+      "delta_cagr_p50": 2.2833
+    },
+    "real_filter_percentile_vs_random": {
+      "delta_ulcer": 6.6,
+      "delta_cagr": 100.0
+    },
+    "verdict_ulcer": "미달 — §8 사전확약대로 전체 중단"
+  },
+  "gate2": {
+    "block21": {
+      "delta_ulcer_ci95": [
+        0.9265,
+        11.8689
+      ],
+      "delta_ulcer_excludes_zero": true,
+      "delta_ulcer_mean": 4.2368,
+      "delta_cagr_ci95": [
+        1.7184,
+        9.049
+      ],
+      "delta_cagr_excludes_zero": true,
+      "delta_cagr_mean": 5.3552
+    },
+    "block63": {
+      "delta_ulcer_ci95": [
+        0.8127,
+        11.1339
+      ],
+      "delta_ulcer_excludes_zero": true,
+      "delta_ulcer_mean": 4.0364,
+      "delta_cagr_ci95": [
+        1.1393,
+        9.5414
+      ],
+      "delta_cagr_excludes_zero": true,
+      "delta_cagr_mean": 5.3422
+    },
+    "block126": {
+      "delta_ulcer_ci95": [
+        0.7851,
+        11.5011
+      ],
+      "delta_ulcer_excludes_zero": true,
+      "delta_ulcer_mean": 4.0079,
+      "delta_cagr_ci95": [
+        0.846,
+        9.9601
+      ],
+      "delta_cagr_excludes_zero": true,
+      "delta_cagr_mean": 5.3558
+    },
+    "n_rep": 10000,
+    "cost_bps": 10.0,
+    "point_estimate": {
+      "delta_ulcer": 4.5718,
+      "delta_cagr": 5.3779
+    },
+    "verdict": "통과(3개 블록길이 전부 CI가 0 배제·양의 방향)",
+    "block_length_sensitivity_flip": false
+  },
+  "gate1_pass": false,
+  "gate2_pass": true,
+  "overall_pass": false
+}

@@ -1,0 +1,106 @@
+{
+  "currency": "krw",
+  "config": {
+    "fx_ticker": "KRW=X",
+    "rate_series": "IR3TIB01KRM156N",
+    "note": "한국 3개월 은행간금리(FRED) — 최종 확인 대상, 외부검증 2/3 통과 시에만 실행"
+  },
+  "date_range": [
+    "2003-12-01",
+    "2026-07-29"
+  ],
+  "n_days": 5700,
+  "avg_exposure": 0.6087,
+  "per_ratio_exposure": [
+    0.6532,
+    0.6667,
+    0.6589,
+    0.5649,
+    0.4998
+  ],
+  "gate1": {
+    "n_rep": 2000,
+    "n_combo_used": 5,
+    "cost_bps": 10.0,
+    "baseline": {
+      "cagr": 12.066,
+      "ulcer": 6.34,
+      "mdd": -30.3
+    },
+    "real_filter": {
+      "cagr": 13.595,
+      "ulcer": 7.434,
+      "mdd": -34.46,
+      "delta_ulcer": -1.0943,
+      "delta_cagr": 1.5285,
+      "avg_exposure": 0.6087
+    },
+    "random_control": {
+      "delta_ulcer_mean": -1.0516,
+      "delta_ulcer_p50": -0.8948,
+      "delta_ulcer_p95": 0.2364,
+      "delta_cagr_mean": -0.6569,
+      "delta_cagr_p50": -0.6479
+    },
+    "real_filter_percentile_vs_random": {
+      "delta_ulcer": 41.4,
+      "delta_cagr": 100.0
+    },
+    "verdict_ulcer": "미달 — §8 사전확약대로 전체 중단"
+  },
+  "gate2": {
+    "block21": {
+      "delta_ulcer_ci95": [
+        -2.0937,
+        4.1733
+      ],
+      "delta_ulcer_excludes_zero": false,
+      "delta_ulcer_mean": 0.839,
+      "delta_cagr_ci95": [
+        -0.9025,
+        3.853
+      ],
+      "delta_cagr_excludes_zero": false,
+      "delta_cagr_mean": 1.511
+    },
+    "block63": {
+      "delta_ulcer_ci95": [
+        -3.455,
+        2.9503
+      ],
+      "delta_ulcer_excludes_zero": false,
+      "delta_ulcer_mean": 0.116,
+      "delta_cagr_ci95": [
+        -1.0568,
+        4.101
+      ],
+      "delta_cagr_excludes_zero": false,
+      "delta_cagr_mean": 1.5188
+    },
+    "block126": {
+      "delta_ulcer_ci95": [
+        -4.7724,
+        2.4734
+      ],
+      "delta_ulcer_excludes_zero": false,
+      "delta_ulcer_mean": -0.3405,
+      "delta_cagr_ci95": [
+        -1.2913,
+        4.3204
+      ],
+      "delta_cagr_excludes_zero": false,
+      "delta_cagr_mean": 1.5174
+    },
+    "n_rep": 10000,
+    "cost_bps": 10.0,
+    "point_estimate": {
+      "delta_ulcer": -1.0943,
+      "delta_cagr": 1.5285
+    },
+    "verdict": "미달 — CI가 0을 포함하거나 블록길이에 따라 결과가 뒤집힘(그 자체가 경고, §4 Gate2)",
+    "block_length_sensitivity_flip": false
+  },
+  "gate1_pass": false,
+  "gate2_pass": false,
+  "overall_pass": false
+}

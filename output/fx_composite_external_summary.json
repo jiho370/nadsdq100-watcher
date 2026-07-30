@@ -1,0 +1,9 @@
+{
+  "n_pass": 0,
+  "majority_pass": false,
+  "per_currency": {
+    "jpy": false,
+    "brl": false,
+    "zar": false
+  }
+}
