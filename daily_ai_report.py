@@ -2,10 +2,13 @@
 """
 daily_ai_report.py — 메일 2통 분리 러너 (2026-07-09 개편).
 
-  · 한국장 메일 (--kr) : 월~금 KST 10:00 발송(개장 1시간 후, 2026-07-28 08:00→10:00 이관 —
-        개장 직후 변동성 구간 회피 + 개장 1시간치 실제 시세 반영 목적). 종목 선정에 쓰이는
-        펀더멘탈(PER/PBR/배당)은 KRX가 장중에 당일치를 안 올려 여전히 전일 기준(kr_stocks.py
-        참고), 개별 종목 가격·보유현황 평가액(yfinance)만 10:00 시점 시세로 갱신됨.
+  · 한국장 메일 (--kr) : 월~금 KST 09:40 발송(2026-07-30 10:00→09:40 이관 — GitHub Actions
+        스케줄 지연/드롭이 반복돼(report.yml 참고) 워치독까지 감안한 "확실한 도착 시각"을
+        앞당기려고 지호 님이 시세 신선도(개장 1시간 안정화)보다 이른 도착을 우선하기로 결정.
+        개장(09:00) 40분 후 시점이라 07-28에 노렸던 "1시간 안정화" 효과는 약해짐 — 트레이드오프
+        인지하고 채택). 종목 선정에 쓰이는 펀더멘탈(PER/PBR/배당)은 KRX가 장중에 당일치를
+        안 올려 여전히 전일 기준(kr_stocks.py 참고), 개별 종목 가격·보유현황 평가액(yfinance)만
+        09:40 시점 시세로 갱신됨.
         내용 = 전일 세계시장 요약(밤사이 미국 마감 포함, 코드 생성) + 지수·코인 신호
                + 코스피200 매수/관찰/매도. AI 검증은 전날 저녁 pregen_kr.json(구독 CLI)
                이 있으면 재사용(검색 0회), 없으면 API 폴백.
@@ -297,7 +300,7 @@ def _preview_and_send(html, images, subject, out_name, no_email, sent_update):
             _save_last_sent(sent_update)   # 발송 성공 시에만 기록(실패하면 다음 실행 때 재시도)
 
 
-# ------------------------- 한국장 메일 (개장후 10:00) -------------------------
+# ------------------------- 한국장 메일 (개장후 09:40) -------------------------
 def run_kr(no_email: bool = False, force: bool = False):
     import datetime as _dt
     R._require_yf()
@@ -610,7 +613,7 @@ def run_us(no_email: bool = False, force: bool = False):
 
 if __name__ == "__main__":
     ap = argparse.ArgumentParser(description="AI 종목추천 보고서 — 메일 2통(한국 개장후/미국 개장후)")
-    ap.add_argument("--kr", action="store_true", help="한국장 메일(개장후 10:00)")
+    ap.add_argument("--kr", action="store_true", help="한국장 메일(개장후 09:40)")
     ap.add_argument("--us", action="store_true", help="미국장 개장 메일(개장 30분~90분 후)")
     ap.add_argument("--weekly", action="store_true", help="주간 자산배분 리포트")
     ap.add_argument("--daily", action="store_true", help="(수동) 한국+미국 둘 다 실행")
