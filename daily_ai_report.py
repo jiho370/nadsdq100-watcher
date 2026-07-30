@@ -426,15 +426,19 @@ def run_kr(no_email: bool = False, force: bool = False):
                             name_map[s] = n
                 except Exception:
                     pass
-            # 2026-07-23(지호 님 요청): 국장도 미장의 알고리즘+ETF 블렌드 참고선과 대칭되는
-            # 코스피70+알고리즘30 참고선 추가(라이브 배분 아닌 시각적 참고선일 뿐 — 미장과
-            # 동일 원칙). bench_dates/closes(코스피)를 그대로 blend_index 소스로 재사용.
-            kr_blend_label = "코스피70+알고리즘30" if _KFONT else "KOSPI70+Algo30"
+            # 2026-07-29 재정정(지호 님 결정): 2026-07-23~29엔 미장의 "알고리즘70+SPMO30"
+            # 참고선(§6-C)과 대칭 맞추려 임의로 70:30을 썼으나, 그 미장 원본은 §6-H 사전등록
+            # 재검증에서 유의하게 기각·2026-07-28 제거돼 대칭의 근거 자체가 사라졌다. 대신
+            # STRATEGY.md §3 Stage 2(kr_topn_ratio_sweep.py)가 실제로 검증한 코어(코스피/
+            # KODEX200)65:새틀라이트(알고리즘)35 — §3 하단 "포트폴리오 구성 권고"·주간
+            # 자산배분이 쓰는 것과 동일한 공식 비율 — 로 교체. bench_dates/closes(코스피)를
+            # 그대로 blend_index 소스로 재사용.
+            kr_blend_label = "코스피65+알고리즘35" if _KFONT else "KOSPI65+Algo35"
             holdings_html, holdings_images = _holdings_section(
                 kr_state, kr["ind_map"], price_map, bench_dates, bench_closes, "코스피", krw=True,
                 name_map=name_map, market="KR",
                 blend_index={"label": kr_blend_label, "dates": bench_dates, "closes": bench_closes,
-                            "ratio": 0.3})
+                            "ratio": 0.35})
         except Exception as e:
             print(f"[경고] 한국 보유목록 갱신 실패({e})", file=sys.stderr)
 
