@@ -1,0 +1,41 @@
+{
+  "n_rep": 2000,
+  "n_combo_used": 528,
+  "cost_bps": 10.0,
+  "baseline": {
+    "cagr": 12.049,
+    "ulcer": 6.34,
+    "mdd": -30.3
+  },
+  "real_filter": {
+    "cagr": 11.549,
+    "ulcer": 6.221,
+    "mdd": -30.74,
+    "delta_ulcer": 0.1186,
+    "delta_cagr": -0.5001,
+    "avg_exposure": 0.4992
+  },
+  "random_control": {
+    "delta_ulcer_mean": -0.9906,
+    "delta_ulcer_p50": -0.9917,
+    "delta_ulcer_p95": -0.8127,
+    "delta_cagr_mean": 0.1706,
+    "delta_cagr_p50": 0.1698
+  },
+  "real_filter_percentile_vs_random": {
+    "delta_ulcer": 100.0,
+    "delta_cagr": 0.0
+  },
+  "verdict_ulcer": "통과(>=95퍼센타일)",
+  "date_range": [
+    "2003-12-01",
+    "2026-07-29"
+  ],
+  "n_days": 5700,
+  "assumptions": {
+    "equity_sleeve": "SPY(라이브 topn8 알고리즘 아님 — 환헤지 질문과 종목선정 알파를 분리)",
+    "hedge_carry_proxy": "(KR 3M interbank − US 3M T-bill)/100/252, FRED IR3TIB01KRM156N·DTB3",
+    "execution_lag": "1봉(신호 결정일 종가 → 익일 수익 적용)",
+    "cost_model": "|Δh_t|×10bp"
+  }
+}

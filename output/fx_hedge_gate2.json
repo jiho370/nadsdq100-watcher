@@ -1,0 +1,56 @@
+{
+  "block21": {
+    "delta_ulcer_ci95": [
+      -3.2176,
+      2.8184
+    ],
+    "delta_ulcer_excludes_zero": false,
+    "delta_ulcer_mean": -0.0922,
+    "delta_cagr_ci95": [
+      -3.0003,
+      1.8947
+    ],
+    "delta_cagr_excludes_zero": false,
+    "delta_cagr_mean": -0.5236
+  },
+  "block63": {
+    "delta_ulcer_ci95": [
+      -2.7244,
+      2.1003
+    ],
+    "delta_ulcer_excludes_zero": false,
+    "delta_ulcer_mean": -0.1743,
+    "delta_cagr_ci95": [
+      -2.8125,
+      1.9576
+    ],
+    "delta_cagr_excludes_zero": false,
+    "delta_cagr_mean": -0.4916
+  },
+  "block126": {
+    "delta_ulcer_ci95": [
+      -2.3196,
+      1.8467
+    ],
+    "delta_ulcer_excludes_zero": false,
+    "delta_ulcer_mean": -0.1527,
+    "delta_cagr_ci95": [
+      -2.6944,
+      1.856
+    ],
+    "delta_cagr_excludes_zero": false,
+    "delta_cagr_mean": -0.5225
+  },
+  "n_rep": 10000,
+  "cost_bps": 10.0,
+  "point_estimate": {
+    "delta_ulcer": 0.1186,
+    "delta_cagr": -0.5001
+  },
+  "verdict": "미달 — CI가 0을 포함하거나 블록길이에 따라 결과가 뒤집힘(그 자체가 경고, §4 Gate2)",
+  "block_length_sensitivity_flip": false,
+  "date_range": [
+    "2003-12-01",
+    "2026-07-29"
+  ]
+}
