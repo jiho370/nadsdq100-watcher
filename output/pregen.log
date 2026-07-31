@@ -3320,3 +3320,75 @@ git : error: cannot pull with rebase: You have unstaged changes.
  
 error: Please commit or stash them.
 2026-07-30 16:32:16 [kr] [寃쎄퀬] 而ㅻ컠 吏곸쟾 ??pull ?ㅽ뙣 ???묒뾽?몃━媛 ?ъ쟾??dirty?섍굅??異⑸룎. ?꾨옒 push???ㅽ뙣 媛??
+[main 15ceb27] chore: pregen kr [skip ci]
+ 3 files changed, 125 insertions(+), 67 deletions(-)
+git : To https://github.com/jiho370/nadsdq100-watcher.git
+위치 C:\Users\JH\Documents\GitHub\nadsdq100-watcher\run_pregen.ps1:56 문자:9
++         git push 2>&1 | Out-File -Append -Encoding utf8 $log
++         ~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (To https://gith...100-watcher.git:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+   7f9db9a..15ceb27  main -> main
+2026-07-30 16:32:19 [kr] === pregen ?꾨즺 ===
+2026-07-31 07:18:44 [us] === pregen ?쒖옉(?ъ떆??猷⑦봽, 理쒕? 15?쒓컙) ===
+git : error: cannot pull with rebase: You have unstaged changes.
+위치 C:\Users\JH\Documents\GitHub\nadsdq100-watcher\run_pregen.ps1:77 문자:1
++ git pull --rebase 2>&1 | Tee-Object -Variable pullOutput | Out-Null
++ ~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (error: cannot p...staged changes.:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+error: Please commit or stash them.
+2026-07-31 07:18:45 [us] [寃쎄퀬] git pull ?ㅽ뙣 ??濡쒖뺄??而ㅻ컠 ????蹂寃쎌씠 ?덉쑝硫??ш린??留됲옒. ?꾨옒 ?ъ떆?꾩뿉?쒕룄 怨꾩냽 ?ㅽ뙣?????덉쓬.
+2026-07-31 07:18:45 [us]         ?닿껐: ??μ냼 ?대뜑?먯꽌 'git add -A; git commit -m sync; git push' ??踰??섎룞 ?ㅽ뻾.
+python : [정보] SPY 보유종목 503개 로드
+위치 C:\Users\JH\Documents\GitHub\nadsdq100-watcher\run_pregen.ps1:95 문자:5
++     python pregen.py --$Mode 2>&1 | Out-File -Append -Encoding utf8 $ ...
++     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: ([정보] SPY 보유종목 503개 로드:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+[섹터] 위키에서 503종목 GICS 섹터 확보 (Sub-Industry 503종목)
+[탐욕지수] 39 (공포)
+[프로필] 503종목 로드 (생성 2026-06-20)
+C:\Users\JH\Documents\GitHub\nadsdq100-watcher\tech_factors.py:26: FutureWarning: The default fill_method='pad' in Data
+Frame.pct_change is deprecated and will be removed in a future version. Either fill in any non-leading NA values prior 
+to calling pct_change or specify 'fill_method=None' to not fill NA values.
+  mret = panel.pct_change()
+2026-07-31 16:00:04 [kr] === pregen ?쒖옉(?ъ떆??猷⑦봽, 理쒕? 18?쒓컙) ===
+git : error: cannot pull with rebase: You have unstaged changes.
+위치 C:\Users\JH\Documents\GitHub\nadsdq100-watcher\run_pregen.ps1:77 문자:1
++ git pull --rebase 2>&1 | Tee-Object -Variable pullOutput | Out-Null
++ ~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (error: cannot p...staged changes.:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+error: Please commit or stash them.
+2026-07-31 16:00:04 [kr] [寃쎄퀬] git pull ?ㅽ뙣 ??濡쒖뺄??而ㅻ컠 ????蹂寃쎌씠 ?덉쑝硫??ш린??留됲옒. ?꾨옒 ?ъ떆?꾩뿉?쒕룄 怨꾩냽 ?ㅽ뙣?????덉쓬.
+2026-07-31 16:00:04 [kr]         ?닿껐: ??μ냼 ?대뜑?먯꽌 'git add -A; git commit -m sync; git push' ??踰??섎룞 ?ㅽ뻾.
+python : [KR] 펀더멘탈 통과 170/200종목 (EPS>0·ROE>0)
+위치 C:\Users\JH\Documents\GitHub\nadsdq100-watcher\run_pregen.ps1:95 문자:5
++     python pregen.py --$Mode 2>&1 | Out-File -Append -Encoding utf8 $ ...
++     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: ([KR] 펀더멘탈 통과 170/200종목 (EPS>0·ROE>0):String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+[KR] AI 검증 풀 8(최종 채택은 AI 검증 후 상위 5명) · 관찰 0 (후보 170)
+[PREGEN] 서술 사전생성 5종목
+[PREGEN] 저장: output/pregen_kr.json (대상일 2026-08-01 · 종목 9 · 서술캐시 5건)
+KRX 로그인 시도...
+  로그인 ID: jiho370
+KRX 로그인 완료.
+  로그인 시간: 2026-07-31 16:00:20
+  만료 시간: 2026-07-31 17:00:20
+2026-07-31 16:06:43 [kr] ?깃났(?먮뒗 ?대? ?꾨즺) ???ъ떆??猷⑦봽 醫낅즺(?쒕룄 1?뚯㎏)
+git : error: cannot pull with rebase: You have unstaged changes.
+위치 C:\Users\JH\Documents\GitHub\nadsdq100-watcher\run_pregen.ps1:44 문자:5
++     git pull --rebase 2>&1 | Out-File -Append -Encoding utf8 $log
++     ~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (error: cannot p...staged changes.:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+error: Please commit or stash them.
+2026-07-31 16:06:43 [kr] [寃쎄퀬] 而ㅻ컠 吏곸쟾 ??pull ?ㅽ뙣 ???묒뾽?몃━媛 ?ъ쟾??dirty?섍굅??異⑸룎. ?꾨옒 push???ㅽ뙣 媛??
