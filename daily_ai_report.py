@@ -624,7 +624,7 @@ if __name__ == "__main__":
     now = _dt.datetime.now(R.KST)   # 요일·시각은 반드시 KST 기준(러너는 UTC)
     if args.weekly:
         import weekly_report
-        weekly_report.run(no_email=args.no_email)
+        weekly_report.run(no_email=args.no_email, force=args.force)
     elif args.kr:
         run_kr(no_email=args.no_email, force=args.force)
     elif args.us:
@@ -636,7 +636,7 @@ if __name__ == "__main__":
         # 플래그 없음(수동/구 스케줄 호환): 일요일=주간, 오전=한국장, 오후=미국장
         if now.weekday() == 6:
             import weekly_report
-            weekly_report.run(no_email=args.no_email)
+            weekly_report.run(no_email=args.no_email, force=args.force)
         elif now.hour < 12:
             run_kr(no_email=args.no_email, force=args.force)
         else:

@@ -659,7 +659,36 @@ def render_html(ctx, d, verdict_html=""):
 
 
 # ------------------------- 실행 -------------------------
-def run(no_email: bool = False):
+_LAST_SENT = os.path.join("output", "last_sent.json")
+
+
+def _load_last_sent() -> dict:
+    try:
+        with open(_LAST_SENT, encoding="utf-8") as f:
+            return json.load(f) or {}
+    except Exception:
+        return {}
+
+
+def _save_last_sent(update: dict):
+    """부분 갱신 — daily_ai_report.py의 kr/us 기록을 덮어쓰지 않게 merge(같은 파일 공유)."""
+    d = _load_last_sent(); d.update(update)
+    os.makedirs("output", exist_ok=True)
+    with open(_LAST_SENT, "w", encoding="utf-8") as f:
+        json.dump(d, f)
+
+
+def run(no_email: bool = False, force: bool = False):
+    # 2026-08-02(지호 님 신고 — 주간 메일 3통 중복): daily_ai_report.py의 run_kr/run_us는
+    # 처음부터 last_sent.json 날짜 가드가 있었는데 weekly만 없었다 — 외부 크론(cron-job.org)
+    # 추가 전엔 트리거가 1개뿐이라 안 드러났을 뿐, 구조적으로 이 리포트만 무방비 상태였음.
+    # 이제 같은 날 primary(외부 cron)·GH 자체 schedule·워치독까지 최대 3번 겹칠 수 있어
+    # kr/us와 동일한 가드를 적용한다.
+    today_kst = dt.datetime.now(R.KST).date().isoformat()
+    last = _load_last_sent()
+    if not force and not no_email and last.get("sent_weekly_kst") == today_kst:
+        _log(f"[중복] 오늘({today_kst}) 주간 리포트 이미 발송 → 생략")
+        return
     ctx = gather()
     if not ctx["assets"]:
         _log("자산 데이터 수집 실패 → 발송 중단.")
@@ -711,11 +740,13 @@ def run(no_email: bool = False):
     _log("미리보기 output/weekly_report.html 저장")
 
     if not no_email:
-        R.send_email(f"[주간 자산배분] {ctx['as_of']} 리포트", html, images)
+        if R.send_email(f"[주간 자산배분] {ctx['as_of']} 리포트", html, images):
+            _save_last_sent({"sent_weekly_kst": today_kst})
 
 
 if __name__ == "__main__":
     ap = argparse.ArgumentParser(description="주간 자산배분 리포트")
     ap.add_argument("--no-email", action="store_true")
+    ap.add_argument("--force", action="store_true", help="중복 발송 체크 무시")
     args = ap.parse_args()
-    run(no_email=args.no_email)
+    run(no_email=args.no_email, force=args.force)
