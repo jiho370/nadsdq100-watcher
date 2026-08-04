@@ -3630,3 +3630,249 @@ git : error: cannot pull with rebase: You have unstaged changes.
  
 error: Please commit or stash them.
 2026-08-04 13:34:47 [us] [寃쎄퀬] 而ㅻ컠 吏곸쟾 ??pull ?ㅽ뙣 ???묒뾽?몃━媛 ?ъ쟾??dirty?섍굅??異⑸룎. ?꾨옒 push???ㅽ뙣 媛??
+[main 13123d6] chore: pregen us [skip ci]
+ 2 files changed, 217 insertions(+), 139 deletions(-)
+git : To https://github.com/jiho370/nadsdq100-watcher.git
+위치 C:\Users\JH\Documents\GitHub\nadsdq100-watcher\run_pregen.ps1:56 문자:9
++         git push 2>&1 | Out-File -Append -Encoding utf8 $log
++         ~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (To https://gith...100-watcher.git:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+ ! [rejected]        main -> main (fetch first)
+error: failed to push some refs to 'https://github.com/jiho370/nadsdq100-watcher.git'
+hint: Updates were rejected because the remote contains work that you do not
+hint: have locally. This is usually caused by another repository pushing to
+hint: the same ref. If you want to integrate the remote changes, use
+hint: 'git pull' before pushing again.
+hint: See the 'Note about fast-forwards' in 'git push --help' for details.
+2026-08-04 13:34:50 [us] [寃쎄퀬] git push ?ㅽ뙣 ??蹂댄넻 濡쒖뺄??origin蹂대떎 ?ㅼ쿂???덉쓣 ??諛쒖깮. ??pull 寃쎄퀬 李멸퀬.
+2026-08-04 13:34:50 [us] === pregen ?꾨즺 ===
+2026-08-04 19:38:59 [kr] === pregen ?쒖옉(?ъ떆??猷⑦봽, 理쒕? 18?쒓컙) ===
+git : error: cannot pull with rebase: You have unstaged changes.
+위치 C:\Users\JH\Documents\GitHub\nadsdq100-watcher\run_pregen.ps1:77 문자:1
++ git pull --rebase 2>&1 | Tee-Object -Variable pullOutput | Out-Null
++ ~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (error: cannot p...staged changes.:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+error: Please commit or stash them.
+2026-08-04 19:38:59 [kr] [寃쎄퀬] git pull ?ㅽ뙣 ??濡쒖뺄??而ㅻ컠 ????蹂寃쎌씠 ?덉쑝硫??ш린??留됲옒. ?꾨옒 ?ъ떆?꾩뿉?쒕룄 怨꾩냽 ?ㅽ뙣?????덉쓬.
+2026-08-04 19:38:59 [kr]         ?닿껐: ??μ냼 ?대뜑?먯꽌 'git add -A; git commit -m sync; git push' ??踰??섎룞 ?ㅽ뻾.
+python : [KR] pykrx 없음(HTTPSConnectionPool(host='data.krx.co.kr', port=443): Max retries exceeded with url: /contents/M
+DC/COMS/client/MDCCOMS001.cmd (Caused by NameResolutionError("HTTPSConnection(host='data.krx.co.kr', port=443): Failed 
+to resolve 'data.krx.co.kr' ([Errno 11001] getaddrinfo failed)"))) → 캐시 폴백
+위치 C:\Users\JH\Documents\GitHub\nadsdq100-watcher\run_pregen.ps1:95 문자:5
++     python pregen.py --$Mode 2>&1 | Out-File -Append -Encoding utf8 $ ...
++     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: ([KR] pykrx 없음(H...ed)"))) → 캐시 폴백:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+[KR] 캐시 사용(기준일 20260803)
+[KR] 펀더멘탈 통과 170/200종목 (EPS>0·ROE>0)
+$010130.KS: possibly delisted; no price data found  (period=2y)
+$012450.KS: possibly delisted; no price data found  (period=2y)
+$185750.KS: possibly delisted; no price data found  (period=2y)
+$017670.KS: possibly delisted; no price data found  (period=2y)
+$000810.KS: possibly delisted; no price data found  (period=2y)
+$008930.KS: possibly delisted; no price data found  (period=2y)
+$078930.KS: possibly delisted; no price data found  (period=2y)
+$161390.KS: possibly delisted; no price data found  (period=2y)
+$028670.KS: possibly delisted; no price data found  (period=2y)
+$002790.KS: possibly delisted; no price data found  (period=2y)
+$005490.KS: possibly delisted; no price data found  (period=2y)
+$139130.KS: possibly delisted; no price data found  (period=2y)
+$103140.KS: possibly delisted; no price data found  (period=2y)
+$272210.KS: possibly delisted; no price data found  (period=2y)
+$003230.KS: possibly delisted; no price data found  (period=2y)
+$298020.KS: possibly delisted; no price data found  (period=2y)
+$300720.KS: possibly delisted; no price data found  (period=2y)
+$000120.KS: possibly delisted; no price data found  (period=2y)
+$001800.KS: possibly delisted; no price data found  (period=2y)
+$029780.KS: possibly delisted; no price data found  (period=2y)
+$052690.KS: possibly delisted; no price data found  (period=2y)
+$007310.KS: possibly delisted; no price data found  (period=2y)
+$028260.KS: possibly delisted; no price data found  (period=2y)
+$064400.KS: possibly delisted; no price data found  (period=2y)
+$003550.KS: possibly delisted; no price data found  (period=2y)
+$259960.KS: possibly delisted; no price data found  (period=2y)
+$011200.KS: possibly delisted; no price data found  (period=2y)
+$007660.KS: possibly delisted; no price data found  (period=2y)
+$002030.KS: possibly delisted; no price data found  (period=2y)
+$207940.KS: possibly delisted; no price data found  (period=2y)
+$267270.KS: possibly delisted; no price data found  (period=2y)
+$011210.KS: possibly delisted; no price data found  (period=2y)
+$105560.KS: possibly delisted; no price data found  (period=2y)
+$278470.KS: possibly delisted; no price data found  (period=2y)
+$285130.KS: possibly delisted; no price data found  (period=2y)
+$010140.KS: possibly delisted; no price data found  (period=2y)
+$000150.KS: possibly delisted; no price data found  (period=2y)
+$139480.KS: possibly delisted; no price data found  (period=2y)
+$034220.KS: possibly delisted; no price data found  (period=2y)
+$030200.KS: possibly delisted; no price data found  (period=2y)
+$005850.KS: possibly delisted; no price data found  (period=2y)
+$034230.KS: possibly delisted; no price data found  (period=2y)
+$000100.KS: possibly delisted; no price data found  (period=2y)
+$483650.KS: possibly delisted; no price data found  (period=2y)
+$090430.KS: possibly delisted; no price data found  (period=2y)
+$251270.KS: possibly delisted; no price data found  (period=2y)
+$005830.KS: possibly delisted; no price data found  (period=2y)
+$009970.KS: possibly delisted; no price data found  (period=2y)
+$012750.KS: possibly delisted; no price data found  (period=2y)
+$192820.KS: possibly delisted; no price data found  (period=2y)
+$001440.KS: possibly delisted; no price data found  (period=2y)
+$030000.KS: possibly delisted; no price data found  (period=2y)
+$018260.KS: possibly delisted; no price data found  (period=2y)
+$267250.KS: possibly delisted; no price data found  (period=2y)
+$307950.KS: possibly delisted; no price data found  (period=2y)
+$111770.KS: possibly delisted; no price data found  (period=2y)
+$086790.KS: possibly delisted; no price data found  (period=2y)
+$112610.KS: possibly delisted; no price data found  (period=2y)
+$032830.KS: possibly delisted; no price data found  (period=2y)
+$120110.KS: possibly delisted; no price data found  (period=2y)
+$039490.KS: possibly delisted; no price data found  (period=2y)
+$066570.KS: possibly delisted; no price data found  (period=2y)
+$036460.KS: possibly delisted; no price data found  (period=2y)
+$015760.KS: possibly delisted; no price data found  (period=2y)
+$377300.KS: possibly delisted; no price data found  (period=2y)
+$008730.KS: possibly delisted; no price data found  (period=2y)
+$071970.KS: possibly delisted; no price data found  (period=2y)
+$007340.KS: possibly delisted; no price data found  (period=2y)
+$006260.KS: possibly delisted; no price data found  (period=2y)
+$071050.KS: possibly delisted; no price data found  (period=2y)
+$443060.KS: possibly delisted; no price data found  (period=2y)
+$035420.KS: possibly delisted; no price data found  (period=2y)
+$069260.KS: possibly delisted; no price data found  (period=2y)
+$175330.KS: possibly delisted; no price data found  (period=2y)
+$002380.KS: possibly delisted; no price data found  (period=2y)
+$093370.KS: possibly delisted; no price data found  (period=2y)
+$028050.KS: possibly delisted; no price data found  (period=2y)
+$081660.KS: possibly delisted; no price data found  (period=2y)
+$024110.KS: possibly delisted; no price data found  (period=2y)
+$026960.KS: possibly delisted; no price data found  (period=2y)
+$034020.KS: possibly delisted; no price data found  (period=2y)
+$204320.KS: possibly delisted; no price data found  (period=2y)
+$032640.KS: possibly delisted; no price data found  (period=2y)
+$086280.KS: possibly delisted; no price data found  (period=2y)
+$316140.KS: possibly delisted; no price data found  (period=2y)
+$267260.KS: possibly delisted; no price data found  (period=2y)
+$383220.KS: possibly delisted; no price data found  (period=2y)
+$004370.KS: possibly delisted; no price data found  (period=2y)
+$457190.KS: possibly delisted; no price data found  (period=2y)
+$450080.KS: possibly delisted; no price data found  (period=2y)
+$326030.KS: possibly delisted; no price data found  (period=2y)
+$017800.KS: possibly delisted; no price data found  (period=2y)
+$042660.KS: possibly delisted; no price data found  (period=2y)
+$003670.KS: possibly delisted; no price data found  (period=2y)
+$000270.KS: possibly delisted; no price data found  (period=2y)
+$003090.KS: possibly delisted; no price data found  (period=2y)
+$005940.KS: possibly delisted; no price data found  (period=2y)
+$033780.KS: possibly delisted; no price data found  (period=2y)
+$192080.KS: possibly delisted; no price data found  (period=2y)
+$323410.KS: possibly delisted; no price data found  (period=2y)
+$071320.KS: possibly delisted; no price data found  (period=2y)
+$055550.KS: possibly delisted; no price data found  (period=2y)
+$003030.KS: possibly delisted; no price data found  (period=2y)
+$016360.KS: possibly delisted; no price data found  (period=2y)
+$004000.KS: possibly delisted; no price data found  (period=2y)
+$180640.KS: possibly delisted; no price data found  (period=2y)
+$014680.KS: possibly delisted; no price data found  (period=2y)
+$073240.KS: possibly delisted; no price data found  (period=2y)
+$002840.KS: possibly delisted; no price data found  (period=2y)
+$268280.KS: possibly delisted; no price data found  (period=2y)
+$004170.KS: possibly delisted; no price data found  (period=2y)
+$138040.KS: possibly delisted; no price data found  (period=2y)
+$047050.KS: possibly delisted; no price data found  (period=2y)
+$010120.KS: possibly delisted; no price data found  (period=2y)
+$375500.KS: possibly delisted; no price data found  (period=2y)
+$009540.KS: possibly delisted; no price data found  (period=2y)
+$017960.KS: possibly delisted; no price data found  (period=2y)
+$003240.KS: possibly delisted; no price data found  (period=2y)
+$000990.KS: possibly delisted; no price data found  (period=2y)
+$035250.KS: possibly delisted; no price data found  (period=2y)
+$051600.KS: possibly delisted; no price data found  (period=2y)
+$069620.KS: possibly delisted; no price data found  (period=2y)
+$023530.KS: possibly delisted; no price data found  (period=2y)
+$021240.KS: possibly delisted; no price data found  (period=2y)
+$006650.KS: possibly delisted; no price data found  (period=2y)
+$000660.KS: possibly delisted; no price data found  (period=2y)
+$007070.KS: possibly delisted; no price data found  (period=2y)
+$010950.KS: possibly delisted; no price data found  (period=2y)
+$022100.KS: possibly delisted; no price data found  (period=2y)
+$009240.KS: possibly delisted; no price data found  (period=2y)
+$001450.KS: possibly delisted; no price data found  (period=2y)
+$068270.KS: possibly delisted; no price data found  (period=2y)
+$088350.KS: possibly delisted; no price data found  (period=2y)
+$009150.KS: possibly delisted; no price data found  (period=2y)
+$298040.KS: possibly delisted; no price data found  (period=2y)
+$241560.KS: possibly delisted; no price data found  (period=2y)
+$011070.KS: possibly delisted; no price data found  (period=2y)
+$001040.KS: possibly delisted; no price data found  (period=2y)
+$329180.KS: possibly delisted; no price data found  (period=2y)
+$006040.KS: possibly delisted; no price data found  (period=2y)
+$012330.KS: possibly delisted; no price data found  (period=2y)
+$079550.KS: possibly delisted; no price data found  (period=2y)
+$036570.KS: possibly delisted; no price data found  (period=2y)
+$000880.KS: possibly delisted; no price data found  (period=2y)
+$014820.KS: possibly delisted; no price data found  (period=2y)
+$062040.KS: possibly delisted; no price data found  (period=2y)
+$161890.KS: possibly delisted; no price data found  (period=2y)
+$042700.KS: possibly delisted; no price data found  (period=2y)
+$005930.KS: possibly delisted; no price data found  (period=2y)
+$000240.KS: possibly delisted; no price data found  (period=2y)
+$003490.KS: possibly delisted; no price data found  (period=2y)
+$001430.KS: possibly delisted; no price data found  (period=2y)
+$138930.KS: possibly delisted; no price data found  (period=2y)
+$035720.KS: possibly delisted; no price data found  (period=2y)
+$402340.KS: possibly delisted; no price data found  (period=2y)
+$006800.KS: possibly delisted; no price data found  (period=2y)
+$000080.KS: possibly delisted; no price data found  (period=2y)
+$011780.KS: possibly delisted; no price data found  (period=2y)
+$064350.KS: possibly delisted; no price data found  (period=2y)
+$000720.KS: possibly delisted; no price data found  (period=2y)
+$280360.KS: possibly delisted; no price data found  (period=2y)
+$128940.KS: possibly delisted; no price data found  (period=2y)
+$282330.KS: possibly delisted; no price data found  (period=2y)
+$005300.KS: possibly delisted; no price data found  (period=2y)
+$082740.KS: possibly delisted; no price data found  (period=2y)
+$069960.KS: possibly delisted; no price data found  (period=2y)
+$005380.KS: possibly delisted; no price data found  (period=2y)
+$271560.KS: possibly delisted; no price data found  (period=2y)
+$034730.KS: possibly delisted; no price data found  (period=2y)
+$047810.KS: possibly delisted; no price data found  (period=2y)
+
+170 Failed downloads:
+['010130.KS', '012450.KS', '185750.KS', '017670.KS', '000810.KS', '008930.KS', '078930.KS', '161390.KS', '028670.KS', '
+002790.KS', '005490.KS', '139130.KS', '103140.KS', '272210.KS', '003230.KS', '298020.KS', '300720.KS', '000120.KS', '00
+1800.KS', '029780.KS', '052690.KS', '007310.KS', '028260.KS', '064400.KS', '003550.KS', '259960.KS', '011200.KS', '0076
+60.KS', '002030.KS', '207940.KS', '267270.KS', '011210.KS', '105560.KS', '278470.KS', '285130.KS', '010140.KS', '000150
+.KS', '139480.KS', '034220.KS', '030200.KS', '005850.KS', '034230.KS', '000100.KS', '483650.KS', '090430.KS', '251270.K
+S', '005830.KS', '009970.KS', '012750.KS', '192820.KS', '001440.KS', '030000.KS', '018260.KS', '267250.KS', '307950.KS'
+, '111770.KS', '086790.KS', '112610.KS', '032830.KS', '120110.KS', '039490.KS', '066570.KS', '036460.KS', '015760.KS', 
+'377300.KS', '008730.KS', '071970.KS', '007340.KS', '006260.KS', '071050.KS', '443060.KS', '035420.KS', '069260.KS', '1
+75330.KS', '002380.KS', '093370.KS', '028050.KS', '081660.KS', '024110.KS', '026960.KS', '034020.KS', '204320.KS', '032
+640.KS', '086280.KS', '316140.KS', '267260.KS', '383220.KS', '004370.KS', '457190.KS', '450080.KS', '326030.KS', '01780
+0.KS', '042660.KS', '003670.KS', '000270.KS', '003090.KS', '005940.KS', '033780.KS', '192080.KS', '323410.KS', '071320.
+KS', '055550.KS', '003030.KS', '016360.KS', '004000.KS', '180640.KS', '014680.KS', '073240.KS', '002840.KS', '268280.KS
+', '004170.KS', '138040.KS', '047050.KS', '010120.KS', '375500.KS', '009540.KS', '017960.KS', '003240.KS', '000990.KS',
+ '035250.KS', '051600.KS', '069620.KS', '023530.KS', '021240.KS', '006650.KS', '000660.KS', '007070.KS', '010950.KS', '
+022100.KS', '009240.KS', '001450.KS', '068270.KS', '088350.KS', '009150.KS', '298040.KS', '241560.KS', '011070.KS', '00
+1040.KS', '329180.KS', '006040.KS', '012330.KS', '079550.KS', '036570.KS', '000880.KS', '014820.KS', '062040.KS', '1618
+90.KS', '042700.KS', '005930.KS', '000240.KS', '003490.KS', '001430.KS', '138930.KS', '035720.KS', '402340.KS', '006800
+.KS', '000080.KS', '011780.KS', '064350.KS', '000720.KS', '280360.KS', '128940.KS', '282330.KS', '005300.KS', '082740.K
+S', '069960.KS', '005380.KS', '271560.KS', '034730.KS', '047810.KS']: possibly delisted; no price data found  (period=2
+y)
+[KR] 펀더멘탈 통과 종목 중 시세 확보된 종목 없음
+[PREGEN] 한국 후보 없음 → 스킵
+KRX 로그인 시도...
+  로그인 ID: jiho370
+2026-08-05 00:31:00 [kr] ?깃났(?먮뒗 ?대? ?꾨즺) ???ъ떆??猷⑦봽 醫낅즺(?쒕룄 1?뚯㎏)
+git : error: cannot pull with rebase: You have unstaged changes.
+위치 C:\Users\JH\Documents\GitHub\nadsdq100-watcher\run_pregen.ps1:44 문자:5
++     git pull --rebase 2>&1 | Out-File -Append -Encoding utf8 $log
++     ~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (error: cannot p...staged changes.:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+error: Please commit or stash them.
+2026-08-05 00:31:00 [kr] [寃쎄퀬] 而ㅻ컠 吏곸쟾 ??pull ?ㅽ뙣 ???묒뾽?몃━媛 ?ъ쟾??dirty?섍굅??異⑸룎. ?꾨옒 push???ㅽ뙣 媛??
