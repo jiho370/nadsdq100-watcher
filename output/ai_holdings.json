@@ -3,7 +3,7 @@
     "SWKS": {
       "since": "2026-07-16",
       "entry_price": 57.83,
-      "peak": 65.0999984741211,
+      "peak": 66.03500366210938,
       "armed": true
     },
     "APTV": {
@@ -33,13 +33,13 @@
     "BKNG": {
       "since": "2026-07-16",
       "entry_price": 179.93,
-      "peak": 201.08999633789062,
+      "peak": 206.17999267578125,
       "armed": true
     },
     "WDAY": {
       "since": "2026-07-22",
       "entry_price": 146.65,
-      "peak": 168.375,
+      "peak": 170.32000732421875,
       "armed": true
     },
     "META": {
@@ -49,5 +49,5 @@
       "armed": true
     }
   },
-  "last_run": "2026-08-04"
+  "last_run": "2026-08-05"
 }
