@@ -3988,3 +3988,78 @@ git : error: cannot pull with rebase: You have unstaged changes.
  
 error: Please commit or stash them.
 2026-08-06 12:23:56 [us] [寃쎄퀬] 而ㅻ컠 吏곸쟾 ??pull ?ㅽ뙣 ???묒뾽?몃━媛 ?ъ쟾??dirty?섍굅??異⑸룎. ?꾨옒 push???ㅽ뙣 媛??
+[main b0aa794] chore: pregen us [skip ci]
+ 2 files changed, 207 insertions(+), 143 deletions(-)
+git : To https://github.com/jiho370/nadsdq100-watcher.git
+위치 C:\Users\JH\Documents\GitHub\nadsdq100-watcher\run_pregen.ps1:56 문자:9
++         git push 2>&1 | Out-File -Append -Encoding utf8 $log
++         ~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (To https://gith...100-watcher.git:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+ ! [rejected]        main -> main (fetch first)
+error: failed to push some refs to 'https://github.com/jiho370/nadsdq100-watcher.git'
+hint: Updates were rejected because the remote contains work that you do not
+hint: have locally. This is usually caused by another repository pushing to
+hint: the same ref. If you want to integrate the remote changes, use
+hint: 'git pull' before pushing again.
+hint: See the 'Note about fast-forwards' in 'git push --help' for details.
+2026-08-06 12:23:59 [us] [寃쎄퀬] git push ?ㅽ뙣 ??蹂댄넻 濡쒖뺄??origin蹂대떎 ?ㅼ쿂???덉쓣 ??諛쒖깮. ??pull 寃쎄퀬 李멸퀬.
+2026-08-06 12:23:59 [us] === pregen ?꾨즺 ===
+2026-08-06 19:32:37 [kr] === pregen ?쒖옉(?ъ떆??猷⑦봽, 理쒕? 18?쒓컙) ===
+git : error: cannot pull with rebase: You have unstaged changes.
+위치 C:\Users\JH\Documents\GitHub\nadsdq100-watcher\run_pregen.ps1:77 문자:1
++ git pull --rebase 2>&1 | Tee-Object -Variable pullOutput | Out-Null
++ ~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (error: cannot p...staged changes.:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+error: Please commit or stash them.
+2026-08-06 19:32:37 [kr] [寃쎄퀬] git pull ?ㅽ뙣 ??濡쒖뺄??而ㅻ컠 ????蹂寃쎌씠 ?덉쑝硫??ш린??留됲옒. ?꾨옒 ?ъ떆?꾩뿉?쒕룄 怨꾩냽 ?ㅽ뙣?????덉쓬.
+2026-08-06 19:32:37 [kr]         ?닿껐: ??μ냼 ?대뜑?먯꽌 'git add -A; git commit -m sync; git push' ??踰??섎룞 ?ㅽ뻾.
+python : [PREGEN] 한국장 pregen 은 16시 이후 또는 10시 이전에만 유효 → 스킵
+위치 C:\Users\JH\Documents\GitHub\nadsdq100-watcher\run_pregen.ps1:95 문자:5
++     python pregen.py --$Mode 2>&1 | Out-File -Append -Encoding utf8 $ ...
++     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: ([PREGEN] 한국장 pr...0시 이전에만 유효 → 스킵:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+2026-08-07 12:03:57 [kr] ?대쾲 ?ㅽ뻾 ?쒓컖? ?좏슚 ?쒓컙李?諛????ъ떆???섎? ?놁뼱 醫낅즺(?쒕룄 1?뚯㎏)
+2026-08-07 12:03:57 [kr] === pregen ?꾨즺 ===
+2026-08-07 12:09:34 [us] === pregen ?쒖옉(?ъ떆??猷⑦봽, 理쒕? 15?쒓컙) ===
+git : error: cannot pull with rebase: You have unstaged changes.
+위치 C:\Users\JH\Documents\GitHub\nadsdq100-watcher\run_pregen.ps1:77 문자:1
++ git pull --rebase 2>&1 | Tee-Object -Variable pullOutput | Out-Null
++ ~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (error: cannot p...staged changes.:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+error: Please commit or stash them.
+2026-08-07 12:09:34 [us] [寃쎄퀬] git pull ?ㅽ뙣 ??濡쒖뺄??而ㅻ컠 ????蹂寃쎌씠 ?덉쑝硫??ш린??留됲옒. ?꾨옒 ?ъ떆?꾩뿉?쒕룄 怨꾩냽 ?ㅽ뙣?????덉쓬.
+2026-08-07 12:09:34 [us]         ?닿껐: ??μ냼 ?대뜑?먯꽌 'git add -A; git commit -m sync; git push' ??踰??섎룞 ?ㅽ뻾.
+python : [정보] SPY 보유종목 503개 로드
+위치 C:\Users\JH\Documents\GitHub\nadsdq100-watcher\run_pregen.ps1:95 문자:5
++     python pregen.py --$Mode 2>&1 | Out-File -Append -Encoding utf8 $ ...
++     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: ([정보] SPY 보유종목 503개 로드:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+[섹터] 위키에서 503종목 GICS 섹터 확보 (Sub-Industry 503종목)
+[탐욕지수] 60 (탐욕)
+[프로필] 503종목 로드 (생성 2026-06-20)
+C:\Users\JH\Documents\GitHub\nadsdq100-watcher\tech_factors.py:26: FutureWarning: The default fill_method='pad' in Data
+Frame.pct_change is deprecated and will be removed in a future version. Either fill in any non-leading NA values prior 
+to calling pct_change or specify 'fill_method=None' to not fill NA values.
+  mret = panel.pct_change()
+[PREGEN] 서술 사전생성 9종목
+[PREGEN] 저장: output/pregen_us.json (대상일 2026-08-08 · 종목 26 · 서술캐시 9건)
+2026-08-07 12:18:02 [us] ?깃났(?먮뒗 ?대? ?꾨즺) ???ъ떆??猷⑦봽 醫낅즺(?쒕룄 1?뚯㎏)
+git : error: cannot pull with rebase: You have unstaged changes.
+위치 C:\Users\JH\Documents\GitHub\nadsdq100-watcher\run_pregen.ps1:44 문자:5
++     git pull --rebase 2>&1 | Out-File -Append -Encoding utf8 $log
++     ~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (error: cannot p...staged changes.:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+error: Please commit or stash them.
+2026-08-07 12:18:02 [us] [寃쎄퀬] 而ㅻ컠 吏곸쟾 ??pull ?ㅽ뙣 ???묒뾽?몃━媛 ?ъ쟾??dirty?섍굅??異⑸룎. ?꾨옒 push???ㅽ뙣 媛??
