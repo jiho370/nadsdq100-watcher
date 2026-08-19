@@ -27,19 +27,19 @@
     "MRNA": {
       "since": "2026-07-16",
       "entry_price": 67.71,
-      "peak": 67.71,
+      "peak": 141.77310180664062,
       "armed": true
     },
     "BKNG": {
       "since": "2026-07-16",
       "entry_price": 179.93,
-      "peak": 214.27000427246094,
+      "peak": 215.19000244140625,
       "armed": true
     },
     "WDAY": {
       "since": "2026-07-22",
       "entry_price": 146.65,
-      "peak": 196.10989379882812,
+      "peak": 199.1300048828125,
       "armed": true
     },
     "META": {
@@ -49,5 +49,5 @@
       "armed": true
     }
   },
-  "last_run": "2026-08-18"
+  "last_run": "2026-08-19"
 }
