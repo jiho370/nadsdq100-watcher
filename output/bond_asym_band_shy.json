@@ -3,7 +3,7 @@
   "ticker": "SHY",
   "trend_ma_fixed": 300,
   "baseline_no_filter": {
-    "cagr": 1.98,
+    "cagr": 1.99,
     "ulcer": 1.1,
     "mdd": -5.7
   },
@@ -19,11 +19,11 @@
     "band_down": 0.0,
     "confirm": 5,
     "symmetric": true,
-    "cagr": 1.84,
+    "cagr": 1.86,
     "ulcer": 0.47,
     "mdd": -2.2,
     "off_episodes": 9,
-    "score": 0.5716376464550745,
+    "score": 0.5716245083825775,
     "rankable": true
   },
   "best_symmetric": {
@@ -31,11 +31,11 @@
     "band_down": 0.0,
     "confirm": 5,
     "symmetric": true,
-    "cagr": 1.84,
+    "cagr": 1.86,
     "ulcer": 0.47,
     "mdd": -2.2,
     "off_episodes": 9,
-    "score": 0.5716376464550745,
+    "score": 0.5716245083825775,
     "rankable": true
   },
   "all_rows": [
@@ -44,11 +44,11 @@
       "band_down": 0.0,
       "confirm": 1,
       "symmetric": true,
-      "cagr": 1.7,
+      "cagr": 1.71,
       "ulcer": 0.77,
       "mdd": -2.8,
       "off_episodes": 36,
-      "score": 0.2995514317795199,
+      "score": 0.29951247774420814,
       "rankable": true
     },
     {
@@ -56,11 +56,11 @@
       "band_down": 0.0,
       "confirm": 3,
       "symmetric": true,
-      "cagr": 1.81,
+      "cagr": 1.82,
       "ulcer": 0.53,
       "mdd": -2.2,
       "off_episodes": 14,
-      "score": 0.513629709650997,
+      "score": 0.5136047366400066,
       "rankable": true
     },
     {
@@ -68,11 +68,11 @@
       "band_down": 0.0,
       "confirm": 5,
       "symmetric": true,
-      "cagr": 1.84,
+      "cagr": 1.86,
       "ulcer": 0.47,
       "mdd": -2.2,
       "off_episodes": 9,
-      "score": 0.5716376464550745,
+      "score": 0.5716245083825775,
       "rankable": true
     },
     {
@@ -80,11 +80,11 @@
       "band_down": 0.0,
       "confirm": 10,
       "symmetric": true,
-      "cagr": 1.83,
+      "cagr": 1.85,
       "ulcer": 0.51,
       "mdd": -2.2,
       "off_episodes": 7,
-      "score": 0.5385390031575799,
+      "score": 0.5385527007493,
       "rankable": false
     },
     {
@@ -92,11 +92,11 @@
       "band_down": 0.0,
       "confirm": 1,
       "symmetric": false,
-      "cagr": 1.73,
-      "ulcer": 0.61,
+      "cagr": 1.75,
+      "ulcer": 0.6,
       "mdd": -2.2,
       "off_episodes": 7,
-      "score": 0.4481831577512765,
+      "score": 0.44817992351259023,
       "rankable": false
     },
     {
@@ -104,11 +104,11 @@
       "band_down": 0.0,
       "confirm": 3,
       "symmetric": false,
-      "cagr": 1.72,
+      "cagr": 1.73,
       "ulcer": 0.56,
       "mdd": -2.2,
       "off_episodes": 6,
-      "score": 0.4868058595149324,
+      "score": 0.4868178534944309,
       "rankable": false
     },
     {
@@ -116,11 +116,11 @@
       "band_down": 0.0,
       "confirm": 5,
       "symmetric": false,
-      "cagr": 1.81,
+      "cagr": 1.82,
       "ulcer": 0.43,
       "mdd": -2.2,
       "off_episodes": 4,
-      "score": 0.6092292431231534,
+      "score": 0.6092044483798132,
       "rankable": false
     },
     {
@@ -128,11 +128,11 @@
       "band_down": 0.0,
       "confirm": 10,
       "symmetric": false,
-      "cagr": 1.8,
+      "cagr": 1.82,
       "ulcer": 0.42,
       "mdd": -2.2,
       "off_episodes": 4,
-      "score": 0.6131972081290287,
+      "score": 0.6131772440409236,
       "rankable": false
     },
     {
@@ -140,11 +140,11 @@
       "band_down": 0.0,
       "confirm": 1,
       "symmetric": false,
-      "cagr": 1.62,
+      "cagr": 1.64,
       "ulcer": 0.74,
       "mdd": -2.8,
       "off_episodes": 5,
-      "score": 0.32420441045715154,
+      "score": 0.3241615397395067,
       "rankable": false
     },
     {
@@ -152,11 +152,11 @@
       "band_down": 0.0,
       "confirm": 3,
       "symmetric": false,
-      "cagr": 1.71,
+      "cagr": 1.73,
       "ulcer": 0.41,
       "mdd": -2.2,
       "off_episodes": 3,
-      "score": 0.6266028648513663,
+      "score": 0.6265914130158523,
       "rankable": false
     },
     {
@@ -164,11 +164,11 @@
       "band_down": 0.0,
       "confirm": 5,
       "symmetric": false,
-      "cagr": 1.7,
+      "cagr": 1.72,
       "ulcer": 0.39,
       "mdd": -2.2,
       "off_episodes": 3,
-      "score": 0.64756853600054,
+      "score": 0.647551605246479,
       "rankable": false
     },
     {
@@ -176,11 +176,11 @@
       "band_down": 0.0,
       "confirm": 10,
       "symmetric": false,
-      "cagr": 1.63,
-      "ulcer": 0.4,
+      "cagr": 1.65,
+      "ulcer": 0.39,
       "mdd": -2.2,
       "off_episodes": 3,
-      "score": 0.6401175643960905,
+      "score": 0.640111407923136,
       "rankable": false
     },
     {
@@ -188,11 +188,11 @@
       "band_down": 0.0,
       "confirm": 1,
       "symmetric": false,
-      "cagr": 1.38,
+      "cagr": 1.4,
       "ulcer": 0.68,
       "mdd": -2.2,
       "off_episodes": 3,
-      "score": 0.3802406529461519,
+      "score": 0.3802306664687133,
       "rankable": false
     },
     {
@@ -200,35 +200,35 @@
       "band_down": 0.0,
       "confirm": 3,
       "symmetric": false,
-      "cagr": 1.4,
+      "cagr": 1.42,
       "ulcer": 0.41,
       "mdd": -2.2,
       "off_episodes": 3,
-      "score": 0.6272498065596246,
+      "score": 0.6272387924696188,
       "rankable": false
     },
     {
       "band_up": 0.02,
       "band_down": 0.0,
       "confirm": 5,
+      "symmetric": false,
+      "cagr": 1.47,
+      "ulcer": 0.28,
+      "mdd": -2.2,
+      "off_episodes": 3,
+      "score": 0.7432020276143076,
+      "rankable": false
+    },
+    {
+      "band_up": 0.02,
+      "band_down": 0.0,
+      "confirm": 10,
       "symmetric": false,
       "cagr": 1.45,
       "ulcer": 0.28,
       "mdd": -2.2,
       "off_episodes": 3,
-      "score": 0.7432266976108912,
-      "rankable": false
-    },
-    {
-      "band_up": 0.02,
-      "band_down": 0.0,
-      "confirm": 10,
-      "symmetric": false,
-      "cagr": 1.43,
-      "ulcer": 0.28,
-      "mdd": -2.2,
-      "off_episodes": 3,
-      "score": 0.7462447996266911,
+      "score": 0.7462323796740035,
       "rankable": false
     },
     {
@@ -236,11 +236,11 @@
       "band_down": 0.0,
       "confirm": 1,
       "symmetric": false,
-      "cagr": 1.23,
+      "cagr": 1.25,
       "ulcer": 0.3,
       "mdd": -2.2,
       "off_episodes": 3,
-      "score": 0.7239729731989653,
+      "score": 0.7239076952468438,
       "rankable": false
     },
     {
@@ -248,11 +248,11 @@
       "band_down": 0.0,
       "confirm": 3,
       "symmetric": false,
-      "cagr": 1.01,
+      "cagr": 1.03,
       "ulcer": 0.32,
       "mdd": -2.2,
       "off_episodes": 3,
-      "score": 0.7053740837495063,
+      "score": 0.7053634685829805,
       "rankable": false
     },
     {
@@ -260,11 +260,11 @@
       "band_down": 0.0,
       "confirm": 5,
       "symmetric": false,
-      "cagr": 0.97,
+      "cagr": 1.0,
       "ulcer": 0.28,
       "mdd": -2.2,
       "off_episodes": 3,
-      "score": 0.7420844083849891,
+      "score": 0.7420596194588146,
       "rankable": false
     },
     {
@@ -272,11 +272,11 @@
       "band_down": 0.0,
       "confirm": 10,
       "symmetric": false,
-      "cagr": 0.86,
+      "cagr": 0.88,
       "ulcer": 0.28,
       "mdd": -2.2,
       "off_episodes": 3,
-      "score": 0.7473060836145585,
+      "score": 0.7472958151230928,
       "rankable": false
     },
     {
@@ -332,11 +332,11 @@
       "band_down": 0.005,
       "confirm": 1,
       "symmetric": true,
-      "cagr": 1.92,
-      "ulcer": 0.42,
+      "cagr": 1.94,
+      "ulcer": 0.41,
       "mdd": -2.2,
       "off_episodes": 1,
-      "score": 0.6216163176392949,
+      "score": 0.6216002050276916,
       "rankable": false
     },
     {
@@ -344,11 +344,11 @@
       "band_down": 0.005,
       "confirm": 3,
       "symmetric": true,
-      "cagr": 1.9,
+      "cagr": 1.92,
       "ulcer": 0.45,
       "mdd": -2.2,
       "off_episodes": 1,
-      "score": 0.5855404408133801,
+      "score": 0.585519692143772,
       "rankable": false
     },
     {
@@ -356,11 +356,11 @@
       "band_down": 0.005,
       "confirm": 5,
       "symmetric": true,
-      "cagr": 1.92,
+      "cagr": 1.93,
       "ulcer": 0.43,
       "mdd": -2.2,
       "off_episodes": 1,
-      "score": 0.608270002886825,
+      "score": 0.608256032932105,
       "rankable": false
     },
     {
@@ -368,35 +368,35 @@
       "band_down": 0.005,
       "confirm": 10,
       "symmetric": true,
-      "cagr": 1.91,
-      "ulcer": 0.46,
-      "mdd": -2.2,
-      "off_episodes": 1,
-      "score": 0.5853102819957638,
-      "rankable": false
-    },
-    {
-      "band_up": 0.01,
-      "band_down": 0.005,
-      "confirm": 1,
-      "symmetric": false,
-      "cagr": 1.9,
-      "ulcer": 0.44,
-      "mdd": -2.2,
-      "off_episodes": 1,
-      "score": 0.5990052494860432,
-      "rankable": false
-    },
-    {
-      "band_up": 0.01,
-      "band_down": 0.005,
-      "confirm": 3,
-      "symmetric": false,
-      "cagr": 1.9,
+      "cagr": 1.93,
       "ulcer": 0.45,
       "mdd": -2.2,
       "off_episodes": 1,
-      "score": 0.5857939874287883,
+      "score": 0.5852931113190679,
+      "rankable": false
+    },
+    {
+      "band_up": 0.01,
+      "band_down": 0.005,
+      "confirm": 1,
+      "symmetric": false,
+      "cagr": 1.92,
+      "ulcer": 0.44,
+      "mdd": -2.2,
+      "off_episodes": 1,
+      "score": 0.5989893632227885,
+      "rankable": false
+    },
+    {
+      "band_up": 0.01,
+      "band_down": 0.005,
+      "confirm": 3,
+      "symmetric": false,
+      "cagr": 1.92,
+      "ulcer": 0.45,
+      "mdd": -2.2,
+      "off_episodes": 1,
+      "score": 0.5857719932680623,
       "rankable": false
     },
     {
@@ -404,11 +404,11 @@
       "band_down": 0.005,
       "confirm": 5,
       "symmetric": false,
-      "cagr": 1.9,
-      "ulcer": 0.46,
+      "cagr": 1.92,
+      "ulcer": 0.45,
       "mdd": -2.2,
       "off_episodes": 1,
-      "score": 0.5849771779777134,
+      "score": 0.5849665447801965,
       "rankable": false
     },
     {
@@ -416,11 +416,11 @@
       "band_down": 0.005,
       "confirm": 10,
       "symmetric": false,
-      "cagr": 1.86,
+      "cagr": 1.88,
       "ulcer": 0.46,
       "mdd": -2.2,
       "off_episodes": 1,
-      "score": 0.5799199608768327,
+      "score": 0.5798995127823914,
       "rankable": false
     },
     {
@@ -428,11 +428,11 @@
       "band_down": 0.005,
       "confirm": 1,
       "symmetric": false,
-      "cagr": 1.79,
+      "cagr": 1.8,
       "ulcer": 0.41,
       "mdd": -2.2,
       "off_episodes": 1,
-      "score": 0.6273756255021915,
+      "score": 0.6273581212489874,
       "rankable": false
     },
     {
@@ -440,11 +440,11 @@
       "band_down": 0.005,
       "confirm": 3,
       "symmetric": false,
-      "cagr": 1.77,
+      "cagr": 1.78,
       "ulcer": 0.42,
       "mdd": -2.2,
       "off_episodes": 1,
-      "score": 0.6173063589602553,
+      "score": 0.6172849520110493,
       "rankable": false
     },
     {
@@ -452,11 +452,11 @@
       "band_down": 0.005,
       "confirm": 5,
       "symmetric": false,
-      "cagr": 1.62,
+      "cagr": 1.64,
       "ulcer": 0.39,
       "mdd": -2.2,
       "off_episodes": 1,
-      "score": 0.6430634524146548,
+      "score": 0.643046693777119,
       "rankable": false
     },
     {
@@ -464,11 +464,11 @@
       "band_down": 0.005,
       "confirm": 10,
       "symmetric": false,
-      "cagr": 1.62,
+      "cagr": 1.64,
       "ulcer": 0.39,
       "mdd": -2.2,
       "off_episodes": 1,
-      "score": 0.645240188236142,
+      "score": 0.6452149356461492,
       "rankable": false
     },
     {
@@ -476,11 +476,11 @@
       "band_down": 0.005,
       "confirm": 1,
       "symmetric": false,
-      "cagr": 1.5,
+      "cagr": 1.52,
       "ulcer": 0.39,
       "mdd": -2.2,
       "off_episodes": 1,
-      "score": 0.6437923413309482,
+      "score": 0.6437702221000291,
       "rankable": false
     },
     {
@@ -488,11 +488,11 @@
       "band_down": 0.005,
       "confirm": 3,
       "symmetric": false,
-      "cagr": 1.38,
+      "cagr": 1.4,
       "ulcer": 0.4,
       "mdd": -2.2,
       "off_episodes": 1,
-      "score": 0.6377383099541819,
+      "score": 0.6377111698479918,
       "rankable": false
     },
     {
@@ -500,11 +500,11 @@
       "band_down": 0.005,
       "confirm": 5,
       "symmetric": false,
-      "cagr": 1.36,
+      "cagr": 1.38,
       "ulcer": 0.41,
       "mdd": -2.2,
       "off_episodes": 1,
-      "score": 0.6258296616953334,
+      "score": 0.6258142741528121,
       "rankable": false
     },
     {
@@ -512,11 +512,11 @@
       "band_down": 0.005,
       "confirm": 10,
       "symmetric": false,
-      "cagr": 1.24,
+      "cagr": 1.26,
       "ulcer": 0.41,
       "mdd": -2.2,
       "off_episodes": 1,
-      "score": 0.6269467960303584,
+      "score": 0.6269204976185949,
       "rankable": false
     },
     {
@@ -528,7 +528,7 @@
       "ulcer": 0.42,
       "mdd": -2.2,
       "off_episodes": 1,
-      "score": 0.6142421494286692,
+      "score": 0.6123855384647762,
       "rankable": false
     },
     {
@@ -540,7 +540,7 @@
       "ulcer": 0.45,
       "mdd": -2.2,
       "off_episodes": 1,
-      "score": 0.5936109804206606,
+      "score": 0.5914756556329379,
       "rankable": false
     },
     {
@@ -548,11 +548,11 @@
       "band_down": 0.005,
       "confirm": 5,
       "symmetric": false,
-      "cagr": 0.84,
+      "cagr": 0.83,
       "ulcer": 0.47,
       "mdd": -2.2,
       "off_episodes": 1,
-      "score": 0.576041040285767,
+      "score": 0.5736944278813059,
       "rankable": false
     },
     {
@@ -564,7 +564,7 @@
       "ulcer": 0.46,
       "mdd": -2.2,
       "off_episodes": 1,
-      "score": 0.579472205511887,
+      "score": 0.5771425878137246,
       "rankable": false
     },
     {
@@ -572,11 +572,11 @@
       "band_down": 0.01,
       "confirm": 1,
       "symmetric": true,
-      "cagr": 1.87,
+      "cagr": 1.89,
       "ulcer": 0.57,
       "mdd": -2.6,
       "off_episodes": 1,
-      "score": 0.4804151749570577,
+      "score": 0.4804064892944468,
       "rankable": false
     },
     {
@@ -584,11 +584,11 @@
       "band_down": 0.01,
       "confirm": 3,
       "symmetric": true,
-      "cagr": 1.87,
+      "cagr": 1.89,
       "ulcer": 0.57,
       "mdd": -2.7,
       "off_episodes": 1,
-      "score": 0.48141079934803516,
+      "score": 0.4814035440408809,
       "rankable": false
     },
     {
@@ -596,11 +596,11 @@
       "band_down": 0.01,
       "confirm": 5,
       "symmetric": true,
-      "cagr": 1.87,
+      "cagr": 1.89,
       "ulcer": 0.59,
       "mdd": -2.7,
       "off_episodes": 1,
-      "score": 0.465008442236117,
+      "score": 0.4649992807558252,
       "rankable": false
     },
     {
@@ -608,35 +608,35 @@
       "band_down": 0.01,
       "confirm": 10,
       "symmetric": true,
-      "cagr": 1.82,
+      "cagr": 1.84,
       "ulcer": 0.67,
       "mdd": -3.2,
       "off_episodes": 1,
-      "score": 0.3889685573403477,
+      "score": 0.38895651180903235,
       "rankable": false
     },
     {
       "band_up": 0.02,
       "band_down": 0.01,
       "confirm": 1,
+      "symmetric": false,
+      "cagr": 1.77,
+      "ulcer": 0.53,
+      "mdd": -2.2,
+      "off_episodes": 1,
+      "score": 0.5126678856646584,
+      "rankable": false
+    },
+    {
+      "band_up": 0.02,
+      "band_down": 0.01,
+      "confirm": 3,
       "symmetric": false,
       "cagr": 1.76,
       "ulcer": 0.53,
       "mdd": -2.2,
       "off_episodes": 1,
-      "score": 0.5126781874570118,
-      "rankable": false
-    },
-    {
-      "band_up": 0.02,
-      "band_down": 0.01,
-      "confirm": 3,
-      "symmetric": false,
-      "cagr": 1.74,
-      "ulcer": 0.53,
-      "mdd": -2.2,
-      "off_episodes": 1,
-      "score": 0.5136389976622413,
+      "score": 0.5136330022937247,
       "rankable": false
     },
     {
@@ -644,11 +644,11 @@
       "band_down": 0.01,
       "confirm": 5,
       "symmetric": false,
-      "cagr": 1.59,
+      "cagr": 1.61,
       "ulcer": 0.54,
       "mdd": -2.2,
       "off_episodes": 1,
-      "score": 0.5114582019908722,
+      "score": 0.511443736555725,
       "rankable": false
     },
     {
@@ -656,11 +656,11 @@
       "band_down": 0.01,
       "confirm": 10,
       "symmetric": false,
-      "cagr": 1.58,
+      "cagr": 1.6,
       "ulcer": 0.62,
       "mdd": -2.2,
       "off_episodes": 1,
-      "score": 0.43785597127705217,
+      "score": 0.437841249062034,
       "rankable": false
     },
     {
@@ -668,11 +668,11 @@
       "band_down": 0.01,
       "confirm": 1,
       "symmetric": false,
-      "cagr": 1.47,
-      "ulcer": 0.56,
+      "cagr": 1.49,
+      "ulcer": 0.55,
       "mdd": -2.2,
       "off_episodes": 1,
-      "score": 0.49394489692475724,
+      "score": 0.49393285552186095,
       "rankable": false
     },
     {
@@ -680,11 +680,11 @@
       "band_down": 0.01,
       "confirm": 3,
       "symmetric": false,
-      "cagr": 1.36,
-      "ulcer": 0.55,
+      "cagr": 1.38,
+      "ulcer": 0.54,
       "mdd": -2.2,
       "off_episodes": 1,
-      "score": 0.5032320577501534,
+      "score": 0.503225689257941,
       "rankable": false
     },
     {
@@ -692,11 +692,11 @@
       "band_down": 0.01,
       "confirm": 5,
       "symmetric": false,
-      "cagr": 1.34,
+      "cagr": 1.35,
       "ulcer": 0.58,
       "mdd": -2.2,
       "off_episodes": 1,
-      "score": 0.46771806067878186,
+      "score": 0.4677055944912029,
       "rankable": false
     },
     {
@@ -704,11 +704,11 @@
       "band_down": 0.01,
       "confirm": 10,
       "symmetric": false,
-      "cagr": 1.19,
+      "cagr": 1.21,
       "ulcer": 0.69,
       "mdd": -2.2,
       "off_episodes": 1,
-      "score": 0.3693454587514202,
+      "score": 0.3693314806298972,
       "rankable": false
     },
     {
@@ -720,7 +720,7 @@
       "ulcer": 0.68,
       "mdd": -2.2,
       "off_episodes": 1,
-      "score": 0.3847007664456482,
+      "score": 0.38010472570036963,
       "rankable": false
     },
     {
@@ -728,11 +728,11 @@
       "band_down": 0.01,
       "confirm": 3,
       "symmetric": false,
-      "cagr": 0.82,
+      "cagr": 0.81,
       "ulcer": 0.67,
       "mdd": -2.2,
       "off_episodes": 1,
-      "score": 0.3929644204921062,
+      "score": 0.3884659471032308,
       "rankable": false
     },
     {
@@ -740,11 +740,11 @@
       "band_down": 0.01,
       "confirm": 5,
       "symmetric": false,
-      "cagr": 0.81,
+      "cagr": 0.8,
       "ulcer": 0.72,
       "mdd": -2.2,
       "off_episodes": 1,
-      "score": 0.34504589230463006,
+      "score": 0.34000556578265584,
       "rankable": false
     },
     {
@@ -752,11 +752,11 @@
       "band_down": 0.01,
       "confirm": 10,
       "symmetric": false,
-      "cagr": 0.75,
-      "ulcer": 0.85,
+      "cagr": 0.74,
+      "ulcer": 0.86,
       "mdd": -2.2,
       "off_episodes": 1,
-      "score": 0.22357674067898176,
+      "score": 0.21722428360733556,
       "rankable": false
     }
   ]

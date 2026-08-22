@@ -58,11 +58,18 @@ def _log(m): print(f"[레짐백테스트] {m}", file=sys.stderr)
 
 
 # ------------------------- 데이터 -------------------------
-def fetch(ticker: str, cache_path: str) -> pd.Series:
+def fetch(ticker: str, cache_path: str, max_stale_days: int = 5) -> pd.Series:
+    """캐시가 있으면 재사용하되, 마지막 데이터가 max_stale_days일(달력일) 이상 지났으면
+    재다운로드한다. (2026-08-22 재검증: 캐시가 무기한 재사용돼 gold/btc/eth 등 여러 자산이
+    5주 넘게 stale한 채로 '검증'되고 있었음이 발견됨 — 무조건 재다운로드는 비용이 크니
+    작은 여유(주말·휴장 감안 5일)만 허용.)"""
     if os.path.exists(cache_path):
         s = pd.read_pickle(cache_path)
-        _log(f"{ticker}: 캐시 사용({cache_path}, {len(s)}일)")
-        return s
+        stale_days = (pd.Timestamp.now().normalize() - s.index.max().normalize()).days
+        if stale_days <= max_stale_days:
+            _log(f"{ticker}: 캐시 사용({cache_path}, {len(s)}일, 최신 {s.index.max().date()})")
+            return s
+        _log(f"{ticker}: 캐시 stale(최신 {s.index.max().date()}, {stale_days}일 경과) — 재다운로드")
     import yfinance as yf
     df = yf.download(ticker, period="max", auto_adjust=True, interval="1d", progress=False)
     s = df["Close"][ticker] if isinstance(df.columns, pd.MultiIndex) else df["Close"]

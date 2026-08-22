@@ -1,0 +1,299 @@
+{
+  "asset": "btc",
+  "ticker": "BTC-USD",
+  "n_days": 4358,
+  "date_range": [
+    "2014-09-17",
+    "2026-08-22"
+  ],
+  "cost_bps": 30.0,
+  "buy_hold": {
+    "cagr": 34.53,
+    "sharpe": 0.816,
+    "mdd": -83.4,
+    "ulcer": 42.55
+  },
+  "ma_sweep": {
+    "rows": [
+      {
+        "ma": 10,
+        "cagr": 23.82,
+        "bh_cagr": 34.53,
+        "excess_cagr": -10.71,
+        "sharpe": 0.747,
+        "mdd": -71.2,
+        "ulcer": 40.84,
+        "off_episodes": 355,
+        "rankable": true
+      },
+      {
+        "ma": 20,
+        "cagr": 28.49,
+        "bh_cagr": 34.53,
+        "excess_cagr": -6.04,
+        "sharpe": 0.849,
+        "mdd": -70.0,
+        "ulcer": 39.53,
+        "off_episodes": 230,
+        "rankable": true
+      },
+      {
+        "ma": 30,
+        "cagr": 32.11,
+        "bh_cagr": 34.53,
+        "excess_cagr": -2.42,
+        "sharpe": 0.915,
+        "mdd": -65.6,
+        "ulcer": 30.9,
+        "off_episodes": 174,
+        "rankable": true
+      },
+      {
+        "ma": 40,
+        "cagr": 44.31,
+        "bh_cagr": 34.53,
+        "excess_cagr": 9.78,
+        "sharpe": 1.134,
+        "mdd": -68.8,
+        "ulcer": 27.89,
+        "off_episodes": 133,
+        "rankable": true
+      },
+      {
+        "ma": 50,
+        "cagr": 40.61,
+        "bh_cagr": 34.53,
+        "excess_cagr": 6.08,
+        "sharpe": 1.059,
+        "mdd": -60.7,
+        "ulcer": 28.5,
+        "off_episodes": 112,
+        "rankable": true
+      },
+      {
+        "ma": 60,
+        "cagr": 38.08,
+        "bh_cagr": 34.53,
+        "excess_cagr": 3.55,
+        "sharpe": 1.013,
+        "mdd": -62.7,
+        "ulcer": 29.39,
+        "off_episodes": 92,
+        "rankable": true
+      },
+      {
+        "ma": 75,
+        "cagr": 35.15,
+        "bh_cagr": 34.53,
+        "excess_cagr": 0.62,
+        "sharpe": 0.948,
+        "mdd": -61.9,
+        "ulcer": 32.43,
+        "off_episodes": 92,
+        "rankable": true
+      },
+      {
+        "ma": 90,
+        "cagr": 34.6,
+        "bh_cagr": 34.53,
+        "excess_cagr": 0.06,
+        "sharpe": 0.933,
+        "mdd": -61.6,
+        "ulcer": 29.41,
+        "off_episodes": 85,
+        "rankable": true
+      },
+      {
+        "ma": 100,
+        "cagr": 36.24,
+        "bh_cagr": 34.53,
+        "excess_cagr": 1.71,
+        "sharpe": 0.957,
+        "mdd": -62.7,
+        "ulcer": 27.74,
+        "off_episodes": 74,
+        "rankable": true
+      },
+      {
+        "ma": 120,
+        "cagr": 45.81,
+        "bh_cagr": 34.53,
+        "excess_cagr": 11.27,
+        "sharpe": 1.117,
+        "mdd": -61.2,
+        "ulcer": 25.87,
+        "off_episodes": 52,
+        "rankable": true
+      },
+      {
+        "ma": 150,
+        "cagr": 44.38,
+        "bh_cagr": 34.53,
+        "excess_cagr": 9.85,
+        "sharpe": 1.087,
+        "mdd": -62.1,
+        "ulcer": 29.56,
+        "off_episodes": 39,
+        "rankable": true
+      },
+      {
+        "ma": 180,
+        "cagr": 36.98,
+        "bh_cagr": 34.53,
+        "excess_cagr": 2.45,
+        "sharpe": 0.959,
+        "mdd": -64.5,
+        "ulcer": 37.68,
+        "off_episodes": 44,
+        "rankable": true
+      },
+      {
+        "ma": 200,
+        "cagr": 35.03,
+        "bh_cagr": 34.53,
+        "excess_cagr": 0.5,
+        "sharpe": 0.919,
+        "mdd": -70.7,
+        "ulcer": 42.05,
+        "off_episodes": 38,
+        "rankable": true
+      },
+      {
+        "ma": 220,
+        "cagr": 33.72,
+        "bh_cagr": 34.53,
+        "excess_cagr": -0.81,
+        "sharpe": 0.89,
+        "mdd": -67.7,
+        "ulcer": 42.21,
+        "off_episodes": 48,
+        "rankable": true
+      },
+      {
+        "ma": 250,
+        "cagr": 35.14,
+        "bh_cagr": 34.53,
+        "excess_cagr": 0.61,
+        "sharpe": 0.906,
+        "mdd": -67.3,
+        "ulcer": 38.3,
+        "off_episodes": 39,
+        "rankable": true
+      },
+      {
+        "ma": 300,
+        "cagr": 36.27,
+        "bh_cagr": 34.53,
+        "excess_cagr": 1.74,
+        "sharpe": 0.916,
+        "mdd": -69.7,
+        "ulcer": 40.45,
+        "off_episodes": 36,
+        "rankable": true
+      }
+    ],
+    "best_by_return": {
+      "ma": 120,
+      "cagr": 45.81,
+      "bh_cagr": 34.53,
+      "excess_cagr": 11.27,
+      "sharpe": 1.117,
+      "mdd": -61.2,
+      "ulcer": 25.87,
+      "off_episodes": 52,
+      "rankable": true
+    },
+    "best_by_risk_adj": {
+      "ma": 40,
+      "cagr": 44.31,
+      "bh_cagr": 34.53,
+      "excess_cagr": 9.78,
+      "sharpe": 1.134,
+      "mdd": -68.8,
+      "ulcer": 27.89,
+      "off_episodes": 133,
+      "rankable": true
+    }
+  },
+  "ma_sweep_pbo_dsr": {
+    "input": {
+      "horizon": "regime_grid",
+      "universe": "gold_or_btc",
+      "cost": "30.0bp"
+    },
+    "n_trials": 16,
+    "n_events": 207,
+    "pbo": {
+      "pbo": 0.3442,
+      "embargo": 0,
+      "purged_events_total": 0,
+      "n_combos": 924,
+      "n_blocks": 12,
+      "lambda_mean": 0.3905,
+      "is_sharpe_mean": 0.0324,
+      "oos_sharpe_mean": -0.0375,
+      "degradation_slope": -0.976,
+      "prob_oos_loss": 0.7251
+    },
+    "pbo_verdict": "중간(주의)",
+    "dsr": {
+      "sr": 0.0153,
+      "sr0": 0.072,
+      "dsr": 0.2077,
+      "dsr_uncorrected": 0.2077,
+      "skew": 0.186,
+      "kurtosis": 8.114,
+      "T": 207,
+      "T_eff": 207,
+      "N": 16,
+      "best_trial": "tm120_b0.0_c1"
+    },
+    "dsr_verdict": "통과 실패(다중검정 감안 시 샤프가 유의하지 않음)",
+    "passed": false,
+    "references": [
+      "Bailey et al. 2017 (PBO/CSCV)",
+      "Bailey & López de Prado 2014 (DSR)"
+    ],
+    "note": "조합 간 상관으로 N이 과대계상될 수 있어 DSR은 보수적(실제보다 낮게) 추정됨."
+  },
+  "ma_best_vs_buyhold_bootstrap": {
+    "cagr": 45.81,
+    "bh_cagr": 34.53,
+    "sharpe": 1.117,
+    "bh_sharpe": 0.816,
+    "mdd": -61.2,
+    "bh_mdd": -83.4,
+    "ulcer": 25.87,
+    "bh_ulcer": 42.55,
+    "off_episodes": 52,
+    "delta_cagr_ci90": [
+      -5.353,
+      28.544
+    ],
+    "prob_beats_buyhold_pct": 86.6,
+    "n_boot": 2000,
+    "block": 60
+  },
+  "golden_dead_cross": [
+    {
+      "fast": 50,
+      "slow": 200,
+      "cagr": 32.63,
+      "bh_cagr": 34.53,
+      "sharpe": 0.856,
+      "bh_sharpe": 0.816,
+      "mdd": -69.5,
+      "bh_mdd": -83.4,
+      "ulcer": 36.99,
+      "bh_ulcer": 42.55,
+      "off_episodes": 11,
+      "delta_cagr_ci90": [
+        -20.72,
+        17.944
+      ],
+      "prob_beats_buyhold_pct": 46.6,
+      "n_boot": 2000,
+      "block": 60
+    }
+  ]
+}

@@ -1,0 +1,35 @@
+{
+  "asset": "gold",
+  "ticker": "GLD",
+  "filter_params": {
+    "trend_ma": 200,
+    "band": 0.01,
+    "confirm": 3
+  },
+  "cost_bps": 5,
+  "date_range": [
+    "2004-11-18",
+    "2026-08-21"
+  ],
+  "n_days": 5473,
+  "filter_cagr": 8.61,
+  "bh_cagr": 10.95,
+  "filter_ulcer": 19.31,
+  "bh_ulcer": 20.99,
+  "filter_mdd": -36.9,
+  "bh_mdd": -45.6,
+  "delta_cagr_ci90": [
+    -5.647,
+    1.61
+  ],
+  "delta_cagr_excludes_zero": false,
+  "prob_beats_buyhold_pct": 17.9,
+  "delta_ulcer_ci90": [
+    -2.868,
+    9.489
+  ],
+  "delta_ulcer_excludes_zero": false,
+  "n_boot": 2000,
+  "block": 60,
+  "note": "GLD 단독표본(LBMA 장기 스플라이스 미포함, 파일 부재 재확인) — §6-F는 1968~58년 표본 기준. 여기는 §6-F와 같은 방법론을 짧은 표본(2004-11~)에 적용한 재현 시도일 뿐, §6-F 대체 아님."
+}

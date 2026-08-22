@@ -104,24 +104,32 @@ AI(Claude)는 최신 뉴스 검증과 서술(설명 문장)만 담당한다 — 
 
 ### 3.2 미국 개별주 선정 — S&P500
 
-**팩터 가중치(백테스트로 확정, `output/best_weights.json`)**:
+**팩터 가중치(`output/best_weights.json`)**:
 
 ```
-gross_margin × 2 + accruals × 2 + mom6 × 2 + mom12_1 × 1 + shareholder_yield × 1
+int_gp_assets × 1 + rd_mktcap × 2 + shareholder_yield × 2
 ```
 
-- 팩터별 z-score(±3 클리핑)를 위 가중치로 합성해 랭킹(`export_data.select_by_weights`).
-- **백테스트 성과**: 12개월 초과수익 **+20%p**, 승률 **89.5%**, 최악낙폭(MDD) **-1.8%**, 샤프 **1.6**,
-  권장 보유기간 1개월.
-- **워크포워드 검증**: 학습구간(IS) 6개월 +9.73%p → 표본외(OOS) +9.88%p (과최적화 아님 — OOS가
-  IS보다 오히려 높음).
-- **탈락한 팩터**(검증 후 배제): 골든크로스류(IC≈0), 저변동성, 단기 반전, 오버나이트 모멘텀
-  (IC -0.017, 대형주에서 역효과). 잔차 모멘텀은 약함(IC 0.004).
-- **채택된 개별 팩터 IC**(예측력 순): gp_assets(0.088) · gross_margin(0.075) · shareholder_yield ·
-  accruals · roa · mom6 · cop(0.029).
-- 재검증 명령: `python backtest_weights.py --years 10 --keep 8 --oos 0.4`
-  (IC 상위 8개 팩터로 가중치 재탐색, 표본외 40%로 워크포워드 검증. 결과는
-  `output/best_weights.json`/`ic_report.json`에 저장 — 없으면 12-1 모멘텀 단일팩터로 자동 폴백).
+- 팩터별 z-score(shareholder_yield만 ±5, 나머지 ±3 클리핑)를 합성해 랭킹(`export_data.
+  select_by_weights`), 섹터캡 2 적용 후 topN **8**종목 보유.
+- ⚠ **정정(2026-08-22)**: 이 문서가 예전에 적어뒀던 `gross_margin×2+accruals×2+mom6×2+
+  mom12_1×1+shareholder_yield×1` 가중치와 "+20%p·승률89.5%" 성과는 **STRATEGY.md §2에서
+  재현 실패로 이미 폐기된 옛 정보**였다(mom12_1 IC가 이 표본에서 음수로 확인). 이 문서만
+  갱신이 안 돼 있었음 — 위 1:2:2가 현재 실제 라이브 값이다.
+- **현재 값의 채택 근거**: "게이트를 통과해서"가 아니라, EDGAR 데이터 버그 수정 후 665개
+  대안 조합 중 통계적으로 유의하게 이긴 게 하나도 없어서 유지 중이다(STRATEGY.md §6-A).
+  2026-08-22 재검증(신선한 데이터, 665조합 재탐색): PBO 22.0%("중간")·DSR 0.8763 — 여전히
+  통과 기준(DSR≥0.95) 미달.
+- **성과**(2026-08-22 재검증, topN8 라이브 그대로 15년 NAV): CAGR ~30%대(SPY는 동기간
+  ~14.8~15.4%) · 샤프 ~1.17 · MDD ~-37%. ⚠ **재현성 주의**: 섹터캡이 "오늘 시점" 위키피디아
+  스냅샷을 과거 전체 구간에 소급 적용하는 방식이라, 같은 코드를 재실행해도 정확한 소수점
+  수치는 실행마다 흔들릴 수 있음이 확인됐다(예: 같은 15년 창을 이전 세션엔 CAGR 43.35%·
+  MDD -55.8%로 계산했었음) — 다만 "SPY를 큰 폭으로 이긴다"는 방향성 결론은 모든 재실행에서
+  일관됨. 상세는 STRATEGY.md §9.
+- **SPY 대비 이길 확률**(`algo_vs_spy_winrate_by_horizon.py`, 겹치는 롤링윈도우 기준,
+  2026-08-22 갱신): 6개월 보유 73.7%, 12개월 보유 75.2%(보유기간이 길수록 상승).
+- 재검증 명령: `python algo_vs_spy_winrate_by_horizon.py`(승률) · `python backtest_costs.py
+  --years 10` 후 `python overfit_stats.py`(PBO/DSR). 근거 상세는 STRATEGY.md §2·§6-A·§9.
 - **재검증 주기 권장**: 분기~반기(팩터 IC는 시간이 지나며 감쇠하는 경향).
 
 **진입 필터**(`export_data.split_by_entry` — '지금 매수'에 오르기 위한 추가 조건):

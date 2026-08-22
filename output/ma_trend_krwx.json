@@ -1,0 +1,299 @@
+{
+  "asset": "krwx",
+  "ticker": "KRW=X",
+  "n_days": 5895,
+  "date_range": [
+    "2003-12-01",
+    "2026-08-22"
+  ],
+  "cost_bps": 10.0,
+  "buy_hold": {
+    "cagr": 0.62,
+    "sharpe": 0.113,
+    "mdd": -36.4,
+    "ulcer": 23.47
+  },
+  "ma_sweep": {
+    "rows": [
+      {
+        "ma": 10,
+        "cagr": -15.02,
+        "bh_cagr": 0.62,
+        "excess_cagr": -15.63,
+        "sharpe": -1.662,
+        "mdd": -97.8,
+        "ulcer": 85.94,
+        "off_episodes": 642,
+        "rankable": true
+      },
+      {
+        "ma": 20,
+        "cagr": -11.41,
+        "bh_cagr": 0.62,
+        "excess_cagr": -12.03,
+        "sharpe": -1.192,
+        "mdd": -94.3,
+        "ulcer": 81.13,
+        "off_episodes": 449,
+        "rankable": true
+      },
+      {
+        "ma": 30,
+        "cagr": -9.22,
+        "bh_cagr": 0.62,
+        "excess_cagr": -9.84,
+        "sharpe": -0.93,
+        "mdd": -90.0,
+        "ulcer": 75.78,
+        "off_episodes": 364,
+        "rankable": true
+      },
+      {
+        "ma": 40,
+        "cagr": -7.43,
+        "bh_cagr": 0.62,
+        "excess_cagr": -8.04,
+        "sharpe": -0.737,
+        "mdd": -85.3,
+        "ulcer": 72.67,
+        "off_episodes": 300,
+        "rankable": true
+      },
+      {
+        "ma": 50,
+        "cagr": -7.15,
+        "bh_cagr": 0.62,
+        "excess_cagr": -7.77,
+        "sharpe": -0.71,
+        "mdd": -85.1,
+        "ulcer": 71.53,
+        "off_episodes": 266,
+        "rankable": true
+      },
+      {
+        "ma": 60,
+        "cagr": -7.52,
+        "bh_cagr": 0.62,
+        "excess_cagr": -8.14,
+        "sharpe": -0.741,
+        "mdd": -86.6,
+        "ulcer": 73.11,
+        "off_episodes": 256,
+        "rankable": true
+      },
+      {
+        "ma": 75,
+        "cagr": -6.65,
+        "bh_cagr": 0.62,
+        "excess_cagr": -7.27,
+        "sharpe": -0.644,
+        "mdd": -83.3,
+        "ulcer": 70.44,
+        "off_episodes": 222,
+        "rankable": true
+      },
+      {
+        "ma": 90,
+        "cagr": -5.74,
+        "bh_cagr": 0.62,
+        "excess_cagr": -6.36,
+        "sharpe": -0.548,
+        "mdd": -78.9,
+        "ulcer": 65.61,
+        "off_episodes": 195,
+        "rankable": true
+      },
+      {
+        "ma": 100,
+        "cagr": -5.44,
+        "bh_cagr": 0.62,
+        "excess_cagr": -6.06,
+        "sharpe": -0.517,
+        "mdd": -76.2,
+        "ulcer": 61.95,
+        "off_episodes": 193,
+        "rankable": true
+      },
+      {
+        "ma": 120,
+        "cagr": -4.52,
+        "bh_cagr": 0.62,
+        "excess_cagr": -5.14,
+        "sharpe": -0.408,
+        "mdd": -69.7,
+        "ulcer": 55.51,
+        "off_episodes": 166,
+        "rankable": true
+      },
+      {
+        "ma": 150,
+        "cagr": -4.12,
+        "bh_cagr": 0.62,
+        "excess_cagr": -4.74,
+        "sharpe": -0.371,
+        "mdd": -66.7,
+        "ulcer": 50.04,
+        "off_episodes": 162,
+        "rankable": true
+      },
+      {
+        "ma": 180,
+        "cagr": -3.07,
+        "bh_cagr": 0.62,
+        "excess_cagr": -3.68,
+        "sharpe": -0.259,
+        "mdd": -58.1,
+        "ulcer": 44.13,
+        "off_episodes": 131,
+        "rankable": true
+      },
+      {
+        "ma": 200,
+        "cagr": -3.06,
+        "bh_cagr": 0.62,
+        "excess_cagr": -3.68,
+        "sharpe": -0.259,
+        "mdd": -57.1,
+        "ulcer": 43.46,
+        "off_episodes": 119,
+        "rankable": true
+      },
+      {
+        "ma": 220,
+        "cagr": -2.89,
+        "bh_cagr": 0.62,
+        "excess_cagr": -3.51,
+        "sharpe": -0.242,
+        "mdd": -53.4,
+        "ulcer": 40.45,
+        "off_episodes": 123,
+        "rankable": true
+      },
+      {
+        "ma": 250,
+        "cagr": -2.64,
+        "bh_cagr": 0.62,
+        "excess_cagr": -3.26,
+        "sharpe": -0.218,
+        "mdd": -53.9,
+        "ulcer": 40.7,
+        "off_episodes": 118,
+        "rankable": true
+      },
+      {
+        "ma": 300,
+        "cagr": -2.76,
+        "bh_cagr": 0.62,
+        "excess_cagr": -3.38,
+        "sharpe": -0.229,
+        "mdd": -60.6,
+        "ulcer": 46.66,
+        "off_episodes": 103,
+        "rankable": true
+      }
+    ],
+    "best_by_return": {
+      "ma": 250,
+      "cagr": -2.64,
+      "bh_cagr": 0.62,
+      "excess_cagr": -3.26,
+      "sharpe": -0.218,
+      "mdd": -53.9,
+      "ulcer": 40.7,
+      "off_episodes": 118,
+      "rankable": true
+    },
+    "best_by_risk_adj": {
+      "ma": 250,
+      "cagr": -2.64,
+      "bh_cagr": 0.62,
+      "excess_cagr": -3.26,
+      "sharpe": -0.218,
+      "mdd": -53.9,
+      "ulcer": 40.7,
+      "off_episodes": 118,
+      "rankable": true
+    }
+  },
+  "ma_sweep_pbo_dsr": {
+    "input": {
+      "horizon": "regime_grid",
+      "universe": "gold_or_btc",
+      "cost": "10.0bp"
+    },
+    "n_trials": 16,
+    "n_events": 280,
+    "pbo": {
+      "pbo": 0.2554,
+      "embargo": 0,
+      "purged_events_total": 0,
+      "n_combos": 924,
+      "n_blocks": 12,
+      "lambda_mean": 0.4982,
+      "is_sharpe_mean": -0.1431,
+      "oos_sharpe_mean": -0.2142,
+      "degradation_slope": -0.7398,
+      "prob_oos_loss": 1.0
+    },
+    "pbo_verdict": "중간(주의)",
+    "dsr": {
+      "sr": -0.1632,
+      "sr0": 0.1725,
+      "dsr": 0.0,
+      "dsr_uncorrected": 0.0,
+      "skew": -1.806,
+      "kurtosis": 11.683,
+      "T": 280,
+      "T_eff": 280,
+      "N": 16,
+      "best_trial": "tm300_b0.0_c1"
+    },
+    "dsr_verdict": "통과 실패(다중검정 감안 시 샤프가 유의하지 않음)",
+    "passed": false,
+    "references": [
+      "Bailey et al. 2017 (PBO/CSCV)",
+      "Bailey & López de Prado 2014 (DSR)"
+    ],
+    "note": "조합 간 상관으로 N이 과대계상될 수 있어 DSR은 보수적(실제보다 낮게) 추정됨."
+  },
+  "ma_best_vs_buyhold_bootstrap": {
+    "cagr": -2.64,
+    "bh_cagr": 0.62,
+    "sharpe": -0.218,
+    "bh_sharpe": 0.113,
+    "mdd": -53.9,
+    "bh_mdd": -36.4,
+    "ulcer": 40.7,
+    "bh_ulcer": 23.47,
+    "off_episodes": 118,
+    "delta_cagr_ci90": [
+      -5.819,
+      -1.029
+    ],
+    "prob_beats_buyhold_pct": 0.7,
+    "n_boot": 2000,
+    "block": 60
+  },
+  "golden_dead_cross": [
+    {
+      "fast": 50,
+      "slow": 200,
+      "cagr": 0.34,
+      "bh_cagr": 0.62,
+      "sharpe": 0.084,
+      "bh_sharpe": 0.113,
+      "mdd": -33.6,
+      "bh_mdd": -36.4,
+      "ulcer": 24.17,
+      "bh_ulcer": 23.47,
+      "off_episodes": 15,
+      "delta_cagr_ci90": [
+        -2.25,
+        1.602
+      ],
+      "prob_beats_buyhold_pct": 39.2,
+      "n_boot": 2000,
+      "block": 60
+    }
+  ]
+}

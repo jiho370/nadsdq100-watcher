@@ -1,0 +1,253 @@
+{
+  "live_weights_fixed": {
+    "weights": {
+      "int_gp_assets": 1,
+      "rd_mktcap": 2,
+      "shareholder_yield": 2
+    },
+    "turnover": 17.4,
+    "ret_1m_gross": 0.65,
+    "ret_1m": 0.55,
+    "excess_1m": 0.55,
+    "win_1m": 65.6,
+    "worst_1m": -17.6,
+    "sharpe_1m": 0.97,
+    "ret_3m_gross": 4.94,
+    "ret_3m": 4.83,
+    "excess_3m": 1.23,
+    "win_3m": 75.0,
+    "worst_3m": -8.0,
+    "sharpe_3m": 0.73,
+    "ret_6m_gross": 10.8,
+    "ret_6m": 10.68,
+    "excess_6m": 3.33,
+    "win_6m": 84.4,
+    "worst_6m": -2.9,
+    "sharpe_6m": 0.92,
+    "ret_12m_gross": 26.54,
+    "ret_12m": 26.41,
+    "excess_12m": 11.1,
+    "win_12m": 96.9,
+    "worst_12m": -0.4,
+    "sharpe_12m": 0.81
+  },
+  "auto_search_best_by_score_config": {
+    "weights": {
+      "mom12_1": 0,
+      "int_gp_assets": 0,
+      "shareholder_yield": 3,
+      "gp_assets": 0,
+      "fcf_ev": 2
+    },
+    "turnover": 25.3,
+    "ret_1m_gross": 0.59,
+    "ret_1m": 0.48,
+    "excess_1m": 0.49,
+    "win_1m": 62.5,
+    "worst_1m": -22.1,
+    "sharpe_1m": 0.59,
+    "ret_3m_gross": 5.33,
+    "ret_3m": 5.22,
+    "excess_3m": 1.61,
+    "win_3m": 71.9,
+    "worst_3m": -8.4,
+    "sharpe_3m": 0.68,
+    "ret_6m_gross": 10.95,
+    "ret_6m": 10.84,
+    "excess_6m": 3.49,
+    "win_6m": 84.4,
+    "worst_6m": -6.0,
+    "sharpe_6m": 0.59,
+    "ret_12m_gross": 22.2,
+    "ret_12m": 22.08,
+    "excess_12m": 6.77,
+    "win_12m": 90.6,
+    "worst_12m": -3.6,
+    "sharpe_12m": 0.59
+  },
+  "outlier_diagnostics": {
+    "live": {
+      "mean_pct": 3.33,
+      "median_pct": 3.16,
+      "max_pct": 16.56,
+      "min_pct": -6.51,
+      "skew": 0.43,
+      "top3_share_of_sum_pct": 39.3,
+      "mean_excl_top1_pct": 2.91,
+      "mean_excl_top3_pct": 2.23
+    },
+    "candidate": {
+      "mean_pct": 2.28,
+      "median_pct": 2.11,
+      "max_pct": 7.09,
+      "min_pct": -4.1,
+      "skew": -0.34,
+      "top3_share_of_sum_pct": 27.4,
+      "mean_excl_top1_pct": 2.13,
+      "mean_excl_top3_pct": 1.83
+    }
+  },
+  "raw_event_excess_6m": {
+    "live": [
+      0.049531,
+      0.022112,
+      0.061398,
+      -0.004572,
+      0.029873,
+      -0.001426,
+      -0.042559,
+      0.066565,
+      0.033966,
+      0.02195,
+      0.033341,
+      0.083963,
+      0.165637,
+      0.084938,
+      0.022887,
+      -0.012249,
+      0.050846,
+      0.116702,
+      0.021896,
+      0.010973,
+      0.043306,
+      0.077595,
+      0.023717,
+      -0.017313,
+      0.034259,
+      0.07766,
+      -0.037009,
+      -0.065086,
+      -0.046301,
+      -0.010393,
+      0.033336,
+      0.136721
+    ],
+    "candidate": [
+      0.008554,
+      0.010736,
+      0.056319,
+      0.012914,
+      0.019602,
+      0.024625,
+      0.002434,
+      0.033053,
+      0.070869,
+      0.056118,
+      0.06573,
+      0.022511,
+      0.06325,
+      -0.00698,
+      0.053958,
+      0.02867,
+      0.019573,
+      0.014083,
+      0.006461,
+      0.040336,
+      0.048107,
+      0.051709,
+      0.017742,
+      0.006875,
+      0.045933,
+      0.059956,
+      -0.037696,
+      -0.040982,
+      -0.020478,
+      0.031049,
+      -0.010993,
+      -0.024323
+    ]
+  },
+  "paired_bootstrap": {
+    "excess_diff_ci90_live_minus_candidate": [
+      -0.0055,
+      0.0287
+    ],
+    "pct_live_higher_excess": 84.4,
+    "sharpe_diff_ci90_candidate_minus_live": [
+      -0.23,
+      0.5474
+    ],
+    "pct_candidate_higher_sharpe": 72.7
+  },
+  "sharpe_dsr_best_candidate": {
+    "weights": {
+      "int_gp_assets": 1,
+      "shareholder_yield": 2,
+      "roa": 1
+    },
+    "turnover": 15.3,
+    "ret_1m_gross": 0.92,
+    "ret_1m": 0.82,
+    "excess_1m": 0.82,
+    "win_1m": 68.8,
+    "worst_1m": -15.8,
+    "sharpe_1m": 1.87,
+    "ret_3m_gross": 4.8,
+    "ret_3m": 4.69,
+    "excess_3m": 1.08,
+    "win_3m": 81.2,
+    "worst_3m": -8.2,
+    "sharpe_3m": 0.9,
+    "ret_6m_gross": 9.75,
+    "ret_6m": 9.63,
+    "excess_6m": 2.28,
+    "win_6m": 87.5,
+    "worst_6m": -13.2,
+    "sharpe_6m": 1.09,
+    "ret_12m_gross": 20.72,
+    "ret_12m": 20.59,
+    "excess_12m": 5.28,
+    "win_12m": 90.6,
+    "worst_12m": -9.3,
+    "sharpe_12m": 0.96
+  },
+  "ic_top10": [
+    [
+      "int_gp_assets",
+      0.0747
+    ],
+    [
+      "shareholder_yield",
+      0.0554
+    ],
+    [
+      "gp_assets",
+      0.0517
+    ],
+    [
+      "fcf_ev",
+      0.0512
+    ],
+    [
+      "rd_mktcap",
+      0.0499
+    ],
+    [
+      "fcf_yield",
+      0.046
+    ],
+    [
+      "roe",
+      0.0443
+    ],
+    [
+      "cop",
+      0.0435
+    ],
+    [
+      "roa",
+      0.0413
+    ],
+    [
+      "op_margin",
+      0.0401
+    ]
+  ],
+  "n_events": 32,
+  "pit_coverage": {
+    "mean": 91.7,
+    "min": 84.4
+  },
+  "keep": 5,
+  "levels": "0,1,2,3"
+}

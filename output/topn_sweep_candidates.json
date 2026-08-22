@@ -1,0 +1,151 @@
+{
+  "years": 10,
+  "topn_range": [
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10
+  ],
+  "spy": {
+    "cagr_pct": 15.3,
+    "sharpe": 0.85,
+    "mdd_pct": -33.7
+  },
+  "candidates": {
+    "라이브1:2:2": {
+      "weights": {
+        "int_gp_assets": 1,
+        "rd_mktcap": 2,
+        "shareholder_yield": 2
+      },
+      "by_topn": {
+        "4": {
+          "cagr_pct": 37.47,
+          "sharpe": 1.07,
+          "mdd_pct": -53.4
+        },
+        "5": {
+          "cagr_pct": 36.31,
+          "sharpe": 1.09,
+          "mdd_pct": -47.4
+        },
+        "6": {
+          "cagr_pct": 38.02,
+          "sharpe": 1.11,
+          "mdd_pct": -41.9
+        },
+        "7": {
+          "cagr_pct": 33.13,
+          "sharpe": 1.13,
+          "mdd_pct": -39.2
+        },
+        "8": {
+          "cagr_pct": 31.33,
+          "sharpe": 1.1,
+          "mdd_pct": -36.5
+        },
+        "9": {
+          "cagr_pct": 29.53,
+          "sharpe": 1.04,
+          "mdd_pct": -38.0
+        },
+        "10": {
+          "cagr_pct": 31.25,
+          "sharpe": 1.16,
+          "mdd_pct": -34.8
+        }
+      }
+    },
+    "대안#1(topn8 1위)": {
+      "weights": {
+        "int_gp_assets": 2,
+        "shareholder_yield": 3,
+        "fcf_ev": 3
+      },
+      "by_topn": {
+        "4": {
+          "cagr_pct": 27.88,
+          "sharpe": 1.05,
+          "mdd_pct": -39.7
+        },
+        "5": {
+          "cagr_pct": 27.96,
+          "sharpe": 1.07,
+          "mdd_pct": -38.6
+        },
+        "6": {
+          "cagr_pct": 24.55,
+          "sharpe": 1.0,
+          "mdd_pct": -37.0
+        },
+        "7": {
+          "cagr_pct": 22.99,
+          "sharpe": 0.96,
+          "mdd_pct": -35.9
+        },
+        "8": {
+          "cagr_pct": 25.49,
+          "sharpe": 0.99,
+          "mdd_pct": -39.3
+        },
+        "9": {
+          "cagr_pct": 23.5,
+          "sharpe": 0.94,
+          "mdd_pct": -38.0
+        },
+        "10": {
+          "cagr_pct": 22.9,
+          "sharpe": 0.94,
+          "mdd_pct": -38.8
+        }
+      }
+    },
+    "대안#2(topn8 2위)": {
+      "weights": {
+        "int_gp_assets": 2,
+        "shareholder_yield": 3,
+        "fcf_ev": 2
+      },
+      "by_topn": {
+        "4": {
+          "cagr_pct": 25.71,
+          "sharpe": 1.06,
+          "mdd_pct": -39.7
+        },
+        "5": {
+          "cagr_pct": 28.3,
+          "sharpe": 1.09,
+          "mdd_pct": -38.5
+        },
+        "6": {
+          "cagr_pct": 24.69,
+          "sharpe": 1.02,
+          "mdd_pct": -37.0
+        },
+        "7": {
+          "cagr_pct": 23.2,
+          "sharpe": 0.97,
+          "mdd_pct": -35.9
+        },
+        "8": {
+          "cagr_pct": 25.46,
+          "sharpe": 0.98,
+          "mdd_pct": -39.7
+        },
+        "9": {
+          "cagr_pct": 23.93,
+          "sharpe": 0.96,
+          "mdd_pct": -37.9
+        },
+        "10": {
+          "cagr_pct": 23.02,
+          "sharpe": 0.94,
+          "mdd_pct": -37.0
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,63 @@
+{
+  "assets": {
+    "ief": {
+      "path": "output/regime_price_cache_ief.pkl",
+      "start": "2002-07-30",
+      "end": "2026-08-21",
+      "n_days": 6055,
+      "n_nan": 0,
+      "n_nonpositive": 0,
+      "n_gaps_over_7d": 0,
+      "gap_examples": [],
+      "annualized_vol_pct": 6.79
+    },
+    "tlt": {
+      "path": "output/regime_price_cache_tlt.pkl",
+      "start": "2002-07-30",
+      "end": "2026-08-21",
+      "n_days": 6055,
+      "n_nan": 0,
+      "n_nonpositive": 0,
+      "n_gaps_over_7d": 0,
+      "gap_examples": [],
+      "annualized_vol_pct": 14.27
+    },
+    "shy": {
+      "path": "output/regime_price_cache_shy.pkl",
+      "start": "2002-07-30",
+      "end": "2026-08-21",
+      "n_days": 6055,
+      "n_nan": 0,
+      "n_nonpositive": 0,
+      "n_gaps_over_7d": 0,
+      "gap_examples": [],
+      "annualized_vol_pct": 1.52
+    }
+  },
+  "distinctness": {
+    "n_common_obs": 6055,
+    "return_corr": {
+      "ief": {
+        "ief": 1.0,
+        "tlt": 0.911,
+        "shy": 0.776
+      },
+      "tlt": {
+        "ief": 0.911,
+        "tlt": 1.0,
+        "shy": 0.587
+      },
+      "shy": {
+        "ief": 0.776,
+        "tlt": 0.587,
+        "shy": 1.0
+      }
+    },
+    "max_abs_nav_diff": {
+      "ief_vs_tlt": 1.3824,
+      "ief_vs_shy": 1.1474,
+      "tlt_vs_shy": 2.515
+    }
+  },
+  "volatility_order_shy_lt_ief_lt_tlt": true
+}

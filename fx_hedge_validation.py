@@ -45,9 +45,18 @@ def _log(m): print(f"[FX헤지검증] {m}", file=sys.stderr)
 
 
 # ------------------------- 데이터 -------------------------
+def _is_fresh(path: str, max_stale_days: int = 5) -> bool:
+    """2026-08-22 재검증: fetch 캐시들이 무기한 재사용돼 수 주 stale한 채로 쓰이고 있었음
+    (backtest_regime_assets.fetch()와 동일 버그) — 여기도 동일 기준으로 신선도 확인."""
+    if not os.path.exists(path):
+        return False
+    s = pd.read_pickle(path)
+    return (pd.Timestamp.now().normalize() - s.index.max().normalize()).days <= max_stale_days
+
+
 def fetch_spy() -> pd.Series:
     path = "output/regime_price_cache_spy_hedge.pkl"
-    if os.path.exists(path):
+    if _is_fresh(path):
         return pd.read_pickle(path)
     import yfinance as yf
     df = yf.download("SPY", period="max", auto_adjust=True, interval="1d", progress=False)
@@ -61,7 +70,7 @@ def fetch_spy() -> pd.Series:
 
 def fetch_fred(series_id: str) -> pd.Series:
     path = f"output/fred_cache_{series_id}.pkl"
-    if os.path.exists(path):
+    if _is_fresh(path, max_stale_days=35):   # 금리류 월간 지표 — 일단위 신선도 기준 부적합
         return pd.read_pickle(path)
     url = f"https://fred.stlouisfed.org/graph/fredgraph.csv?id={series_id}"
     df = pd.read_csv(url, parse_dates=["observation_date"], index_col="observation_date")

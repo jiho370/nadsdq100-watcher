@@ -1,0 +1,202 @@
+{
+  "winner_params": {
+    "trend_ma": 100,
+    "band": 0.0,
+    "confirm": 5
+  },
+  "bh_cagr": 0.617,
+  "date_range": [
+    "2003-12-01",
+    "2026-08-22"
+  ],
+  "fine_sweep": [
+    {
+      "cost_bps": 0,
+      "cagr": 1.396,
+      "bh_cagr": 0.617,
+      "excess_cagr": 0.779
+    },
+    {
+      "cost_bps": 2,
+      "cagr": 1.325,
+      "bh_cagr": 0.617,
+      "excess_cagr": 0.708
+    },
+    {
+      "cost_bps": 4,
+      "cagr": 1.254,
+      "bh_cagr": 0.617,
+      "excess_cagr": 0.636
+    },
+    {
+      "cost_bps": 6,
+      "cagr": 1.183,
+      "bh_cagr": 0.617,
+      "excess_cagr": 0.565
+    },
+    {
+      "cost_bps": 8,
+      "cagr": 1.112,
+      "bh_cagr": 0.617,
+      "excess_cagr": 0.495
+    },
+    {
+      "cost_bps": 10,
+      "cagr": 1.041,
+      "bh_cagr": 0.617,
+      "excess_cagr": 0.424
+    },
+    {
+      "cost_bps": 12,
+      "cagr": 0.97,
+      "bh_cagr": 0.617,
+      "excess_cagr": 0.353
+    },
+    {
+      "cost_bps": 14,
+      "cagr": 0.899,
+      "bh_cagr": 0.617,
+      "excess_cagr": 0.282
+    },
+    {
+      "cost_bps": 16,
+      "cagr": 0.828,
+      "bh_cagr": 0.617,
+      "excess_cagr": 0.211
+    },
+    {
+      "cost_bps": 18,
+      "cagr": 0.757,
+      "bh_cagr": 0.617,
+      "excess_cagr": 0.14
+    },
+    {
+      "cost_bps": 20,
+      "cagr": 0.687,
+      "bh_cagr": 0.617,
+      "excess_cagr": 0.069
+    },
+    {
+      "cost_bps": 22,
+      "cagr": 0.616,
+      "bh_cagr": 0.617,
+      "excess_cagr": -0.001
+    },
+    {
+      "cost_bps": 24,
+      "cagr": 0.545,
+      "bh_cagr": 0.617,
+      "excess_cagr": -0.072
+    },
+    {
+      "cost_bps": 26,
+      "cagr": 0.475,
+      "bh_cagr": 0.617,
+      "excess_cagr": -0.143
+    },
+    {
+      "cost_bps": 28,
+      "cagr": 0.404,
+      "bh_cagr": 0.617,
+      "excess_cagr": -0.213
+    },
+    {
+      "cost_bps": 30,
+      "cagr": 0.333,
+      "bh_cagr": 0.617,
+      "excess_cagr": -0.284
+    },
+    {
+      "cost_bps": 32,
+      "cagr": 0.263,
+      "bh_cagr": 0.617,
+      "excess_cagr": -0.354
+    },
+    {
+      "cost_bps": 34,
+      "cagr": 0.192,
+      "bh_cagr": 0.617,
+      "excess_cagr": -0.425
+    },
+    {
+      "cost_bps": 36,
+      "cagr": 0.122,
+      "bh_cagr": 0.617,
+      "excess_cagr": -0.495
+    },
+    {
+      "cost_bps": 38,
+      "cagr": 0.052,
+      "bh_cagr": 0.617,
+      "excess_cagr": -0.566
+    },
+    {
+      "cost_bps": 40,
+      "cagr": -0.019,
+      "bh_cagr": 0.617,
+      "excess_cagr": -0.636
+    },
+    {
+      "cost_bps": 42,
+      "cagr": -0.089,
+      "bh_cagr": 0.617,
+      "excess_cagr": -0.706
+    },
+    {
+      "cost_bps": 44,
+      "cagr": -0.16,
+      "bh_cagr": 0.617,
+      "excess_cagr": -0.777
+    },
+    {
+      "cost_bps": 46,
+      "cagr": -0.23,
+      "bh_cagr": 0.617,
+      "excess_cagr": -0.847
+    },
+    {
+      "cost_bps": 48,
+      "cagr": -0.3,
+      "bh_cagr": 0.617,
+      "excess_cagr": -0.917
+    },
+    {
+      "cost_bps": 50,
+      "cagr": -0.37,
+      "bh_cagr": 0.617,
+      "excess_cagr": -0.988
+    },
+    {
+      "cost_bps": 52,
+      "cagr": -0.441,
+      "bh_cagr": 0.617,
+      "excess_cagr": -1.058
+    },
+    {
+      "cost_bps": 54,
+      "cagr": -0.511,
+      "bh_cagr": 0.617,
+      "excess_cagr": -1.128
+    },
+    {
+      "cost_bps": 56,
+      "cagr": -0.581,
+      "bh_cagr": 0.617,
+      "excess_cagr": -1.198
+    },
+    {
+      "cost_bps": 58,
+      "cagr": -0.651,
+      "bh_cagr": 0.617,
+      "excess_cagr": -1.268
+    },
+    {
+      "cost_bps": 60,
+      "cagr": -0.721,
+      "bh_cagr": 0.617,
+      "excess_cagr": -1.338
+    }
+  ],
+  "crossover_bps_approx": 22,
+  "note": "excess_cagr>0 구간이 전략 우위. crossover_bps_approx는 이분탐색으로 초과CAGR이 처음 <=0이 되는 1bp 단위 지점(근사, 비용은 선형이 아니라 회전빈도에 따라 계단식으로 영향을 줌)."
+}

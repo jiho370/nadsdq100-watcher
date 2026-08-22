@@ -1,0 +1,20 @@
+{
+  "btc": {
+    "asset": "btc",
+    "n_rows": 4358,
+    "start": "2014-09-17",
+    "end": "2026-08-22",
+    "max_gap_days_threshold": 3,
+    "n_gaps": 0,
+    "gaps": []
+  },
+  "eth": {
+    "asset": "eth",
+    "n_rows": 3209,
+    "start": "2017-11-09",
+    "end": "2026-08-22",
+    "max_gap_days_threshold": 3,
+    "n_gaps": 0,
+    "gaps": []
+  }
+}

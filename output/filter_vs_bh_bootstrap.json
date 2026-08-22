@@ -1,0 +1,60 @@
+{
+  "params_used": {
+    "trend_ma": 120,
+    "band": 0.03,
+    "confirm": 3
+  },
+  "note": "ETH는 독립 라이브 파라미터가 없어 BTC_CURRENT를 그대로 적용(run_eth_grid.py의 그리드와 별개 — 여기는 '현재 라이브 규칙이 필터 없음보다 나은가'만 검정)",
+  "btc": {
+    "point_estimates": {
+      "filter_cagr": 44.51,
+      "bh_cagr": 34.53,
+      "filter_ulcer": 27.13,
+      "bh_ulcer": 42.55,
+      "filter_mdd": -60.0,
+      "bh_mdd": -83.4
+    },
+    "bootstrap": {
+      "delta_ulcer_ci90": [
+        3.208,
+        32.597
+      ],
+      "delta_cagr_ci90": [
+        -5.782,
+        28.547
+      ],
+      "delta_ulcer_excludes_zero": true,
+      "delta_cagr_excludes_zero": false,
+      "prob_ulcer_improves_pct": 98.7,
+      "prob_cagr_beats_pct": 86.1,
+      "n_boot": 2000,
+      "block": 60
+    }
+  },
+  "eth": {
+    "point_estimates": {
+      "filter_cagr": 20.11,
+      "bh_cagr": 17.22,
+      "filter_ulcer": 44.62,
+      "bh_ulcer": 60.25,
+      "filter_mdd": -72.5,
+      "bh_mdd": -94.0
+    },
+    "bootstrap": {
+      "delta_ulcer_ci90": [
+        -3.282,
+        43.939
+      ],
+      "delta_cagr_ci90": [
+        -36.092,
+        34.816
+      ],
+      "delta_ulcer_excludes_zero": false,
+      "delta_cagr_excludes_zero": false,
+      "prob_ulcer_improves_pct": 92.5,
+      "prob_cagr_beats_pct": 59.2,
+      "n_boot": 2000,
+      "block": 60
+    }
+  }
+}
