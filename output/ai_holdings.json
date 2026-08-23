@@ -3,7 +3,7 @@
     "SWKS": {
       "since": "2026-07-16",
       "entry_price": 57.83,
-      "peak": 64.56999969482422,
+      "peak": 70.22000122070312,
       "armed": true
     },
     "APTV": {
@@ -21,25 +21,25 @@
     "INCY": {
       "since": "2026-07-16",
       "entry_price": 115.63,
-      "peak": 127.94000244140625,
+      "peak": 129.58999633789062,
       "armed": true
     },
     "MRNA": {
       "since": "2026-07-16",
       "entry_price": 67.71,
-      "peak": 67.71,
+      "peak": 150.55999755859375,
       "armed": true
     },
     "BKNG": {
       "since": "2026-07-16",
       "entry_price": 179.93,
-      "peak": 201.08999633789062,
+      "peak": 215.19000244140625,
       "armed": true
     },
     "WDAY": {
       "since": "2026-07-22",
       "entry_price": 146.65,
-      "peak": 168.375,
+      "peak": 200.33639526367188,
       "armed": true
     },
     "META": {
@@ -49,5 +49,5 @@
       "armed": true
     }
   },
-  "last_run": "2026-07-31"
+  "last_run": "2026-08-21"
 }
