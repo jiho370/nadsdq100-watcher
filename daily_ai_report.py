@@ -21,9 +21,15 @@ daily_ai_report.py — 메일 2통 분리 러너 (2026-07-09 개편).
         내용 = 미국 시황 + S&P500 매수/관찰/매도. pregen_us.json은 그 전날 낮에 미리 생성돼
         for_kst가 "다음날"로 찍힘(pregen.py run_us 참고 — 자정 교차와 동일한 이유).
   · 주간   (--weekly) : 일요일 자산배분 리포트(기존 weekly_report).
+  · 코인전용(--coin)  : 토·일·월 KST 09:07 발송(2026-08-23, docs/superpowers/specs/
+        2026-08-03-coin-only-mail-design.md 구현 — 비트코인은 24/7 거래되는데 화~토
+        미장 메일이 토요일(금요일 마감)~화요일(월요일 마감) 사이 약 2.5~3일 신호 공백이
+        생겨 그 공백을 BTC+ETH 레짐 신호만으로 채운다. AI 호출 없음, 종목추천·보유현황·
+        자산배분 없음 — 순수 신호 계산이라 비용 0).
 
 실행:  python daily_ai_report.py --kr [--no-email]
        python daily_ai_report.py --us [--no-email]
+       python daily_ai_report.py --coin [--no-email]
        (플래그 없으면 KST 시간으로 자동: 일요일=주간, 오전=--kr, 오후=--us)
 AI 실패 시 지표+계획 기반(deterministic)으로 무조건 발송 — 발송 누락 없음.
 """
@@ -260,9 +266,12 @@ def _gather_signals():
 
 def _signal_images(signals, when=None):
     """when 지정 시 그 메일에 표시되는 추세신호 자산(코스피/코스닥/금 또는 나스닥100/S&P500/
-    비트코인)만 차트를 만든다 — 안 쓸 이미지를 만들지 않는다."""
+    비트코인, 또는 코인전용 메일의 비트코인/이더리움)만 차트를 만든다 — 안 쓸 이미지를
+    만들지 않는다. CORE_ASSETS의 when이 튜플(자산 하나가 여러 메일 소속)일 수 있어
+    market_signals.when_matches로 멤버십 체크(2026-08-23, 코인전용 메일 도입)."""
+    import market_signals as MS
     sig_cids, images = {}, []
-    items = [a for a in signals.get("core", []) if not when or a.get("when") == when]
+    items = [a for a in signals.get("core", []) if not when or MS.when_matches(a.get("when"), when)]
     for a in items:
         png = _stock_chart_png(a.get("closes") or [], a["name"])
         if png:
@@ -611,10 +620,57 @@ def run_us(no_email: bool = False, force: bool = False):
                       {"sent_us_kst": today_kst, "us_as_of": as_of})
 
 
+# ------------------------- 코인 전용 메일(주말 공백 채우기, 토·일·월 09:07) -------------------------
+def run_coin(no_email: bool = False, force: bool = False):
+    """docs/superpowers/specs/2026-08-03-coin-only-mail-design.md 구현(2026-08-23, 지호 님
+    승인 2026-08-03 → 뒤늦게 구현). 비트코인·이더리움은 24/7 거래되는데 화~토 미장 메일이
+    토요일(금요일 마감 기준)을 마지막으로 화요일(월요일 마감 기준)까지 약 2.5~3일 신호
+    공백이 생긴다 — 그 공백(토·일·월 아침)에 BTC+ETH 레짐 신호만 최소 HTML로 채운다.
+    AI 호출 없음(뉴스검색·종목추천·보유현황·자산배분 전부 생략 — 순수 신호 계산, 비용 0).
+    화~토 미장 메일의 BTC 카드는 그대로 유지(중복 발송이지만 최소 변경 원칙, 설계 §범위)."""
+    import datetime as _dt
+    R._require_yf()
+    today_kst = _dt.datetime.now(R.KST).date().isoformat()
+    last = _load_last_sent()
+    if not force and not no_email and last.get("sent_coin_kst") == today_kst:
+        print(f"[중복] 오늘({today_kst}) 코인전용 메일 이미 발송 → 생략", file=sys.stderr)
+        return
+
+    MS, signals = _gather_signals()
+    if not signals:
+        print("[경고] 지수·코인 신호 수집 실패 — 코인전용 메일 발송 생략", file=sys.stderr)
+        return
+
+    sig_images, sig_cids = _signal_images(signals, when="coin")
+    signals_html = MS.signal_cards_html(signals, sig_cids, when="coin")
+    if not signals_html:
+        print("[경고] 코인 신호 카드 없음 — 코인전용 메일 발송 생략", file=sys.stderr)
+        return
+
+    html = (
+        '<div style="font-family:-apple-system,BlinkMacSystemFont,\'Segoe UI\',\'Malgun Gothic\',sans-serif;'
+        'max-width:700px;margin:0 auto;color:#111">'
+        f'<h2 style="margin:6px 0">&#129689; 주말 코인 시그널 · BTC·ETH '
+        f'<span style="color:#9ca3af;font-size:12px">({today_kst} 기준)</span></h2>'
+        '<div style="font-size:12px;color:#374151;background:#f8fafc;border-radius:6px;'
+        'padding:6px 9px;margin:2px 0 10px;line-height:1.5">비트코인·이더리움은 24/7 거래돼 '
+        '화~토 미국장 메일 사이(토요일 낮~월요일)에도 레짐이 바뀔 수 있습니다. 이 메일은 '
+        '그 공백을 메우는 신호 전용 요약이며, 종목 추천·뉴스 검증·보유현황·자산배분은 '
+        '포함하지 않습니다.</div>'
+        f'{signals_html}'
+        '<div style="font-size:11px;color:#9ca3af;margin-top:14px;line-height:1.5">'
+        '정보 제공용이며 투자 권유가 아닙니다. 판단·책임은 본인에게 있습니다.<br>'
+        '전략 근거: STRATEGY.md §1</div>'
+        '</div>')
+    _preview_and_send(html, sig_images, f"[주말 코인] {today_kst} BTC·ETH 시그널",
+                      "coin_report.html", no_email, {"sent_coin_kst": today_kst})
+
+
 if __name__ == "__main__":
     ap = argparse.ArgumentParser(description="AI 종목추천 보고서 — 메일 2통(한국 개장후/미국 개장후)")
     ap.add_argument("--kr", action="store_true", help="한국장 메일(개장후 09:40)")
     ap.add_argument("--us", action="store_true", help="미국장 개장 메일(개장 30분~90분 후)")
+    ap.add_argument("--coin", action="store_true", help="주말 코인전용 메일(토·일·월 09:07, BTC·ETH만)")
     ap.add_argument("--weekly", action="store_true", help="주간 자산배분 리포트")
     ap.add_argument("--daily", action="store_true", help="(수동) 한국+미국 둘 다 실행")
     ap.add_argument("--no-email", action="store_true")
@@ -629,6 +685,8 @@ if __name__ == "__main__":
         run_kr(no_email=args.no_email, force=args.force)
     elif args.us:
         run_us(no_email=args.no_email, force=args.force)
+    elif args.coin:
+        run_coin(no_email=args.no_email, force=args.force)
     elif args.daily:
         run_kr(no_email=args.no_email, force=args.force)
         run_us(no_email=args.no_email, force=args.force)

@@ -26,14 +26,18 @@ import math
 
 # ------------------------- 자산 정의 -------------------------
 CORE_ASSETS = [
-    # key, 이름, 야후 티커, 종류, 표시 메일(kr=국장 장전 / us=미장 마감)
+    # key, 이름, 야후 티커, 종류, 표시 메일(kr=국장 장전 / us=미장 마감 / coin=주말 코인전용)
+    # when은 자산 하나가 여러 메일에 동시 소속될 수 있게 문자열 또는 튜플 둘 다 허용
+    # (2026-08-23, docs/superpowers/specs/2026-08-03-coin-only-mail-design.md 구현 —
+    # BTC는 화~토 미장 메일과 토·일·월 코인전용 메일 둘 다에 표시).
     ("KOSPI",  "코스피",     "^KS11",   "equity", "kr"),
     ("KOSDAQ", "코스닥",     "^KQ11",   "equity", "kr"),
     ("GOLD",   "금",         "GLD",     "equity", "kr"),
     ("BOND",   "미국채 10년", "IEF",    "bond",   "kr"),
     ("NDX",    "나스닥 100", "^NDX",    "equity", "us"),
     ("SPX",    "S&P 500",    "^GSPC",   "equity", "us"),
-    ("BTC",    "비트코인",   "BTC-USD", "crypto", "us"),
+    ("BTC",    "비트코인",   "BTC-USD", "crypto", ("us", "coin")),
+    ("ETH",    "이더리움",   "ETH-USD", "crypto", ("coin",)),
 ]
 # 전일 시장 요약(국장 메일 전용) — 추세신호(CORE_ASSETS)와 겹치지 않는 자산만.
 # 유럽·글로벌은 개별국 지수 대신 그 지역을 대표하는 ETF(다른 코드에서도 이미 쓰는 것과 통일).
@@ -221,9 +225,18 @@ def gather(yf) -> dict:
     return {"core": core, "world": world}
 
 
+def when_matches(item_when, target) -> bool:
+    """item_when(CORE_ASSETS의 when — 문자열 또는 튜플)에 target이 포함되는지(멤버십) 확인.
+    문자열이면 1개짜리 튜플로 정규화해 기존 '==' 동등비교와 동일하게 동작(하위호환)."""
+    if item_when is None or target is None:
+        return item_when == target
+    tup = item_when if isinstance(item_when, tuple) else (item_when,)
+    return target in tup
+
+
 def core_for(sig: dict, when: str) -> list:
-    """추세신호 카드 중 해당 메일(when='kr'|'us')에 표시할 것만 필터."""
-    return [a for a in sig.get("core", []) if a.get("when") == when]
+    """추세신호 카드 중 해당 메일(when='kr'|'us'|'coin')에 표시할 것만 필터."""
+    return [a for a in sig.get("core", []) if when_matches(a.get("when"), when)]
 
 
 def lean_for_ai(sig: dict, when: str | None = None) -> list:

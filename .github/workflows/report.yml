@@ -62,18 +62,26 @@ on:
     - cron: "40 0 * * 1-5"    # KST 월~금 09:40 — 한국장 메일(2026-07-30: 시세신선도보다 이른 도착 우선)
     - cron: "7 15 * * 1-5"    # KST 00:07대(다음날) 화~토 — 미국장 개장 메일(정각 혼잡 회피로 +7분)
     - cron: "30 22 * * 6"     # KST 일 07:30 — 주간 자산배분
+    # ── 코인전용(2026-08-23 구현, docs/superpowers/specs/2026-08-03-coin-only-mail-design.md
+    #   — 2026-08-03 승인 후 뒤늦게 구현): 비트코인 24/7 거래인데 미장 메일이 토요일(금요일
+    #   마감)~화요일(월요일 마감) 사이 약 2.5~3일 신호 공백이 생겨 토·일·월 아침에 BTC+ETH
+    #   레짐 신호만 별도 발송(정각 혼잡 회피로 +7분, 기존 관행과 동일).
+    - cron: "7 0 * * 6"       # KST 토 09:07 — 코인전용
+    - cron: "7 0 * * 0"       # KST 일 09:07 — 코인전용
+    - cron: "7 0 * * 1"       # KST 월 09:07 — 코인전용
     # ── 워치독(2026-07-29 추가): 위 세 cron이 GitHub 측 혼잡으로 지연·드롭되는 사고가
     #   반복 확인돼(§ 상단 참고, 국장 cron은 21분+ 지연 후 아예 미실행) 각 primary 45분
     #   전후로 재시도 cron을 추가한다. daily_ai_report.py의 last_sent.json 날짜 가드가
     #   이미 발송된 건 자동으로 스킵하므로("[중복] ... 이미 발송 → 생략") primary가
     #   정상 실행됐으면 이 워치독은 그냥 조용히 아무것도 안 하고 끝난다 — 중복발송 위험 없음.
+    #   (코인전용은 설계 문서 범위상 워치독 없이 시작 — 필요성 실측되면 후속 추가.)
     - cron: "5 1 * * 1-5"     # KST 10:05 — 한국장 워치독(+25분)
     - cron: "32 15 * * 1-5"   # KST 00:32대(다음날) — 미국장 워치독(+25분)
     - cron: "55 22 * * 6"     # KST 일 07:55 — 주간 워치독(+25분)
   workflow_dispatch:
     inputs:
       mode:
-        description: "강제 모드: kr / us / weekly / daily(둘 다) / preview(발송 없음)"
+        description: "강제 모드: kr / us / coin / weekly / daily(둘 다) / preview(발송 없음)"
         required: false
         default: ""
 
@@ -138,11 +146,15 @@ jobs:
               "32 15 * * 1-5") MODE="us" ;;       # 미장 워치독
               "30 22 * * 6") MODE="weekly" ;;
               "55 22 * * 6") MODE="weekly" ;;     # 주간 워치독
+              "7 0 * * 6") MODE="coin" ;;         # 코인전용(토)
+              "7 0 * * 0") MODE="coin" ;;         # 코인전용(일)
+              "7 0 * * 1") MODE="coin" ;;         # 코인전용(월)
             esac
           fi
           case "$MODE" in
             kr)      python daily_ai_report.py --kr ;;
             us)      python daily_ai_report.py --us ;;
+            coin)    python daily_ai_report.py --coin ;;
             weekly)  python daily_ai_report.py --weekly ;;
             daily)   python daily_ai_report.py --daily --force ;;
             preview) python daily_ai_report.py --daily --no-email ;;

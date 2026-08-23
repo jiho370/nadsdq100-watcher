@@ -3721,3 +3721,33 @@ roa후보보다 훨씬 강한, 그러나 여전히 "통계적으로 유의"라�
 
 원자료: `output/kr_trial_returns.json`·`output/kr_pbo_report.json`.
 신규 스크립트: `kr_pbo_dsr_gate.py`.
+
+---
+
+## 10. 코인전용 메일(주말 공백 채우기) 구현 (2026-08-23)
+
+지호 님 리포트: "주말에 비트코인 메일이 안 오던데." 확인 결과, 이 문제를 메우는 설계
+(`docs/superpowers/specs/2026-08-03-coin-only-mail-design.md`)가 **2026-08-03에 이미
+승인**까지 됐으나 코드 구현이 전혀 안 된 채 3주 넘게 방치돼 있었다(cron·CLI 플래그·
+CORE_ASSETS 변경 전부 부재 — 설계-구현 괴리 사례, §9-E의 채권 문서공백과 반대 방향
+케이스). 승인된 설계를 그대로 구현:
+
+- `market_signals.py`: `CORE_ASSETS`의 `when` 필드가 문자열 또는 튜플 둘 다 가능하도록
+  일반화(`when_matches()` 신규, 멤버십 체크 — 하위호환 유지). BTC의 `when`을
+  `("us", "coin")`으로, 이더리움(ETH-USD)을 `when=("coin",)`으로 신규 추가(BTC 파라미터
+  튜닝 없이 그대로 적용 — §1의 기존 방향성 확인 이력과 정합). `core_for()`가 이 로직을
+  쓰므로 `lean_for_ai()`·`signal_cards_html()`도 자동 반영.
+- `daily_ai_report.py`: `_signal_images()`도 동일 멤버십 체크로 수정(설계 문서에 명시 안
+  됐던 누락분 — 안 고치면 BTC when이 튜플이 된 순간 기존 화~토 미장 메일의 BTC 차트가
+  깨졌을 것). 신규 `run_coin()` — AI 호출 없이 BTC+ETH 신호카드만 담은 최소 HTML 발송,
+  `sent_coin_kst` 중복발송 가드. `--coin` CLI 플래그 추가.
+- `.github/workflows/report.yml`: 신규 cron 3개(토·일·월 09:07 KST) + MODE 매핑 + 실행
+  분기. 설계 문서 범위대로 워치독은 이번엔 추가 안 함.
+
+**검증**: `python daily_ai_report.py --coin --no-email`로 `output/coin_report.html` 생성
+확인(BTC·ETH 카드 둘 다 포함, 매수후보·보유현황 섹션 없음 — 설계대로 최소 구성).
+`python daily_ai_report.py --us --no-email`로 기존 미장 메일 회귀 확인(BTC는 그대로 표시,
+ETH는 미표시 — `when` 멤버십 변경이 기존 메일에 영향 없음 확인).
+
+원자료: 없음(순수 기능 구현). 변경 파일: `market_signals.py`·`daily_ai_report.py`·
+`.github/workflows/report.yml`.
