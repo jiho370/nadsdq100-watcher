@@ -109,6 +109,17 @@ jobs:
       - name: Install dependencies
         run: pip install -r requirements.txt
 
+      - name: Install Korean font (2026-08-24 — 차트 제목 한글 깨짐 수정)
+        # ubuntu-latest 러너엔 한글 폰트가 기본 없어(daily_ai_report.py 상단 _KFONT 탐색이
+        # 전부 실패) 매플롯립 차트 제목(추세신호 카드 등)의 한글이 깨진 사각형(tofu)으로
+        # 렌더링됐다(§11-4, 코인전용 메일 실발송으로 발견). 한국 개별종목 차트는 종목코드
+        # 대신 회사명(한글)을 쓰는 게 의도된 설계(코드는 사람이 못 알아봄)라 영문 대체 대신
+        # 폰트 자체를 설치해 근본 해결. fonts-nanum은 우분투 표준 저장소 패키지(가벼움).
+        run: |
+          sudo apt-get update -y
+          sudo apt-get install -y fonts-nanum
+          fc-cache -f
+
       - name: Run report and send email
         env:
           # ── AI 해설: 2026-07-10부터 일단 비활성(API 없이 최대한 자동화 — pregen 캐시 +
