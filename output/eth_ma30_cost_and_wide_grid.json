@@ -1,0 +1,84 @@
+{
+  "cost_sensitivity": [
+    {
+      "cost_bps": 30.0,
+      "ma30_cagr": 36.02,
+      "live_cagr": 19.6,
+      "bh_cagr": 17.22,
+      "ma30_excess_over_live": 16.43
+    },
+    {
+      "cost_bps": 50.0,
+      "ma30_cagr": 30.88,
+      "live_cagr": 18.24,
+      "bh_cagr": 17.22,
+      "ma30_excess_over_live": 12.64
+    },
+    {
+      "cost_bps": 100.0,
+      "ma30_cagr": 18.81,
+      "live_cagr": 14.89,
+      "bh_cagr": 17.22,
+      "ma30_excess_over_live": 3.92
+    }
+  ],
+  "pbo_dsr_full_ma_grid": {
+    "input": {
+      "horizon": "regime_grid",
+      "universe": "gold_or_btc",
+      "cost": "30.0bp"
+    },
+    "n_trials": 16,
+    "n_events": 152,
+    "pbo": {
+      "pbo": 0.408,
+      "embargo": 0,
+      "purged_events_total": 0,
+      "n_combos": 924,
+      "n_blocks": 12,
+      "lambda_mean": 0.3339,
+      "is_sharpe_mean": 0.0322,
+      "oos_sharpe_mean": -0.0417,
+      "degradation_slope": -0.9111,
+      "prob_oos_loss": 0.7165
+    },
+    "pbo_verdict": "중간(주의)",
+    "dsr": {
+      "sr": 0.0137,
+      "sr0": 0.0542,
+      "dsr": 0.3084,
+      "dsr_uncorrected": 0.3084,
+      "skew": 0.823,
+      "kurtosis": 4.528,
+      "T": 152,
+      "T_eff": 152,
+      "N": 16,
+      "best_trial": "tm30_b0.0_c1"
+    },
+    "dsr_verdict": "통과 실패(다중검정 감안 시 샤프가 유의하지 않음)",
+    "passed": false,
+    "references": [
+      "Bailey et al. 2017 (PBO/CSCV)",
+      "Bailey & López de Prado 2014 (DSR)"
+    ],
+    "note": "조합 간 상관으로 N이 과대계상될 수 있어 DSR은 보수적(실제보다 낮게) 추정됨."
+  },
+  "ma_grid_used": [
+    10,
+    20,
+    30,
+    40,
+    50,
+    60,
+    75,
+    90,
+    100,
+    120,
+    150,
+    180,
+    200,
+    220,
+    250,
+    300
+  ]
+}

@@ -69,6 +69,14 @@ _CLOSE_LABEL = "종가" if _KFONT else "Close"
 _PORT_LABEL = "보유 포트폴리오" if _KFONT else "My holdings"
 _BENCH_SUFFIX = "(동일시점·동일금액)" if _KFONT else "(same timing/amount)"
 _CUM_RET_LABEL = "누적수익률(%)" if _KFONT else "Cumulative return (%)"
+# 추세신호 카드 차트 제목 영문명(2026-08-24, 지호 님 리포트 — GitHub Actions Ubuntu 러너엔
+# 한글 폰트가 없어 _KFONT가 항상 None이라 CORE_ASSETS의 한글 이름을 제목에 쓰면 차트에서
+# 깨진 사각형(tofu)으로 렌더링됨. 범례(_MA_LABEL 등)는 이미 _KFONT 유무로 분기하고 있었으나
+# 차트 제목은 그 분기가 없었던 게 근본 원인 — 한글 대신 항상 영문 표기로 고정(지호 님:
+# "한글 안 쓰고 영어 써도 된다").
+_ASSET_EN_NAME = {"KOSPI": "KOSPI", "KOSDAQ": "KOSDAQ", "GOLD": "Gold (GLD)",
+                  "BOND": "US 10Y Treasury (IEF)", "NDX": "Nasdaq 100", "SPX": "S&P 500",
+                  "BTC": "Bitcoin", "ETH": "Ethereum"}
 
 
 def _ma(arr, w):
@@ -273,7 +281,7 @@ def _signal_images(signals, when=None):
     sig_cids, images = {}, []
     items = [a for a in signals.get("core", []) if not when or MS.when_matches(a.get("when"), when)]
     for a in items:
-        png = _stock_chart_png(a.get("closes") or [], a["name"])
+        png = _stock_chart_png(a.get("closes") or [], _ASSET_EN_NAME.get(a.get("key"), a["name"]))
         if png:
             cid = f"sig_{a['key']}"
             images.append((cid, png)); sig_cids[a["key"]] = cid

@@ -1,0 +1,96 @@
+{
+  "full_period": {
+    "ma30_cagr": 36.02,
+    "ma30_mdd": -61.2,
+    "ma30_ulcer": 34.1,
+    "live_cagr": 19.6,
+    "live_mdd": -61.5,
+    "live_ulcer": 37.33,
+    "bh_cagr": 17.22
+  },
+  "paired_bootstrap": {
+    "cagr_diff_ci90_ma30_minus_live": [
+      -13.5,
+      45.54
+    ],
+    "pct_ma30_higher_cagr": 78.8,
+    "sharpe_diff_ci90_ma30_minus_live": [
+      -0.253,
+      0.683
+    ],
+    "pct_ma30_higher_sharpe": 76.1
+  },
+  "outlier_diagnostics": {
+    "ma30": {
+      "n": 50,
+      "mean_pct": 13.23,
+      "max_pct": 183.91,
+      "skew": 2.45,
+      "top3_share_pct": 66.8,
+      "mean_excl_top1_pct": 9.75
+    },
+    "live": {
+      "n": 50,
+      "mean_pct": 9.43,
+      "max_pct": 199.35,
+      "skew": 2.81,
+      "top3_share_pct": 78.9,
+      "mean_excl_top1_pct": 5.55
+    }
+  },
+  "pbo_dsr_short_ma_grid": {
+    "input": {
+      "horizon": "regime_grid",
+      "universe": "gold_or_btc",
+      "cost": "30.0bp"
+    },
+    "n_trials": 8,
+    "n_events": 152,
+    "pbo": {
+      "pbo": 0.2619,
+      "embargo": 0,
+      "purged_events_total": 0,
+      "n_combos": 924,
+      "n_blocks": 12,
+      "lambda_mean": 0.556,
+      "is_sharpe_mean": 0.0262,
+      "oos_sharpe_mean": -0.0273,
+      "degradation_slope": -0.9497,
+      "prob_oos_loss": 0.6299
+    },
+    "pbo_verdict": "중간(주의)",
+    "dsr": {
+      "sr": 0.0137,
+      "sr0": 0.0611,
+      "dsr": 0.2792,
+      "dsr_uncorrected": 0.2792,
+      "skew": 0.823,
+      "kurtosis": 4.528,
+      "T": 152,
+      "T_eff": 152,
+      "N": 8,
+      "best_trial": "tm30_b0.0_c1"
+    },
+    "dsr_verdict": "통과 실패(다중검정 감안 시 샤프가 유의하지 않음)",
+    "passed": false,
+    "references": [
+      "Bailey et al. 2017 (PBO/CSCV)",
+      "Bailey & López de Prado 2014 (DSR)"
+    ],
+    "note": "조합 간 상관으로 N이 과대계상될 수 있어 DSR은 보수적(실제보다 낮게) 추정됨."
+  },
+  "era_split": {
+    "전반부": {
+      "n_days": 1604,
+      "buy_hold_cagr": 44.09,
+      "ma30_cagr": 68.27,
+      "live_cagr": 44.96
+    },
+    "후반부": {
+      "n_days": 1605,
+      "buy_hold_cagr": -5.38,
+      "ma30_cagr": 11.72,
+      "live_cagr": 1.54
+    }
+  }
+}
