@@ -88,7 +88,10 @@ def load_or_build(force: bool = False) -> pd.DataFrame:
 
 def self_test_features():
     """합성 60주치 일간 데이터(추세 있는 gold, 반대추세 dxy, 하락하는 real_rate)로
-    build_weekly_features 배선 확인. 상관 계산을 위해 현실적 변동성 포함."""
+    build_weekly_features 배선 확인. 상관 계산을 위해 현실적 변동성 포함.
+
+    real_rate는 역사적으로 음수 영역을 통과했으므로(DFII10 2020-2022),
+    합성 데이터도 양수→음수로 전환되도록 해서 diff() 메서드가 실제로 사용됨을 검증한다."""
     np.random.seed(42)
     idx = pd.bdate_range("2020-01-01", periods=300)  # ~60주
     # 추세 + 소음: 금은 상승, DXY는 하락, 음의 상관 가능하게 구조화
@@ -104,20 +107,46 @@ def self_test_features():
     ief_noise = np.random.normal(0, 0.002, 300)
     ief = pd.Series(100 * np.exp(np.cumsum(ief_drift + ief_noise)), index=idx)
 
-    # real_rate: 레벨 값, 음의 추세
-    real_rate = pd.Series(2.0 - np.cumsum(np.full(300, 0.002)) + np.random.normal(0, 0.01, 300), index=idx)
+    # real_rate: 레벨 값, 양수(~1.0)에서 음수(~-0.7)로 전환되는 추세 + 소음.
+    # 이는 역사적 DFII10 데이터와 일치(2020-2022 음의 실질금리).
+    # pct_change 대신 diff 사용을 증명하기 위해 0을 통과하는 시리즈 필요.
+    real_rate_drift = -np.cumsum(np.full(300, 0.0065))  # 1.0 → -0.95 정도로 하락
+    real_rate_base = 1.0 + real_rate_drift
+    real_rate = pd.Series(real_rate_base + np.random.normal(0, 0.02, 300), index=idx)
+
     breakeven = pd.Series(np.full(300, 2.0) + np.random.normal(0, 0.05, 300), index=idx)
 
     df = pd.DataFrame({"gold": gold, "dxy": dxy, "ief": ief, "real_rate": real_rate,
                        "breakeven": breakeven})
+
+    # build_weekly_features 실행
     feat = build_weekly_features(df)
     assert feat.index.freqstr in ("W-FRI",) or feat.index.freq is not None or len(feat) < len(df)
+
+    # 예상 real_rate_mom_12m 계산: 주간 리샘플 후 52주 차이.
+    # diff를 사용함을 검증하기 위해 정확한 값과 비교.
+    weekly_rr = real_rate.resample("W-FRI").last()
+    expected_rr_mom_12m = weekly_rr.iloc[-1] - weekly_rr.iloc[-53]  # last - 52주 전
+
     last = feat.iloc[-1]
     assert last["gold_mom_12m"] > 0, "금 12개월 모멘텀은 양수여야 함(꾸준 상승 합성데이터)"
     assert last["dxy_mom_12m"] < 0, "DXY 12개월 모멘텀은 음수여야 함"
-    assert last["real_rate_mom_12m"] < 0, "실질금리 12개월 모멘텀(레벨변화)은 음수여야 함"
+
+    # real_rate_mom_12m이 정확히 예상값과 일치하는지 확인 (diff 사용 증명).
+    assert np.isclose(last["real_rate_mom_12m"], expected_rr_mom_12m, atol=1e-10), \
+        f"실질금리 12개월 모멘텀은 diff를 사용한 {expected_rr_mom_12m:.6f}여야 하는데 {last['real_rate_mom_12m']:.6f} (pct_change 사용 증거)"
+    assert last["real_rate_mom_12m"] < 0, "음의 추세 → 음수 레벨변화"
+
+    # pct_change를 쓰면 음수/양수 전환 시리즈에서 NaN이나 이상 값 생성됨을 추가 검증.
+    # pct_change 계산: (마지막값 - 52주전) / |52주전값|이므로,
+    # 시작(양수)에서 끝(음수)로 가면 극단적 음수 값 생성.
+    weekly_rr_pct = weekly_rr.pct_change(52)
+    wrong_formula_result = weekly_rr_pct.iloc[-1]
+    assert abs(wrong_formula_result) > abs(last["real_rate_mom_12m"]), \
+        "pct_change는 zero-crossing 시리즈에서 극단적 값을 생성 (diff가 정답)"
+
     assert last["gold_dxy_corr60"] < 0, "반대추세로 만들었으니 상관은 음수여야 함"
-    print("[self-test] 통과: build_weekly_features 배선 정상", file=sys.stderr)
+    print("[self-test] 통과: build_weekly_features 배선 정상 (diff 메서드 검증 포함)", file=sys.stderr)
 
 
 def self_test():
