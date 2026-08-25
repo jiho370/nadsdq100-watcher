@@ -111,7 +111,8 @@ def simulate_exposure(gold_daily: pd.Series, regime: pd.DataFrame, cost_bps: flo
     exp_lag = np.roll(exp_arr, 1)
     strat_ret = (exp_lag * ret)[1:]
     turnover = np.abs(np.diff(exp_arr))
-    cost = turnover * (cost_bps / 10000.0)
+    cost_shifted = np.concatenate([[0.0], turnover[:-1]])
+    cost = cost_shifted * (cost_bps / 10000.0)
     strat_ret = np.nan_to_num(strat_ret - cost, nan=0.0)
     nav = np.cumprod(1 + strat_ret)
     n = len(nav)
@@ -188,6 +189,30 @@ def self_test_simulate():
     _log("통과: simulate_exposure/fixed_weight_benchmark 배선 정상")
 
 
+def self_test_cost_timing():
+    idx = pd.bdate_range("2020-01-01", periods=30)
+    rng = np.random.default_rng(8)
+    gold_daily = pd.Series(100 * np.exp(np.cumsum(rng.normal(0.0003, 0.01, 30))), index=idx)
+
+    weekly_idx = pd.date_range(idx[0], idx[-1], freq="W-FRI")
+    regime = pd.DataFrame({"exposure": 1.0, "verdict": "HOLD", "strength": None,
+                          "confidence": "normal", "unexplained": False}, index=weekly_idx)
+
+    regime_change = regime.copy()
+    if len(regime_change) > 1:
+        regime_change.iloc[1, regime_change.columns.get_loc("exposure")] = 0.5
+
+    sim_with_cost = simulate_exposure(gold_daily, regime_change, 50.0)
+    sim_no_cost = simulate_exposure(gold_daily, regime_change, 0.0)
+
+    cost_per_ret = sim_no_cost["strat_ret"] - sim_with_cost["strat_ret"]
+    assert (cost_per_ret >= -1e-10).all(), "비용은 수익률을 감소시켜야 함"
+    assert cost_per_ret.sum() > 0.0, "총 비용이 양수여야 함"
+    assert sim_with_cost["nav"][-1] < sim_no_cost["nav"][-1], "비용이 최종 NAV를 감소시켜야 함"
+
+    _log("통과: simulate_exposure 거래비용 타이밍 정상(신규노출 기간에 비용 적용)")
+
+
 def self_test():
     # 1) 강한 ADD: 금 UP 다수결 + DXY 살아있고 DOWN + 실질금리 살아있고 DOWN + IEF 동조
     row = _mk_row(gold_mom_3m=0.05, gold_mom_6m=0.08, gold_mom_12m=0.10,
@@ -230,6 +255,7 @@ def self_test():
     _log("통과: classify/target_exposure 4개 시나리오(ADD강/HOLD/설명안됨/REDUCE강) 정상")
     self_test_regime_series()
     self_test_simulate()
+    self_test_cost_timing()
 
 
 if __name__ == "__main__":
