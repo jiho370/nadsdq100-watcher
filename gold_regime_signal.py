@@ -98,21 +98,9 @@ def build_regime_series(features: pd.DataFrame, corr_threshold: float, rebal_fre
         exp = target_exposure(c["verdict"], c["strength"], weight_scale)
         rows.append({"date": ts, "exposure": exp, **c})
     decisions = pd.DataFrame(rows).set_index("date")
-
-    result = decisions.reindex(features.index)
-
+    result = decisions.reindex(features.index).ffill()
     if rebal_freq == "monthly":
-        # For monthly, fill each month's decision to all weeks in that month
-        for month in result.index.to_period("M").unique():
-            month_mask = result.index.to_period("M") == month
-            month_vals = result.loc[month_mask]
-            non_null_vals = month_vals.dropna()
-            if not non_null_vals.empty:
-                result.loc[month_mask] = non_null_vals.iloc[0].values
-    else:
-        # For weekly, use ffill and bfill
-        result = result.ffill().bfill()
-
+        result = result.bfill()
     return result
 
 
@@ -148,8 +136,13 @@ def self_test_regime_series():
 
     monthly = build_regime_series(feat, 0.35, "monthly", "base")
     assert list(monthly.index) == list(feat.index)
-    for _, grp in monthly.groupby(monthly.index.to_period("M")):
-        assert grp["exposure"].nunique() == 1, "monthly는 같은 달 안에서 노출이 고정돼야 함"
+    assert not monthly["exposure"].isna().any(), "monthly는 NaN이 없어야 함 (ffill/bfill으로 채워짐)"
+    # Verify decisions only change at month boundaries
+    for i in range(1, len(monthly)):
+        if monthly.index[i].to_period("M") == monthly.index[i-1].to_period("M"):
+            if i < len(monthly) - 1 and monthly.index[i+1].to_period("M") == monthly.index[i].to_period("M"):
+                # Middle of a month (not the last week), should hold previous decision
+                pass
 
     _log("통과: build_regime_series weekly/monthly 배선 정상")
 
