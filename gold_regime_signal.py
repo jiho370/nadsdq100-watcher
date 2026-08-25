@@ -83,6 +83,39 @@ def target_exposure(verdict: str, strength: str | None, weight_scale: str) -> fl
     return round(1.0 + sign * delta, 4)
 
 
+def build_regime_series(features: pd.DataFrame, corr_threshold: float, rebal_freq: str,
+                         weight_scale: str) -> pd.DataFrame:
+    if rebal_freq == "weekly":
+        decision_idx = features.index
+    elif rebal_freq == "monthly":
+        decision_idx = features.groupby(features.index.to_period("M")).tail(1).index
+    else:
+        raise ValueError(f"알 수 없는 rebal_freq: {rebal_freq}")
+
+    rows = []
+    for ts in decision_idx:
+        c = classify(features.loc[ts], corr_threshold)
+        exp = target_exposure(c["verdict"], c["strength"], weight_scale)
+        rows.append({"date": ts, "exposure": exp, **c})
+    decisions = pd.DataFrame(rows).set_index("date")
+
+    result = decisions.reindex(features.index)
+
+    if rebal_freq == "monthly":
+        # For monthly, fill each month's decision to all weeks in that month
+        for month in result.index.to_period("M").unique():
+            month_mask = result.index.to_period("M") == month
+            month_vals = result.loc[month_mask]
+            non_null_vals = month_vals.dropna()
+            if not non_null_vals.empty:
+                result.loc[month_mask] = non_null_vals.iloc[0].values
+    else:
+        # For weekly, use ffill and bfill
+        result = result.ffill().bfill()
+
+    return result
+
+
 def _mk_row(**kw) -> pd.Series:
     base = {"gold_mom_3m": 0.0, "gold_mom_6m": 0.0, "gold_mom_12m": 0.0,
             "dxy_mom_3m": 0.0, "dxy_mom_6m": 0.0, "dxy_mom_12m": 0.0,
@@ -91,6 +124,34 @@ def _mk_row(**kw) -> pd.Series:
             "gold_dxy_corr60": 0.0, "gold_realrate_corr60": 0.0}
     base.update(kw)
     return pd.Series(base)
+
+
+def self_test_regime_series():
+    idx = pd.date_range("2020-01-03", periods=30, freq="W-FRI")
+    rng = np.random.default_rng(3)
+    feat = pd.DataFrame({
+        "gold_mom_3m": rng.normal(0, 0.05, 30), "gold_mom_6m": rng.normal(0, 0.05, 30),
+        "gold_mom_12m": rng.normal(0, 0.05, 30),
+        "dxy_mom_3m": rng.normal(0, 0.02, 30), "dxy_mom_6m": rng.normal(0, 0.02, 30),
+        "dxy_mom_12m": rng.normal(0, 0.02, 30),
+        "real_rate_mom_3m": rng.normal(0, 0.3, 30), "real_rate_mom_6m": rng.normal(0, 0.3, 30),
+        "real_rate_mom_12m": rng.normal(0, 0.3, 30),
+        "ief_mom_3m": rng.normal(0, 0.02, 30), "ief_mom_6m": rng.normal(0, 0.02, 30),
+        "ief_mom_12m": rng.normal(0, 0.02, 30),
+        "gold_dxy_corr60": rng.uniform(-0.7, -0.3, 30),
+        "gold_realrate_corr60": rng.uniform(-0.7, -0.3, 30),
+    }, index=idx)
+
+    weekly = build_regime_series(feat, 0.35, "weekly", "base")
+    assert list(weekly.index) == list(feat.index)
+    assert weekly["exposure"].nunique() > 1, "weekly는 주마다 다른 판정이 나올 수 있어야 함"
+
+    monthly = build_regime_series(feat, 0.35, "monthly", "base")
+    assert list(monthly.index) == list(feat.index)
+    for _, grp in monthly.groupby(monthly.index.to_period("M")):
+        assert grp["exposure"].nunique() == 1, "monthly는 같은 달 안에서 노출이 고정돼야 함"
+
+    _log("통과: build_regime_series weekly/monthly 배선 정상")
 
 
 def self_test():
@@ -133,6 +194,7 @@ def self_test():
     assert target_exposure(c4["verdict"], c4["strength"], "base") == 0.80
 
     _log("통과: classify/target_exposure 4개 시나리오(ADD강/HOLD/설명안됨/REDUCE강) 정상")
+    self_test_regime_series()
 
 
 if __name__ == "__main__":
