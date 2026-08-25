@@ -259,31 +259,58 @@ def self_test_cost_timing():
 
 
 def self_test_era():
-    idx = pd.bdate_range("2000-06-01", periods=1800)  # ~7년, 2000년대 강세장 구간 포함
-    rng = np.random.default_rng(1)
-    gold_daily = pd.Series(100 * np.exp(np.cumsum(rng.normal(0.0005, 0.01, 1800))), index=idx)
+    # Test 1: Date alignment verification using value-based metric (CAGR, not just counts)
+    # Build synthetic prices: flat for 100 days, then 2% daily growth for 150 days
+    # This structure ensures an off-by-one shift in dates selection would noticeably change CAGR
+    idx = pd.bdate_range("2020-01-01", periods=250)
+    prices = np.concatenate([
+        np.full(100, 100.0),  # Days 0-99: flat
+        100.0 * (1.02 ** np.arange(150))  # Days 100-249: exponential growth at 2%/day
+    ])
+    gold_daily = pd.Series(prices, index=idx)
+
+    # Constant exposure regime
     weekly_idx = pd.date_range(idx[0], idx[-1], freq="W-FRI")
     regime = pd.DataFrame({"exposure": 1.0, "verdict": "HOLD", "strength": None,
                            "confidence": "normal", "unexplained": False}, index=weekly_idx)
 
-    # Test 1: Date alignment verification with concrete n_days check
-    # Pick a known sub-range: days 50-200 (150 days, well above 20-day minimum)
-    # Independently compute how many dates from gold_daily.index[1:] fall in this range
-    start_date = idx[50]
-    end_date = idx[200]
-    dates_array = gold_daily.index[1:]  # This is what era_performance() uses internally
-    expected_n_days = int(((dates_array >= start_date) & (dates_array < end_date)).sum())
-    assert expected_n_days >= 20, "Test setup: need >= 20 days for this range"
+    # Era starting exactly at the transition point (idx[100], first day of growth)
+    # With correct dates = gold_daily.index[1:], this era includes strat_ret[99],
+    # which is the return from day 99->100 (the massive ~99% jump from flat to growth).
+    # If dates were incorrectly shifted (e.g., gold_daily.index[:-1]), we'd miss this return.
+    transition_idx = 100
+    era_start = idx[transition_idx].strftime("%Y-%m-%d")
+    era_end = (idx[-1] + pd.Timedelta(days=1)).strftime("%Y-%m-%d")
 
-    era_range = [("alignment_test", start_date.strftime("%Y-%m-%d"), end_date.strftime("%Y-%m-%d"))]
-    result = era_performance(gold_daily, regime, 5.0, eras=era_range)
-    assert len(result) == 1
-    assert "signal_cagr" in result[0], "Should have metrics for sufficient sample"
-    assert result[0]["n_days"] == expected_n_days, \
-        f"Date alignment error: returned n_days={result[0]['n_days']}, expected {expected_n_days}"
+    result = era_performance(gold_daily, regime, 0.0, eras=[("growth", era_start, era_end)])
+
+    assert len(result) == 1, "Should have one era result"
+    assert "signal_cagr" in result[0], "Should have CAGR for sufficient sample"
+
+    computed_cagr = result[0]["signal_cagr"]
+    n_days = result[0]["n_days"]
+
+    # Hand-compute expected CAGR: (price_end / price_start) ^ (252 / n_days) - 1
+    # Price start at day 100: 100.0
+    # Price end at day 249: 100.0 * (1.02 ^ 149) ≈ 1911.7
+    price_start = prices[transition_idx]
+    price_end = prices[-1]
+    expected_cagr = ((price_end / price_start) ** (252.0 / n_days) - 1) * 100
+
+    # Assert computed CAGR matches expected value within tolerance
+    # An off-by-one shift in dates would miss the ~99% transition return,
+    # causing CAGR to drop dramatically (by >1%), which exceeds our tolerance.
+    assert abs(computed_cagr - expected_cagr) < 1.0, \
+        f"CAGR mismatch: computed {computed_cagr:.1f}%, expected {expected_cagr:.1f}%. " \
+        f"Off-by-one bug in dates selection would cause {price_end/price_start:.1f}x price ratio " \
+        f"to be computed with different returns, changing CAGR outside tolerance."
+
+    # Sanity check: with 2% daily growth over 150 days, CAGR should be enormous (> 100%)
+    assert computed_cagr > 100, f"Expected very high CAGR from synthetic growth, got {computed_cagr:.1f}%"
 
     # Test 2: Insufficient sample case
-    tiny = era_performance(gold_daily, regime, 5.0, eras=[("표본부족", idx[0].strftime("%Y-%m-%d"), idx[5].strftime("%Y-%m-%d"))])
+    tiny = era_performance(gold_daily, regime, 0.0,
+                          eras=[("tiny", idx[0].strftime("%Y-%m-%d"), idx[5].strftime("%Y-%m-%d"))])
     assert len(tiny) == 1
     assert "note" in tiny[0] and tiny[0]["note"].startswith("표본 부족"), \
         "Tiny era should return note about insufficient sample"
