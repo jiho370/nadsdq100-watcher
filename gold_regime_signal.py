@@ -98,10 +98,7 @@ def build_regime_series(features: pd.DataFrame, corr_threshold: float, rebal_fre
         exp = target_exposure(c["verdict"], c["strength"], weight_scale)
         rows.append({"date": ts, "exposure": exp, **c})
     decisions = pd.DataFrame(rows).set_index("date")
-    result = decisions.reindex(features.index).ffill()
-    if rebal_freq == "monthly":
-        result = result.bfill()
-    return result
+    return decisions.reindex(features.index).ffill()
 
 
 def _mk_row(**kw) -> pd.Series:
@@ -136,13 +133,12 @@ def self_test_regime_series():
 
     monthly = build_regime_series(feat, 0.35, "monthly", "base")
     assert list(monthly.index) == list(feat.index)
-    assert not monthly["exposure"].isna().any(), "monthly는 NaN이 없어야 함 (ffill/bfill으로 채워짐)"
-    # Verify decisions only change at month boundaries
-    for i in range(1, len(monthly)):
-        if monthly.index[i].to_period("M") == monthly.index[i-1].to_period("M"):
-            if i < len(monthly) - 1 and monthly.index[i+1].to_period("M") == monthly.index[i].to_period("M"):
-                # Middle of a month (not the last week), should hold previous decision
-                pass
+    # 첫 월말 결정일 이전 주는 NaN이어야 함(아직 판정 근거가 없음 — 룩어헤드 아님)
+    first_decision = feat.groupby(feat.index.to_period("M")).tail(1).index[0]
+    before_first = monthly.index < first_decision
+    assert monthly.loc[before_first, "exposure"].isna().all(), "첫 결정일 이전은 NaN이어야 함(룩어헤드 방지)"
+    after_first = ~before_first
+    assert not monthly.loc[after_first, "exposure"].isna().any(), "첫 결정일 이후는 NaN이 없어야 함"
 
     _log("통과: build_regime_series weekly/monthly 배선 정상")
 
