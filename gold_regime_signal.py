@@ -124,6 +124,49 @@ def fixed_weight_benchmark(regime: pd.DataFrame) -> float:
     return float(regime["exposure"].mean())
 
 
+ERAS = [
+    ("2000년대 강세장", "2001-01-01", "2011-08-01"),
+    ("2013-2015 약세장", "2013-01-01", "2016-01-01"),
+    ("2022 금리인상기", "2022-03-01", "2023-07-01"),
+    ("2022년 이후", "2022-01-01", "2027-01-01"),
+]
+
+
+def era_performance(gold_daily: pd.Series, regime: pd.DataFrame, cost_bps: float,
+                    eras: list = ERAS) -> list[dict]:
+    sim = simulate_exposure(gold_daily, regime, cost_bps)
+    bh = regime.copy(); bh["exposure"] = 1.0
+    sim_bh = simulate_exposure(gold_daily, bh, 0.0)
+    fw_level = fixed_weight_benchmark(regime)
+    fw = regime.copy(); fw["exposure"] = fw_level
+    sim_fw = simulate_exposure(gold_daily, fw, cost_bps)
+
+    dates = gold_daily.index[1:]
+    unexplained_daily = regime["unexplained"].reindex(gold_daily.index).ffill().fillna(False).to_numpy()[1:]
+
+    out = []
+    for label, start, end in eras:
+        mask = (dates >= pd.Timestamp(start)) & (dates < pd.Timestamp(end))
+        n = int(mask.sum())
+        if n < 20:
+            out.append({"era": label, "n_days": n, "note": "표본 부족(20일 미만) — 생략"})
+            continue
+        nav_s = np.cumprod(1 + sim["strat_ret"][mask])
+        nav_bh = np.cumprod(1 + sim_bh["strat_ret"][mask])
+        nav_fw = np.cumprod(1 + sim_fw["strat_ret"][mask])
+        out.append({
+            "era": label, "n_days": n,
+            "signal_cagr": round(_cagr(nav_s, n), 2),
+            "buyhold_cagr": round(_cagr(nav_bh, n), 2),
+            "fixed_weight_cagr": round(_cagr(nav_fw, n), 2),
+            "signal_ulcer": round(_ulcer(nav_s), 2),
+            "buyhold_ulcer": round(_ulcer(nav_bh), 2),
+            "fixed_weight_ulcer": round(_ulcer(nav_fw), 2),
+            "unexplained_pct": round(float(unexplained_daily[mask].mean() * 100), 1),
+        })
+    return out
+
+
 def _mk_row(**kw) -> pd.Series:
     base = {"gold_mom_3m": 0.0, "gold_mom_6m": 0.0, "gold_mom_12m": 0.0,
             "dxy_mom_3m": 0.0, "dxy_mom_6m": 0.0, "dxy_mom_12m": 0.0,
@@ -213,6 +256,23 @@ def self_test_cost_timing():
     _log("통과: simulate_exposure 거래비용 타이밍 정상(신규노출 기간에 비용 적용)")
 
 
+def self_test_era():
+    idx = pd.bdate_range("2000-06-01", periods=1800)  # ~7년, 2000년대 강세장 구간 포함
+    rng = np.random.default_rng(1)
+    gold_daily = pd.Series(100 * np.exp(np.cumsum(rng.normal(0.0005, 0.01, 1800))), index=idx)
+    weekly_idx = pd.date_range(idx[0], idx[-1], freq="W-FRI")
+    regime = pd.DataFrame({"exposure": 1.0, "verdict": "HOLD", "strength": None,
+                           "confidence": "normal", "unexplained": False}, index=weekly_idx)
+    result = era_performance(gold_daily, regime, 5.0, eras=[("전체구간", "2000-01-01", "2008-01-01")])
+    assert len(result) == 1
+    assert "signal_cagr" in result[0] and "note" not in result[0]
+
+    tiny = era_performance(gold_daily, regime, 5.0, eras=[("표본부족", "2000-06-01", "2000-06-05")])
+    assert tiny[0]["note"].startswith("표본 부족")
+
+    _log("통과: era_performance 배선 정상")
+
+
 def self_test():
     # 1) 강한 ADD: 금 UP 다수결 + DXY 살아있고 DOWN + 실질금리 살아있고 DOWN + IEF 동조
     row = _mk_row(gold_mom_3m=0.05, gold_mom_6m=0.08, gold_mom_12m=0.10,
@@ -256,6 +316,7 @@ def self_test():
     self_test_regime_series()
     self_test_simulate()
     self_test_cost_timing()
+    self_test_era()
 
 
 if __name__ == "__main__":
