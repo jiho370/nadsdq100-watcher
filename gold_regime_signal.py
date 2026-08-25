@@ -99,7 +99,16 @@ def build_regime_series(features: pd.DataFrame, corr_threshold: float, rebal_fre
         exp = target_exposure(c["verdict"], c["strength"], weight_scale)
         rows.append({"date": ts, "exposure": exp, **c})
     decisions = pd.DataFrame(rows).set_index("date")
-    return decisions.reindex(features.index).ffill()
+
+    # 행 단위로 ffill: 각 출력 행의 모든 컬럼은 같은 결정일(governing decision)에서
+    # 와야 한다. DataFrame.ffill()을 그대로 쓰면 strength=None(HOLD)이 NA로 취급되어
+    # 셀 단위로 이전 ADD/REDUCE의 strength가 새어 들어온다(verdict='HOLD'인데
+    # strength='mild' 같은 내부 불일치 발생).
+    governing = pd.Series(decisions.index, index=decisions.index).reindex(features.index).ffill()
+    valid = governing.dropna()
+    result = decisions.loc[valid.values]
+    result.index = valid.index
+    return result.reindex(features.index)
 
 
 def simulate_exposure(gold_daily: pd.Series, regime: pd.DataFrame, cost_bps: float) -> dict:
@@ -209,6 +218,31 @@ def self_test_regime_series():
     assert not monthly.loc[after_first, "exposure"].isna().any(), "첫 결정일 이후는 NaN이 없어야 함"
 
     _log("통과: build_regime_series weekly/monthly 배선 정상")
+
+    # strength 컬럼 row-wise ffill 검증: ADD strong 주 다음에 HOLD 주들이 오면,
+    # HOLD 주의 strength는 None이어야 한다(이전 ADD의 'strong'이 새어들면 안 됨).
+    # DataFrame.ffill()을 셀 단위로 쓰면 strength=None(NA)이 채워져서
+    # verdict='HOLD', strength='strong' 같은 내부 불일치가 생기는 버그를 잡는다.
+    ffill_idx = pd.date_range("2020-01-03", periods=4, freq="W-FRI")
+    add_strong_row = _mk_row(gold_mom_3m=0.05, gold_mom_6m=0.08, gold_mom_12m=0.10,
+                             dxy_mom_3m=-0.02, dxy_mom_6m=-0.03, dxy_mom_12m=-0.01,
+                             real_rate_mom_3m=-0.3, real_rate_mom_6m=-0.5, real_rate_mom_12m=-0.4,
+                             ief_mom_3m=0.02, ief_mom_6m=0.01, ief_mom_12m=0.03,
+                             gold_dxy_corr60=-0.6, gold_realrate_corr60=-0.5)
+    hold_row = _mk_row(gold_mom_3m=0.01, gold_mom_6m=-0.01, gold_mom_12m=0.005,
+                       gold_dxy_corr60=-0.6, gold_realrate_corr60=-0.5)
+    ffill_feat = pd.DataFrame([add_strong_row, hold_row, hold_row, hold_row], index=ffill_idx)
+    ffill_result = build_regime_series(ffill_feat, 0.35, "weekly", "base")
+
+    assert ffill_result.loc[ffill_idx[0], "verdict"] == "ADD", ffill_result.loc[ffill_idx[0]]
+    assert ffill_result.loc[ffill_idx[0], "strength"] == "strong", ffill_result.loc[ffill_idx[0]]
+    for ts in ffill_idx[1:]:
+        row = ffill_result.loc[ts]
+        assert row["verdict"] == "HOLD", row
+        assert row["strength"] is None or pd.isna(row["strength"]), \
+            f"HOLD 주({ts.date()})의 strength가 이전 ADD의 값('strong')으로 오염됨: {row['strength']!r}"
+
+    _log("통과: build_regime_series strength 컬럼 행 단위 ffill 정상(HOLD가 이전 강도로 오염 안 됨)")
 
 
 def self_test_simulate():

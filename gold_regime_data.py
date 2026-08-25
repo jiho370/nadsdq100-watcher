@@ -75,10 +75,23 @@ def build_weekly_features(df: pd.DataFrame) -> pd.DataFrame:
     return out.dropna()
 
 
-def load_or_build(force: bool = False) -> pd.DataFrame:
+def load_or_build(force: bool = False, max_stale_days: int = 5) -> pd.DataFrame:
+    """캐시가 있으면 재사용하되, 캐시 파일이 max_stale_days일(달력일) 이상 전에
+    빌드됐으면 재구축한다(backtest_regime_assets.fetch()와 동일한 신선도 관례,
+    5일 여유). force=True면 무조건 재구축.
+
+    신선도는 캐시 파일의 mtime(빌드 시각) 기준이지 인덱스 최댓값 기준이 아니다:
+    W-FRI 리샘플은 진행 중인 주를 그 주의 금요일 날짜로 라벨링하므로
+    (예: 화요일에 빌드해도 마지막 행은 이번 주 금요일로 찍힘), 인덱스 최댓값은
+    빌드 시점보다 미래일 수 있어 "오늘 - 인덱스 최댓값" 방식은 주중에 stale_days가
+    음수가 되어 절대 재구축을 트리거하지 못하는 결함이 있다."""
     if not force and os.path.exists(DATASET_PATH):
-        return pd.read_pickle(DATASET_PATH)
-    df = fetch_all()
+        mtime = pd.Timestamp.fromtimestamp(os.path.getmtime(DATASET_PATH))
+        stale_days = (pd.Timestamp.now() - mtime).days
+        if stale_days <= max_stale_days:
+            return pd.read_pickle(DATASET_PATH)
+        _log(f"캐시 stale(빌드 후 {stale_days}일 경과) — 재구축")
+    df = fetch_all(max_stale_days)
     feat = build_weekly_features(df)
     os.makedirs("output", exist_ok=True)
     feat.to_pickle(DATASET_PATH)
@@ -172,5 +185,5 @@ if __name__ == "__main__":
     if args.self_test:
         self_test()
     else:
-        df = fetch_all()
-        print(df.tail())
+        feat = load_or_build(force=True)
+        print(feat.tail())
