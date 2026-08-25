@@ -67,7 +67,7 @@ def walk_forward(features: pd.DataFrame, gold_daily: pd.Series, cost_bps: float 
     while start + train_weeks + test_weeks <= n:
         train = features.iloc[start:start + train_weeks]
         test = features.iloc[start + train_weeks:start + train_weeks + test_weeks]
-        train_gold = gold_daily[gold_daily.index <= train.index[-1]]
+        train_gold = gold_daily[(gold_daily.index >= train.index[0]) & (gold_daily.index <= train.index[-1])]
         best = None
         for ct in CORR_THRESHOLDS:
             for freq in REBAL_FREQS:
@@ -146,6 +146,7 @@ def self_test():
     assert "dsr" in report and "pbo" in report
     _log("통과: grid_trials/run_dsr_pbo 배선 정상")
     self_test_walk_forward()
+    self_test_walk_forward_no_leakage()
 
 
 def self_test_walk_forward():
@@ -178,6 +179,66 @@ def self_test_walk_forward():
     assert cs["15.0bp"]["cagr"] <= cs["5.0bp"]["cagr"] + 1e-9, "비용이 높으면 CAGR이 같거나 낮아야 함"
 
     _log("통과: walk_forward/cost_sensitivity 배선 정상")
+
+
+def self_test_walk_forward_no_leakage():
+    # train_years=1/test_years=1, 156주(3년) -> 정확히 2개 fold:
+    #   fold0: train=주[0:52), test=주[52:104)
+    #   fold1: train=주[52:104), test=주[104:156)
+    # fold1의 test 구간(주[104:156)) 안에만 뚜렷한 가격 충격을 넣은 변형(shock)과
+    # 넣지 않은 변형(flat) 두 gold_daily를 만든다. 두 변형은 그 구간 이전(모든 학습
+    # 구간 포함)에는 완전히 동일하다. 만약 파라미터 탐색이 미래(test) 구간 데이터를
+    # 누출해서 본다면 fold1의 chosen_params가 두 변형 사이에서 달라질 것이고,
+    # 누출이 없다면 학습 구간이 동일하므로 chosen_params가 반드시 같아야 한다.
+    idx = pd.date_range("2003-01-03", periods=156, freq="W-FRI")  # 3년
+    rng = np.random.default_rng(19)
+    feat = pd.DataFrame({
+        "gold_mom_3m": rng.normal(0, 0.05, 156), "gold_mom_6m": rng.normal(0, 0.05, 156),
+        "gold_mom_12m": rng.normal(0, 0.05, 156),
+        "dxy_mom_3m": rng.normal(0, 0.02, 156), "dxy_mom_6m": rng.normal(0, 0.02, 156),
+        "dxy_mom_12m": rng.normal(0, 0.02, 156),
+        "real_rate_mom_3m": rng.normal(0, 0.3, 156), "real_rate_mom_6m": rng.normal(0, 0.3, 156),
+        "real_rate_mom_12m": rng.normal(0, 0.3, 156),
+        "ief_mom_3m": rng.normal(0, 0.02, 156), "ief_mom_6m": rng.normal(0, 0.02, 156),
+        "ief_mom_12m": rng.normal(0, 0.02, 156),
+        "gold_dxy_corr60": rng.uniform(-0.7, -0.1, 156),
+        "gold_realrate_corr60": rng.uniform(-0.7, -0.1, 156),
+    }, index=idx)
+
+    bdays = pd.bdate_range(idx[0], idx[-1] + pd.Timedelta(days=7))
+    rng2 = np.random.default_rng(23)
+    base_rets = rng2.normal(0.0002, 0.003, len(bdays))  # 잔잔한 변동성
+
+    fold1_test_start = idx[104]  # fold1 test 구간 시작(fold1 train 구간 이후)
+    shock_end = fold1_test_start + pd.Timedelta(days=10)
+    shock_mask = (bdays >= fold1_test_start) & (bdays <= shock_end)
+    assert shock_mask.sum() > 0, "충격 구간이 비어있음 — 테스트 설계 오류"
+
+    shock_rets = base_rets.copy()
+    shock_rets[shock_mask] = -0.05  # fold1 test 구간 안에서만 뚜렷한 급락
+
+    gold_daily_flat = pd.Series(100 * np.exp(np.cumsum(base_rets)), index=bdays)
+    gold_daily_shock = pd.Series(100 * np.exp(np.cumsum(shock_rets)), index=bdays)
+
+    wf_flat = walk_forward(feat, gold_daily_flat, train_years=1, test_years=1)
+    wf_shock = walk_forward(feat, gold_daily_shock, train_years=1, test_years=1)
+    assert wf_flat["n_folds"] == 2 and wf_shock["n_folds"] == 2, \
+        (wf_flat["n_folds"], wf_shock["n_folds"])
+
+    fold0_flat, fold0_shock = wf_flat["folds"][0], wf_shock["folds"][0]
+    assert fold0_flat == fold0_shock, \
+        f"fold0은 충격 구간 이전이라 완전히 동일해야 함: {fold0_flat} vs {fold0_shock}"
+
+    fold1_flat, fold1_shock = wf_flat["folds"][1], wf_shock["folds"][1]
+    assert fold1_flat["test_end"] == fold1_shock["test_end"]
+    assert fold1_flat["chosen_params"] == fold1_shock["chosen_params"], \
+        (f"fold1 test 구간에만 넣은 충격이 파라미터 선택을 바꿈 -> lookahead 누출 의심: "
+         f"{fold1_flat['chosen_params']} vs {fold1_shock['chosen_params']}")
+    assert (fold1_flat["oos_cagr"] != fold1_shock["oos_cagr"]
+            or fold1_flat["oos_ulcer"] != fold1_shock["oos_ulcer"]), \
+        "충격이 OOS 결과에 아무 영향도 주지 않음 — 테스트가 실제로 검증하는지 확인 필요"
+
+    _log("통과: walk_forward 파라미터 선택에 test 구간 미래 데이터 누출 없음")
 
 
 if __name__ == "__main__":
