@@ -1,0 +1,311 @@
+{
+  "eras": [
+    {
+      "era": "2000년대 강세장",
+      "n_days": 2150,
+      "signal_cagr": 20.51,
+      "buyhold_cagr": 19.9,
+      "fixed_weight_cagr": 20.7,
+      "signal_ulcer": 10.26,
+      "buyhold_ulcer": 8.29,
+      "fixed_weight_ulcer": 8.69,
+      "unexplained_pct": 22.0
+    },
+    {
+      "era": "2013-2015 약세장",
+      "n_days": 756,
+      "signal_cagr": -14.42,
+      "buyhold_cagr": -14.13,
+      "fixed_weight_cagr": -14.83,
+      "signal_ulcer": 25.78,
+      "buyhold_ulcer": 25.87,
+      "fixed_weight_ulcer": 27.01,
+      "unexplained_pct": 43.5
+    },
+    {
+      "era": "2022 금리인상기",
+      "n_days": 336,
+      "signal_cagr": -0.82,
+      "buyhold_cagr": 0.86,
+      "fixed_weight_cagr": 0.84,
+      "signal_ulcer": 11.99,
+      "buyhold_ulcer": 10.97,
+      "fixed_weight_ulcer": 11.47,
+      "unexplained_pct": 3.9
+    },
+    {
+      "era": "2022년 이후",
+      "n_days": 1167,
+      "signal_cagr": 24.36,
+      "buyhold_cagr": 22.55,
+      "fixed_weight_cagr": 23.63,
+      "signal_ulcer": 9.58,
+      "buyhold_ulcer": 8.56,
+      "fixed_weight_ulcer": 8.96,
+      "unexplained_pct": 28.7
+    }
+  ],
+  "overfit_gate": {
+    "dsr_pbo": {
+      "input": {
+        "horizon": "monthly_approx",
+        "universe": "gold_regime",
+        "cost": "5.0bp"
+      },
+      "n_trials": 12,
+      "n_events": 296,
+      "pbo": {
+        "pbo": 0.1905,
+        "embargo": 0,
+        "purged_events_total": 0,
+        "n_combos": 924,
+        "n_blocks": 12,
+        "lambda_mean": 0.9392,
+        "is_sharpe_mean": 0.0482,
+        "oos_sharpe_mean": 0.025,
+        "degradation_slope": -0.9464,
+        "prob_oos_loss": 0.3128
+      },
+      "pbo_verdict": "낮음(과최적화 가능성 작음)",
+      "dsr": {
+        "sr": 0.0455,
+        "sr0": 0.0372,
+        "dsr": 0.5567,
+        "dsr_uncorrected": 0.5567,
+        "skew": -0.03,
+        "kurtosis": 7.125,
+        "T": 296,
+        "T_eff": 296,
+        "N": 12,
+        "best_trial": "ct0.45_monthly_wide"
+      },
+      "dsr_verdict": "통과 실패(다중검정 감안 시 샤프가 유의하지 않음)",
+      "passed": false,
+      "references": [
+        "Bailey et al. 2017 (PBO/CSCV)",
+        "Bailey & López de Prado 2014 (DSR)"
+      ],
+      "note": "조합 간 상관으로 N이 과대계상될 수 있어 DSR은 보수적(실제보다 낮게) 추정됨."
+    },
+    "walk_forward": {
+      "n_folds": 17,
+      "folds": [
+        {
+          "train_end": "2008-12-19",
+          "test_end": "2009-12-18",
+          "chosen_params": {
+            "ct": 0.25,
+            "freq": "monthly",
+            "scale": "base"
+          },
+          "oos_cagr": 31.04,
+          "oos_ulcer": 6.27
+        },
+        {
+          "train_end": "2009-12-18",
+          "test_end": "2010-12-17",
+          "chosen_params": {
+            "ct": 0.45,
+            "freq": "monthly",
+            "scale": "base"
+          },
+          "oos_cagr": 28.33,
+          "oos_ulcer": 3.41
+        },
+        {
+          "train_end": "2010-12-17",
+          "test_end": "2011-12-16",
+          "chosen_params": {
+            "ct": 0.45,
+            "freq": "monthly",
+            "scale": "base"
+          },
+          "oos_cagr": 17.77,
+          "oos_ulcer": 6.33
+        },
+        {
+          "train_end": "2011-12-16",
+          "test_end": "2012-12-14",
+          "chosen_params": {
+            "ct": 0.45,
+            "freq": "monthly",
+            "scale": "base"
+          },
+          "oos_cagr": 2.59,
+          "oos_ulcer": 7.47
+        },
+        {
+          "train_end": "2012-12-14",
+          "test_end": "2013-12-13",
+          "chosen_params": {
+            "ct": 0.45,
+            "freq": "monthly",
+            "scale": "base"
+          },
+          "oos_cagr": -25.36,
+          "oos_ulcer": 17.36
+        },
+        {
+          "train_end": "2013-12-13",
+          "test_end": "2014-12-12",
+          "chosen_params": {
+            "ct": 0.45,
+            "freq": "weekly",
+            "scale": "base"
+          },
+          "oos_cagr": -0.39,
+          "oos_ulcer": 7.98
+        },
+        {
+          "train_end": "2014-12-12",
+          "test_end": "2015-12-11",
+          "chosen_params": {
+            "ct": 0.45,
+            "freq": "weekly",
+            "scale": "base"
+          },
+          "oos_cagr": -11.82,
+          "oos_ulcer": 11.31
+        },
+        {
+          "train_end": "2015-12-11",
+          "test_end": "2016-12-09",
+          "chosen_params": {
+            "ct": 0.45,
+            "freq": "weekly",
+            "scale": "base"
+          },
+          "oos_cagr": 8.74,
+          "oos_ulcer": 5.34
+        },
+        {
+          "train_end": "2016-12-09",
+          "test_end": "2017-12-08",
+          "chosen_params": {
+            "ct": 0.25,
+            "freq": "weekly",
+            "scale": "base"
+          },
+          "oos_cagr": 8.76,
+          "oos_ulcer": 3.69
+        },
+        {
+          "train_end": "2017-12-08",
+          "test_end": "2018-12-07",
+          "chosen_params": {
+            "ct": 0.25,
+            "freq": "weekly",
+            "scale": "base"
+          },
+          "oos_cagr": -0.91,
+          "oos_ulcer": 8.13
+        },
+        {
+          "train_end": "2018-12-07",
+          "test_end": "2019-12-06",
+          "chosen_params": {
+            "ct": 0.45,
+            "freq": "weekly",
+            "scale": "base"
+          },
+          "oos_cagr": 19.95,
+          "oos_ulcer": 3.57
+        },
+        {
+          "train_end": "2019-12-06",
+          "test_end": "2020-12-04",
+          "chosen_params": {
+            "ct": 0.45,
+            "freq": "monthly",
+            "scale": "base"
+          },
+          "oos_cagr": 29.0,
+          "oos_ulcer": 5.63
+        },
+        {
+          "train_end": "2020-12-04",
+          "test_end": "2021-12-03",
+          "chosen_params": {
+            "ct": 0.45,
+            "freq": "monthly",
+            "scale": "base"
+          },
+          "oos_cagr": -3.94,
+          "oos_ulcer": 9.35
+        },
+        {
+          "train_end": "2021-12-03",
+          "test_end": "2022-12-02",
+          "chosen_params": {
+            "ct": 0.45,
+            "freq": "monthly",
+            "scale": "base"
+          },
+          "oos_cagr": 0.93,
+          "oos_ulcer": 11.73
+        },
+        {
+          "train_end": "2022-12-02",
+          "test_end": "2023-12-01",
+          "chosen_params": {
+            "ct": 0.45,
+            "freq": "monthly",
+            "scale": "base"
+          },
+          "oos_cagr": 13.52,
+          "oos_ulcer": 5.6
+        },
+        {
+          "train_end": "2023-12-01",
+          "test_end": "2024-11-29",
+          "chosen_params": {
+            "ct": 0.45,
+            "freq": "monthly",
+            "scale": "base"
+          },
+          "oos_cagr": 40.17,
+          "oos_ulcer": 2.94
+        },
+        {
+          "train_end": "2024-11-29",
+          "test_end": "2025-11-28",
+          "chosen_params": {
+            "ct": 0.45,
+            "freq": "monthly",
+            "scale": "base"
+          },
+          "oos_cagr": 71.27,
+          "oos_ulcer": 3.68
+        }
+      ],
+      "oos_cagr_mean": 13.51,
+      "n_param_combos_tried": 12
+    },
+    "cost_sensitivity": {
+      "5.0bp": {
+        "cagr": 11.98,
+        "ulcer": 21.63
+      },
+      "15.0bp": {
+        "cagr": 11.8,
+        "ulcer": 21.98
+      }
+    },
+    "n_param_combos": 12
+  },
+  "current_judgment": {
+    "as_of": "2026-08-28",
+    "score": -1,
+    "verdict": "REDUCE",
+    "strength": "mild",
+    "gold_direction": "MIXED",
+    "dxy_alive": true,
+    "dxy_direction": "UP",
+    "realrate_alive": false,
+    "realrate_direction": "UP",
+    "ief_sync": 0,
+    "unexplained": false,
+    "confidence": "normal",
+    "target_exposure": 0.9
+  }
+}
