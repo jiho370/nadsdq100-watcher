@@ -9,6 +9,7 @@ from __future__ import annotations
 import sys, argparse
 import numpy as np
 import pandas as pd
+from backtest_regime_assets import _cagr, _ulcer, _mdd
 
 CORR_THRESHOLDS = (0.25, 0.35, 0.45)
 REBAL_FREQS = ("weekly", "monthly")
@@ -101,6 +102,27 @@ def build_regime_series(features: pd.DataFrame, corr_threshold: float, rebal_fre
     return decisions.reindex(features.index).ffill()
 
 
+def simulate_exposure(gold_daily: pd.Series, regime: pd.DataFrame, cost_bps: float) -> dict:
+    exposure_daily = regime["exposure"].reindex(
+        gold_daily.index.union(regime.index)).sort_index().ffill().reindex(gold_daily.index)
+    exposure_daily = exposure_daily.ffill().fillna(1.0)
+    ret = gold_daily.pct_change().to_numpy()
+    exp_arr = exposure_daily.to_numpy()
+    exp_lag = np.roll(exp_arr, 1)
+    strat_ret = (exp_lag * ret)[1:]
+    turnover = np.abs(np.diff(exp_arr))
+    cost = turnover * (cost_bps / 10000.0)
+    strat_ret = np.nan_to_num(strat_ret - cost, nan=0.0)
+    nav = np.cumprod(1 + strat_ret)
+    n = len(nav)
+    return {"nav": nav, "cagr": _cagr(nav, n), "ulcer": _ulcer(nav), "mdd": _mdd(nav),
+            "strat_ret": strat_ret}
+
+
+def fixed_weight_benchmark(regime: pd.DataFrame) -> float:
+    return float(regime["exposure"].mean())
+
+
 def _mk_row(**kw) -> pd.Series:
     base = {"gold_mom_3m": 0.0, "gold_mom_6m": 0.0, "gold_mom_12m": 0.0,
             "dxy_mom_3m": 0.0, "dxy_mom_6m": 0.0, "dxy_mom_12m": 0.0,
@@ -141,6 +163,29 @@ def self_test_regime_series():
     assert not monthly.loc[after_first, "exposure"].isna().any(), "첫 결정일 이후는 NaN이 없어야 함"
 
     _log("통과: build_regime_series weekly/monthly 배선 정상")
+
+
+def self_test_simulate():
+    idx = pd.bdate_range("2020-01-01", periods=500)
+    rng = np.random.default_rng(9)
+    gold_daily = pd.Series(100 * np.exp(np.cumsum(rng.normal(0.0003, 0.01, 500))), index=idx)
+
+    weekly_idx = pd.date_range(idx[0], idx[-1], freq="W-FRI")
+    always_on = pd.DataFrame({"exposure": 1.0, "verdict": "HOLD", "strength": None,
+                              "confidence": "normal", "unexplained": False}, index=weekly_idx)
+    sim_bh = simulate_exposure(gold_daily, always_on, 0.0)
+    raw_cagr = (gold_daily.iloc[-1] / gold_daily.iloc[0]) ** (252 / len(gold_daily)) - 1
+    assert abs(sim_bh["cagr"] - raw_cagr * 100) < 1.0, (sim_bh["cagr"], raw_cagr * 100)
+
+    half_off = always_on.copy()
+    half_off.loc[half_off.index[len(half_off) // 2:], "exposure"] = 0.5
+    sim_half = simulate_exposure(gold_daily, half_off, 5.0)
+    assert sim_half["ulcer"] < sim_bh["ulcer"], "노출을 줄인 구간이 있으면 Ulcer가 더 낮아야 함"
+
+    fw = fixed_weight_benchmark(half_off)
+    assert 0.5 < fw < 1.0, fw
+
+    _log("통과: simulate_exposure/fixed_weight_benchmark 배선 정상")
 
 
 def self_test():
@@ -184,6 +229,7 @@ def self_test():
 
     _log("통과: classify/target_exposure 4개 시나리오(ADD강/HOLD/설명안됨/REDUCE강) 정상")
     self_test_regime_series()
+    self_test_simulate()
 
 
 if __name__ == "__main__":
