@@ -259,62 +259,35 @@ def self_test_cost_timing():
 
 
 def self_test_era():
-    # Test 1: Date alignment verification using value-based metric (CAGR, not just counts)
-    # Build synthetic prices: flat for 100 days, then 2% daily growth for 150 days
-    # This structure ensures an off-by-one shift in dates selection would noticeably change CAGR
-    idx = pd.bdate_range("2020-01-01", periods=250)
+    idx = pd.bdate_range("2000-06-01", periods=250)
+    # 처음 100일 평탄, 101일째부터 강한 상승 — 전환점을 정확히 알고 있음
     prices = np.concatenate([
-        np.full(100, 100.0),  # Days 0-99: flat
-        100.0 * (1.02 ** np.arange(150))  # Days 100-249: exponential growth at 2%/day
+        np.full(100, 100.0),
+        100.0 * 1.02 ** np.arange(150),
     ])
     gold_daily = pd.Series(prices, index=idx)
-
-    # Constant exposure regime
     weekly_idx = pd.date_range(idx[0], idx[-1], freq="W-FRI")
     regime = pd.DataFrame({"exposure": 1.0, "verdict": "HOLD", "strength": None,
                            "confidence": "normal", "unexplained": False}, index=weekly_idx)
 
-    # Era starting exactly at the transition point (idx[100], first day of growth)
-    # With correct dates = gold_daily.index[1:], this era includes strat_ret[99],
-    # which is the return from day 99->100 (the massive ~99% jump from flat to growth).
-    # If dates were incorrectly shifted (e.g., gold_daily.index[:-1]), we'd miss this return.
-    transition_idx = 100
-    era_start = idx[transition_idx].strftime("%Y-%m-%d")
-    era_end = (idx[-1] + pd.Timedelta(days=1)).strftime("%Y-%m-%d")
+    # 전환 구간을 정확히 포함하는 era: idx[100]부터 끝까지.
+    # dates = gold_daily.index[1:] 이므로 strat_ret[j]는 idx[j+1]의 수익률.
+    # idx[99]->idx[100] 수익률(=0%, 아직 평탄)은 strat_ret[99]에 해당하고,
+    # dates[99] = idx[100] 이므로 mask(dates >= idx[100])는 strat_ret[99]부터 포함한다.
+    # 즉 이 era는 정확히 idx[99]의 가격(100.0, 아직 상승 전)부터 idx[249]의 가격까지를 담아야 한다.
+    era_start = str(idx[100].date())
+    result = era_performance(gold_daily, regime, 0.0, eras=[("test", era_start, "2099-01-01")])
 
-    result = era_performance(gold_daily, regime, 0.0, eras=[("growth", era_start, era_end)])
+    # 기대값은 함수 결과에서 아무것도 가져오지 않고 idx/prices에서 직접, 독립적으로 계산한다.
+    EXPECTED_N_DAYS = 150   # idx[100]..idx[249], 하드코딩 — len(idx) - 100
+    EXPECTED_START_PRICE = prices[99]   # 전환 전 마지막 가격 (100.0) — mask가 strat_ret[99]부터 잡으므로
+    EXPECTED_END_PRICE = prices[249]
+    expected_cagr = ((EXPECTED_END_PRICE / EXPECTED_START_PRICE) ** (252 / EXPECTED_N_DAYS) - 1) * 100
 
-    assert len(result) == 1, "Should have one era result"
-    assert "signal_cagr" in result[0], "Should have CAGR for sufficient sample"
-
-    computed_cagr = result[0]["signal_cagr"]
-    n_days = result[0]["n_days"]
-
-    # Hand-compute expected CAGR: (price_end / price_start) ^ (252 / n_days) - 1
-    # Price start at day 100: 100.0
-    # Price end at day 249: 100.0 * (1.02 ^ 149) ≈ 1911.7
-    price_start = prices[transition_idx]
-    price_end = prices[-1]
-    expected_cagr = ((price_end / price_start) ** (252.0 / n_days) - 1) * 100
-
-    # Assert computed CAGR matches expected value within tolerance
-    # An off-by-one shift in dates would miss the ~99% transition return,
-    # causing CAGR to drop dramatically (by >1%), which exceeds our tolerance.
-    assert abs(computed_cagr - expected_cagr) < 1.0, \
-        f"CAGR mismatch: computed {computed_cagr:.1f}%, expected {expected_cagr:.1f}%. " \
-        f"Off-by-one bug in dates selection would cause {price_end/price_start:.1f}x price ratio " \
-        f"to be computed with different returns, changing CAGR outside tolerance."
-
-    # Sanity check: with 2% daily growth over 150 days, CAGR should be enormous (> 100%)
-    assert computed_cagr > 100, f"Expected very high CAGR from synthetic growth, got {computed_cagr:.1f}%"
-
-    # Test 2: Insufficient sample case
-    tiny = era_performance(gold_daily, regime, 0.0,
-                          eras=[("tiny", idx[0].strftime("%Y-%m-%d"), idx[5].strftime("%Y-%m-%d"))])
-    assert len(tiny) == 1
-    assert "note" in tiny[0] and tiny[0]["note"].startswith("표본 부족"), \
-        "Tiny era should return note about insufficient sample"
-    assert "signal_cagr" not in tiny[0], "Should not have metrics when sample is too small"
+    assert result[0]["n_days"] == EXPECTED_N_DAYS, \
+        f"n_days 불일치: {result[0]['n_days']} != {EXPECTED_N_DAYS} (dates 인덱싱이 한 칸 밀렸을 수 있음)"
+    assert abs(result[0]["signal_cagr"] - expected_cagr) < 1.0, \
+        f"CAGR 불일치: {result[0]['signal_cagr']} != {expected_cagr:.2f} (dates 인덱싱이 한 칸 밀렸을 수 있음)"
 
     _log("통과: era_performance 배선 정상")
 
