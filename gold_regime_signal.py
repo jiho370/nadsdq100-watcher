@@ -142,7 +142,9 @@ def era_performance(gold_daily: pd.Series, regime: pd.DataFrame, cost_bps: float
     sim_fw = simulate_exposure(gold_daily, fw, cost_bps)
 
     dates = gold_daily.index[1:]
-    unexplained_daily = regime["unexplained"].reindex(gold_daily.index).ffill().fillna(False).to_numpy()[1:]
+    # Note: FutureWarning about downcasting is from pandas' reindex/ffill/fillna chain;
+    # this will be addressed in a future pandas version, no functional impact
+    unexplained_daily = regime["unexplained"].reindex(gold_daily.index).ffill().fillna(False).to_numpy()[1:].astype(bool)
 
     out = []
     for label, start, end in eras:
@@ -263,12 +265,29 @@ def self_test_era():
     weekly_idx = pd.date_range(idx[0], idx[-1], freq="W-FRI")
     regime = pd.DataFrame({"exposure": 1.0, "verdict": "HOLD", "strength": None,
                            "confidence": "normal", "unexplained": False}, index=weekly_idx)
-    result = era_performance(gold_daily, regime, 5.0, eras=[("전체구간", "2000-01-01", "2008-01-01")])
-    assert len(result) == 1
-    assert "signal_cagr" in result[0] and "note" not in result[0]
 
-    tiny = era_performance(gold_daily, regime, 5.0, eras=[("표본부족", "2000-06-01", "2000-06-05")])
-    assert tiny[0]["note"].startswith("표본 부족")
+    # Test 1: Date alignment verification with concrete n_days check
+    # Pick a known sub-range: days 50-200 (150 days, well above 20-day minimum)
+    # Independently compute how many dates from gold_daily.index[1:] fall in this range
+    start_date = idx[50]
+    end_date = idx[200]
+    dates_array = gold_daily.index[1:]  # This is what era_performance() uses internally
+    expected_n_days = int(((dates_array >= start_date) & (dates_array < end_date)).sum())
+    assert expected_n_days >= 20, "Test setup: need >= 20 days for this range"
+
+    era_range = [("alignment_test", start_date.strftime("%Y-%m-%d"), end_date.strftime("%Y-%m-%d"))]
+    result = era_performance(gold_daily, regime, 5.0, eras=era_range)
+    assert len(result) == 1
+    assert "signal_cagr" in result[0], "Should have metrics for sufficient sample"
+    assert result[0]["n_days"] == expected_n_days, \
+        f"Date alignment error: returned n_days={result[0]['n_days']}, expected {expected_n_days}"
+
+    # Test 2: Insufficient sample case
+    tiny = era_performance(gold_daily, regime, 5.0, eras=[("표본부족", idx[0].strftime("%Y-%m-%d"), idx[5].strftime("%Y-%m-%d"))])
+    assert len(tiny) == 1
+    assert "note" in tiny[0] and tiny[0]["note"].startswith("표본 부족"), \
+        "Tiny era should return note about insufficient sample"
+    assert "signal_cagr" not in tiny[0], "Should not have metrics when sample is too small"
 
     _log("통과: era_performance 배선 정상")
 
