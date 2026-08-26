@@ -89,18 +89,25 @@ def _ma(arr, w):
     return out
 
 
-def _stock_chart_png(closes, ticker, big=False):
-    """종가 + 이동평균선(20/50/200) 차트 PNG."""
+def _stock_chart_png(closes, ticker, big=False, display_days=None):
+    """종가 + 이동평균선(20/50/200) 차트 PNG. 이동평균은 closes 전체(표시구간보다 앞선
+    과거분 포함)로 계산한 뒤 최근 display_days만 잘라 그린다 — display_days만큼만 미리
+    잘라서 넘긴 배열로 계산하면 200일선이 표시구간의 마지막 극히 일부(표시일수-200)에만
+    나타나는 문제가 있었다(2026-08-27, 지호 님 지적: "200일선이 뒤쪽 100일 정도만 그려짐").
+    display_days=None이면 넘어온 closes 전체를 그대로 표시(하위호환)."""
     if not closes or len(closes) < 30:
         return None
-    x = range(len(closes))
+    mas = {w: _ma(closes, w) for w in (20, 50, 200)}
+    view = closes[-display_days:] if display_days else closes
+    off = len(closes) - len(view)
+    x = range(len(view))
     figsize = (7.6, 2.7) if big else (4.8, 2.4)
     dpi = 200 if big else 150
     fig, ax = plt.subplots(figsize=figsize, dpi=dpi)
-    ax.plot(x, closes, lw=1.6, color="#111827", label=_CLOSE_LABEL)
+    ax.plot(x, view, lw=1.6, color="#111827", label=_CLOSE_LABEL)
     for w, col in [(20, "#f59e0b"), (50, "#3b82f6"), (200, "#ef4444")]:
         if len(closes) >= w:
-            ax.plot(x, _ma(closes, w), lw=1.1, color=col, label=_MA_LABEL[w])
+            ax.plot(x, mas[w][off:], lw=1.1, color=col, label=_MA_LABEL[w])
     ax.set_title(ticker, fontsize=10, loc="left", color="#111827", fontweight="bold")
     ax.legend(fontsize=8 if big else 7, loc="upper left", frameon=False, ncol=4,
               handlelength=1.1, columnspacing=0.9, borderpad=0.1)
@@ -469,7 +476,7 @@ def run_kr(no_email: bool = False, force: bool = False):
         c = kr_by_sym.get(r.get("symbol"))
         if not c:
             continue
-        png = _stock_chart_png(c.get("closes") or [], c["name"])   # 국장은 차트 제목도 코드 없이 이름만
+        png = _stock_chart_png(c.get("closes") or [], c["name"], display_days=252)   # 국장은 차트 제목도 코드 없이 이름만
         if png:
             images.append((f"chart_{c['symbol']}", png))
         gap200 = ((c["price"] / c["ma200"] - 1) * 100) if (c.get("price") and c.get("ma200")) else None
@@ -599,7 +606,7 @@ def run_us(no_email: bool = False, force: bool = False):
     images, metrics = list(holdings_images), {}
     spy_closes = market.get("spy_closes") or []
     if spy_closes:
-        png = _stock_chart_png(spy_closes, "S&P 500 (SPY)", big=True)
+        png = _stock_chart_png(spy_closes, "S&P 500 (SPY)", big=True, display_days=252)
         if png:
             images.append(("spy_chart", png))
     by_sym = {c["symbol"]: c for c in candidates["candidates"]}
@@ -607,7 +614,7 @@ def run_us(no_email: bool = False, force: bool = False):
         c = by_sym.get(r.get("symbol"))
         if not c:
             continue
-        png = _stock_chart_png(c.get("closes") or [], r["symbol"])
+        png = _stock_chart_png(c.get("closes") or [], r["symbol"], display_days=252)
         if png:
             images.append((f"chart_{r['symbol']}", png))
         gap200 = ((c["price"] / c["ma200"] - 1) * 100) if (c.get("price") and c.get("ma200")) else None

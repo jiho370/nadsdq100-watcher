@@ -25,8 +25,12 @@ def _round(x, nd=2):
     return None if R._isnan(x) else round(float(x), nd)
 
 
-def _closes_tail(hist, sym, n=252):
-    """차트용 최근 종가 리스트(소수 2자리). 없으면 []"""
+def _closes_tail(hist, sym, n=452):
+    """차트용 최근 종가 리스트(소수 2자리). 없으면 [].
+    n=452(표시 252일 + 200일선 계산용 버퍼 200일) — daily_ai_report._stock_chart_png가
+    display_days=252로 최근 252일만 그리되 200일선은 그 이전 과거분까지 써서 계산하므로,
+    표시구간 전체에 200일선이 끊기지 않으려면 여기서 252일보다 더 넉넉히 남겨야 한다
+    (2026-08-27, 지호 님 지적 — "200일선이 뒤쪽 100일 정도만 그려짐")."""
     s = hist.get(sym)
     if s is None or len(s) == 0:
         return []
@@ -105,7 +109,7 @@ def build_market(data):
         "sectors_1w": sectors_1w,
         "top_gainers_1d": top_g, "top_losers_1d": top_l,
         "spy_closes": _closes_tail(data["hist"], "SPY") if "SPY" in data["hist"] else
-                      ([round(float(v), 2) for v in spy.dropna().tail(252).tolist()] if spy is not None else []),
+                      ([round(float(v), 2) for v in spy.dropna().tail(452).tolist()] if spy is not None else []),
     }
 
 

@@ -169,8 +169,11 @@ def select(yf) -> dict:
         c = d["closes"]
         price = c[-1]
         ma200 = MS._sma(c, 200); ma50 = MS._sma(c, 50); ma20 = MS._sma(c, 20)
+        # 차트용 종가는 표시구간(252일)보다 200일치 더 넉넉히 남긴다 — 200일선이 표시구간
+        # 끝까지 다 그려지려면 표시 시작일 이전에 200일치 과거분이 더 있어야 한다
+        # (2026-08-27, 지호 님 지적 — daily_ai_report._stock_chart_png의 display_days 참고).
         ind_map[t] = {"price": price, "ma200": ma200,
-                      "closes": c[-252:], "dates": d["dates"][-252:]}
+                      "closes": c[-452:], "dates": d["dates"][-452:]}
         # 2026-07-14: 200일선 진입 필터 폐지(§8 검증 — 추세필터 강제 시 밸류 전략 성과 훼손,
         # 미국 진입게이트 폐지와 동일 결론). 매도 측 200일선 -3% 백업은 holdings.py에 그대로.
         pbr, div = f.get("pbr"), f.get("div_yield")
@@ -186,7 +189,7 @@ def select(yf) -> dict:
             "high_52w": max(c[-252:]), "above_ma200": bool(ma200 and price > ma200),
             "ret": {"1w": MS._ret(c, 5), "1m": MS._ret(c, 21), "3m": MS._ret(c, 63),
                     "6m": MS._ret(c, 126), "1y": MS._ret(c, 252)},
-            "closes": [round(v, 0) for v in c[-252:]],
+            "closes": [round(v, 0) for v in c[-452:]],   # 차트용(위 ind_map과 동일 이유로 452일)
         }
     if not cands:
         _log("펀더멘탈 통과 종목 중 시세 확보된 종목 없음")
