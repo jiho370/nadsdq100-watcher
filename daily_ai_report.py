@@ -288,7 +288,14 @@ def _signal_images(signals, when=None):
     sig_cids, images = {}, []
     items = [a for a in signals.get("core", []) if not when or MS.when_matches(a.get("when"), when)]
     for a in items:
-        png = _stock_chart_png(a.get("closes") or [], _ASSET_EN_NAME.get(a.get("key"), a["name"]))
+        # chart_closes(3년 버퍼, market_signals.gather 참고)가 있으면 그걸로 그리되, 표시
+        # 기간은 원래 closes(2년) 길이만큼만 — 그래야 보이는 기간은 그대로고 200일선만
+        # 끊김없이 채워진다(2026-08-27, 지호 님 지적). chart_closes 없으면(구버전 캐시 등)
+        # 예전처럼 closes 그대로 표시.
+        base_closes = a.get("closes") or []
+        chart_closes = a.get("chart_closes") or base_closes
+        png = _stock_chart_png(chart_closes, _ASSET_EN_NAME.get(a.get("key"), a["name"]),
+                               display_days=len(base_closes) or None)
         if png:
             cid = f"sig_{a['key']}"
             images.append((cid, png)); sig_cids[a["key"]] = cid

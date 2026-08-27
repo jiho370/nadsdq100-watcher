@@ -195,9 +195,9 @@ def analyze(closes: list, kind: str) -> dict:
 
 
 # ------------------------- 데이터 수집 -------------------------
-def fetch_closes(yf, tickers: list[str]) -> dict:
-    """야후에서 2년 일봉 종가. {ticker: {'closes': [...], 'dates': [...]}}"""
-    df = yf.download(tickers, period="2y", interval="1d",
+def fetch_closes(yf, tickers: list[str], period: str = "2y") -> dict:
+    """야후에서 일봉 종가(기본 2년). {ticker: {'closes': [...], 'dates': [...]}}"""
+    df = yf.download(tickers, period=period, interval="1d",
                      auto_adjust=True, progress=False, threads=True)
     close = df["Close"] if "Close" in getattr(df, "columns", []) else df
     out = {}
@@ -216,13 +216,24 @@ def gather(yf) -> dict:
     """핵심 자산 신호(when 태그 포함) + 세계시장 요약 데이터."""
     tickers = [t for _, _, t, _, _ in CORE_ASSETS] + [t for _, _, t in WORLD_ASSETS]
     raw = fetch_closes(yf, tickers)
+    # 차트 전용 추가 버퍼(3년) — analyze()에 넘기는 raw(2년)는 그대로 두고 차트에서만
+    # 더 긴 과거분을 써서 200일선이 표시구간(2년) 전체에 끊김없이 나오게 한다(2026-08-27,
+    # 지호 님 지적 — "200일선이 표시구간 앞부분에서 끊김"). analyze()의 입력을 안 건드리므로
+    # 실거래 매수/매도 신호 계산엔 영향 없다. 실패해도 raw의 closes로 조용히 폴백.
+    core_tickers = [t for _, _, t, _, _ in CORE_ASSETS]
+    try:
+        chart_raw = fetch_closes(yf, core_tickers, period="3y")
+    except Exception:
+        chart_raw = {}
     core, world = [], []
     for key, name, tic, kind, when in CORE_ASSETS:
         d = raw.get(tic)
         if not d:
             continue
+        chart_d = chart_raw.get(tic) or d
         core.append({"key": key, "name": name, "ticker": tic, "kind": kind, "when": when,
                      "as_of": d["dates"][-1], "closes": d["closes"], "dates": d["dates"],
+                     "chart_closes": chart_d["closes"],
                      **analyze(d["closes"], kind)})
     for key, name, tic in WORLD_ASSETS:
         d = raw.get(tic)
