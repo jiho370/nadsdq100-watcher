@@ -6585,3 +6585,40 @@ git : error: cannot pull with rebase: You have unstaged changes.
  
 error: Please commit or stash them.
 2026-08-27 20:29:06 [us] [寃쎄퀬] 而ㅻ컠 吏곸쟾 ??pull ?ㅽ뙣 ???묒뾽?몃━媛 ?ъ쟾??dirty?섍굅??異⑸룎. ?꾨옒 push???ㅽ뙣 媛??
+[main 15da6bb] chore: pregen us ?????嚥≪뮄??[skip ci]
+ 1 file changed, 37 insertions(+)
+git : To https://github.com/jiho370/nadsdq100-watcher.git
+위치 C:\Users\JH\Documents\GitHub\stock\run_pregen.ps1:56 문자:9
++         git push 2>&1 | Out-File -Append -Encoding utf8 $log
++         ~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (To https://gith...100-watcher.git:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+   87980a3..15da6bb  main -> main
+python : [정보] SPY 보유종목 503개 로드
+위치 C:\Users\JH\Documents\GitHub\stock\run_pregen.ps1:95 문자:5
++     python pregen.py --$Mode 2>&1 | Out-File -Append -Encoding utf8 $ ...
++     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: ([정보] SPY 보유종목 503개 로드:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+[섹터] 위키에서 503종목 GICS 섹터 확보 (Sub-Industry 503종목)
+[탐욕지수] 55 (탐욕)
+[프로필] 503종목 로드 (생성 2026-06-20)
+C:\Users\JH\Documents\GitHub\stock\tech_factors.py:26: FutureWarning: The default fill_method='pad' in DataFrame.pct_ch
+ange is deprecated and will be removed in a future version. Either fill in any non-leading NA values prior to calling p
+ct_change or specify 'fill_method=None' to not fill NA values.
+  mret = panel.pct_change()
+[REPORT] 검증 1차 실패(RuntimeError) → 웹검색 없이 재시도
+[REPORT] 검증 실패(RuntimeError: claude CLI rc=1: Not logged in · Please run /login)
+[PREGEN] 검증 실패 \u2014 파일 미생성(오후에 API 폴백)
+2026-08-27 20:46:37 [us] ?ㅽ뙣(rc=1, ?쒕룄 22?뚯㎏) ??15遺????ъ떆?? 吏湲덇퉴吏 濡쒓렇留??곗꽑 而ㅻ컠.
+git : error: cannot pull with rebase: You have unstaged changes.
+위치 C:\Users\JH\Documents\GitHub\stock\run_pregen.ps1:44 문자:5
++     git pull --rebase 2>&1 | Out-File -Append -Encoding utf8 $log
++     ~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (error: cannot p...staged changes.:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+error: Please commit or stash them.
+2026-08-27 20:46:38 [us] [寃쎄퀬] 而ㅻ컠 吏곸쟾 ??pull ?ㅽ뙣 ???묒뾽?몃━媛 ?ъ쟾??dirty?섍굅??異⑸룎. ?꾨옒 push???ㅽ뙣 媛??
