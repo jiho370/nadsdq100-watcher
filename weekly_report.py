@@ -639,6 +639,8 @@ def render_html(ctx, d, verdict_html=""):
         f'max-width:700px;margin:0 auto;color:#111">'
         f'<h2 style="margin:6px 0">📊 주간 자산배분 리포트 '
         f'<span style="color:#9ca3af;font-size:12px">({_esc(ctx["as_of"])} 기준)</span></h2>'
+        f'<div style="font-size:11px;color:#9ca3af;margin:-4px 0 8px">⏳ 확인 시각 '
+        f'{dt.datetime.now(R.KST).strftime("%Y-%m-%d %H:%M")} KST</div>'
         f'<div style="background:#f8fafc;border-left:3px solid #6b7280;padding:8px 12px;font-size:13px;'
         f'line-height:1.6;margin:8px 0"><b>🧭 이번 주</b> {_esc(d.get("overview"))}<br>'
         f'<div style="margin-top:6px"><b>🎯 대응 후보</b> {_strategy_html(ctx)}</div></div>'

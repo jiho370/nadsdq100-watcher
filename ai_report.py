@@ -29,6 +29,9 @@ ai_report.py — 2단계(검증→서술) AI 리포트 생성기. 비용 최소�
 """
 from __future__ import annotations
 import os, sys, json, shutil, subprocess
+from datetime import datetime, timezone, timedelta
+
+_KST = timezone(timedelta(hours=9))
 
 try:
     import anthropic
@@ -1130,6 +1133,12 @@ def render_report_html(report, as_of="", metrics_by_sym=None, market_html="", si
             + (f'<h3 style="margin:18px 0 2px">&#128064; 미국 관찰 · 내려오면 매수 <span style="color:#9ca3af;font-size:12px">'
                f'(좋은 종목이나 지금은 조정 중 · AI 강등 포함)</span></h3>{watch_cards}' if watch_cards else ""))
     head = _esc(title) if title else "&#128200; 데일리 시장 점검 · 매수·매도 후보"
+    # 2026-08-27(지호 님 요청 — "체크한 시간도 나오게"): 실제 이 리포트가 생성된(=데이터를
+    # 확인한) 시각을 KST로 표시. 최근 GitHub Actions의 schedule 트리거가 몇 시간씩 지연되는
+    # 사고가 반복돼(§워치독 참고), 발송 예정 시각과 실제 생성 시각이 크게 벌어질 수 있다 —
+    # 이 줄로 그 지연을 메일만 보고도 바로 알 수 있게 한다.
+    checked_html = (f'<div style="font-size:11px;color:#9ca3af;margin:-4px 0 8px">'
+                    f'&#8987; 확인 시각 {datetime.now(_KST).strftime("%Y-%m-%d %H:%M")} KST</div>')
     # 2026-07-15: 차트+추천종목을 지수·코인 추세 신호보다 위로(지호 님 요청) — KR 전용 호출은
     # spy/us_sec가 원래 빈 문자열이라 이 순서 변경으로 KR 레이아웃엔 영향 없음.
     # 2026-07-19: AI 제외 후보도 지수·코인 추세보다 위로, 추천종목 바로 아래로(지호 님 요청).
@@ -1137,6 +1146,7 @@ def render_report_html(report, as_of="", metrics_by_sym=None, market_html="", si
         f'<div style="font-family:-apple-system,BlinkMacSystemFont,\'Segoe UI\',\'Malgun Gothic\',sans-serif;'
         f'max-width:700px;margin:0 auto;color:#111">'
         f'<h2 style="margin:6px 0">{head}{sub}</h2>'
+        f'{checked_html}'
         f'{banner_html}'
         f'{expectancy_html}'
         f'<div style="background:#f8fafc;border-left:3px solid #6b7280;padding:8px 12px;font-size:13px;'

@@ -674,6 +674,8 @@ def run_coin(no_email: bool = False, force: bool = False):
         'max-width:700px;margin:0 auto;color:#111">'
         f'<h2 style="margin:6px 0">&#129689; 주말 코인 시그널 · BTC·ETH '
         f'<span style="color:#9ca3af;font-size:12px">({today_kst} 기준)</span></h2>'
+        f'<div style="font-size:11px;color:#9ca3af;margin:-4px 0 8px">&#8987; 확인 시각 '
+        f'{_dt.datetime.now(R.KST).strftime("%Y-%m-%d %H:%M")} KST</div>'
         '<div style="font-size:12px;color:#374151;background:#f8fafc;border-radius:6px;'
         'padding:6px 9px;margin:2px 0 10px;line-height:1.5">비트코인·이더리움은 24/7 거래돼 '
         '화~토 미국장 메일 사이(토요일 낮~월요일)에도 레짐이 바뀔 수 있습니다. 이 메일은 '
