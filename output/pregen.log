@@ -9374,3 +9374,96 @@ git : error: cannot pull with rebase: You have unstaged changes.
  
 error: Please commit or stash them.
 2026-08-30 16:32:21 [kr] [寃쎄퀬] 而ㅻ컠 吏곸쟾 ??pull ?ㅽ뙣 ???묒뾽?몃━媛 ?ъ쟾??dirty?섍굅??異⑸룎. ?꾨옒 push???ㅽ뙣 媛??
+[main 6d12a26] chore: pregen kr ?????嚥≪뮄??[skip ci]
+ 1 file changed, 43 insertions(+)
+git : To https://github.com/jiho370/nadsdq100-watcher.git
+위치 C:\Users\JH\Documents\GitHub\stock\run_pregen.ps1:56 문자:9
++         git push 2>&1 | Out-File -Append -Encoding utf8 $log
++         ~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (To https://gith...100-watcher.git:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+ ! [rejected]        main -> main (fetch first)
+error: failed to push some refs to 'https://github.com/jiho370/nadsdq100-watcher.git'
+hint: Updates were rejected because the remote contains work that you do not
+hint: have locally. This is usually caused by another repository pushing to
+hint: the same ref. If you want to integrate the remote changes, use
+hint: 'git pull' before pushing again.
+hint: See the 'Note about fast-forwards' in 'git push --help' for details.
+2026-08-30 16:32:22 [kr] [寃쎄퀬] git push ?ㅽ뙣 ??蹂댄넻 濡쒖뺄??origin蹂대떎 ?ㅼ쿂???덉쓣 ??諛쒖깮. ??pull 寃쎄퀬 李멸퀬.
+2026-08-31 12:37:00 [us] === pregen ?쒖옉(?ъ떆??猷⑦봽, 理쒕? 15?쒓컙) ===
+git : error: cannot pull with rebase: You have unstaged changes.
+위치 C:\Users\JH\Documents\GitHub\stock\run_pregen.ps1:77 문자:1
++ git pull --rebase 2>&1 | Tee-Object -Variable pullOutput | Out-Null
++ ~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (error: cannot p...staged changes.:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+error: Please commit or stash them.
+2026-08-31 12:37:00 [us] [寃쎄퀬] git pull ?ㅽ뙣 ??濡쒖뺄??而ㅻ컠 ????蹂寃쎌씠 ?덉쑝硫??ш린??留됲옒. ?꾨옒 ?ъ떆?꾩뿉?쒕룄 怨꾩냽 ?ㅽ뙣?????덉쓬.
+2026-08-31 12:37:00 [us]         ?닿껐: ??μ냼 ?대뜑?먯꽌 'git add -A; git commit -m sync; git push' ??踰??섎룞 ?ㅽ뻾.
+python : [경고] SPY xlsx 파싱 실패: HTTPSConnectionPool(host='www.ssga.com', port=443): Max retries exceeded with url: /us/en
+/intermediary/etfs/library-content/products/fund-data/etfs/us/holdings-daily-us-en-spy.xlsx (Caused by NameResolutionEr
+ror("HTTPSConnection(host='www.ssga.com', port=443): Failed to resolve 'www.ssga.com' ([Errno 11001] getaddrinfo failed
+)"))
+위치 C:\Users\JH\Documents\GitHub\stock\run_pregen.ps1:95 문자:5
++     python pregen.py --$Mode 2>&1 | Out-File -Append -Encoding utf8 $ ...
++     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: ([경고] SPY xlsx 파...info failed)")):String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+[경고] SPY 보유종목 로드 실패 → 내장 스냅샷으로 폴백
+[섹터] 위키 requests+read_html 실패: HTTPSConnectionPool(host='en.wikipedia.org', port=443): Max retries exceeded with url: /
+wiki/List_of_S%26P_500_companies (Caused by NameResolutionError("HTTPSConnection(host='en.wikipedia.org', port=443): Fa
+iled to resolve 'en.wikipedia.org' ([Errno 11001] getaddrinfo failed)"))
+[섹터] 위키 read_html(url) 실패: <urlopen error [Errno 11001] getaddrinfo failed>
+[섹터] 위키 정규식 파싱 실패: HTTPSConnectionPool(host='en.wikipedia.org', port=443): Max retries exceeded with url: /wiki/List_of
+_S%26P_500_companies (Caused by NameResolutionError("HTTPSConnection(host='en.wikipedia.org', port=443): Failed to reso
+lve 'en.wikipedia.org' ([Errno 11001] getaddrinfo failed)"))
+$AAPL: possibly delisted; no price data found  (period=5y)
+
+1 Failed download:
+['AAPL']: possibly delisted; no price data found  (period=5y)
+$AAPL: possibly delisted; no price data found  (period=5y)
+$SPY: possibly delisted; no price data found  (period=5y)
+
+1 Failed download:
+['SPY']: possibly delisted; no price data found  (period=5y)
+$SPY: possibly delisted; no price data found  (period=5y)
+[탐욕지수] https://production.dataviz.cnn.io/index/fearandgreed/graphdata → 오류 ConnectionError: HTTPSConnectionPool(host='p
+roduction.dataviz.cnn.io', port=443): Max retries exceeded with url: /ind
+[탐욕지수] https://production.dataviz.cnn.io/index/fearandgreed/graphdata/2026-08-31 → 오류 ConnectionError: HTTPSConnectionP
+ool(host='production.dataviz.cnn.io', port=443): Max retries exceeded with url: /ind
+[탐욕지수] 확보 실패 \u2014 메일엔 '탐욕지수 확보 실패'로 표시(다른 기능 정상)
+[프로필] 503종목 로드 (생성 2026-06-20)
+Traceback (most recent call last):
+  File "C:\Users\JH\Documents\GitHub\stock\pregen.py", line 247, in <module>
+    raise SystemExit(_EXIT_CODE[run_us()])
+                                ^^^^^^^^
+  File "C:\Users\JH\Documents\GitHub\stock\pregen.py", line 208, in run_us
+    scored, info, _m = E.select_pool(data, int(os.environ.get("REPORT_MAX_CANDIDATES", "60")))
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\JH\Documents\GitHub\stock\export_data.py", line 356, in select_pool
+    scored = select_by_weights(w, data["ind_map"], n, funds=funds, cross=cross,
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\JH\Documents\GitHub\stock\export_data.py", line 277, in select_by_weights
+    valid = df["mom6"].notna() | df["mom12_1"].notna()   # 모멘텀 결측 종목 제외
+            ~~^^^^^^^^
+  File "C:\Users\JH\AppData\Local\Programs\Python\Python312\Lib\site-packages\pandas\core\frame.py", line 4113, in __ge
+titem__
+    indexer = self.columns.get_loc(key)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\JH\AppData\Local\Programs\Python\Python312\Lib\site-packages\pandas\core\indexes\range.py", line 417, 
+in get_loc
+    raise KeyError(key)
+KeyError: 'mom6'
+2026-08-31 14:42:13 [us] ?ㅽ뙣(rc=1, ?쒕룄 1?뚯㎏) ??15遺????ъ떆?? 吏湲덇퉴吏 濡쒓렇留??곗꽑 而ㅻ컠.
+git : error: cannot pull with rebase: You have unstaged changes.
+위치 C:\Users\JH\Documents\GitHub\stock\run_pregen.ps1:44 문자:5
++     git pull --rebase 2>&1 | Out-File -Append -Encoding utf8 $log
++     ~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (error: cannot p...staged changes.:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+error: Please commit or stash them.
+2026-08-31 14:42:14 [us] [寃쎄퀬] 而ㅻ컠 吏곸쟾 ??pull ?ㅽ뙣 ???묒뾽?몃━媛 ?ъ쟾??dirty?섍굅??異⑸룎. ?꾨옒 push???ㅽ뙣 媛??
