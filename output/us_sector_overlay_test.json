@@ -1,0 +1,39 @@
+{
+  "n_quarters": 34,
+  "BASE": {
+    "n": 34,
+    "mean_excess_6m_pct": 6.93,
+    "std_pct": 8.19,
+    "hit_rate_pct": 73.5
+  },
+  "IT_IND": {
+    "n": 34,
+    "mean_excess_6m_pct": 7.36,
+    "std_pct": 8.71,
+    "hit_rate_pct": 76.5
+  },
+  "EX_FIN": {
+    "n": 34,
+    "mean_excess_6m_pct": 6.93,
+    "std_pct": 8.19,
+    "hit_rate_pct": 73.5
+  },
+  "paired_vs_base": [
+    {
+      "label": "IT_IND",
+      "paired_diff_6m_pct": 0.43,
+      "paired_tstat": 0.41,
+      "significant_p05": false
+    },
+    {
+      "label": "EX_FIN",
+      "paired_diff_6m_pct": 0.0,
+      "paired_tstat": 0.0,
+      "significant_p05": false
+    }
+  ],
+  "pbo": 0.7424,
+  "dsr": 0.9998,
+  "passed": false,
+  "note": "top8·섹터캡2 라이브와 동일 조건, 왕복비용 10bp 근사 반영. (미상) 16종목은 실제 섹터로 재분류 적용."
+}
