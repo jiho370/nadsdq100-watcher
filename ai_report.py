@@ -1025,11 +1025,18 @@ def holdings_table_html(summary: list, krw: bool = False, chart_cid: str | None 
     if not summary:
         return ""
     name_map = name_map or {}
+    def _dod_cell(v):
+        if v is None:
+            return '<td style="padding:3px 8px;color:#9ca3af">-</td>'
+        c = "#15803d" if v >= 0 else "#b91c1c"
+        return f'<td style="padding:3px 8px;color:{c}">{v:+.1f}%</td>'
+
     rows = "".join(
         f'<tr><td style="padding:3px 8px">{_esc(name_map.get(r["symbol"], r["symbol"]))}</td>'
         f'<td style="padding:3px 8px;color:#6b7280">{_esc(r.get("since"))}</td>'
         f'<td style="padding:3px 8px">{EP._fmt(r.get("entry"), krw)}</td>'
         f'<td style="padding:3px 8px">{EP._fmt(r.get("price"), krw)}</td>'
+        f'{_dod_cell(r.get("dod_pct"))}'
         f'<td style="padding:3px 8px;font-weight:700;color:{"#15803d" if r["ret_pct"] >= 0 else "#b91c1c"}">'
         f'{r["ret_pct"]:+.1f}%</td>'
         f'<td style="padding:3px 8px;color:#6b7280">{r.get("held_days") if r.get("held_days") is not None else "-"}일</td></tr>'
@@ -1045,6 +1052,14 @@ def holdings_table_html(summary: list, krw: bool = False, chart_cid: str | None 
             f'<b style="color:{sc}">{totals["strategy"]:+.1f}%</b>'
             f' <span style="color:#9ca3af">vs</span> {_esc(totals["index_name"])}(동일시점·동일금액) '
             f'<b style="color:{bc}">{totals["bench"]:+.1f}%</b></div>')
+        if totals.get("dod_strategy") is not None:
+            dsc = "#15803d" if totals["dod_strategy"] >= 0 else "#b91c1c"
+            dbc = "#15803d" if totals["dod_bench"] >= 0 else "#b91c1c"
+            totals_html += (
+                f'<div style="font-size:12px;margin:0 0 2px;color:#6b7280">전일대비(포트폴리오 전체) '
+                f'<b style="color:{dsc}">{totals["dod_strategy"]:+.1f}%p</b>'
+                f' <span style="color:#9ca3af">vs</span> {_esc(totals["index_name"])} '
+                f'<b style="color:{dbc}">{totals["dod_bench"]:+.1f}%p</b></div>')
     if realized:
         rc = "#15803d" if realized["avg_pct"] >= 0 else "#b91c1c"
         totals_html += (
@@ -1055,7 +1070,8 @@ def holdings_table_html(summary: list, krw: bool = False, chart_cid: str | None 
         '<table role="presentation" style="border-collapse:collapse;font-size:12px;width:100%;max-width:640px">'
         '<tr style="color:#6b7280;text-align:left"><th style="padding:3px 8px">종목</th>'
         '<th style="padding:3px 8px">매수일</th><th style="padding:3px 8px">진입가</th>'
-        '<th style="padding:3px 8px">현재가</th><th style="padding:3px 8px">수익률</th>'
+        '<th style="padding:3px 8px">현재가</th><th style="padding:3px 8px">전일대비</th>'
+        '<th style="padding:3px 8px">수익률</th>'
         '<th style="padding:3px 8px">보유일</th></tr>' + rows + '</table>' + chart)
 
 

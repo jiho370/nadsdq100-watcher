@@ -141,13 +141,29 @@ def _holdings_compare_chart_png(series: dict, index_name: str, extra_line: dict 
     bench = [v if v is not None else np.nan for v in series["bench"]]
     x = np.arange(len(dates))
     fig, ax = plt.subplots(figsize=(7.6, 3.0), dpi=150)
+
+    # 2026-09-02(지호 님 요청 — "그래프에 수치도 보여주고"): 각 선의 마지막(=오늘) 값을
+    # 숫자로 직접 표시 — 그래프만 보고 대략 짐작하지 않도록.
+    def _label_last(vals, color):
+        arr = np.asarray(vals, dtype=float)
+        idx = np.where(~np.isnan(arr))[0]
+        if len(idx) == 0:
+            return
+        i = idx[-1]
+        ax.annotate(f"{arr[i]:+.1f}%", (i, arr[i]), xytext=(4, 0), textcoords="offset points",
+                    fontsize=8, fontweight="bold", color=color, va="center")
+
     ax.plot(x, bench, lw=1.4, color="#9ca3af", label=f"{index_name} {_BENCH_SUFFIX}")
+    _label_last(bench, "#6b7280")
     if extra_line and extra_line.get("values"):
         ax.plot(x, extra_line["values"], lw=1.4, color="#93c5fd", label=extra_line["label"])
+        _label_last(extra_line["values"], "#60a5fa")
     ax.plot(x, port, lw=1.8, color="#2563eb", label=_PORT_LABEL)
+    _label_last(port, "#2563eb")
     if blend_line and blend_line.get("values"):
         ax.plot(x, blend_line["values"], lw=1.1, color="#cbd5e1", linestyle=(0, (4, 2)), label=blend_line["label"])
     ax.axhline(0, color="#111827", lw=0.8)
+    ax.margins(x=0.06)  # 오른쪽 끝 라벨이 잘리지 않게 여백 확보
     # 2026-07-28(지호 님 지적 — "날짜 공백이 너무 많다, 거래일 다 있어야지"): 예전엔
     # np.linspace로 최대 6개 라벨만 골라 보여줘서 실제 거래일 데이터는 다 있는데 라벨만
     # 듬성듬성했다. 거래일(주말 제외) 전부를 라벨로 표시 — 겹침 방지로 45도 회전 + 작은 폰트.
@@ -186,6 +202,12 @@ def _holdings_section(hstate, ind_map, price_map, bench_dates, bench_closes, ind
     summary = H.live_summary(hstate, ind_map)
     if not summary:
         return "", []
+    # 2026-09-02(지호 님 요청 — "전일대비 수익률도, 종목별로 그리고 전체"): price_map의
+    # 최근 두 종가로 종목별 전일대비 등락률을 붙인다(진입일 이후 총수익률인 ret_pct와는
+    # 별개 지표).
+    for r in summary:
+        closes = (price_map.get(r["symbol"]) or {}).get("closes") or []
+        r["dod_pct"] = (closes[-1] / closes[-2] - 1) * 100 if len(closes) >= 2 and closes[-2] else None
     series = H.portfolio_series(summary, price_map, bench_dates, bench_closes)
     images, chart_cid, totals = [], None, None
     if series:
@@ -220,6 +242,11 @@ def _holdings_section(hstate, ind_map, price_map, bench_dates, bench_closes, ind
         lb = [v for v in series["bench"] if v is not None]
         if lp and lb:
             totals = {"strategy": lp[-1], "bench": lb[-1], "index_name": index_name}
+            # 전체(포트폴리오) 전일대비 — 누적수익률 시계열의 마지막 두 값 차이로 근사
+            # (2026-09-02, 지호 님 요청). 개별 종목의 dod_pct와는 별개 지표.
+            if len(lp) >= 2 and len(lb) >= 2:
+                totals["dod_strategy"] = lp[-1] - lp[-2]
+                totals["dod_bench"] = lb[-1] - lb[-2]
     else:
         since_min = min((r.get("since") for r in summary if r.get("since")), default=None)
         print(f"[경고] {index_name} 보유현황 그래프 생략(series 없음) — "
