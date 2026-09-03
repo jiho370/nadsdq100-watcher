@@ -164,12 +164,17 @@ def _holdings_compare_chart_png(series: dict, index_name: str, extra_line: dict 
         ax.plot(x, blend_line["values"], lw=1.1, color="#cbd5e1", linestyle=(0, (4, 2)), label=blend_line["label"])
     ax.axhline(0, color="#111827", lw=0.8)
     ax.margins(x=0.06)  # 오른쪽 끝 라벨이 잘리지 않게 여백 확보
-    # 2026-07-28(지호 님 지적 — "날짜 공백이 너무 많다, 거래일 다 있어야지"): 예전엔
-    # np.linspace로 최대 6개 라벨만 골라 보여줘서 실제 거래일 데이터는 다 있는데 라벨만
-    # 듬성듬성했다. 거래일(주말 제외) 전부를 라벨로 표시 — 겹침 방지로 45도 회전 + 작은 폰트.
-    ticks = np.arange(len(dates))
-    ax.set_xticks(ticks)
-    ax.set_xticklabels([dates[i][5:] for i in ticks], fontsize=6, rotation=45, ha="right")
+    # 2026-07-28: 거래일 전부를 라벨로 표시하도록 바꿨었으나, 날짜가 많아지니(한 달+) 라벨이
+    # 다닥다닥 붙어 오히려 안 읽힘 — 2026-09-02(지호 님 재지적 — "가독성 높이는 방향으로")
+    # 최대 10개 정도로 다시 솎아낸다. 선 자체는 여전히 거래일 전부(x=np.arange(len(dates)))를
+    # 그대로 잇는다 — 라벨만 줄었을 뿐 데이터 촘촘함은 그대로.
+    max_labels = 10
+    if len(dates) > max_labels:
+        idx = sorted(set(np.linspace(0, len(dates) - 1, max_labels).round().astype(int)))
+    else:
+        idx = list(range(len(dates)))
+    ax.set_xticks(idx)
+    ax.set_xticklabels([dates[i][5:] for i in idx], fontsize=7, rotation=30, ha="right")
     ax.set_ylabel(_CUM_RET_LABEL, fontsize=9)
     ax.legend(fontsize=8, frameon=False, loc="upper left")
     ax.grid(True, axis="y", alpha=0.15, lw=0.5)
