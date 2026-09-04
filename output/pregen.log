@@ -10595,3 +10595,50 @@ git : error: cannot pull with rebase: You have unstaged changes.
  
 error: Please commit or stash them.
 2026-09-04 08:54:19 [us] [寃쎄퀬] 而ㅻ컠 吏곸쟾 ??pull ?ㅽ뙣 ???묒뾽?몃━媛 ?ъ쟾??dirty?섍굅??異⑸룎. ?꾨옒 push???ㅽ뙣 媛??
+[main ef3a70f] chore: pregen us [skip ci]
+ 2 files changed, 228 insertions(+), 173 deletions(-)
+git : To https://github.com/jiho370/nadsdq100-watcher.git
+위치 C:\Users\JH\Documents\GitHub\stock\run_pregen.ps1:56 문자:9
++         git push 2>&1 | Out-File -Append -Encoding utf8 $log
++         ~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (To https://gith...100-watcher.git:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+   0829660..ef3a70f  main -> main
+2026-09-04 08:54:22 [us] === pregen ?꾨즺 ===
+2026-09-05 01:11:24 [kr] === pregen ?쒖옉(?ъ떆??猷⑦봽, 理쒕? 18?쒓컙) ===
+git : error: cannot pull with rebase: You have unstaged changes.
+위치 C:\Users\JH\Documents\GitHub\stock\run_pregen.ps1:77 문자:1
++ git pull --rebase 2>&1 | Tee-Object -Variable pullOutput | Out-Null
++ ~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (error: cannot p...staged changes.:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+error: Please commit or stash them.
+2026-09-05 01:11:24 [kr] [寃쎄퀬] git pull ?ㅽ뙣 ??濡쒖뺄??而ㅻ컠 ????蹂寃쎌씠 ?덉쑝硫??ш린??留됲옒. ?꾨옒 ?ъ떆?꾩뿉?쒕룄 怨꾩냽 ?ㅽ뙣?????덉쓬.
+2026-09-05 01:11:24 [kr]         ?닿껐: ??μ냼 ?대뜑?먯꽌 'git add -A; git commit -m sync; git push' ??踰??섎룞 ?ㅽ뻾.
+python : [KR] 펀더멘탈 통과 170/201종목 (EPS>0·ROE>0)
+위치 C:\Users\JH\Documents\GitHub\stock\run_pregen.ps1:95 문자:5
++     python pregen.py --$Mode 2>&1 | Out-File -Append -Encoding utf8 $ ...
++     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: ([KR] 펀더멘탈 통과 170/201종목 (EPS>0·ROE>0):String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+[KR] AI 검증 풀 8(최종 채택은 AI 검증 후 상위 5명) · 관찰 0 (후보 170)
+[PREGEN] 서술 사전생성 5종목
+[PREGEN] 저장: output/pregen_kr.json (대상일 2026-09-05 · 종목 9 · 서술캐시 5건)
+KRX 로그인 시도...
+  로그인 ID: jiho370
+KRX 로그인 완료.
+  로그인 시간: 2026-09-05 01:11:41
+  만료 시간: 2026-09-05 02:11:41
+2026-09-05 01:17:31 [kr] ?깃났(?먮뒗 ?대? ?꾨즺) ???ъ떆??猷⑦봽 醫낅즺(?쒕룄 1?뚯㎏)
+git : error: cannot pull with rebase: You have unstaged changes.
+위치 C:\Users\JH\Documents\GitHub\stock\run_pregen.ps1:44 문자:5
++     git pull --rebase 2>&1 | Out-File -Append -Encoding utf8 $log
++     ~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (error: cannot p...staged changes.:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+error: Please commit or stash them.
+2026-09-05 01:17:32 [kr] [寃쎄퀬] 而ㅻ컠 吏곸쟾 ??pull ?ㅽ뙣 ???묒뾽?몃━媛 ?ъ쟾??dirty?섍굅??異⑸룎. ?꾨옒 push???ㅽ뙣 媛??
