@@ -349,7 +349,7 @@ def _attach_headlines(cands, suffix=""):
         print(f"[정보] 뉴스 헤드라인 수집 생략({e})", file=sys.stderr)
 
 
-def _preview_and_send(html, images, subject, out_name, no_email, sent_update):
+def _preview_and_send(html, images, subject, out_name, no_email, sent_update, guard_key=None):
     os.makedirs("output", exist_ok=True)
     import base64
     prev = html
@@ -359,6 +359,22 @@ def _preview_and_send(html, images, subject, out_name, no_email, sent_update):
         f.write(prev)
     print(f"[정보] 미리보기 output/{out_name}", file=sys.stderr)
     if not no_email:
+        # 2026-09-04(지호 님 지적 — "미장 메일이 두 번 온다"): GitHub Actions 실행 두 개가
+        # 몇 초 간격으로 겹쳐 뜨면(PC 보조 트리거+GitHub 자체 스케줄 등 서로 다른 트리거가
+        # 근접한 시각에 겹칠 때 발생 확인됨), 둘 다 실행 시작 시점의 낡은 last_sent.json을
+        # 리포트 생성 내내(1~2분) 들고 있다가 서로의 발송 여부를 모른 채 둘 다 보내버렸다
+        # (실측: A가 15:09:06 발송·기록 push 완료 후, B가 그 사실을 모른 채 15:11:11에 또
+        # 발송). 보내기 직전에 git pull로 최신 상태를 한 번 더 받아 재확인하면, 먼저 보낸
+        # 쪽의 기록이 이미 반영된 뒤이므로 늦게 온 쪽은 여기서 걸러진다.
+        if guard_key:
+            import subprocess
+            try:
+                subprocess.run(["git", "pull", "--quiet"], timeout=30, check=False)
+            except Exception:
+                pass
+            if _load_last_sent().get(guard_key) == sent_update.get(guard_key):
+                print(f"[중복] 발송 직전 재확인 결과 이미 발송됨({guard_key}) → 막판 취소", file=sys.stderr)
+                return
         if R.send_email(subject, html, images):
             _save_last_sent(sent_update)   # 발송 성공 시에만 기록(실패하면 다음 실행 때 재시도)
 
@@ -536,7 +552,7 @@ def run_kr(no_email: bool = False, force: bool = False):
                                  holdings_html=holdings_html)
     _preview_and_send(html, images, f"[개장후] {today_kst} 한국 시장 점검 · 매수·매도 후보",
                       "kr_report.html", no_email,
-                      {"sent_kr_kst": today_kst, "kr_as_of": kr.get("as_of")})
+                      {"sent_kr_kst": today_kst, "kr_as_of": kr.get("as_of")}, guard_key="sent_kr_kst")
 
 
 # ------------------------- 미국장 메일 (개장 30분~90분 후, KST 자정대) -------------------------
@@ -671,7 +687,7 @@ def run_us(no_email: bool = False, force: bool = False):
                                  holdings_html=holdings_html)
     _preview_and_send(html, images, f"[미국 개장] {today_kst} 시장 점검 · 매수·매도 후보",
                       "us_report.html", no_email,
-                      {"sent_us_kst": today_kst, "us_as_of": as_of})
+                      {"sent_us_kst": today_kst, "us_as_of": as_of}, guard_key="sent_us_kst")
 
 
 # ------------------------- 코인 전용 메일(주말 공백 채우기, 토·일·월 09:07) -------------------------
@@ -719,7 +735,7 @@ def run_coin(no_email: bool = False, force: bool = False):
         '전략 근거: STRATEGY.md §1</div>'
         '</div>')
     _preview_and_send(html, sig_images, f"[주말 코인] {today_kst} BTC·ETH 시그널",
-                      "coin_report.html", no_email, {"sent_coin_kst": today_kst})
+                      "coin_report.html", no_email, {"sent_coin_kst": today_kst}, guard_key="sent_coin_kst")
 
 
 if __name__ == "__main__":

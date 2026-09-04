@@ -742,6 +742,17 @@ def run(no_email: bool = False, force: bool = False):
     _log("미리보기 output/weekly_report.html 저장")
 
     if not no_email:
+        # 2026-09-04(daily_ai_report.py와 동일 조치 — "미장 메일 두 번 온다" 실측 원인):
+        # 실행 두 개가 근접 시각에 겹치면 서로의 발송 여부를 모른 채 둘 다 보낼 수 있어,
+        # 보내기 직전 git pull로 재확인한다.
+        import subprocess
+        try:
+            subprocess.run(["git", "pull", "--quiet"], timeout=30, check=False)
+        except Exception:
+            pass
+        if _load_last_sent().get("sent_weekly_kst") == today_kst:
+            _log("발송 직전 재확인 결과 이미 발송됨(sent_weekly_kst) → 막판 취소")
+            return
         if R.send_email(f"[주간 자산배분] {ctx['as_of']} 리포트", html, images):
             _save_last_sent({"sent_weekly_kst": today_kst})
 
