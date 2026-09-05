@@ -37,30 +37,51 @@ Set-Location -Path $PSScriptRoot
 $log = Join-Path $PSScriptRoot "output\pregen.log"
 New-Item -ItemType Directory -Force -Path (Join-Path $PSScriptRoot "output") | Out-Null
 
+# Git attributes select this driver only for output/kospi200_cache.json.
+# Register it on every scheduled run so a fresh PC clone needs no manual setup.
+git config merge.kospi200-latest.name "Keep newest KOSPI200 cache snapshot"
+git config merge.kospi200-latest.driver "python merge_kospi200_cache.py %O %A %B"
+
 function Log($msg) { "$(Get-Date -Format 'yyyy-MM-dd HH:mm:ss') [$Mode] $msg" | Out-File -Append -Encoding utf8 $log }
 
 function Push-Result {
-    # pregen 파일 + pregen.log(이 실행이 방금 쓴 로그 자체 — 커밋 안 하면 다음 실행의 git
-    # pull이 또 막힘, 2026-07-23 수정 참고) + (한국장만) kospi200_cache.json. 커밋 직전
-    # 재-pull(2026-07-27 발견 — pregen.py 실행 중 GitHub Actions의 상태 커밋이 origin에
-    # 새로 얹혀 push가 non-fast-forward로 거부되는 경우 완화).
+    # Commit the locally generated snapshot before rebasing.  Pulling while the
+    # cache is uncommitted cannot invoke Git's merge driver and is the direct
+    # cause of the recurring manual conflict.
     param([string]$CommitMsg)
-    git pull --rebase 2>&1 | Out-File -Append -Encoding utf8 $log
-    if ($LASTEXITCODE -ne 0) {
-        Log "[경고] 커밋 직전 재-pull 실패 — 작업트리가 여전히 dirty하거나 충돌. 아래 push도 실패 가능."
-    }
     $files = @("output/pregen_$Mode.json", "output/pregen.log")
     if ($Mode -eq "kr" -and (Test-Path "output/kospi200_cache.json")) {
         $files += "output/kospi200_cache.json"
     }
     $existing = $files | Where-Object { Test-Path $_ }
-    if ($existing.Count -gt 0) {
-        git add -f $existing 2>&1 | Out-File -Append -Encoding utf8 $log
-        git commit -m $CommitMsg 2>&1 | Out-File -Append -Encoding utf8 $log
-        git push 2>&1 | Out-File -Append -Encoding utf8 $log
-        if ($LASTEXITCODE -ne 0) {
-            Log "[경고] git push 실패 — 보통 로컬이 origin보다 뒤처져 있을 때 발생. 위 pull 경고 참고."
-        }
+    if ($existing.Count -eq 0) {
+        Log "저장할 사전생성 산출물 없음 - push 생략"
+        return
+    }
+
+    git add -f $existing 2>&1 | Out-File -Append -Encoding utf8 $log
+    if (git diff --cached --quiet) {
+        Log "사전생성 산출물 변경 없음 - push 생략"
+        return
+    }
+
+    git commit -m $CommitMsg 2>&1 | Out-File -Append -Encoding utf8 $log
+    if ($LASTEXITCODE -ne 0) {
+        Log "[경고] 사전생성 커밋 실패 - push 생략"
+        return
+    }
+
+    # .gitattributes + merge.kospi200-latest driver choose the newest valid
+    # KRX snapshot during this rebase.  Any malformed JSON fails closed here.
+    git pull --rebase 2>&1 | Out-File -Append -Encoding utf8 $log
+    if ($LASTEXITCODE -ne 0) {
+        Log "[경고] 커밋 뒤 rebase 실패 - 자동 병합하지 못했으므로 push 생략"
+        return
+    }
+
+    git push 2>&1 | Out-File -Append -Encoding utf8 $log
+    if ($LASTEXITCODE -ne 0) {
+        Log "[경고] git push 실패 - 다음 실행에서 재시도"
     }
 }
 
