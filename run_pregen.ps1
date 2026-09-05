@@ -60,7 +60,8 @@ function Push-Result {
     }
 
     git add -f $existing 2>&1 | Out-File -Append -Encoding utf8 $log
-    if (git diff --cached --quiet) {
+    git diff --cached --quiet
+    if ($LASTEXITCODE -eq 0) {
         Log "사전생성 산출물 변경 없음 - push 생략"
         return
     }
