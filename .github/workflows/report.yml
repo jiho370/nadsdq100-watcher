@@ -109,6 +109,11 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Configure KOSPI200 cache merge driver
+        run: |
+          git config merge.kospi200-latest.name "Keep newest KOSPI200 cache snapshot"
+          git config merge.kospi200-latest.driver "python merge_kospi200_cache.py %O %A %B"
+
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
@@ -207,7 +212,10 @@ jobs:
           # 스테이징된 변경 유무는 git diff --cached --quiet(변경 있으면 종료코드 1)로 판단.
           if ! git diff --cached --quiet; then
             git commit -m "chore: update report state [skip ci]"
-            git pull --rebase origin ${GITHUB_REF_NAME} || true
+            if ! git pull --rebase origin ${GITHUB_REF_NAME}; then
+              echo "상태 rebase 실패 - 자동 병합하지 못했으므로 push 중단"
+              exit 1
+            fi
             git push
           else
             echo "상태 변경 없음 - 커밋 생략"
