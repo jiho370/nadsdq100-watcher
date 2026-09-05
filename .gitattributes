@@ -1,0 +1,3 @@
+# KRX cache is a complete dated snapshot.  The registered merge driver retains
+# the newest valid as_of snapshot instead of producing line-level JSON conflicts.
+output/kospi200_cache.json merge=kospi200-latest
