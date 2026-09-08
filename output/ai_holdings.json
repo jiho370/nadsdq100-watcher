@@ -3,7 +3,7 @@
     "SWKS": {
       "since": "2026-07-16",
       "entry_price": 57.83,
-      "peak": 74.0199966430664,
+      "peak": 74.5,
       "armed": true
     },
     "APTV": {
@@ -49,5 +49,5 @@
       "armed": true
     }
   },
-  "last_run": "2026-09-04"
+  "last_run": "2026-09-08"
 }
