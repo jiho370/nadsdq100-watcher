@@ -59,7 +59,7 @@ python -m research.us.us_factor_formula_sweep
 | 백테스트 코어 | `backtest_costs` `backtest_weights` `backtest_exec` `backtest_kr` `overfit_stats` |
 | 리포트 생성 | `ai_report` `ai_commentary` `ai_verdict_log` |
 | 상시 운영 | `upbit_crash_check` `realtime_circuit_breaker_paper` |
-| 유지보수 | `gen_profiles` (분기 1회 — 종목 프로필 캐시 재생성) |
+| 유지보수 | `gen_profiles` (분기 1회 — 종목 프로필 캐시 재생성, claude CLI 필요) |
 
 ### 리서치 코드 (`research/`)
 
@@ -106,6 +106,14 @@ import 되지 않는다. 서로를 import 하므로 **반드시 `python -m resea
 | `KRX_ID` / `KRX_PW` | KRX 정보데이터시스템 (2025-12-27부터 로그인 필수) |
 
 > `FMP_API_KEY`는 현재 코드 어디에서도 쓰이지 않는다 — 정리해도 된다.
+
+### 유료 API 경로
+
+기본적으로 **꺼져 있다.** 리포트 AI 해설은 `report.yml`의 `AI_ENABLED: "0"`으로 비활성이고
+(pregen 캐시 또는 지표 기반 deterministic 리포트로 발송), `gen_profiles.py`는 로컬 claude
+CLI(구독, $0)만 쓴다 — CLI가 없으면 예전처럼 유료 Batch API로 폴백하지 않고 그 자리에서
+중단한다. 정말 과금 경로로 돌려야 하면 `PROFILE_API_FALLBACK=1`과 `ANTHROPIC_API_KEY`를
+함께 지정한다.
 
 ### Windows 작업 스케줄러 (보조)
 

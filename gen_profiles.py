@@ -11,7 +11,9 @@ gen_profiles.py — 종목 '사업 프로필' 캐시를 1회 생성(분기 1회 
   분기 1회·~900종목(20개씩 묶어 ~45요청)짜리 일회성 로컬 작업이라 배치의 '동시 처리'
   이점이 꼭 필요하지 않다. 로컬 claude -p(Pro 구독)로 순차 호출해도 몇 분이면 끝나고
   비용은 $0 — Batch API의 50% 할인(유료)보다 구독 쪽이 항상 더 싸다.
-  claude CLI가 없는 환경(로컬 미설치)에서만 기존 Batch API(ANTHROPIC_API_KEY 필요)로 폴백.
+  2026-09-10부터 CLI가 유일한 경로다 — 예전엔 CLI가 없으면 유료 Batch API로 자동
+  폴백했지만, 의도치 않은 과금을 막으려고 기본 비활성화했다(PROFILE_API_FALLBACK=1
+  로만 되살아남). CLI가 없으면 폴백 대신 그 자리에서 중단한다.
 
 대상:
   · sp500_profiles.json  → tickers[sym].detail 이 빈 종목만 채움 (--refresh 면 전체)
@@ -20,11 +22,17 @@ gen_profiles.py — 종목 '사업 프로필' 캐시를 1회 생성(분기 1회 
 실행(로컬):
   python gen_profiles.py            # 빈 것만
   python gen_profiles.py --refresh  # 전체 재생성 (분기 1회 권장)
-CLI 있으면 $0. 없고 ANTHROPIC_API_KEY만 있으면 Batch API 폴백
-(700종목 × haiku 배치 단가 ≈ $0.1 미만).
+CLI(Pro 구독)로 $0. CLI가 없으면 중단된다 — 유료 Batch API 폴백은 기본 꺼져 있고,
+정말 필요하면 PROFILE_API_FALLBACK=1 + ANTHROPIC_API_KEY 를 함께 지정한다.
 """
 from __future__ import annotations
 import os, sys, json, time, shutil, argparse, datetime
+
+# 2026-09-10(지호 님 요청 — "API 루트는 꺼줘"): claude CLI가 없을 때 유료 Batch API로
+# 자동 폴백하던 경로를 기본 비활성화한다. 구독 CLI로 $0에 끝나는 작업이라 의도치 않은
+# 과금 경로를 열어둘 이유가 없다. _run_batch 구현 자체는 남겨두고 진입만 막는다 —
+# 되살리려면 PROFILE_API_FALLBACK=1.
+API_FALLBACK = os.environ.get("PROFILE_API_FALLBACK", "0") == "1"
 
 MODEL = os.environ.get("PROFILE_MODEL", "claude-haiku-4-5")
 # 2026-07-16(지호 님 지적 — 아세아 오서술 사건): 업종 분류 '근거'만 주는 건 여전히 기억 기반
@@ -260,10 +268,12 @@ def main():
     use_cli = shutil.which(CLAUDE_BIN) is not None or os.path.exists(CLAUDE_BIN)
     if use_cli:
         _log(f"로컬 claude CLI 사용({CLAUDE_BIN}, Pro 구독 — $0)")
-    elif os.environ.get("ANTHROPIC_API_KEY"):
-        _log("claude CLI 없음 → API Batch로 폴백(유료 — ANTHROPIC_API_KEY 사용)")
+    elif API_FALLBACK and os.environ.get("ANTHROPIC_API_KEY"):
+        _log("claude CLI 없음 → API Batch로 폴백(유료 — PROFILE_API_FALLBACK=1로 명시 허용됨)")
     else:
-        sys.exit("claude CLI도 ANTHROPIC_API_KEY도 없음 — 프로필 생성 불가")
+        sys.exit(f"claude CLI({CLAUDE_BIN})를 찾을 수 없어 프로필 생성을 중단한다. "
+                 "유료 API 폴백은 2026-09-10부터 기본 비활성 — 정말 과금 경로로 돌리려면 "
+                 "PROFILE_API_FALLBACK=1 과 ANTHROPIC_API_KEY 를 함께 지정할 것.")
 
     us_prof, us_todo = _collect_us(args.refresh)
     kr_prof, kr_todo = _collect_kr(args.refresh)
