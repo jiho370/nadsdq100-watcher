@@ -33,14 +33,14 @@ state_gated·진입가 트레일링·재난스톱)보다 전 기간에 걸쳐 �
 회복해야("armed") 재이탈 시 매도된다. 이게 "매수 직후 즉시매도" 버그의 근본 해법이고,
 지금 무조건 꺼둔 것보다 다음에 실수로 부활시켰을 때 안전하다.
 
-상태파일(output/ai_holdings.json):
+상태파일(state/ai_holdings.json):
   {"holdings": {"NVDA": {"since":"2026-07-01","entry_price":1200.0,"peak":1250.0}, ...},
    "last_run": "2026-07-02"}
 """
 from __future__ import annotations
 import os, json
 
-STATE = os.environ.get("HOLDINGS_FILE", "output/ai_holdings.json")
+STATE = os.environ.get("HOLDINGS_FILE", "state/ai_holdings.json")
 # 2026-07 재검증(backtest_exec.py 21조합·PBO 1.6%·DSR 0.97 통과): 트레일링 -20%가 트레이드의
 # 88%를 중도 손절시키며 순수익을 절반으로 깎는 것으로 확인(+7.7% vs 고정6개월 +14.9%,
 # 200일선only +9.4%) → 기본 비활성(0). 되살리려면 SELL_TRAIL=0.20.

@@ -82,7 +82,7 @@ VOLTGT_WINDOW  = int(os.environ.get("VOLTGT_WINDOW", "60"))     # 실현변동�
 MAX_STALE_DAYS = int(os.environ.get("MAX_STALE_DAYS", "5"))     # 종가 신선도 허용 일수(달력일)
 TREND_MAX      = int(os.environ.get("TREND_MAX", "6"))          # 전환/굳힘 섹션별 최대 종목
 HISTORY_PERIOD = os.environ.get("HISTORY_PERIOD", "5y")
-STATE_FILE     = os.environ.get("STATE_FILE", "state_prev_list.json")
+STATE_FILE     = os.environ.get("STATE_FILE", "state/state_prev_list.json")
 PROFILES_FILE  = os.environ.get("PROFILES_FILE", "sp500_profiles.json")  # 분기 갱신 종목 프로필
 _PROFILES_CACHE = None
 KST            = timezone(timedelta(hours=9))
@@ -1573,6 +1573,7 @@ def load_state() -> dict:
 
 def save_state(state: dict):
     try:
+        os.makedirs(os.path.dirname(STATE_FILE) or ".", exist_ok=True)
         with open(STATE_FILE, "w", encoding="utf-8") as f:
             json.dump(state, f, ensure_ascii=False, indent=2)
     except Exception as e:

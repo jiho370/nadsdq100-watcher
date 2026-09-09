@@ -263,7 +263,7 @@ def _holdings_section(hstate, ind_map, price_map, bench_dates, bench_closes, ind
 
 
 # ------------------------- 공용 헬퍼 -------------------------
-_LAST_SENT = os.path.join("output", "last_sent.json")
+_LAST_SENT = os.path.join("state", "last_sent.json")
 
 
 def _load_last_sent() -> dict:
@@ -277,7 +277,7 @@ def _load_last_sent() -> dict:
 def _save_last_sent(update: dict):
     """부분 갱신 — KR/US 메일이 서로의 기록을 덮어쓰지 않게 merge."""
     d = _load_last_sent(); d.update(update)
-    os.makedirs("output", exist_ok=True)
+    os.makedirs(os.path.dirname(_LAST_SENT) or ".", exist_ok=True)
     with open(_LAST_SENT, "w", encoding="utf-8") as f:
         json.dump(d, f)
 

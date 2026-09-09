@@ -13,18 +13,18 @@ kr_stocks.py — 코스피200 개별 종목 선별 (STRATEGY.md §3, 2026-07-14 
     STRATEGY.md §3 참고). 보유 상한 5
   · 매도: 6개월 정기 재평가(후보풀 이탈)만 활성 — 200일선 백업은 2026-07-15부로 기본
     비활성(holdings.py SELL_MA200_BACKUP, 근거는 STRATEGY.md §3 Stage 6)
-    (output/kr_holdings.json 자동 추적)
+    (state/kr_holdings.json 자동 추적)
 
 데이터: 구성종목·펀더멘탈(PER/PBR/EPS/BPS/DIV) = pykrx(KRX), 시세 = yfinance(.KS 배치 1회).
-pykrx 실패 시 output/kospi200_cache.json 캐시로 폴백(성공 시마다 갱신).
+pykrx 실패 시 state/kospi200_cache.json 캐시로 폴백(성공 시마다 갱신).
 """
 from __future__ import annotations
 import os, sys, json, datetime as dt
 
 import market_signals as MS
 
-CACHE = "output/kospi200_cache.json"
-KR_HOLDINGS = "output/kr_holdings.json"
+CACHE = "state/kospi200_cache.json"
+KR_HOLDINGS = "state/kr_holdings.json"
 # 후보 '풀' 크기 — AI 검증(강등/제외) 후 최종 채택은 ai_report가 KR_FINAL_BUY(5)로 확정.
 # 관찰 폐지(2026-07-13): 풀 전체가 매수 후보, N_WATCH 기본 0.
 # 2026-07-16: topn 6→5 변경(STRATEGY.md §3 Stage 3.1·3.2 — 13년 재검증에서 5가 CAGR·샤프·
@@ -105,7 +105,7 @@ def _krx_universe_funda() -> dict | None:
                  f"PER>0 비율 {nonzero_ratio:.0%}) → 하루 더 소급")
         if not out:
             _log("코스피200 구성종목/재무데이터 조회 실패"); return None
-        os.makedirs("output", exist_ok=True)
+        os.makedirs(os.path.dirname(CACHE) or ".", exist_ok=True)
         with open(CACHE, "w", encoding="utf-8") as f:
             json.dump({"as_of": d, "data": out}, f, ensure_ascii=False)
         return out

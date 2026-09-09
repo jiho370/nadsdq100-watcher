@@ -163,7 +163,7 @@ def run_kr() -> str:
         _log("한국 후보 없음 → 스킵"); return "done"
     _headlines((kr.get("buy") or []) + (kr.get("watch") or []), suffix=".KS")
     groups = {"kr_buy": kr.get("buy") or [], "kr_watch": kr.get("watch") or [],
-              "sells": _holding_syms("output/kr_holdings.json")}
+              "sells": _holding_syms("state/kr_holdings.json")}
     # 시황 컨텍스트는 '전일 한국장' 범위로만 좁힌다(코스피·코스닥 등락+추세신호) — 19시엔
     # 이미 확정된 데이터라 미국장 마감을 기다릴 필요가 없다. world(해외지수)는 일부러 안 준다:
     # 밤사이 미국 마감을 다루려던 옛 설계의 흔적이라, 범위를 국장으로 좁힌 지금은 불필요.
@@ -214,7 +214,7 @@ def run_us() -> str:
     buy, watch = E.split_by_entry(cands, k=pool_k)
     _headlines(buy + watch)
     groups = {"buy_now": buy, "watch": watch,
-              "sells": _holding_syms("output/ai_holdings.json")}
+              "sells": _holding_syms("state/ai_holdings.json")}
     market = {"as_of": R._last_data_date(data["hist"]), **E.build_market(data)}
     ver = AR.verify_stage(groups, market)
     if not ver.get("by_sym"):

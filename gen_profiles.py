@@ -15,7 +15,7 @@ gen_profiles.py — 종목 '사업 프로필' 캐시를 1회 생성(분기 1회 
 
 대상:
   · sp500_profiles.json  → tickers[sym].detail 이 빈 종목만 채움 (--refresh 면 전체)
-  · kospi200_profiles.json → output/kospi200_cache.json 의 구성종목으로 생성(없으면 생략)
+  · kospi200_profiles.json → state/kospi200_cache.json 의 구성종목으로 생성(없으면 생략)
 
 실행(로컬):
   python gen_profiles.py            # 빈 것만
@@ -130,14 +130,14 @@ def _collect_kr(refresh: bool) -> tuple[dict, list]:
     except Exception:
         prof = {"meta": {"note": "코스피200 사업 프로필 — gen_profiles.py 생성"}, "tickers": {}}
     try:
-        with open("output/kospi200_cache.json", encoding="utf-8") as f:
+        with open("state/kospi200_cache.json", encoding="utf-8") as f:
             uni = (json.load(f) or {}).get("data") or {}
     except Exception:
-        _log("output/kospi200_cache.json 없음 → 한국 생략(데일리 1회 실행 후 다시)")
+        _log("state/kospi200_cache.json 없음 → 한국 생략(데일리 1회 실행 후 다시)")
         return prof, []
     sec_by_ticker = {}
     try:
-        import kr_sector as KS
+        import research.kr.kr_sector as KS
         today8 = datetime.date.today().strftime("%Y%m%d")
         sec_by_date = KS.fetch_sectors([today8])
         sec_by_ticker = sec_by_date.get(today8) or {}

@@ -1,11 +1,50 @@
+# ── 비밀 ────────────────────────────────────────────────────────────────
 # 비밀번호 평문 포함 — 절대 푸시 금지 (자동화는 GitHub Secrets 사용)
 run_daily.bat
+.env
+*.pem
+*.key
 
+# ── 파이썬 ──────────────────────────────────────────────────────────────
 __pycache__/
 *.pyc
+*.pyo
+.venv/
+venv/
+
+# ── 에이전트 작업 공간 ──────────────────────────────────────────────────
+.worktrees/
+.claude/worktrees/
+.claude/settings.local.json
+
+# ── 원본 데이터 (수동 다운로드, 재취득 가능) ────────────────────────────
+data/
+
+# ── output/ 정책 ────────────────────────────────────────────────────────
+# 기본 원칙: 리포트 산출물·로그·캐시는 무시하고,
+#            백테스트 "결과"와 런타임이 읽는 데이터/상태 파일만 추적한다.
+
+# 리포트 산출물 (매 실행마다 재생성)
 output/*.html
 output/*.png
 output/*.pkl
-data/
+output/*.xls
+output/*.xlsx
 
-.worktrees/
+# 로그 (재현 불가·가치 없음 — 친구가 지적한 그것)
+*.log
+output/*.jsonl
+
+# 네트워크/연산 캐시 (재생성 가능, 용량 큼)
+output/kr_bt_cache.json
+output/kr_sector_cache.json
+output/kr_regime_cache.json
+output/etf_control_price_cache.json
+output/*_nav_cache.csv
+output/binance_1m_cache_*.pkl
+
+# 위 캐시 규칙의 예외 — 이름은 cache지만 실제로는 추적해야 하는 파일:
+#   output/fundamentals_cache.json : export_data.py 가 읽는 런타임 데이터 의존성.
+#                                    없으면 종목 선정에서 펀더멘탈 팩터가 조용히 빠진다.
+#   output/kospi200_cache.json     : GitHub Actions 가 commit-back 하는 상태 파일.
+# (두 파일은 위 패턴에 걸리지 않으므로 별도 예외 규칙이 필요 없다 — 이 주석은 실수 방지용)
