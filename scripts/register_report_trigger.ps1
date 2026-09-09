@@ -6,7 +6,12 @@
 # 먼저 보내도 중복발송 없음. PC가 꺼져있으면 이 보조 트리거만 안 뜨고, 그 경우엔
 # GitHub 쪽 스케줄이 원래대로(느리더라도) 시도하므로 "PC 꺼져도 발송"이라는 원래
 # 취지는 깨지지 않는다.
+#
+# 2026-09-10: Register-ScheduledTask 는 실패해도 '비종료 오류'라 그냥 다음 줄로 넘어간다 —
+# 예전엔 뒤의 "Registered:" 를 무조건 출력해 실패를 성공으로 오인하게 만들었다
+# (register_pregen_task.ps1 의 같은 수정 참고). 종료 오류로 승격시켜 catch 한다.
 $script = Join-Path $PSScriptRoot "trigger_report.ps1"
+$failed = $false
 
 foreach ($t in @(
     @{Name="ReportTriggerKR";     Mode="kr";     Days=@("Monday","Tuesday","Wednesday","Thursday","Friday"); At="09:40"},
@@ -23,10 +28,21 @@ foreach ($t in @(
         -StartWhenAvailable -AllowStartIfOnBatteries -DontStopIfGoingOnBatteries `
         -ExecutionTimeLimit (New-TimeSpan -Minutes 5)
 
-    Register-ScheduledTask -TaskName $t.Name -Action $action -Trigger $trigger `
-        -Settings $settings -Description "Backup trigger to work around GitHub Actions schedule delay ($($t.Mode))" -Force
+    try {
+        Register-ScheduledTask -TaskName $t.Name -Action $action -Trigger $trigger `
+            -Settings $settings -Description "Backup trigger to work around GitHub Actions schedule delay ($($t.Mode))" `
+            -Force -ErrorAction Stop | Out-Null
+        Write-Host "Registered: $($t.Name) at $($t.At) on $($t.Days -join ',')"
+    } catch {
+        Write-Warning "등록 실패: $($t.Name) — $($_.Exception.Message)"
+        $failed = $true
+    }
+}
 
-    Write-Host "Registered: $($t.Name) at $($t.At) on $($t.Days -join ',')"
+if ($failed) {
+    Write-Warning "일부 작업이 등록되지 않았습니다. 'Access is denied' 라면 관리자 권한 PowerShell 에서 다시 실행하세요."
+    Write-Warning "확인: Get-ScheduledTask -TaskName ReportTrigger* | Select TaskName, State"
+    exit 1
 }
 
 Write-Host "Check:"

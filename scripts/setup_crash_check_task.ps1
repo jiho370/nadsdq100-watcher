@@ -19,7 +19,17 @@ $Settings = New-ScheduledTaskSettingsSet -StartWhenAvailable -DontStopOnIdleEnd 
   -AllowStartIfOnBatteries -DontStopIfGoingOnBatteries `
   -ExecutionTimeLimit (New-TimeSpan -Minutes 5) -MultipleInstances IgnoreNew
 
-Register-ScheduledTask -TaskName $TaskName -Action $Action -Trigger $Trigger -Settings $Settings -Description "업비트 BTC/ETH -5% 급락 체크(15분 주기, 페이퍼 로깅 전용, 실주문 없음)" -Force
+# 2026-09-10: Register-ScheduledTask 는 실패해도 '비종료 오류'라 뒤의 "등록 완료" 가
+# 그대로 출력돼 실패를 성공으로 오인하게 만든다(register_pregen_task.ps1 의 같은 수정 참고).
+try {
+    Register-ScheduledTask -TaskName $TaskName -Action $Action -Trigger $Trigger -Settings $Settings `
+        -Description "업비트 BTC/ETH -5% 급락 체크(15분 주기, 페이퍼 로깅 전용, 실주문 없음)" `
+        -Force -ErrorAction Stop | Out-Null
+} catch {
+    Write-Warning "등록 실패: $TaskName — $($_.Exception.Message)"
+    Write-Warning "'Access is denied' 라면 관리자 권한 PowerShell 에서 다시 실행하세요."
+    exit 1
+}
 
 Write-Host "등록 완료: $TaskName (15분마다 실행)"
 Write-Host "확인: Get-ScheduledTask -TaskName $TaskName | Get-ScheduledTaskInfo"
