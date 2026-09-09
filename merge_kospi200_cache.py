@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Git merge driver for output/kospi200_cache.json.
+"""Git merge driver for state/kospi200_cache.json.
 
 The file is a complete KRX snapshot, not an append-only record.  When two
 writers overlap, retain the valid snapshot with the later as_of trading date.

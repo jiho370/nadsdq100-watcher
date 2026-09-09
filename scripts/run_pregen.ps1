@@ -1,4 +1,4 @@
-# run_pregen.ps1 — 작업 스케줄러가 실행하는 사전 검증(구독 CLI, 과금 없음).
+﻿# run_pregen.ps1 — 작업 스케줄러가 실행하는 사전 검증(구독 CLI, 과금 없음).
 # 사용: run_pregen.ps1 -Mode kr   (저녁 — 다음날 10:00 한국장 메일용)
 #       run_pregen.ps1 -Mode us   (아침 — 그날 저녁 개장 30분~90분 후 미국장 메일용)
 # 흐름: git pull → [pregen.py --Mode 성공할 때까지 15분 간격 반복] → output/pregen_{Mode}.json

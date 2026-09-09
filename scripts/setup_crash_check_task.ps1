@@ -1,4 +1,4 @@
-# setup_crash_check_task.ps1 — upbit_crash_check.py를 15분마다 실행하는 작업 스케줄러 등록
+﻿# setup_crash_check_task.ps1 — upbit_crash_check.py를 15분마다 실행하는 작업 스케줄러 등록
 # (2026-09-06, realtime_circuit_breaker_paper.py의 상시 폴링 대신 경량화)
 # 관리자 권한 불필요(현재 사용자 계정으로 등록). 재부팅해도 유지됨.
 #

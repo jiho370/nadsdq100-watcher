@@ -1,4 +1,4 @@
-# trigger_report.ps1 — Windows 작업 스케줄러가 GitHub Actions의 schedule 트리거 지연을
+﻿# trigger_report.ps1 — Windows 작업 스케줄러가 GitHub Actions의 schedule 트리거 지연을
 # 우회하기 위해 gh workflow run으로 정시에 직접 워크플로를 깨운다(2026-08-27, 지호 님
 # 요청 — 국장 메일이 며칠 연속 몇 시간씩 지연되는 사고가 반복돼(.github/workflows/report.yml
 # "2차 워치독" 코멘트 참고), 기존 GitHub schedule cron(본편+워치독 3회)은 그대로 두고
