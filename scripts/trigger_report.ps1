@@ -12,5 +12,16 @@ $Root = Split-Path -Parent $PSScriptRoot   # scripts/ 의 부모 = 리포 루트
 $log = Join-Path $Root "output\report_trigger.log"
 New-Item -ItemType Directory -Force -Path (Join-Path $Root "output") | Out-Null
 "$(Get-Date -Format 'yyyy-MM-dd HH:mm:ss') [$Mode] trigger attempt" | Out-File -Append -Encoding utf8 $log
-gh workflow run "Daily & Weekly Market Report" --repo jiho370/nadsdq100-watcher -f mode=$Mode 2>&1 |
-    Out-File -Append -Encoding utf8 $log
+$ghOutput = gh workflow run "Daily & Weekly Market Report" --repo jiho370/nadsdq100-watcher -f mode=$Mode 2>&1
+$ghExit = $LASTEXITCODE
+$ghOutput | Out-File -Append -Encoding utf8 $log
+# 2026-09-10: 예전엔 gh 실패(인증 만료·미설치·네트워크 오류 등)를 로그에만 남기고 스크립트
+# 종료코드는 항상 0이라, 작업 스케줄러의 "마지막 실행 결과"엔 늘 성공으로만 보였다
+# (register_pregen_task.ps1의 같은 유형 버그 참고). GitHub 쪽 schedule cron이 보조
+# 안전망이라 발송 자체가 끊기진 않지만, 이 보조 트리거가 계속 죽어 있어도 알 방법이 없었다.
+if ($ghExit -ne 0) {
+    "$(Get-Date -Format 'yyyy-MM-dd HH:mm:ss') [$Mode] [경고] gh workflow run 실패(exit=$ghExit) — GitHub 쪽 schedule cron이 대신 발송하지만, 이 보조 트리거는 죽어 있다는 뜻." |
+        Out-File -Append -Encoding utf8 $log
+    exit $ghExit
+}
+"$(Get-Date -Format 'yyyy-MM-dd HH:mm:ss') [$Mode] trigger 성공" | Out-File -Append -Encoding utf8 $log
