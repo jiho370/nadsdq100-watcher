@@ -143,27 +143,45 @@ def _holdings_compare_chart_png(series: dict, index_name: str, extra_line: dict 
     fig, ax = plt.subplots(figsize=(7.6, 3.0), dpi=150)
 
     # 2026-09-02(지호 님 요청 — "그래프에 수치도 보여주고"): 각 선의 마지막(=오늘) 값을
-    # 숫자로 직접 표시 — 그래프만 보고 대략 짐작하지 않도록.
-    def _label_last(vals, color):
+    # 숫자로 직접 표시 — 그래프만 보고 대략 짐작하지 않도록. 2026-09-14(지호 님 지적 —
+    # "라벨 겹치는것도 고쳐줘"): 두 선의 마지막 값이 서로 가까우면(예: S&P500 +1.5% vs
+    # 나스닥100 +1.7%) 글자가 겹쳐 보였다 — 실제 표시 위치(y)를 값(val)과 분리해서, 값이
+    # 가까운 라벨들은 표시 위치만 최소 간격만큼 밀어내고(텍스트 자체는 원래 값을 그대로
+    # 보여줌) 나중에 한꺼번에 그린다.
+    label_specs = []
+
+    def _register_last(vals, color):
         arr = np.asarray(vals, dtype=float)
         idx = np.where(~np.isnan(arr))[0]
         if len(idx) == 0:
             return
         i = idx[-1]
-        ax.annotate(f"{arr[i]:+.1f}%", (i, arr[i]), xytext=(4, 0), textcoords="offset points",
-                    fontsize=8, fontweight="bold", color=color, va="center")
+        label_specs.append({"x": i, "val": float(arr[i]), "y": float(arr[i]), "color": color})
 
     ax.plot(x, bench, lw=1.4, color="#9ca3af", label=f"{index_name} {_BENCH_SUFFIX}")
-    _label_last(bench, "#6b7280")
+    _register_last(bench, "#6b7280")
     if extra_line and extra_line.get("values"):
         ax.plot(x, extra_line["values"], lw=1.4, color="#93c5fd", label=extra_line["label"])
-        _label_last(extra_line["values"], "#60a5fa")
+        _register_last(extra_line["values"], "#60a5fa")
     ax.plot(x, port, lw=1.8, color="#2563eb", label=_PORT_LABEL)
-    _label_last(port, "#2563eb")
+    _register_last(port, "#2563eb")
     if blend_line and blend_line.get("values"):
         ax.plot(x, blend_line["values"], lw=1.1, color="#cbd5e1", linestyle=(0, (4, 2)), label=blend_line["label"])
     ax.axhline(0, color="#111827", lw=0.8)
     ax.margins(x=0.06)  # 오른쪽 끝 라벨이 잘리지 않게 여백 확보
+
+    if label_specs:
+        all_vals = [v for v in (port + bench + (extra_line["values"] if extra_line else []))
+                   if v is not None and v == v]
+        data_range = (max(all_vals) - min(all_vals)) if len(all_vals) >= 2 else 0.0
+        min_gap = max(data_range * 0.07, 0.6)  # 값 범위가 아주 좁을 때를 대비한 최소치
+        label_specs.sort(key=lambda s: s["val"])
+        for j in range(1, len(label_specs)):
+            if label_specs[j]["y"] - label_specs[j - 1]["y"] < min_gap:
+                label_specs[j]["y"] = label_specs[j - 1]["y"] + min_gap
+        for s in label_specs:
+            ax.annotate(f"{s['val']:+.1f}%", (s["x"], s["y"]), xytext=(4, 0), textcoords="offset points",
+                        fontsize=8, fontweight="bold", color=s["color"], va="center")
     # 2026-07-28: 거래일 전부를 라벨로 표시하도록 바꿨었으나, 날짜가 많아지니(한 달+) 라벨이
     # 다닥다닥 붙어 오히려 안 읽힘 — 2026-09-02(지호 님 재지적 — "가독성 높이는 방향으로")
     # 최대 10개 정도로 다시 솎아낸다. 선 자체는 여전히 거래일 전부(x=np.arange(len(dates)))를
