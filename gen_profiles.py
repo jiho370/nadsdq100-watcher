@@ -180,16 +180,22 @@ def _build_requests(todo: list, prefix: str, chunk_size=CHUNK, model=MODEL,
     return reqs
 
 
-def _run_cli(reqs: list) -> dict:
+def _run_cli(reqs: list) -> tuple[dict, list]:
     """로컬 claude -p(Pro 구독, $0)로 순차 실행. 분기 1회 일회성 작업이라 배치의
     동시 처리 없이 순차로도 충분(요청당 몇 초~수십 초, 전체 몇 분).
     2026-07-15: 703종목 --refresh 시 36청크 중 일부가 이유 불명 타임아웃/부분파싱실패로
     누락되는 게 확인돼(예: 'timed out after -1186초'처럼 음수 타임아웃까지 관측 — CLI
     프로세스 자체의 일시적 이상으로 추정, 원인 미상) 1회 재시도를 추가한다.
     2026-07-16: model/system/web을 req["params"]에서 그대로 읽는다(하드코딩된 _SYSTEM/MODEL
-    대신) — 검색모드 요청(한국)과 기존 요청(미국)이 섞여도 각자 맞는 설정으로 호출된다."""
+    대신) — 검색모드 요청(한국)과 기존 요청(미국)이 섞여도 각자 맞는 설정으로 호출된다.
+    2026-09-10: 2회 재시도 다 실패한 요청은 예전엔 out에서 조용히 빠지기만 하고 아무
+    신호도 안 남았다(전체가 실패해도 main()은 종료코드 0으로 끝나고 profiles_updated를
+    오늘 날짜로 찍었다 — register_pregen_task.ps1의 "실패해도 Registered: 출력" 버그와
+    같은 유형). 실패한 custom_id 목록을 반환해 호출부가 판단할 수 있게 한다. 개별 종목
+    재시도 자체는 안전하다 — 실패한 종목은 detail이 계속 비어 있어 다음 실행 때 자동으로
+    다시 todo에 잡힌다(_collect_us/_collect_kr 참고)."""
     import ai_report as AR
-    out = {}
+    out, failed = {}, []
     for i, req in enumerate(reqs, 1):
         cid = req["custom_id"]
         p = req["params"]
@@ -202,13 +208,17 @@ def _run_cli(reqs: list) -> dict:
                 break
             except Exception as e:
                 _log(f"  실패({attempt}/2): {cid} ({type(e).__name__}: {e})")
-    return out
+        else:
+            failed.append(cid)
+    return out, failed
 
 
-def _run_batch(client, reqs: list) -> dict:
-    """배치 제출 → 폴링 → {custom_id: 응답텍스트}. (마감 없는 작업 = 배치 최적)"""
+def _run_batch(client, reqs: list) -> tuple[dict, list]:
+    """배치 제출 → 폴링 → {custom_id: 응답텍스트}. (마감 없는 작업 = 배치 최적)
+    2026-09-10: _run_cli와 동일하게 실패한 custom_id 목록도 반환 — 호출부가 "전부 실패"와
+    "일부만 실패"를 구분해 판단할 수 있게 한다."""
     if not reqs:
-        return {}
+        return {}, []
     batch = client.messages.batches.create(requests=reqs)
     _log(f"배치 제출: {batch.id} ({len(reqs)}요청)")
     while True:
@@ -218,7 +228,7 @@ def _run_batch(client, reqs: list) -> dict:
         if b.processing_status == "ended":
             break
         time.sleep(POLL_SEC)
-    out = {}
+    out, failed = {}, []
     for r in client.messages.batches.results(batch.id):
         if r.result.type == "succeeded":
             msg = r.result.message
@@ -226,7 +236,8 @@ def _run_batch(client, reqs: list) -> dict:
                                        if getattr(bk, "type", "") == "text")
         else:
             _log(f"  실패: {r.custom_id} ({r.result.type})")
-    return out
+            failed.append(r.custom_id)
+    return out, failed
 
 
 def _merge(results: dict, prefix: str, tickers: dict) -> int:
@@ -288,10 +299,10 @@ def main():
            + _build_requests(kr_todo, "kr", chunk_size=CHUNK_SEARCH, model=MODEL_SEARCH,
                              system=_SYSTEM_SEARCH, web=True))
     if use_cli:
-        results = _run_cli(reqs)
+        results, failed = _run_cli(reqs)
     else:
         import anthropic
-        results = _run_batch(anthropic.Anthropic(), reqs)
+        results, failed = _run_batch(anthropic.Anthropic(), reqs)
 
     if args.dry_run:
         _log("--dry-run: 저장하지 않고 결과만 출력")
@@ -299,19 +310,36 @@ def main():
             _log(f"  [{cid}] {(text or '')[:400]}")
         return
 
+    # 2026-09-10: 예전엔 여기서 결과가 텅 비어도(=요청 전부 실패) 조용히 profiles_updated를
+    # 오늘 날짜로 찍고 종료코드 0으로 끝났다 — register_pregen_task.ps1의 "실패해도 성공
+    # 출력" 버그와 같은 유형. 청크 단위 산발적 실패(문서화된 정상 케이스, 다음 실행 때
+    # detail 빈 종목만 자동 재시도됨)는 그대로 두되, 시장별로 "단 하나도 성공 못 함"은
+    # 구분해서 profiles_updated를 찍지 않고 실행 끝에 종료코드로 드러낸다.
     today = datetime.date.today().isoformat()
+    any_saved = False
     if us_todo:
         n = _merge(results, "us", us_prof["tickers"])
-        us_prof.setdefault("meta", {})["profiles_updated"] = today
+        if n:
+            us_prof.setdefault("meta", {})["profiles_updated"] = today
+            any_saved = True
         with open(US_PROFILE_PATH, "w", encoding="utf-8") as f:
             json.dump(us_prof, f, ensure_ascii=False, indent=1)
-        _log(f"{US_PROFILE_PATH}: {n}종목 기록")
+        _log(f"{US_PROFILE_PATH}: {n}/{len(us_todo)}종목 기록" + ("" if n else " — 전부 실패, 다음 실행에 재시도"))
     if kr_todo:
         n = _merge(results, "kr", kr_prof["tickers"])
-        kr_prof.setdefault("meta", {})["profiles_updated"] = today
+        if n:
+            kr_prof.setdefault("meta", {})["profiles_updated"] = today
+            any_saved = True
         with open(KR_PROFILE_PATH, "w", encoding="utf-8") as f:
             json.dump(kr_prof, f, ensure_ascii=False, indent=1)
-        _log(f"{KR_PROFILE_PATH}: {n}종목 기록")
+        _log(f"{KR_PROFILE_PATH}: {n}/{len(kr_todo)}종목 기록" + ("" if n else " — 전부 실패, 다음 실행에 재시도"))
+
+    if failed:
+        _log(f"실패 청크 {len(failed)}/{len(reqs)}건: {failed[:10]}" + (" ..." if len(failed) > 10 else ""))
+    if not any_saved:
+        backend = "CLI" if use_cli else "Batch API"
+        sys.exit(f"claude {backend} 요청이 전부 실패해 갱신된 프로필이 없다"
+                 f"({len(failed)}/{len(reqs)}건 실패). 위 실패 로그를 확인할 것.")
 
 
 if __name__ == "__main__":
