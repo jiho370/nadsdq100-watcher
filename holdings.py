@@ -284,6 +284,28 @@ def portfolio_series(summary: list, price_map: dict, bench_dates: list, bench_cl
     # 쪽으로 되돌림: 배당 드리프트는 보유기간이 최대 ~180일(6개월 재평가)로 제한돼 오차가
     # 작고 완만하지만, 매수일 체결가 괴리는 크고 즉각적이라 이쪽을 막는 게 더 중요하다. 이제
     # 상단 합계는 항상 개별 종목 표의 평균과 정확히 일치한다.
+    # 2026-09-04(지호 님 지적 — "그래프가 첫날부터 마이너스로 시작한다, 0%여야 하는거
+    # 아닌가"): 분모(entry_price)는 진입 당시 고정 스냅샷인데, 분자(arr)는 오늘 새로
+    # 내려받은 배당조정(auto_adjust) 시계열이다. 보유 기간 중 배당이 한 번이라도 있으면
+    # 그 시계열의 과거 구간 전체가 배당만큼 소급 하향 조정돼, 진입일 값 자체가 당시
+    # entry_price보다 낮게 나와 그래프가 이미 마이너스로 시작하는 것처럼 보였다(개별
+    # 종목 표의 entry_price 기준 수익률과는 무관 — 그래프 전용 버그).
+    # 진입일의 수익률은 정의상 반드시 0%이므로, "같은 시계열 안에서" 진입일 자체의
+    # 값을 기준가로 삼아 조정 기준 불일치를 원천 차단한다(분자·분모가 항상 같은
+    # 소스가 되어 배당 조정 여부와 무관하게 일관됨).
+    anchor = {}
+    for r in entries:
+        arr = aligned.get(r["symbol"])
+        if not arr:
+            continue
+        since = since_capped[r["symbol"]]
+        try:
+            k0 = dates.index(since)
+        except ValueError:
+            continue
+        if arr[k0]:
+            anchor[r["symbol"]] = arr[k0]
+
     port, bench = [], []
     for k, day in enumerate(dates):
         rs, bs = [], []
@@ -292,7 +314,7 @@ def portfolio_series(summary: list, price_map: dict, bench_dates: list, bench_cl
             if since > day:
                 continue
             arr = aligned.get(r["symbol"])
-            base = r["entry"]
+            base = anchor.get(r["symbol"])
             if arr and arr[k] and base:
                 rs.append((arr[k] / base - 1) * 100)
             bi = bisect.bisect_right(bench_dates, since) - 1
