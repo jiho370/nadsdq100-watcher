@@ -24,7 +24,7 @@ import os, sys, json, argparse
 import numpy as np
 
 from research.regime.backtest_regime_assets import fetch, regime_series, _ulcer, _mdd, _cagr, composite_score
-from research.crypto.vol_target_validation import paired_bootstrap
+from research.legacy_cost_30bp.vol_target_validation import paired_bootstrap
 import overfit_stats as OS
 
 TRADING_DAYS = 252

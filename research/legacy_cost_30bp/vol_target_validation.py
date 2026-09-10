@@ -1,5 +1,11 @@
 #!/usr/bin/env python3
 """
+⚠ 2026-09-10 이관: 이 파일은 COST_BPS["btc"]=30bp(또는 자체 COST_BPS=30.0) — 실제
+업비트 시장가 수수료 5bp의 6배인 낡은 가정을 쓴다(2026-09-06 발견, 상세는
+docs/playbook/03-method/EXECUTION.md §3-1). 판정을 뒤집을 후보가 있는지 5bp 기준으로
+재계산해 확인 완료 — 전부 DSR이 채택기준(0.95)에서 멀고 OOS 샤프가 음수/0이라 비용
+문제가 아니라 과최적화로 기각됨(같은 문서 §3-1 표 참고). 그대로 legacy 처리.
+
 vol_target_validation.py — market_signals.PARAMS의 vol_target(코인 40%·주식 15%)이
 실제로 이 프로젝트 데이터로 백테스트된 값인지 검증 (2026-09-06, 지호 님 요청).
 

@@ -1,5 +1,11 @@
 #!/usr/bin/env python3
 """
+⚠ 2026-09-10 이관: 이 파일은 COST_BPS["btc"]=30bp(또는 자체 COST_BPS=30.0) — 실제
+업비트 시장가 수수료 5bp의 6배인 낡은 가정을 쓴다(2026-09-06 발견, 상세는
+docs/playbook/03-method/EXECUTION.md §3-1). 판정을 뒤집을 후보가 있는지 5bp 기준으로
+재계산해 확인 완료 — 전부 DSR이 채택기준(0.95)에서 멀고 OOS 샤프가 음수/0이라 비용
+문제가 아니라 과최적화로 기각됨(같은 문서 §3-1 표 참고). 그대로 legacy 처리.
+
 vol_target_fast_response.py — "60일 평균은 급락에 느리게 반응한다"는 문제를 확인하고,
 짧은 창(5~20일)·일간 재계산으로 급변동에 더 빨리 반응하는 버전을 백테스트 (2026-09-06,
 지호 님 요청 — 업비트 API 자동매매 전 사전검증 단계).
@@ -18,7 +24,7 @@ import numpy as np
 import pandas as pd
 
 from research.regime.backtest_regime_assets import fetch, regime_series, COST_BPS
-from research.crypto.vol_target_validation import vol_target_weight, simulate_weighted, realized_vol_series, composite_score
+from research.legacy_cost_30bp.vol_target_validation import vol_target_weight, simulate_weighted, realized_vol_series, composite_score
 
 TRADING_DAYS = 252
 
