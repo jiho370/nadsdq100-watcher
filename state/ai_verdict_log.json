@@ -973,6 +973,106 @@
       "severity": "",
       "reason": "",
       "price": 550.68
+    },
+    {
+      "date": "2026-09-11",
+      "market": "us",
+      "symbol": "BKNG",
+      "name": "Booking Holdings Inc.",
+      "verdict": "매수유지",
+      "severity": "",
+      "reason": "",
+      "price": 173.84
+    },
+    {
+      "date": "2026-09-11",
+      "market": "us",
+      "symbol": "INCY",
+      "name": "Incyte Corporation",
+      "verdict": "매수유지",
+      "severity": "",
+      "reason": "",
+      "price": 122.49
+    },
+    {
+      "date": "2026-09-11",
+      "market": "us",
+      "symbol": "GM",
+      "name": "General Motors Company",
+      "verdict": "매수유지",
+      "severity": "",
+      "reason": "",
+      "price": 86.77
+    },
+    {
+      "date": "2026-09-11",
+      "market": "us",
+      "symbol": "TTD",
+      "name": "The Trade Desk, Inc.",
+      "verdict": "제외",
+      "severity": "일시적",
+      "reason": "2Q 매출·EPS 컨센 하회(EPS 34c vs 40c), 9/3 인력 약 15% 감원 발표($39~51M 구조조정 비용)와 매출 급둔화 — 자체 실적쇼크·수요 둔화 확정",
+      "price": 14.2
+    },
+    {
+      "date": "2026-09-11",
+      "market": "us",
+      "symbol": "BMY",
+      "name": "Bristol-Myers Squibb Company",
+      "verdict": "매수유지",
+      "severity": "",
+      "reason": "",
+      "price": 63.46
+    },
+    {
+      "date": "2026-09-11",
+      "market": "us",
+      "symbol": "KLAC",
+      "name": "KLA Corporation",
+      "verdict": "매수유지",
+      "severity": "",
+      "reason": "",
+      "price": 181.1
+    },
+    {
+      "date": "2026-09-11",
+      "market": "us",
+      "symbol": "QCOM",
+      "name": "QUALCOMM Incorporated",
+      "verdict": "매수유지",
+      "severity": "",
+      "reason": "",
+      "price": 182.51
+    },
+    {
+      "date": "2026-09-11",
+      "market": "us",
+      "symbol": "XYZ",
+      "name": "Block, Inc.",
+      "verdict": "매수유지",
+      "severity": "",
+      "reason": "",
+      "price": 79.64
+    },
+    {
+      "date": "2026-09-11",
+      "market": "us",
+      "symbol": "META",
+      "name": "Meta Platforms, Inc.",
+      "verdict": "매수유지",
+      "severity": "",
+      "reason": "",
+      "price": 652.08
+    },
+    {
+      "date": "2026-09-11",
+      "market": "us",
+      "symbol": "CMI",
+      "name": "Cummins Inc.",
+      "verdict": "매수유지",
+      "severity": "",
+      "reason": "",
+      "price": 556.42
     }
   ]
 }
