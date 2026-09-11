@@ -593,6 +593,386 @@
       "severity": "",
       "reason": "",
       "price": 139.64
+    },
+    {
+      "date": "2026-08-21",
+      "market": "us",
+      "symbol": "BKNG",
+      "name": "Booking Holdings Inc.",
+      "verdict": "매수유지",
+      "severity": "",
+      "reason": "",
+      "price": 209.62
+    },
+    {
+      "date": "2026-08-21",
+      "market": "us",
+      "symbol": "INCY",
+      "name": "Incyte Corporation",
+      "verdict": "매수유지",
+      "severity": "",
+      "reason": "",
+      "price": 127.81
+    },
+    {
+      "date": "2026-08-21",
+      "market": "us",
+      "symbol": "TTD",
+      "name": "The Trade Desk, Inc.",
+      "verdict": "매수유지",
+      "severity": "",
+      "reason": "",
+      "price": 13.18
+    },
+    {
+      "date": "2026-08-21",
+      "market": "us",
+      "symbol": "GM",
+      "name": "General Motors Company",
+      "verdict": "매수유지",
+      "severity": "",
+      "reason": "",
+      "price": 87.93
+    },
+    {
+      "date": "2026-08-21",
+      "market": "us",
+      "symbol": "BMY",
+      "name": "Bristol-Myers Squibb Company",
+      "verdict": "매수유지",
+      "severity": "",
+      "reason": "",
+      "price": 67.01
+    },
+    {
+      "date": "2026-08-21",
+      "market": "us",
+      "symbol": "SWKS",
+      "name": "Skyworks Solutions, Inc.",
+      "verdict": "매수유지",
+      "severity": "",
+      "reason": "",
+      "price": 67.14
+    },
+    {
+      "date": "2026-08-21",
+      "market": "us",
+      "symbol": "QCOM",
+      "name": "QUALCOMM Incorporated",
+      "verdict": "매수유지",
+      "severity": "",
+      "reason": "",
+      "price": 160.75
+    },
+    {
+      "date": "2026-08-21",
+      "market": "us",
+      "symbol": "XYZ",
+      "name": "Block, Inc.",
+      "verdict": "매수유지",
+      "severity": "",
+      "reason": "",
+      "price": 82.16
+    },
+    {
+      "date": "2026-08-21",
+      "market": "us",
+      "symbol": "META",
+      "name": "Meta Platforms, Inc.",
+      "verdict": "매수유지",
+      "severity": "",
+      "reason": "",
+      "price": 549.9
+    },
+    {
+      "date": "2026-08-21",
+      "market": "us",
+      "symbol": "CMI",
+      "name": "Cummins Inc.",
+      "verdict": "매수유지",
+      "severity": "",
+      "reason": "",
+      "price": 587.68
+    },
+    {
+      "date": "2026-09-04",
+      "market": "kr",
+      "symbol": "071320",
+      "name": "지역난방공사",
+      "verdict": "매수유지",
+      "severity": "",
+      "reason": "",
+      "price": 75600.0
+    },
+    {
+      "date": "2026-09-04",
+      "market": "kr",
+      "symbol": "015760",
+      "name": "한국전력",
+      "verdict": "제외",
+      "severity": "일시적",
+      "reason": "8/12 공시된 2분기 영업이익이 1조1286억원으로 시장 컨센서스(약 2조원) 대비 대폭 미달, 전년동기比 47.2% 감소한 어닝쇼크. 중동發 LNG가격 급등으로 발전자회사 연료비가 8177억원 늘어난 것이 주원인이며 상반기 누적 영업이익도 전년比 16.6% 감소.",
+      "price": 32150.0
+    },
+    {
+      "date": "2026-09-04",
+      "market": "kr",
+      "symbol": "002380",
+      "name": "KCC",
+      "verdict": "매수유지",
+      "severity": "",
+      "reason": "",
+      "price": 482000.0
+    },
+    {
+      "date": "2026-09-04",
+      "market": "kr",
+      "symbol": "003030",
+      "name": "세아제강지주",
+      "verdict": "매수유지",
+      "severity": "",
+      "reason": "",
+      "price": 103000.0
+    },
+    {
+      "date": "2026-09-04",
+      "market": "kr",
+      "symbol": "138930",
+      "name": "BNK금융지주",
+      "verdict": "매수유지",
+      "severity": "",
+      "reason": "",
+      "price": 15390.0
+    },
+    {
+      "date": "2026-09-04",
+      "market": "kr",
+      "symbol": "006040",
+      "name": "동원산업",
+      "verdict": "매수유지",
+      "severity": "",
+      "reason": "",
+      "price": 38100.0
+    },
+    {
+      "date": "2026-09-04",
+      "market": "kr",
+      "symbol": "024110",
+      "name": "기업은행",
+      "verdict": "매수유지",
+      "severity": "",
+      "reason": "",
+      "price": 20700.0
+    },
+    {
+      "date": "2026-09-04",
+      "market": "kr",
+      "symbol": "139480",
+      "name": "이마트",
+      "verdict": "제외",
+      "severity": "일시적",
+      "reason": "8/13 발표 2분기 연결 영업손실 430억원으로 적자전환. 자회사 SCK컴퍼니(스타벅스코리아)가 5월 '탱크데이' 논란발 불매운동 여파로 국내 진출 이후 27년만에 첫 분기 적자(-184억원)를 기록해 연결실적을 훼손. 본업(할인점·트레이더스)은 매출·이익 모두 견조.",
+      "price": 73500.0
+    },
+    {
+      "date": "2026-09-04",
+      "market": "us",
+      "symbol": "BKNG",
+      "name": "Booking Holdings Inc.",
+      "verdict": "매수유지",
+      "severity": "",
+      "reason": "",
+      "price": 193.29
+    },
+    {
+      "date": "2026-09-04",
+      "market": "us",
+      "symbol": "INCY",
+      "name": "Incyte Corporation",
+      "verdict": "매수유지",
+      "severity": "",
+      "reason": "",
+      "price": 126.75
+    },
+    {
+      "date": "2026-09-04",
+      "market": "us",
+      "symbol": "GM",
+      "name": "General Motors Company",
+      "verdict": "매수유지",
+      "severity": "",
+      "reason": "",
+      "price": 87.76
+    },
+    {
+      "date": "2026-09-04",
+      "market": "us",
+      "symbol": "TTD",
+      "name": "The Trade Desk, Inc.",
+      "verdict": "제외",
+      "severity": "일시적",
+      "reason": "2Q 매출·EPS 컨센서스 하회(매출 -4.9%), 3Q 가이던스 전년비 -12% 시사, CFO·CMO·상업총괄 동시 교체, 9/3 인력 15% 감원 발표 — 자체 실적쇼크·가이던스 하향 확정",
+      "price": 14.43
+    },
+    {
+      "date": "2026-09-04",
+      "market": "us",
+      "symbol": "BMY",
+      "name": "Bristol-Myers Squibb Company",
+      "verdict": "매수유지",
+      "severity": "",
+      "reason": "",
+      "price": 66.82
+    },
+    {
+      "date": "2026-09-04",
+      "market": "us",
+      "symbol": "KLAC",
+      "name": "KLA Corporation",
+      "verdict": "매수유지",
+      "severity": "",
+      "reason": "",
+      "price": 185.6
+    },
+    {
+      "date": "2026-09-04",
+      "market": "us",
+      "symbol": "QCOM",
+      "name": "QUALCOMM Incorporated",
+      "verdict": "매수유지",
+      "severity": "",
+      "reason": "",
+      "price": 168.74
+    },
+    {
+      "date": "2026-09-04",
+      "market": "us",
+      "symbol": "XYZ",
+      "name": "Block, Inc.",
+      "verdict": "매수유지",
+      "severity": "",
+      "reason": "",
+      "price": 82.76
+    },
+    {
+      "date": "2026-09-04",
+      "market": "us",
+      "symbol": "META",
+      "name": "Meta Platforms, Inc.",
+      "verdict": "매수유지",
+      "severity": "",
+      "reason": "",
+      "price": 616.77
+    },
+    {
+      "date": "2026-09-04",
+      "market": "us",
+      "symbol": "CMI",
+      "name": "Cummins Inc.",
+      "verdict": "매수유지",
+      "severity": "",
+      "reason": "",
+      "price": 560.75
+    },
+    {
+      "date": "2026-09-10",
+      "market": "us",
+      "symbol": "BKNG",
+      "name": "Booking Holdings Inc.",
+      "verdict": "매수유지",
+      "severity": "",
+      "reason": "",
+      "price": 173.85
+    },
+    {
+      "date": "2026-09-10",
+      "market": "us",
+      "symbol": "INCY",
+      "name": "Incyte Corporation",
+      "verdict": "매수유지",
+      "severity": "",
+      "reason": "",
+      "price": 125.99
+    },
+    {
+      "date": "2026-09-10",
+      "market": "us",
+      "symbol": "GM",
+      "name": "General Motors Company",
+      "verdict": "매수유지",
+      "severity": "",
+      "reason": "",
+      "price": 84.65
+    },
+    {
+      "date": "2026-09-10",
+      "market": "us",
+      "symbol": "TTD",
+      "name": "The Trade Desk, Inc.",
+      "verdict": "제외",
+      "severity": "일시적",
+      "reason": "9/3 전 직원 약 15%(500명 이상) 감원 발표, 3900만~5100만달러 구조조정 비용, 직전 2Q 매출 +3%로 컨센 하회 — 자체 실적 부진·구조조정 확정(9/3).",
+      "price": 13.77
+    },
+    {
+      "date": "2026-09-10",
+      "market": "us",
+      "symbol": "BMY",
+      "name": "Bristol-Myers Squibb Company",
+      "verdict": "매수유지",
+      "severity": "",
+      "reason": "",
+      "price": 64.25
+    },
+    {
+      "date": "2026-09-10",
+      "market": "us",
+      "symbol": "KLAC",
+      "name": "KLA Corporation",
+      "verdict": "매수유지",
+      "severity": "",
+      "reason": "",
+      "price": 175.15
+    },
+    {
+      "date": "2026-09-10",
+      "market": "us",
+      "symbol": "QCOM",
+      "name": "QUALCOMM Incorporated",
+      "verdict": "매수유지",
+      "severity": "",
+      "reason": "",
+      "price": 172.32
+    },
+    {
+      "date": "2026-09-10",
+      "market": "us",
+      "symbol": "XYZ",
+      "name": "Block, Inc.",
+      "verdict": "매수유지",
+      "severity": "",
+      "reason": "",
+      "price": 78.67
+    },
+    {
+      "date": "2026-09-10",
+      "market": "us",
+      "symbol": "META",
+      "name": "Meta Platforms, Inc.",
+      "verdict": "매수유지",
+      "severity": "",
+      "reason": "",
+      "price": 645.94
+    },
+    {
+      "date": "2026-09-10",
+      "market": "us",
+      "symbol": "CMI",
+      "name": "Cummins Inc.",
+      "verdict": "매수유지",
+      "severity": "",
+      "reason": "",
+      "price": 550.68
     }
   ]
 }

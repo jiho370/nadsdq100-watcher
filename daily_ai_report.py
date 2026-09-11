@@ -382,15 +382,26 @@ def _preview_and_send(html, images, subject, out_name, no_email, sent_update, gu
         # 근접한 시각에 겹칠 때 발생 확인됨), 둘 다 실행 시작 시점의 낡은 last_sent.json을
         # 리포트 생성 내내(1~2분) 들고 있다가 서로의 발송 여부를 모른 채 둘 다 보내버렸다
         # (실측: A가 15:09:06 발송·기록 push 완료 후, B가 그 사실을 모른 채 15:11:11에 또
-        # 발송). 보내기 직전에 git pull로 최신 상태를 한 번 더 받아 재확인하면, 먼저 보낸
-        # 쪽의 기록이 이미 반영된 뒤이므로 늦게 온 쪽은 여기서 걸러진다.
+        # 발송). 보내기 직전에 최신 상태를 한 번 더 받아 재확인하면, 먼저 보낸 쪽의 기록이
+        # 이미 반영된 뒤이므로 늦게 온 쪽은 여기서 걸러진다.
+        # 2026-09-11(지호 님 재지적 — "국장 메일이 너무 많이 온다", 실측 원인: output/
+        # 아래 여전히 추적 중이던 ai_verdict_log.json이 매 실행 변경되는데 "Persist state"가
+        # state/만 add해서 unstaged 상태로 남아 git pull --rebase가 매번 실패 → 발송 기록이
+        # 원격에 전혀 반영이 안 돼 재확인 자체가 무의미했다. 그 파일은 state/로 옮겨 근본
+        # 원인은 없앴지만(.gitignore 참고), 이 재확인 로직 자체도 작업트리 상태에 의존하지
+        # 않도록 git pull 대신 원격 브랜치의 파일 내용을 직접 조회(git show)하는 방식으로
+        # 바꾼다 — 로컬에 어떤 unstaged 변경이 있어도(리포트 실행 중 생기는 output/*.html
+        # 등) 영향받지 않는다.
         if guard_key:
             import subprocess
             try:
-                subprocess.run(["git", "pull", "--quiet"], timeout=30, check=False)
+                subprocess.run(["git", "fetch", "--quiet", "origin"], timeout=30, check=False)
+                proc = subprocess.run(["git", "show", "origin/main:state/last_sent.json"],
+                                      capture_output=True, text=True, timeout=15, check=False)
+                remote_last = json.loads(proc.stdout) if proc.returncode == 0 and proc.stdout.strip() else {}
             except Exception:
-                pass
-            if _load_last_sent().get(guard_key) == sent_update.get(guard_key):
+                remote_last = {}
+            if remote_last.get(guard_key) == sent_update.get(guard_key):
                 print(f"[중복] 발송 직전 재확인 결과 이미 발송됨({guard_key}) → 막판 취소", file=sys.stderr)
                 return
         if R.send_email(subject, html, images):

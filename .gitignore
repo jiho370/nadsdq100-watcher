@@ -46,5 +46,10 @@ output/binance_1m_cache_*.pkl
 # 위 캐시 규칙의 예외 — 이름은 cache지만 실제로는 추적해야 하는 파일:
 #   output/fundamentals_cache.json : export_data.py 가 읽는 런타임 데이터 의존성.
 #                                    없으면 종목 선정에서 펀더멘탈 팩터가 조용히 빠진다.
-#   output/kospi200_cache.json     : GitHub Actions 가 commit-back 하는 상태 파일.
-# (두 파일은 위 패턴에 걸리지 않으므로 별도 예외 규칙이 필요 없다 — 이 주석은 실수 방지용)
+# (이 패턴에 걸리지 않으므로 별도 예외 규칙이 필요 없다 — 이 주석은 실수 방지용)
+# ⚠ 2026-09-09 리포 정리로 kospi200_cache.json은 state/로 이전됨(kr_stocks.py CACHE 참고,
+#   위 예외 목록에서도 제거). 2026-09-11: ai_verdict_log.json도 같은 이유로 output/에서
+#   state/로 이전(GitHub Actions "Persist state"가 이제 state/만 add해서, output/에 남아있던
+#   추적 파일의 매 실행 변경분이 unstaged 상태로 남아 git pull --rebase를 막아 상태 커밋
+#   자체가 계속 실패하고 있었다 — 중복발송 가드 무력화의 실제 원인, daily_ai_report.py
+#   _preview_and_send 참고).

@@ -18,7 +18,7 @@ ai_verdict_log.py — AI 검증(매수유지/관찰강등/제외) verdict의 사
 from __future__ import annotations
 import os, json, datetime as dt
 
-LOG_PATH = os.environ.get("AI_VERDICT_LOG", "output/ai_verdict_log.json")
+LOG_PATH = os.environ.get("AI_VERDICT_LOG", "state/ai_verdict_log.json")
 MIN_DAYS = int(os.environ.get("AI_VERDICT_MIN_DAYS", "28"))   # 최소 경과일(약 4주 forward return)
 MIN_N = int(os.environ.get("AI_VERDICT_MIN_N", "10"))          # 그룹당 최소 표본
 
