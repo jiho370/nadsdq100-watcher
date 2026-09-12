@@ -80,6 +80,15 @@ STATE_META = {
     "risk_off":       ("🔴", "위험 회피",        "#b91c1c", "신규 중단 + 비중 절반 이상 축소 권고"),
 }
 
+# 2026-09-05(지호 님 요청): 5단계 매수/매도 라벨(STATE_META)은 무작위매매 대비 유의성이
+# 실제로 검증·통과된 자산에서만 표시한다(HISTORY.md §11 — 샤프·MDD 둘 다 95%ile 통과).
+# 나머지(코스피·코스닥·금·채권·나스닥100·S&P500)는 §9-K-2/§9-D/§9-E에서 PBO/DSR 게이트
+# 불통과 또는 매수후보유 대비 이길 확률 50% 미만으로 확인됐거나(코스피·S&P500), 이 5단계
+# 신호 자체가 아예 검증된 적이 없다(코스닥·나스닥100) — 라벨·액션 문구만 숨기고 가격·
+# 추세·모멘텀 등 원자료는 그대로 표시한다.
+RANDOM_VALIDATED = {"BTC", "ETH"}
+RANDOM_VALIDATED_TICKERS = {tic for key, _, tic, _, _ in CORE_ASSETS if key in RANDOM_VALIDATED}
+
 
 # ------------------------- 계산 유틸 -------------------------
 def _sma(closes, w, idx=None):
@@ -266,9 +275,10 @@ def lean_for_ai(sig: dict, when: str | None = None) -> list:
     items = core_for(sig, when) if when else sig.get("core", [])
     for a in items:
         d = {k: (round(v, 2) if isinstance(v, float) else v) for k, v in a.items() if k not in ("closes", "dates")}
-        meta = STATE_META.get(a["signal"])
-        d["signal_kr"] = meta[1] if meta else a["signal"]
-        d["action"] = meta[3] if meta else ""
+        validated = a.get("key") in RANDOM_VALIDATED
+        meta = STATE_META.get(a["signal"]) if validated else None
+        d["signal_kr"] = (meta[1] if meta else a["signal"]) if validated else None
+        d["action"] = (meta[3] if meta else "") if validated else ""
         out.append(d)
     return out
 
@@ -331,6 +341,7 @@ def signal_cards_html(sig: dict, chart_cids: dict | None = None, when: str | Non
     cards = ""
     items = core_for(sig, when) if when else sig.get("core", [])
     for a in items:
+        validated = a["key"] in RANDOM_VALIDATED
         emoji, label, color, action = STATE_META.get(a["signal"], ("", a["signal"], "#6b7280", ""))
         chips = _pct("전일", a.get("ret_1d"), 2) + _pct("1개월", a.get("ret_1m")) + _pct("6개월", a.get("ret_6m"))
         if a.get("gap_trend") is not None:
@@ -345,20 +356,26 @@ def signal_cards_html(sig: dict, chart_cids: dict | None = None, when: str | Non
         if chart_cids and a["key"] in chart_cids:
             chart = (f'<td width="40%" valign="top" style="padding:10px 10px 10px 0">'
                      f'<img src="cid:{chart_cids[a["key"]]}" style="width:100%;border-radius:6px"></td>')
+        # 2026-09-05: 무작위매매 대비 유의성 검증·통과 자산(RANDOM_VALIDATED)만 5단계
+        # 매수/매도 라벨·액션 문구를 표시. 나머지는 가격·추세·모멘텀 등 원자료만 표시.
+        sig_chip = _chip(f"{emoji} {label}", color, True) if validated else ""
+        action_div = (f'<div style="font-size:12px;color:#1d4ed8;background:#eff6ff;border-radius:6px;'
+                      f'padding:4px 8px;margin-top:6px">🎯 {_esc(action)}</div>') if validated else ""
         cards += (
             f'<table role="presentation" width="100%" style="border-collapse:collapse;border:1px solid #e5e7eb;'
             f'border-radius:10px;margin:8px 0;background:#fff;overflow:hidden"><tr>'
             f'<td valign="top" style="padding:10px 12px">'
             f'<div style="font-size:14px;font-weight:700">{_esc(a["name"])} '
             f'<span style="color:#6b7280;font-size:11px;font-weight:400">{_fmt_price(a)}</span> '
-            f'{_chip(f"{emoji} {label}", color, True)}</div>'
+            f'{sig_chip}</div>'
             f'<div style="margin:4px 0 0">{chips}</div>'
-            f'<div style="font-size:12px;color:#1d4ed8;background:#eff6ff;border-radius:6px;'
-            f'padding:4px 8px;margin-top:6px">🎯 {_esc(action)}</div></td>{chart}</tr></table>')
+            f'{action_div}</td>{chart}</tr></table>')
     legend = ('<div style="font-size:10px;color:#9ca3af;margin-top:4px;line-height:1.5">'
               '신호 규칙: 주식 지수 = 200일선 ±1% 히스테리시스(3일 확인) + 12-1 모멘텀 · '
               '코인 = 120일선 ±3% + 3개월 모멘텀. 눌림목 = 상승 레짐 속 20일선(코인 50일선) 아래. '
               '미국채10년 = 150일선(밴드 없음, 3일 확인) — 이 추세선만 검증됐고 모멘텀/눌림목/'
               '5단계 라벨은 참고용(주식 파라미터를 표시용으로 물려받음). '
-              '자세한 근거는 HISTORY.md.</div>')
+              '5단계 매수/매도 라벨은 무작위매매 대비 유의성이 확인된 비트코인·이더리움에만 '
+              '표시합니다(HISTORY.md §11) — 그 외 자산은 게이트 미통과·미검증이라 라벨 없이 '
+              '추세·모멘텀 수치만 표시합니다. 자세한 근거는 HISTORY.md.</div>')
     return cards + legend

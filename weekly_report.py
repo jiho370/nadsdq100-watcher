@@ -209,10 +209,15 @@ def gather() -> dict:
             ms = MS.analyze(c, kind)   # 일일 신호 엔진과 동일 규칙(레짐 히스테리시스+모멘텀,
                                        # 채권은 전용 파라미터 — market_signals.PARAMS["bond"])
             meta = MS.STATE_META.get(ms["signal"], ("", "", "#6b7280", ""))
+            # 2026-09-05: 무작위매매 대비 유의성이 검증·통과된 자산(코인=BTC)만 5단계
+            # 매수/매도 라벨을 표시(market_signals.RANDOM_VALIDATED, HISTORY.md §11).
+            validated = tic in MS.RANDOM_VALIDATED_TICKERS
             assets[key] = {"key": key, "name": name, "ticker": tic, "howto": howto,
                            "closes": c, **_signals(c, trend_n),
                            "regime": ms["regime"], "mom12": ms["mom"],
-                           "signal": ms["signal"], "signal_kr": meta[1], "signal_action": meta[3]}
+                           "signal": ms["signal"],
+                           "signal_kr": meta[1] if validated else None,
+                           "signal_action": meta[3] if validated else None}
     gsub = {}
     for key, name, tic in GLOBAL_SUB:
         c = closes.get(tic)
