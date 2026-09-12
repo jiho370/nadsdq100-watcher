@@ -18,7 +18,7 @@
 필수 13개: daily_ai_report.py · ai_report.py · export_data.py · market_signals.py · kr_stocks.py ·
 holdings.py · weekly_report.py · tech_factors.py · fundamentals_edgar.py · backtest_weights.py ·
 ai_commentary.py(덮어쓰기) · sp500_daily_report.py(덮어쓰기) · requirements.txt(덮어쓰기)
-문서(권장): USAGE.md · STRATEGY.md · HANDOFF.md · GITHUB_SETUP.md · .gitignore
+문서(권장): USAGE.md · HISTORY.md · HANDOFF.md · GITHUB_SETUP.md · .gitignore
 그대로 두기: sp500_profiles.json · state_prev_list.json (저장소에 이미 있음)
 저장소에서 삭제할 것: 옛 워크플로 yml (이중 발송 방지)
 
@@ -76,7 +76,7 @@ AI 해설 비용: Sonnet + 웹검색 6회 기준 하루 수십 원, 월 2~5천 �
   (GitHub cron 은 5~20분 지연될 수 있음 → 실제 도착 07:30~08:00.)
 - 발송 실패 시: Actions 탭에서 실패 로그 확인. 발송 성공 시에만 `output/last_sent.json` 이 기록돼 이중 발송이 방지된다.
 - 보유목록(매도 추적)은 `output/ai_holdings.json`(미국)·`output/kr_holdings.json`(한국)에 자동 커밋된다.
-- 전략 파라미터 변경: `STRATEGY.md` 규칙 수정 후 해당 코드(주로 `market_signals.py` PARAMS)와 워크플로 env.
+- 전략 파라미터 변경: `HISTORY.md` 규칙 수정 후 해당 코드(주로 `market_signals.py` PARAMS)와 워크플로 env.
 - 분기~반기마다 `backtest_weights.py` 재검증 권장(팩터 감쇠).
 
 ## 5. 예전 방식과의 관계

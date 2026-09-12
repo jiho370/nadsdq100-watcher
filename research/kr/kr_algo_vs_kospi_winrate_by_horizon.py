@@ -105,7 +105,7 @@ def run(save=True, use_cache=True) -> dict:
         "method": "1거래일 단위 겹치는(rolling) 윈도우 — 미국판(algo_vs_spy_winrate_by_"
                   "horizon.py)과 동일 방법론. 윈도우가 매일 겹쳐 자기상관이 큼(독립시행 아님) "
                   "— PBO/DSR류 다중검정 게이트 대상 통계는 아님.",
-        "caveat": "valuediv 전략 자체가 STRATEGY.md §3에서 단일 트라이얼 우승자 게이트를 "
+        "caveat": "valuediv 전략 자체가 HISTORY.md §3에서 단일 트라이얼 우승자 게이트를 "
                   "통과 못함(PBO 77.8%·DSR 0.64) — 코어-새틀라이트 구조로만 조건부 채택된 "
                   "전략이라, 여기서 보는 '새틀라이트 단독' vs 코스피200 비교는 실제 라이브 "
                   "배분(코어65:새틀35 권고)과 다른 조건(새틀라이트 100%)임에 유의.",

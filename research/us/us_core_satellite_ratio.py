@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 us_core_satellite_ratio.py — 지호 님 질문(2026-07-17) 대응: "미국도 코어:새틀라이트
-비율을 백테스트로 검증했나?" STRATEGY.md 확인 결과 §2(미국)에는 "코어" 언급이 전혀
+비율을 백테스트로 검증했나?" HISTORY.md 확인 결과 §2(미국)에는 "코어" 언급이 전혀
 없었음(§3/§3.5 코어-새틀라이트는 전부 한국 전용 — core_satellite_kr.py·
 kr_topn_ratio_sweep.py). 지호 님이 기억한 "며칠 전 미국 비율 검증"은 별개 개념인
 분할매수 비율(entry tranche, §2 line 148)이었을 가능성이 높음. 이 스크립트가 진짜
@@ -27,7 +27,7 @@ import backtest_weights as BW
 import research.kr.core_satellite_kr as CS  # regime_series/timed_nav/mix_nav/stats — 시장 무관 범용 로직
 
 RATIO_LIST = [1.0, 0.9, 0.8, 0.7, 0.65, 0.6, 0.5, 0.4, 0.35, 0.3, 0.2, 0.1, 0.0]
-TOPN = 8  # 현재 라이브 champion(STRATEGY.md §2 topN 재검증 v2)
+TOPN = 8  # 현재 라이브 champion(HISTORY.md §2 topN 재검증 v2)
 
 # 2026-07-17 Fable 5 자문 반영: 샤프·MDD·서브기간 샤프만으로는 "분산=방어력" 직관과
 # 어긋나는 결과(코어비중 낮을수록 단조 개선)의 원인을 못 가림 — (A)코어-새틀라이트

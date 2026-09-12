@@ -17,7 +17,7 @@ us_signal_binary_switch_allassets.png 차트 PNG만 남음)에서 "BTC 라이브
 `backtest_regime_assets.simulate()`로 직접 답한다. ETH에도 동일 방법론을 처음 적용한다.
 
 "라이브 레짐 규칙"의 정의: market_signals.PARAMS["crypto"] / backtest_regime_assets.BTC_CURRENT
-(120일선·±3%밴드·확인3일). 모멘텀 필터(3개월 절대모멘텀)는 포함하지 않음 — STRATEGY.md §1의
+(120일선·±3%밴드·확인3일). 모멘텀 필터(3개월 절대모멘텀)는 포함하지 않음 — HISTORY.md §1의
 "필터 자체 효과" 헤드라인 수치(MDD -83.4%→-60.0%, CAGR 33.5%→45.0% 등)와
 output/regime_backtest_btc.json의 stage1.current가 정확히 이 정의(추세선·밴드·확인일수만,
 모멘텀 AND게이트 제외)로 계산된 것과 일치함을 확인 후 사용했다(모멘텀 AND게이트는 Stage2의
@@ -60,7 +60,7 @@ def _regime_only_exposure(closes: np.ndarray, params: dict) -> np.ndarray:
 def _regime_and_momentum_exposure(closes: np.ndarray, params: dict) -> np.ndarray:
     """market_signals.PARAMS의 '라이브 규칙'을 더 넓게 해석한 버전 — 레짐(추세선) ON뿐
     아니라 절대모멘텀(3개월)까지 AND로 요구(Stage2 정의와 동일). regime-only 버전과
-    나란히 병기하는 이유: 정정 없는 원 STRATEGY.md §1 헤드라인 수치는 regime-only로
+    나란히 병기하는 이유: 정정 없는 원 HISTORY.md §1 헤드라인 수치는 regime-only로
     확인되지만(별도 검증됨), 분실된 2026-08 세션 차트가 실제로 어느 정의를 썼는지는
     코드가 없어 알 수 없다 — 두 정의 모두로 시대분할을 확인해 결론이 정의에 좌우되는지
     점검한다."""
@@ -116,7 +116,7 @@ def main():
 
     era_result = {
         "live_rule_definition": BTC_CURRENT,
-        "note": "두 정의 병기 — regime_only: STRATEGY.md §1 '필터 효과' 헤드라인 수치와 동일 "
+        "note": "두 정의 병기 — regime_only: HISTORY.md §1 '필터 효과' 헤드라인 수치와 동일 "
                 "정의(추세선·밴드·확인일수만). regime_and_momentum: 3개월 절대모멘텀까지 "
                 "AND(Stage2 정의). 분실된 2026-08 세션 차트가 어느 쪽을 썼는지 코드가 없어 "
                 "확인 불가 — 결론이 정의에 좌우되는지 점검하기 위해 둘 다 계산.",

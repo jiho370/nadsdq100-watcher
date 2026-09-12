@@ -39,7 +39,7 @@ python -m research.us.us_factor_formula_sweep
 ├─ state/                 ← CI가 commit-back 하는 상태파일 (추적됨)
 ├─ output/                ← 실행 산출물·백테스트 결과 (대부분 gitignore)
 ├─ docs/                  ← 설계·전략 문서
-│   ├─ strategy/          ← STRATEGY.md 등 전략 근거
+│   ├─ strategy/          ← HISTORY.md 등 전략 근거
 │   ├─ research/          ← 리서치 노트·스펙
 │   └─ archive/           ← 완료된 핸드오프 기록
 └─ data/                  ← 수동 다운로드 원본 (gitignore)
@@ -137,8 +137,11 @@ CLI(구독, $0)만 쓴다 — CLI가 없으면 예전처럼 유료 Batch API로 
 
 | 문서 | 내용 |
 |---|---|
+| [docs/strategy/LIVE.md](docs/strategy/LIVE.md) | **지금 뭐가 라이브고 왜** — 자산군별 요약, 가장 먼저 볼 문서 |
 | [docs/SYSTEM_OVERVIEW.md](docs/SYSTEM_OVERVIEW.md) | 시스템 전체 구조 |
 | [docs/USAGE.md](docs/USAGE.md) | 사용법 |
 | [docs/GITHUB_SETUP.md](docs/GITHUB_SETUP.md) | Actions·시크릿 설정 |
 | [docs/VALIDATION_PIPELINE.md](docs/VALIDATION_PIPELINE.md) | 검증 파이프라인(PBO/DSR) |
-| [docs/strategy/STRATEGY.md](docs/strategy/STRATEGY.md) | 전략 근거 전문 — 모든 파라미터의 출처 |
+| [docs/strategy/HISTORY.md](docs/strategy/HISTORY.md) | 시행착오 전체 기록 — 날짜별 세션 로그, "왜 이렇게 됐는지" |
+| [docs/playbook/03-method/EXECUTION.md](docs/playbook/03-method/EXECUTION.md) | 체결·비용 모델 실측 감사 |
+| [docs/MAINTENANCE.md](docs/MAINTENANCE.md) | 이 리포를 편집·리팩터링할 때 참고할 체크리스트 |

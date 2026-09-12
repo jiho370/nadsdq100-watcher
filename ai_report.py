@@ -2,7 +2,7 @@
 """
 ai_report.py — 2단계(검증→서술) AI 리포트 생성기. 비용 최소화 설계.
 
-역할 분담 (STRATEGY.md §5 + 2026-07 비용 개편):
+역할 분담 (HISTORY.md §5 + 2026-07 비용 개편):
   · 규칙(코드)      = 후보 발굴 + '실행 계획' 확정.
                       매수 분할 가격·비율, 손절선, 관찰→매수 전환 조건, 매도 처분 계획은
                       전부 entry_plan.py 가 지표로 계산한다. AI는 이 숫자를 바꿀 수 없다.
@@ -159,7 +159,7 @@ def attach_plans(groups: dict):
 # 2026-07-16 재설계(Fable 5 자문): 이 필터는 "정량 팩터 랭킹을 신뢰하고 검증 가능한
 # 개별종목 악재만 걸러내는 최소개입 거부권(veto)"이어야 한다 — 순위를 재구성하는
 # 큐레이터가 아니다. 근거: 이 프로젝트의 2단계 재랭킹 백테스트에서 검증 안 된 재정렬은
-# 전부 원래 팩터 신호보다 나빴다(STRATEGY.md §3 "2단계 재랭킹 검증"). 종목 간 비교·상대
+# 전부 원래 팩터 신호보다 나빴다(HISTORY.md §3 "2단계 재랭킹 검증"). 종목 간 비교·상대
 # 우열 판단을 금지해야 그 결론과 충돌하지 않는다.
 _V_SYSTEM = (
     "당신은 규칙 기반으로 선정된 주식 후보를 '최신 정보로 검증'하는 애널리스트다. 한국어로 답한다.\n"
@@ -1120,7 +1120,7 @@ def render_report_html(report, as_of="", metrics_by_sym=None, market_html="", si
         note_html = (f'<div style="font-size:13px;color:#111;margin:4px 0 8px;line-height:1.55">{note}</div>'
                      if note else "")
         signals_sec = ('<h3 style="margin:18px 0 4px">&#129517; 지수·코인 추세 신호 <span style="color:#9ca3af;font-size:12px">'
-                       '(규칙 기반 — STRATEGY.md)</span></h3>' + note_html + signals_html)
+                       '(규칙 기반 — HISTORY.md)</span></h3>' + note_html + signals_html)
     kr_note = (
         '<div style="font-size:12px;color:#374151;background:#f8fafc;border-radius:6px;'
         'padding:6px 9px;margin:2px 0 8px;line-height:1.5">저PER(저평가)·저PBR(저평가)·고배당'
@@ -1179,5 +1179,5 @@ def render_report_html(report, as_of="", metrics_by_sym=None, market_html="", si
         f'{holdings_html}'
         f'<div style="font-size:11px;color:#9ca3af;margin-top:14px;line-height:1.5">'
         f'&#9888;&#65039; {_esc(report.get("risks"))}<br>정보 제공용이며 투자 권유가 아닙니다. 판단·책임은 본인에게 있습니다.<br>'
-        f'매도 규칙: 6개월 정기 재평가 또는 200일선 -3% 이탈 (미국·한국 공통). 전략 근거: STRATEGY.md</div>'
+        f'매도 규칙: 6개월 정기 재평가 또는 200일선 -3% 이탈 (미국·한국 공통). 전략 근거: HISTORY.md</div>'
         f'</div>')

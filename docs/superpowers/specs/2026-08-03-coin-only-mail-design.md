@@ -34,7 +34,7 @@
 
 - `CORE_ASSETS`에 이더리움 추가: `("ETH", "이더리움", "ETH-USD", "crypto", ...)`.
   `PARAMS["crypto"]`(120일선·±3%밴드·확인3일·3개월모멘텀·50일선눌림, `analyze()`가 이미
-  `kind="crypto"`로 이 파라미터를 적용)를 튜닝 없이 그대로 적용 — STRATEGY.md §1에 ETH에
+  `kind="crypto"`로 이 파라미터를 적용)를 튜닝 없이 그대로 적용 — HISTORY.md §1에 ETH에
   BTC 파라미터를 튜닝 없이 적용해도 방향성이 일치했다는 사전 확인 이력이 있음.
 - `when` 필드를 단일 문자열이 아니라 **자산 하나가 여러 메일에 동시 소속**될 수 있게
   일반화. BTC의 `when`을 `("us", "coin")`으로, ETH의 `when`을 `("coin",)`으로 설정.
@@ -108,5 +108,5 @@ MS.gather(yf)  →  core: [KOSPI, KOSDAQ, GOLD, BOND, NDX, SPX, BTC, ETH] (신�
 ## 미해결/후속 과제 (이번 설계 범위 밖)
 
 - 재시도(워치독) cron — 필요성이 실측되면 추가.
-- ETH 파라미터 자체 검증(현재는 BTC 파라미터를 튜닝 없이 전용) — STRATEGY.md §6-G 열린
+- ETH 파라미터 자체 검증(현재는 BTC 파라미터를 튜닝 없이 전용) — HISTORY.md §6-G 열린
   실에 이미 기록된 저우선 과제.

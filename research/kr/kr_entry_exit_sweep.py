@@ -11,7 +11,7 @@ kr_entry_exit_sweep.py — 국장 새틀라이트 매수/매도 '집행 방식' 
 그런데 이 두 스윕은 `_select_basket`(미국 팩터 가중치)로 종목을 고정 선정해 **미국 데이터로만**
 실행됐다. entry_plan.py는 US/KR 공용 모듈이라 이 결론(분할매수 50/50, 즉시전량 매도)을 한국
 쪽으로 검증 없이 그대로 썼다 — 이 프로젝트에서 이미 여러 번 반복된 패턴(topn·매도규칙도
-처음엔 미국 결론을 복사했다가 한국 전용 재검증에서 결론이 달라짐, STRATEGY.md §3 Stage 6·6.1).
+처음엔 미국 결론을 복사했다가 한국 전용 재검증에서 결론이 달라짐, HISTORY.md §3 Stage 6·6.1).
 
 설계: backtest_exec.py의 트레이드 엔진(_simulate_trade, ENTRY_RATIO_2/3, DISPOSAL_SWEEP)은
 종목 선정과 무관한 범용 엔진이다 — run_entry_ratio_sweep/run_disposal_sweep에 select_fn을

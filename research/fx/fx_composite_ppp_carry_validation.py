@@ -3,7 +3,7 @@
 fx_composite_ppp_carry_validation.py — PPP(REER)+캐리 복합신호, 타 통화쌍 선행검증 (2026-07-30).
 
 배경: 캐리+VIX 복합신호(fx_composite_external_validation.py)는 외부검증(JPY/BRL/ZAR)에서
-0/3 기각됐다(STRATEGY.md §6-S-6, JPY·BRL은 무작위 대조군 하위 7%권). VIX가 위기를
+0/3 기각됐다(HISTORY.md §6-S-6, JPY·BRL은 무작위 대조군 하위 7%권). VIX가 위기를
 선행경고하지 못하고 동시에 급등하는 지표라 추세추종과 같은 "전환점 지연" 문제를 반복했을
 가능성이 지목됐다. 지호 님이 VIX를 빼고 **PPP(실질실효환율 평균회귀)+캐리** 조합으로
 재도전하기로 결정.

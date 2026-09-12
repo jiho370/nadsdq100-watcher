@@ -4,7 +4,7 @@ us_factor_formula_pit_sweep.py — us_factor_formula_sweep.py의 정정판(2026-
 
 지호 님이 지적한 문제(전작 스크립트가 backtest_weights.build_panel()의 현재 S&P500
 구성종목만 써서 생존편향이 있었고, PBO 41.2%가 원 검증 PBO 15.0%보다 나쁘게 나온 원인이
-표본 크기가 아니라 이 패널 질 차이였음 — STRATEGY.md §2 정정 기록 참고)를 Fable 5 자문
+표본 크기가 아니라 이 패널 질 차이였음 — HISTORY.md §2 정정 기록 참고)를 Fable 5 자문
 반영해 다음과 같이 고친다:
 
   1. 패널 = backtest_costs.build_panel_pit()(PIT 유니버스, 상장폐지 종목 포함)

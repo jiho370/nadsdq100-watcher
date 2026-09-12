@@ -1,7 +1,7 @@
 # 사용법 가이드 (USAGE.md)
 
 매일 아침 자동으로 시장을 점검하고 종목을 추천하는 메일 시스템의 사용 설명서입니다.
-전략의 근거·수치는 `STRATEGY.md`, 자동화 설정은 `GITHUB_SETUP.md`, 유지보수 맥락은 `HANDOFF.md`를 함께 보세요.
+전략의 근거·수치는 `HISTORY.md`, 자동화 설정은 `GITHUB_SETUP.md`, 유지보수 맥락은 `HANDOFF.md`를 함께 보세요.
 
 ---
 
@@ -96,7 +96,7 @@ PC에서 AI까지 쓰려면(구독 CLI, 무료): `set AI_BACKEND=cli` 후 실행
 | `AI_BACKEND` | cli(PC) / api(클라우드) | AI 경로 |
 
 지수 신호 파라미터(200일선·히스테리시스 등)는 `market_signals.py`의 `PARAMS`, 주간 배분은 `weekly_report.py`의 `*_WEIGHTS`.
-규칙을 바꿀 땐 **STRATEGY.md를 먼저 수정**하고 코드에 반영하세요.
+규칙을 바꿀 땐 **HISTORY.md를 먼저 수정**하고 코드에 반영하세요.
 
 ---
 
@@ -124,6 +124,6 @@ PC에서 AI까지 쓰려면(구독 CLI, 무료): `set AI_BACKEND=cli` 후 실행
 | `fundamentals_edgar.py` / `tech_factors.py` / `ai_commentary.py` | 팩터·뉴스 보조 모듈 |
 | `backtest_weights.py` | 팩터 가중치 백테스트(분기 재검증용) |
 | `.github/workflows/report.yml` | 자동 실행 스케줄(GitHub Actions) |
-| `STRATEGY.md` / `GITHUB_SETUP.md` / `HANDOFF.md` | 전략 근거 / 설정법 / 인수인계 |
+| `HISTORY.md` / `GITHUB_SETUP.md` / `HANDOFF.md` | 전략 근거 / 설정법 / 인수인계 |
 
 ⚠️ 이 시스템은 정보 제공용이며 투자 권유가 아닙니다. 최종 판단과 책임은 본인에게 있습니다.

@@ -91,7 +91,7 @@ TOPN_SWEEP = [5, 8, 10, 12, 15, 20]
 
 PULLBACK_WINDOW = 10     # 2차 트랜치 눌림 대기 거래일
 ATR_WINDOW = 60
-MAX_HOLD = 252           # 강제청산 상한(12m) — STRATEGY.md 장기보유 취지상 이 이상은 안 봄
+MAX_HOLD = 252           # 강제청산 상한(12m) — HISTORY.md 장기보유 취지상 이 이상은 안 봄
 TRAIL = 0.20             # holdings.py와 동일(env SELL_TRAIL로 조정 가능하나 여기선 고정 비교)
 MA_BUFFER = 0.03
 

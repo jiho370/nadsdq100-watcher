@@ -284,7 +284,7 @@ def select_by_weights(weights: dict, ind_map: dict, n: int, funds: dict | None =
 
 
 def split_by_entry(candidates: list, k: int = 5, sector_cap: int | None = 2):
-    """후보(점수순)를 분할 (STRATEGY.md §2 진입 필터 반영):
+    """후보(점수순)를 분할 (HISTORY.md §2 진입 필터 반영):
        지금매수 = 200일선 위 & 52주 고점 -25% 이내 & 상승 지속 — 과열은 hot=True 표시.
        관찰     = 점수 상위지만 지금 하락·조정 중(눌림목) 또는 진입 필터 미달.
     조정 판정: 1주 수익률 -2% 이하 이거나 종가가 20일선 아래(-2% 넘게).

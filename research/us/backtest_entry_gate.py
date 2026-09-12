@@ -3,7 +3,7 @@
 backtest_entry_gate.py — "매수/관찰 분류 게이트"(200일선 위 & 52주고점 -25% 이내)가
 이미 채택된 퀄리티 바스켓의 성과를 실제로 바꾸는지 A/B 검증 (지호 님 요청, 2026-07).
 
-배경: export_data.split_by_entry()의 entry_ok() 필터는 STRATEGY.md에 문헌(Faber/
+배경: export_data.split_by_entry()의 entry_ok() 필터는 HISTORY.md에 문헌(Faber/
 Zakamulin의 200일선 추세추종, George-Hwang 2004의 52주고점 근접도)으로만 근거가 있고,
 이 시스템 자체 데이터로 "이 게이트를 켰을 때 이미 검증된 퀄리티 바스켓 성과가 실제로
 개선되는가"는 한 번도 테스트된 적이 없다. 이걸 직접 검증한다.

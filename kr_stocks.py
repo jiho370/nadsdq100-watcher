@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-kr_stocks.py — 코스피200 개별 종목 선별 (STRATEGY.md §3, 2026-07-14 valuediv로 교체).
+kr_stocks.py — 코스피200 개별 종목 선별 (HISTORY.md §3, 2026-07-14 valuediv로 교체).
 
 규칙(KR_STRATEGY_OPTIONS.md §8 검증 반영 — backtest_kr_strategies.py Phase 3):
   · 유니버스: 코스피200
@@ -8,11 +8,11 @@ kr_stocks.py — 코스피200 개별 종목 선별 (STRATEGY.md §3, 2026-07-14 
     200일선 위 필터는 밸류 전략의 성과를 깎는 것으로 확인돼 폐기(추세필터 강제 시 진짜
     저평가 구간을 걸러버림 — 미국 진입게이트 폐지와 동일 취지).
   · 점수(교체, 옛 mom12_1×0.6+hi52×0.4 폐기) = z(1/PER) + z(1/PBR) + z(배당수익률)
-    — "밸류×주주환원" 계열. 코어-새틀라이트 구조(§2-F, STRATEGY.md §3)의 새틀라이트 역할.
+    — "밸류×주주환원" 계열. 코어-새틀라이트 구조(§2-F, HISTORY.md §3)의 새틀라이트 역할.
   · 매수 후보 풀 5(순위순, 2026-07-16 6→5 변경 — topn 정밀검증 Stage 3.1·3.2 결과 반영,
-    STRATEGY.md §3 참고). 보유 상한 5
+    HISTORY.md §3 참고). 보유 상한 5
   · 매도: 6개월 정기 재평가(후보풀 이탈)만 활성 — 200일선 백업은 2026-07-15부로 기본
-    비활성(holdings.py SELL_MA200_BACKUP, 근거는 STRATEGY.md §3 Stage 6)
+    비활성(holdings.py SELL_MA200_BACKUP, 근거는 HISTORY.md §3 Stage 6)
     (state/kr_holdings.json 자동 추적)
 
 데이터: 구성종목·펀더멘탈(PER/PBR/EPS/BPS/DIV) = pykrx(KRX), 시세 = yfinance(.KS 배치 1회).
@@ -27,7 +27,7 @@ CACHE = "state/kospi200_cache.json"
 KR_HOLDINGS = "state/kr_holdings.json"
 # 후보 '풀' 크기 — AI 검증(강등/제외) 후 최종 채택은 ai_report가 KR_FINAL_BUY(5)로 확정.
 # 관찰 폐지(2026-07-13): 풀 전체가 매수 후보, N_WATCH 기본 0.
-# 2026-07-16: topn 6→5 변경(STRATEGY.md §3 Stage 3.1·3.2 — 13년 재검증에서 5가 CAGR·샤프·
+# 2026-07-16: topn 6→5 변경(HISTORY.md §3 Stage 3.1·3.2 — 13년 재검증에서 5가 CAGR·샤프·
 # MDD·Calmar·다운캡처 전부 근소 우위. 통계적으로 유의하진 않으나(부트스트랩 CI 전부 겹침)
 # 6을 유지할 데이터 근거도 마찬가지로 없어 point-estimate 승자로 결정).
 # 2026-07-16 재설계(지호 님 질문 — "왜 5종목이 아니라 3종목만 나오냐" + Fable 5 자문):
@@ -216,7 +216,7 @@ def select(yf) -> dict:
 def update_holdings(buy_syms: list, ind_map: dict, today: str, pool_syms=None) -> list:
     """holdings.py 와 동일 규칙(6개월 재평가/200일선 -3%)을 한국 종목에 적용.
     2026-07-14 수정: pool_syms를 안 넘겨서 6개월 정기 재평가가 한국에서는 한 번도 발동하지
-    않고 있었다(STRATEGY.md '미국과 동일' 명시와 불일치) — select()의 pool을 받도록 확장."""
+    않고 있었다(HISTORY.md '미국과 동일' 명시와 불일치) — select()의 pool을 받도록 확장."""
     import holdings as H
     state = H.load(KR_HOLDINGS)
     sells = H.update(state, buy_syms, ind_map, today,

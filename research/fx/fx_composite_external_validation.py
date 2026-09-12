@@ -2,7 +2,7 @@
 """
 fx_composite_external_validation.py — 캐리+VIX 복합신호, 타 통화쌍 선행검증 (2026-07-30).
 
-배경: fx_hedge_validation.py(추세추종 MA그리드)는 Gate2에서 기각됐다(STRATEGY.md §6-S).
+배경: fx_hedge_validation.py(추세추종 MA그리드)는 Gate2에서 기각됐다(HISTORY.md §6-S).
 지호 님이 대안으로 "경제적으로 독립된 입력"(가격변환 스태킹 아님)을 요청했고, 검증
 순서도 뒤집어(§6을 먼저 — 원달러 표본은 이미 오염됨) 타 통화쌍에서 먼저 확인하기로
 했다(§6-S-5의 재도전 조건).

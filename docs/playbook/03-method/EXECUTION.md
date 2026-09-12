@@ -125,7 +125,7 @@ PBO 0.3%(과최적화 가능성 매우 낮음)인데도 DSR 0.065인 것으로 �
 ## 5. 검증된 비이슈 — 미국 개장가 이관
 
 라이브는 2026-07-28부터 **개장 30~90분 후 시가** 기준으로 발송하는데
-([`STRATEGY.md` §7](../../strategy/STRATEGY.md)), 백테스트는 **종가** 기준이다.
+([`HISTORY.md` §7](../../strategy/HISTORY.md)), 백테스트는 **종가** 기준이다.
 이 불일치는 실측 검증됐다 (`research/us/us_open_vs_close_return_backtest.py`,
 결과 `output/us_open_vs_close_return_backtest.json`):
 
@@ -164,5 +164,5 @@ PBO 0.3%(과최적화 가능성 매우 낮음)인데도 DSR 0.065인 것으로 �
 ## 관련 문서
 
 - [`KR_STRATEGY_OPTIONS.md` §5](../../strategy/KR_STRATEGY_OPTIONS.md) — 국장 인프라 요구사항 + 구현현황표
-- [`STRATEGY.md` §7](../../strategy/STRATEGY.md) — 개장가 이관 결정 경위
+- [`HISTORY.md` §7](../../strategy/HISTORY.md) — 개장가 이관 결정 경위
 - [`VALIDATION_PIPELINE.md`](../../VALIDATION_PIPELINE.md) — PBO/DSR 채택 기준

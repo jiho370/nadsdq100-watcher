@@ -13,7 +13,7 @@ vol_target_validation.py — market_signals.PARAMS의 vol_target(코인 40%·주
   exposure = min(1, 목표변동성 / 최근60일실현변동성)
 은 지금까지 화면 표시용일 뿐 실제 매매 사이징에 쓰인 적이 없고, 목표변동성 숫자 자체
 (코인 40%·주식 15%)도 이 프로젝트 데이터로 검증된 적이 없었다(코드 전체 grep 확인).
-STRATEGY.md §0의 "변동성 타깃팅 — 강함"(Moreira-Muir 2017·Barroso-Santa-Clara 2015)은
+HISTORY.md §0의 "변동성 타깃팅 — 강함"(Moreira-Muir 2017·Barroso-Santa-Clara 2015)은
 '기법 자체'에 대한 문헌 근거이지, 이 프로젝트가 쓰는 구체적 숫자를 검증한 게 아니다.
 이 스크립트가 그 공백을 처음 메운다.
 

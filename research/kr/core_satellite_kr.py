@@ -7,7 +7,7 @@ core_satellite_kr.py — KR_STRATEGY_OPTIONS.md §2-F: 코어-새틀라이트 �
 
 구성(사전 등록 — 팩터 탐색 아님, 포트폴리오 설계 비교 4종):
   P1 B1 보유(대조군)          : 코스피200 매수후보유
-  P2 코어 단독(레짐 타이밍)    : B1 × STRATEGY.md §1 레짐(200일선 ±1% 히스테리시스·3일 확인,
+  P2 코어 단독(레짐 타이밍)    : B1 × HISTORY.md §1 레짐(200일선 ±1% 히스테리시스·3일 확인,
                                 OFF 시 현금 0% — 무이자 보수적 가정)
   P3 65/35 코어+새틀라이트     : P2 코어 65% + valuediv_flow(Phase 3 생존자) 35%, 월간 리밸
   P4 새틀라이트 단독           : valuediv_flow 100% (backtest_kr_strategies 산출 재사용)
@@ -30,7 +30,7 @@ def _log(m): print(f"[코어새틀KR] {m}", file=sys.stderr)
 
 
 def regime_series(b1: pd.Series, band=0.01, confirm=3) -> pd.Series:
-    """STRATEGY.md §1: 200일선 ±band 히스테리시스 + confirm일 연속 확인. True=ON."""
+    """HISTORY.md §1: 200일선 ±band 히스테리시스 + confirm일 연속 확인. True=ON."""
     ma = b1.rolling(200, min_periods=200).mean()
     above = b1 > ma * (1 + band)
     below = b1 < ma * (1 - band)

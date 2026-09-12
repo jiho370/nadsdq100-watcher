@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-weekly_report.py — 일요일 발송용 '주간 자산배분 리포트' (STRATEGY.md §4 — 2026-07 개편).
+weekly_report.py — 일요일 발송용 '주간 자산배분 리포트' (HISTORY.md §4 — 2026-07 개편).
 
 구조(일일 리포트와 같은 철학):
   · 자산 배분 비율은 안정형/공격형 두 가지 표준안으로 고정. AI는 해설만.
@@ -78,7 +78,7 @@ ASSETS = [
 GLOBAL_SUB = [("EU", "유럽", "VGK"), ("JP", "일본", "EWJ"), ("CN", "중국", "MCHI")]
 FX_TICKER = "KRW=X"   # USD/KRW
 
-# STRATEGY.md §4 — 통념·연구 부합 표준 배분 (금 5~15% 권장 범위, 코인 1~5% 상한)
+# HISTORY.md §4 — 통념·연구 부합 표준 배분 (금 5~15% 권장 범위, 코인 1~5% 상한)
 STABLE_WEIGHTS = {"US_STOCK": 30, "KR_STOCK": 10, "COIN": 2, "BOND": 40, "GOLD": 10, "CASH": 8}
 AGGRESSIVE_WEIGHTS = {"US_STOCK": 50, "KR_STOCK": 15, "COIN": 5, "BOND": 15, "GOLD": 10, "CASH": 5}
 PORTFOLIOS = {
@@ -307,7 +307,7 @@ def build_ai(ctx: dict) -> dict:
 
 
 def defense_cuts(ctx: dict) -> list[dict]:
-    """방어 컷(STRATEGY.md §4): 레짐 OFF + 12개월 수익률 음수 → 목표 비중 절반 (컷분은 현금·채권).
+    """방어 컷(HISTORY.md §4): 레짐 OFF + 12개월 수익률 음수 → 목표 비중 절반 (컷분은 현금·채권).
     일일 신호 엔진과 동일 규칙 — 레짐은 200일선(코인 120일선) 히스테리시스."""
     cuts = []
     for key, name, tic, _ in ASSETS:
@@ -329,7 +329,7 @@ def bond_regime_cut(ctx: dict) -> bool:
     검증 범위 밖).
     ⚠ 정직한 한계: 100개 조합 그리드에서 이 파라미터가 1등이었지만, 무필터 대비 짝지은
     부트스트랩 90%CI가 Ulcer·CAGR 둘 다 0을 포함해 통계적으로 완전히 증명된 값은 아니다
-    (STRATEGY.md 참고). 지호 님 결정으로 라이브 반영."""
+    (HISTORY.md 참고). 지호 님 결정으로 라이브 반영."""
     a = ctx.get("assets", {}).get("BOND") or {}
     return a.get("regime") == "OFF"
 

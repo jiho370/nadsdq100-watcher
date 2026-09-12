@@ -13,7 +13,7 @@ daily_ai_report.py — 메일 2통 분리 러너 (2026-07-09 개편).
                + 코스피200 매수/관찰/매도. AI 검증은 전날 저녁 pregen_kr.json(구독 CLI)
                이 있으면 재사용(검색 0회), 없으면 API 폴백.
   · 미국장 메일 (--us) : 화~토 KST 00:00대 발송(2026-07-28 마감→개장 기준 이관 — 종가 대신
-        개장 30분~90분 후 시가 기준, 근거는 STRATEGY.md §7). 미국 동부 서머타임 때문에 KST
+        개장 30분~90분 후 시가 기준, 근거는 HISTORY.md §7). 미국 동부 서머타임 때문에 KST
         자정을 넘나드는 cron이라(report.yml 참고) "그날 개장" 리포트가 다음날 00:00대에
         도착한다 — 예: 월요일 개장 리포트는 화요일 00:00대 도착. 지호 님이 이 자정 교차를
         그대로 수용하기로 결정(2026-07-28) — 금요일 개장분은 토요일 00:00대 도착, 월요일
@@ -540,7 +540,7 @@ def run_kr(no_email: bool = False, force: bool = False):
             # 2026-07-29 재정정(지호 님 결정): 2026-07-23~29엔 미장의 "알고리즘70+SPMO30"
             # 참고선(§6-C)과 대칭 맞추려 임의로 70:30을 썼으나, 그 미장 원본은 §6-H 사전등록
             # 재검증에서 유의하게 기각·2026-07-28 제거돼 대칭의 근거 자체가 사라졌다. 대신
-            # STRATEGY.md §3 Stage 2(kr_topn_ratio_sweep.py)가 실제로 검증한 코어(코스피/
+            # HISTORY.md §3 Stage 2(kr_topn_ratio_sweep.py)가 실제로 검증한 코어(코스피/
             # KODEX200)65:새틀라이트(알고리즘)35 — §3 하단 "포트폴리오 구성 권고"·주간
             # 자산배분이 쓰는 것과 동일한 공식 비율 — 로 교체. bench_dates/closes(코스피)를
             # 그대로 blend_index 소스로 재사용.
@@ -681,7 +681,7 @@ def run_us(no_email: bool = False, force: bool = False):
     ndx_label = "나스닥100(QQQ)" if _KFONT else "NASDAQ100(QQQ)"
     # 2026-07-19 추가했던 "알고리즘70+SPMO30" 참고선은 2026-07-28 제거(지호 님 결정) — §6-C의
     # 원 근거(t=1.95)가 이후 §6-H 사전등록 재검증에서 기각됨(CAGR차이 95%CI가 완전히 음수,
-    # 위기 동시발생 시 순수 알고리즘보다 오히려 더 나쁨 — STRATEGY.md §6-H·§6-K 참고).
+    # 위기 동시발생 시 순수 알고리즘보다 오히려 더 나쁨 — HISTORY.md §6-H·§6-K 참고).
     holdings_html, holdings_images = _holdings_section(
         hstate, data["ind_map"], price_map, bench_dates, bench_closes, "S&P500",
         extra_index={"label": ndx_label, "dates": ndx_dates, "closes": ndx_closes})
@@ -761,7 +761,7 @@ def run_coin(no_email: bool = False, force: bool = False):
         f'{signals_html}'
         '<div style="font-size:11px;color:#9ca3af;margin-top:14px;line-height:1.5">'
         '정보 제공용이며 투자 권유가 아닙니다. 판단·책임은 본인에게 있습니다.<br>'
-        '전략 근거: STRATEGY.md §1</div>'
+        '전략 근거: HISTORY.md §1</div>'
         '</div>')
     _preview_and_send(html, sig_images, f"[주말 코인] {today_kst} BTC·ETH 시그널",
                       "coin_report.html", no_email, {"sent_coin_kst": today_kst}, guard_key="sent_coin_kst")

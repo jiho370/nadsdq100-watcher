@@ -4,7 +4,7 @@ kr_core_satellite_vs_kospi_winrate_by_horizon.py — 코어65:새틀35(valuediv 
 혼합 vs 코스피200(B1), 보유기간별 승리 확률 (2026-08-22, 지호 님 요청 — 재검증 세션).
 
 kr_algo_vs_kospi_winrate_by_horizon.py는 새틀라이트(valuediv topn5) **단독** vs B1만 비교한다.
-그 스크립트 자신의 caveat이 명시하듯, 이는 실제 라이브 배분(코어65:새틀35 권고, STRATEGY.md
+그 스크립트 자신의 caveat이 명시하듯, 이는 실제 라이브 배분(코어65:새틀35 권고, HISTORY.md
 §3 "포트폴리오 구성 권고")과 다른 조건이다(새틀라이트는 단일 트라이얼 우승자 게이트를 통과
 못함 — PBO 77.8%·DSR 0.64). 이 스크립트는 core_satellite_kr.py의
 regime_series/timed_nav/mix_nav/stats 헬퍼를 그대로 재사용해 실제 권고 구성(코어=B1 200일선
@@ -15,7 +15,7 @@ kr_algo_vs_kospi_winrate_by_horizon.py와 동일한 롤링윈도우 승률 방�
 없으면 신규 pykrx+yfinance 수집). 새틀라이트 NAV는 kr_algo_vs_kospi_winrate_by_horizon.py와
 동일 파이프라인으로 직접 재계산(valuediv 랭킹, topn=5, ma200_backup=False — §3 Stage 6 결론)
 — output/kr_strategy_navs.json(valuediv_flow 변형, 2026-07-14 스냅샷·날짜 미갱신)은 쓰지 않는다.
-코어는 B1(코스피200 시가총액가중)의 200일선 ±1% 히스테리시스·3일 확인 레짐(STRATEGY.md §1).
+코어는 B1(코스피200 시가총액가중)의 200일선 ±1% 히스테리시스·3일 확인 레짐(HISTORY.md §1).
 
 주의(버그 회피): regime_series/timed_nav는 반드시 "전체 이력" B1로 먼저 계산해야 200일
 워밍업이 제대로 반영된다 — 새틀라이트 시작일(결정 격자 첫 지점, LOOKBACK=260거래일 이후)로
@@ -142,10 +142,10 @@ def run(save=True, use_cache=True) -> dict:
                   "동일 방법론(algo_vs_spy_winrate_by_horizon.py 미국판의 한국 이식). 윈도우가 "
                   "매일 겹쳐 자기상관이 큼(독립시행 아님) — PBO/DSR류 다중검정 게이트 대상 "
                   "통계는 아님.",
-        "caveat": "이건 STRATEGY.md §3 '포트폴리오 구성 권고'의 실제 라이브 배분(코어65:새틀35)에 "
+        "caveat": "이건 HISTORY.md §3 '포트폴리오 구성 권고'의 실제 라이브 배분(코어65:새틀35)에 "
                   "대한 win-rate다. 새틀라이트 '단독' win-rate는 "
                   "kr_algo_vs_kospi_winrate_by_horizon.py 참고 — 새틀라이트는 그 자체로는 단일 "
-                  "트라이얼 우승자 게이트를 통과 못함(PBO 77.8%·DSR 0.64, STRATEGY.md §3). "
+                  "트라이얼 우승자 게이트를 통과 못함(PBO 77.8%·DSR 0.64, HISTORY.md §3). "
                   "둘은 다른 질문에 답하며 서로 대체하지 않는다.",
         "horizon_days": horizon_days,
         "win_rate_pct": win_rate_pct,

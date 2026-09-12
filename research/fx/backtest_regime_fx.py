@@ -3,7 +3,7 @@
 backtest_regime_fx.py — 원달러 환율(KRW=X) 레짐타이밍 검증 (2026-07-29).
 
 배경(지호 님 지시): "환율 백테스트해보자 — 환율 자체를 매매 대상으로." market_signals.py의
-6자산 레짐엔진(§STRATEGY.md §1)엔 원래 환율이 없다. `regime_kr.py`가 USDKRW 20일 변화
+6자산 레짐엔진(§HISTORY.md §1)엔 원래 환율이 없다. `regime_kr.py`가 USDKRW 20일 변화
 부호(won_weak/won_strong)를 한국 팩터 IC 진단용으로만 쓰고 있을 뿐, 환율 자체를 추세추종
 매매(또는 미국주식 보유의 동적 환헤지) 대상으로 백테스트한 적은 이번이 처음이다.
 

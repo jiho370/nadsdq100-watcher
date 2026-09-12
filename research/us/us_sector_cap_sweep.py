@@ -6,7 +6,7 @@ INCY·REGN)가 Health Care — 현재 라이브 가중치(rd_mktcap 2·sharehold
 gp_assets 1) 중 rd_mktcap(R&D지출/시가총액)이 구조적으로 바이오/제약을 편애함(REGN
 0.539로 전체 218종목 중 압도적 1위, 2위의 2배). 확인 결과 미국 선정 로직(export_data.
 select_by_weights)엔 섹터 상한이 전혀 없음(pick_with_sector_cap/RECO_SECTOR_MAX는 안 쓰는
-구식 하이브리드 방식 전용). 한국은 이미 Stage 4(STRATEGY.md)에서 섹터캡을 검증했으나
+구식 하이브리드 방식 전용). 한국은 이미 Stage 4(HISTORY.md)에서 섹터캡을 검증했으나
 (캡을 걸어도 성과에 거의 영향 없음 확인) 미국은 한 번도 테스트한 적 없음 — 이 스크립트가
 그 공백을 메운다.
 

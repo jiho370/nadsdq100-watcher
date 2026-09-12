@@ -3,7 +3,7 @@
 us_algo8_band_trading_robustness.py — us_algo8_band_trading_grid.py 결과 강건성 검증
 (2026-09-08, 지호 님 요청 2건):
   1) "상위 조합들이 진짜 고원을 이루는지" — 그리드 이웃(상승·하락 임계값이 한 칸 옆인) 조합도
-     같이 좋은지 확인(STRATEGY.md에서 반복적으로 쓰는 방식: 1등만 좋고 이웃이 나쁘면 과최적화
+     같이 좋은지 확인(HISTORY.md에서 반복적으로 쓰는 방식: 1등만 좋고 이웃이 나쁘면 과최적화
      의심). output/us_algo8_band_trading_grid.json을 그대로 읽어서 계산(재실행 불필요, 빠름).
   2) PBO(Probability of Backtest Overfitting)·DSR(Deflated Sharpe Ratio) — overfit_stats.py의
      기존 방법론(Bailey et al. 2017/2014, 이 저장소의 표준 다중검정 게이트)을 그대로 재사용해

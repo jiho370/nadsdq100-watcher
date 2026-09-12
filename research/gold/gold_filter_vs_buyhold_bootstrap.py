@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""gold_filter_vs_buyhold_bootstrap.py — STRATEGY.md §6-F 재현(신선 GLD 표본, 2026-08-22).
+"""gold_filter_vs_buyhold_bootstrap.py — HISTORY.md §6-F 재현(신선 GLD 표본, 2026-08-22).
 
 배경: §6-F는 "금 트렌드필터(현행 200일선·1%밴드·확인3일) vs 무필터(매수후보유)"를 LBMA
 58년 확장표본(1968~)으로 쌍대 블록부트스트랩 검정해 Δ(Ulcer)·Δ(CAGR) 90%CI가 둘 다 0을

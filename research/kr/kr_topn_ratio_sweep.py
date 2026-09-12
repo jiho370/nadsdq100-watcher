@@ -2,7 +2,7 @@
 """
 kr_topn_ratio_sweep.py — 지호 님 질문(2026-07-14) 대응: valuediv 채택 시 남았던 검증 공백 2개.
 
-kr_stocks.py를 valuediv로 교체(STRATEGY.md §3)하며 topn=6·코어65:새틀35는 옛 momentum
+kr_stocks.py를 valuediv로 교체(HISTORY.md §3)하며 topn=6·코어65:새틀35는 옛 momentum
 알고리즘 검증(backtest_portfolio.py TOPN_KR)과 고정 설계(core_satellite_kr.py CORE_W=0.65)를
 그대로 물려받았을 뿐, valuediv 자체로는 한 번도 스윕된 적이 없었다. 이 스크립트가 메운다:
 

@@ -3,7 +3,7 @@
 us_spmo_vs_spy_prereg.py — "SPMO가 SPY보다 장기적으로 낫다"는 주장 자체의 사전등록 검증
 (2026-07-23, 지호 님 요청)
 
-배경: STRATEGY.md §6-C는 "SPMO 절대샤프 1.193 > SPY 1.091, 전체기간 누적 SPMO +523.7%
+배경: HISTORY.md §6-C는 "SPMO 절대샤프 1.193 > SPY 1.091, 전체기간 누적 SPMO +523.7%
 vs SPY +303.2%"라고 적었지만 이건 점추정치 나열일 뿐 유의성 검정을 거친 적이 없다.
 us_spmo_blend_prereg.py(알고리즘 vs 알고리즘+SPMO 블렌드)와는 별개 질문 — 이 스크립트는
 "SPMO 자체가 SPY 자체를 유의하게 이기는가"만 독립적으로 검증한다.

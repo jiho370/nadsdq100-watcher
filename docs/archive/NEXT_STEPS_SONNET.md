@@ -94,7 +94,7 @@ G3 = score_calibration.json:  recent_5y_deciles 의 상위분위 우위가 전�
    모멘텀 0.6 가중도 kr_ic_report의 mom12_1 행으로 교차 확인해 보고할 것.
 
 ## 5. 마무리 하우스키핑 (어느 분기든 공통)
-- `STRATEGY.md`의 "+20%p·승률 89.5%·MDD -1.8%" 등 재현 안 된 수치를 실측치
+- `HISTORY.md`의 "+20%p·승률 89.5%·MDD -1.8%" 등 재현 안 된 수치를 실측치
   (`backtest_costs_compare.json` 기준)로 교체하고, 각주로 "2026-07 재검증" 명시.
 - `VALIDATION_PIPELINE.md`에 v2 변경(6m 캘리브레이션·T_eff·embargo) 반영.
 - 분기 결과와 무관하게: 시도한 것·실패한 것·수치를 전부 보고서에 남길 것.
