@@ -666,7 +666,11 @@ def render_html(ctx, d, verdict_html=""):
 
 
 # ------------------------- 실행 -------------------------
-_LAST_SENT = os.path.join("output", "last_sent.json")
+# 2026-09-14: output/last_sent.json은 2026-09-09 재구성 전 경로 — 이후 daily_ai_report.py는
+# state/last_sent.json(공유 파일)로 옮겨갔는데 weekly만 안 옮겨져 저장이 이 파일에 안 남고
+# 있었다(막판 재확인이 보는 원격 state/last_sent.json을 이 함수가 갱신 못 함 → 재확인이
+# 영원히 통과 못 막음). ai_verdict_log.json 때와 같은 유형의 경로 불일치 버그.
+_LAST_SENT = os.path.join("state", "last_sent.json")
 
 
 def _load_last_sent() -> dict:
@@ -680,7 +684,7 @@ def _load_last_sent() -> dict:
 def _save_last_sent(update: dict):
     """부분 갱신 — daily_ai_report.py의 kr/us 기록을 덮어쓰지 않게 merge(같은 파일 공유)."""
     d = _load_last_sent(); d.update(update)
-    os.makedirs("output", exist_ok=True)
+    os.makedirs("state", exist_ok=True)
     with open(_LAST_SENT, "w", encoding="utf-8") as f:
         json.dump(d, f)
 
@@ -747,15 +751,22 @@ def run(no_email: bool = False, force: bool = False):
     _log("미리보기 output/weekly_report.html 저장")
 
     if not no_email:
-        # 2026-09-04(daily_ai_report.py와 동일 조치 — "미장 메일 두 번 온다" 실측 원인):
-        # 실행 두 개가 근접 시각에 겹치면 서로의 발송 여부를 모른 채 둘 다 보낼 수 있어,
-        # 보내기 직전 git pull로 재확인한다.
+        # 2026-09-04: 실행 두 개가 근접 시각에 겹치면 서로의 발송 여부를 모른 채 둘 다 보낼
+        # 수 있어 보내기 직전 재확인한다. 2026-09-14(지호 님 재지적 — "주간 리포트도 2번+
+        # 온다", 실측: 22:31/00:10/00:27 세 번 연속 발송 확인): git pull은 리포트 생성 중
+        # 로컬에 생긴 변경(예: 이 실행 자신이 만진 state/ 파일)과 충돌하면 조용히 실패해
+        # 재확인 자체가 무력화됐다(daily_ai_report.py에서 먼저 발견·수정한 것과 동일 원인,
+        # _preview_and_send 참고). git pull(작업트리 상태에 의존) 대신 git show로 원격
+        # 브랜치의 파일 내용을 직접 조회 — 작업트리 상태와 무관해 이 문제 자체가 안 생긴다.
         import subprocess
         try:
-            subprocess.run(["git", "pull", "--quiet"], timeout=30, check=False)
+            subprocess.run(["git", "fetch", "--quiet", "origin"], timeout=30, check=False)
+            proc = subprocess.run(["git", "show", "origin/main:state/last_sent.json"],
+                                  capture_output=True, text=True, timeout=15, check=False)
+            remote_last = json.loads(proc.stdout) if proc.returncode == 0 and proc.stdout.strip() else {}
         except Exception:
-            pass
-        if _load_last_sent().get("sent_weekly_kst") == today_kst:
+            remote_last = {}
+        if remote_last.get("sent_weekly_kst") == today_kst:
             _log("발송 직전 재확인 결과 이미 발송됨(sent_weekly_kst) → 막판 취소")
             return
         if R.send_email(f"[주간 자산배분] {ctx['as_of']} 리포트", html, images):
