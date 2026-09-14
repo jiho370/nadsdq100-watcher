@@ -1073,6 +1073,86 @@
       "severity": "",
       "reason": "",
       "price": 556.42
+    },
+    {
+      "date": "2026-09-14",
+      "market": "kr",
+      "symbol": "071320",
+      "name": "지역난방공사",
+      "verdict": "매수유지",
+      "severity": "",
+      "reason": "",
+      "price": 74700.0
+    },
+    {
+      "date": "2026-09-14",
+      "market": "kr",
+      "symbol": "015760",
+      "name": "한국전력",
+      "verdict": "제외",
+      "severity": "일시적",
+      "reason": "KB증권 등 증권가는 LNG·석탄 연료비 상승 지속으로 2026·2027년 영업이익 전망을 각각 35.2%·27.3% 축소, 3분기도 연료비조정단가 kWh당 5원으로 2분기와 동일해 원가 부담 지속 확인.",
+      "price": 32300.0
+    },
+    {
+      "date": "2026-09-14",
+      "market": "kr",
+      "symbol": "002380",
+      "name": "KCC",
+      "verdict": "매수유지",
+      "severity": "",
+      "reason": "",
+      "price": 463000.0
+    },
+    {
+      "date": "2026-09-14",
+      "market": "kr",
+      "symbol": "003030",
+      "name": "세아제강지주",
+      "verdict": "매수유지",
+      "severity": "",
+      "reason": "",
+      "price": 106700.0
+    },
+    {
+      "date": "2026-09-14",
+      "market": "kr",
+      "symbol": "006040",
+      "name": "동원산업",
+      "verdict": "매수유지",
+      "severity": "",
+      "reason": "",
+      "price": 38000.0
+    },
+    {
+      "date": "2026-09-14",
+      "market": "kr",
+      "symbol": "024110",
+      "name": "기업은행",
+      "verdict": "매수유지",
+      "severity": "",
+      "reason": "",
+      "price": 20750.0
+    },
+    {
+      "date": "2026-09-14",
+      "market": "kr",
+      "symbol": "029780",
+      "name": "삼성카드",
+      "verdict": "매수유지",
+      "severity": "",
+      "reason": "",
+      "price": 45200.0
+    },
+    {
+      "date": "2026-09-14",
+      "market": "kr",
+      "symbol": "139480",
+      "name": "이마트",
+      "verdict": "매수유지",
+      "severity": "",
+      "reason": "",
+      "price": 73600.0
     }
   ]
 }
