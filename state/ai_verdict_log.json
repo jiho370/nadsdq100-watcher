@@ -1353,6 +1353,86 @@
       "severity": "",
       "reason": "",
       "price": 533.74
+    },
+    {
+      "date": "2026-09-16",
+      "market": "kr",
+      "symbol": "071320",
+      "name": "지역난방공사",
+      "verdict": "매수유지",
+      "severity": "",
+      "reason": "",
+      "price": 74200.0
+    },
+    {
+      "date": "2026-09-16",
+      "market": "kr",
+      "symbol": "015760",
+      "name": "한국전력",
+      "verdict": "제외",
+      "severity": "일시적",
+      "reason": "2Q26 영업이익 전년 대비 -47.16%(매출 219,188억원, 영업이익 11,285억원), 3Q 연료비조정단가도 2분기와 동일한 kWh당 5원 유지로 원가 부담 지속 확인.",
+      "price": 31200.0
+    },
+    {
+      "date": "2026-09-16",
+      "market": "kr",
+      "symbol": "002380",
+      "name": "KCC",
+      "verdict": "매수유지",
+      "severity": "",
+      "reason": "",
+      "price": 467500.0
+    },
+    {
+      "date": "2026-09-16",
+      "market": "kr",
+      "symbol": "006040",
+      "name": "동원산업",
+      "verdict": "매수유지",
+      "severity": "",
+      "reason": "",
+      "price": 36600.0
+    },
+    {
+      "date": "2026-09-16",
+      "market": "kr",
+      "symbol": "003030",
+      "name": "세아제강지주",
+      "verdict": "매수유지",
+      "severity": "",
+      "reason": "",
+      "price": 105800.0
+    },
+    {
+      "date": "2026-09-16",
+      "market": "kr",
+      "symbol": "024110",
+      "name": "기업은행",
+      "verdict": "매수유지",
+      "severity": "",
+      "reason": "",
+      "price": 20400.0
+    },
+    {
+      "date": "2026-09-16",
+      "market": "kr",
+      "symbol": "029780",
+      "name": "삼성카드",
+      "verdict": "매수유지",
+      "severity": "",
+      "reason": "",
+      "price": 44850.0
+    },
+    {
+      "date": "2026-09-16",
+      "market": "kr",
+      "symbol": "139480",
+      "name": "이마트",
+      "verdict": "매수유지",
+      "severity": "",
+      "reason": "",
+      "price": 75000.0
     }
   ]
 }
