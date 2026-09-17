@@ -1533,6 +1533,86 @@
       "severity": "",
       "reason": "",
       "price": 534.36
+    },
+    {
+      "date": "2026-09-17",
+      "market": "kr",
+      "symbol": "071320",
+      "name": "지역난방공사",
+      "verdict": "매수유지",
+      "severity": "",
+      "reason": "",
+      "price": 74700.0
+    },
+    {
+      "date": "2026-09-17",
+      "market": "kr",
+      "symbol": "015760",
+      "name": "한국전력",
+      "verdict": "제외",
+      "severity": "일시적",
+      "reason": "3분기 전기요금 동결로 연료비조정단가 +5원 유지, 국제 에너지가 상승에 원가부담 지속되며 2026·2027 영업이익 전망 축소.",
+      "price": 30950.0
+    },
+    {
+      "date": "2026-09-17",
+      "market": "kr",
+      "symbol": "002380",
+      "name": "KCC",
+      "verdict": "매수유지",
+      "severity": "",
+      "reason": "",
+      "price": 466500.0
+    },
+    {
+      "date": "2026-09-17",
+      "market": "kr",
+      "symbol": "006040",
+      "name": "동원산업",
+      "verdict": "매수유지",
+      "severity": "",
+      "reason": "",
+      "price": 36200.0
+    },
+    {
+      "date": "2026-09-17",
+      "market": "kr",
+      "symbol": "003030",
+      "name": "세아제강지주",
+      "verdict": "매수유지",
+      "severity": "",
+      "reason": "",
+      "price": 105400.0
+    },
+    {
+      "date": "2026-09-17",
+      "market": "kr",
+      "symbol": "024110",
+      "name": "기업은행",
+      "verdict": "매수유지",
+      "severity": "",
+      "reason": "",
+      "price": 20200.0
+    },
+    {
+      "date": "2026-09-17",
+      "market": "kr",
+      "symbol": "029780",
+      "name": "삼성카드",
+      "verdict": "제외",
+      "severity": "일시적",
+      "reason": "카드업계 1위 순익에도 이익 상당분이 최대주주 삼성생명으로 귀속되고 자사주 소각이 유보되는 등 주주환원 기대를 저버리는 지배구조 이슈가 최근 보도로 확인됨.",
+      "price": 44450.0
+    },
+    {
+      "date": "2026-09-17",
+      "market": "kr",
+      "symbol": "138930",
+      "name": "BNK금융지주",
+      "verdict": "매수유지",
+      "severity": "",
+      "reason": "",
+      "price": 15770.0
     }
   ]
 }
