@@ -1,3 +1,7 @@
 # KRX cache is a complete dated snapshot.  The registered merge driver retains
 # the newest valid as_of snapshot instead of producing line-level JSON conflicts.
 state/kospi200_cache.json merge=kospi200-latest
+
+# Verdict log is append-only (one entry per date/market/symbol).  The registered
+# merge driver unions both sides instead of producing line-level JSON conflicts.
+state/ai_verdict_log.json merge=verdict-log-union

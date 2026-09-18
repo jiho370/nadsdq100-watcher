@@ -121,10 +121,12 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Configure KOSPI200 cache merge driver
+      - name: Configure state merge drivers
         run: |
           git config merge.kospi200-latest.name "Keep newest KOSPI200 cache snapshot"
           git config merge.kospi200-latest.driver "python merge_kospi200_cache.py %O %A %B"
+          git config merge.verdict-log-union.name "Union ai_verdict_log.json entries"
+          git config merge.verdict-log-union.driver "python merge_verdict_log.py %O %A %B"
 
       - name: Set up Python
         uses: actions/setup-python@v5
@@ -145,6 +147,18 @@ jobs:
           sudo apt-get update -y
           sudo apt-get install -y fonts-nanum
           fc-cache -f
+
+      - name: Sync to latest before running (avoid stale-SHA state conflicts)
+        # 2026-09-18 추가 — concurrency 큐잉으로 대기하다 실행되는 run도 actions/checkout@v4는
+        # 트리거 시점(github.sha)에 고정된 채라, 앞서 끝난 run이 이미 push한 최신 상태(ai_holdings.json
+        # 등)를 못 보고 리포트를 만들었다. 그 결과 뒤 run의 상태 커밋이 마지막 "Persist state" 단계의
+        # git pull --rebase에서 충돌 -> exit 1로 끝나면서 같은 커밋에 있던 last_sent.json(중복발송
+        # 가드) 갱신까지 통째로 유실되는 사고 발생(9/15 run #327, 9/16 run #337 — 둘 다 이메일 발송
+        # 자체는 성공했으나 상태 저장만 실패). 리포트 실행 직전에 origin 최신 커밋으로 강제 동기화해
+        # 애초에 stale한 기준점에서 출발하지 않도록 원천 차단한다.
+        run: |
+          git fetch origin "${GITHUB_REF_NAME}"
+          git reset --hard "origin/${GITHUB_REF_NAME}"
 
       - name: Run report and send email
         env:
