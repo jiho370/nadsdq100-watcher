@@ -1,0 +1,29 @@
+# 일회성 세션 요약 메일 발송용 워크플로 (2026-09-22, 지호 님 요청 — 로컬에 SMTP
+# 인증정보가 없어 Actions Secrets을 쓰기 위해 추가). 발송 확인 후 삭제 예정.
+name: Adhoc Summary Email
+
+on:
+  workflow_dispatch: {}
+
+permissions:
+  contents: read
+
+jobs:
+  send:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Send email
+        env:
+          SMTP_USER: ${{ secrets.SMTP_USER }}
+          SMTP_PASS: ${{ secrets.SMTP_PASS }}
+          EMAIL_TO:  ${{ secrets.EMAIL_TO }}
+        run: python .github/workflows/adhoc_email_send.py
