@@ -1,46 +1,18 @@
-CLAUDE.md
-Behavioral guidelines to reduce common LLM coding mistakes. Merge with project-specific instructions as needed.
-Tradeoff: These guidelines bias toward caution over speed. For trivial tasks, use judgment.
-1. Think Before Coding
-Don't assume. Don't hide confusion. Surface tradeoffs.
-Before implementing:
-State your assumptions explicitly. If uncertain, ask.
-If multiple interpretations exist, present them - don't pick silently.
-If a simpler approach exists, say so. Push back when warranted.
-If something is unclear, stop. Name what's confusing. Ask.
-2. Simplicity First
-Minimum code that solves the problem. Nothing speculative.
-No features beyond what was asked.
-No abstractions for single-use code.
-No "flexibility" or "configurability" that wasn't requested.
-No error handling for impossible scenarios.
-If you write 200 lines and it could be 50, rewrite it.
-Ask yourself: "Would a senior engineer say this is overcomplicated?" If yes, simplify.
-3. Surgical Changes
-Touch only what you must. Clean up only your own mess.
-When editing existing code:
-Don't "improve" adjacent code, comments, or formatting.
-Don't refactor things that aren't broken.
-Match existing style, even if you'd do it differently.
-If you notice unrelated dead code, mention it - don't delete it.
-When your changes create orphans:
-Remove imports/variables/functions that YOUR changes made unused.
-Don't remove pre-existing dead code unless asked.
-The test: Every changed line should trace directly to the user's request.
-4. Goal-Driven Execution
-Define success criteria. Loop until verified.
-Transform tasks into verifiable goals:
-"Add validation" → "Write tests for invalid inputs, then make them pass"
-"Fix the bug" → "Write a test that reproduces it, then make it pass"
-"Refactor X" → "Ensure tests pass before and after"
-For multi-step tasks, state a brief plan:
-```
-1. [Step] → verify: [check]
-2. [Step] → verify: [check]
-3. [Step] → verify: [check]
-```
-Strong success criteria let you loop independently. Weak criteria ("make it work") require constant clarification.
----
-These guidelines are working if: fewer unnecessary changes in diffs, fewer rewrites due to overcomplication, and clarifying questions come before implementation rather than after mistakes.
----
-Project-specific: before editing docs, refactoring/moving files, or syncing git in this repo, read docs/MAINTENANCE.md — it's a checklist of real incidents from this repo (stale docs vs code, silent-failure bugs, git rebase discipline, PowerShell gotchas), not generic advice.
+@AGENTS.md
+
+## Claude Code 전용 메모
+
+지침 본문은 전부 `AGENTS.md` 한 곳에만 둔다. Codex는 `AGENTS.md`를 직접 읽고, Claude Code는
+이 파일의 `@AGENTS.md` import를 통해 같은 내용을 읽는다 — 사본이 하나라 갈라질 일이 없다.
+
+**지침을 고칠 때는 이 파일이 아니라 `AGENTS.md`를 고칠 것.**
+
+2026-09-23 이전까지 이 두 파일은 첫 줄 제목만 다른 완전한 중복 사본이었다. 같은 구조를 쓰던
+다른 저장소에서 실제로 `AGENTS.md`가 2주 뒤처져 폐지된 절차를 계속 지시하고 있었으므로,
+갈라지기 전에 import로 합쳤다.
+
+- 심볼릭 링크(`ln -s AGENTS.md CLAUDE.md`)는 쓰지 말 것. Windows + `core.symlinks=false`라
+  링크가 아니라 복사본이 만들어진다(2026-09-22 실측). 공식 문서도 Windows에서는 import 방식을 권한다.
+- Claude Code가 `AGENTS.md`를 직접 읽는 기능은 v2.1.277 이상이 필요하다. 요건은 충족돼 있지만,
+  텔레메트리가 꺼진 세션이나 Bedrock/Vertex 환경에서는 직접 읽기가 지원되지 않아 지침이 통째로
+  안 읽힌다. import는 그런 환경에서도 동작하므로 이 파일을 남겨둔다.

@@ -93,6 +93,30 @@ GitHub Actions(주 3~4회+워치독), 로컬 PC 작업 스케줄러(pregen), 그
    `exit $code`로 명시해야 작업 스케줄러의 "마지막 실행 결과"가 진실을 반영한다.
    (`trigger_report.ps1`이 `gh workflow run` 실패를 항상 종료코드 0으로 감추고 있었다.)
 
+## 6-b. 일회성 `python -c`의 콘솔 인코딩 (위 2번과 다른 문제다)
+
+위 2번은 **PowerShell이 `.ps1` 파일을 읽는** 쪽 문제다. 이건 **Python이 stdout에 쓰는** 쪽 문제로,
+원인도 대응도 다르다.
+
+한글이나 em dash(`—`), 화살표 같은 비ASCII 문자를 출력하면 이렇게 죽는다:
+
+```
+UnicodeEncodeError: 'cp949' codec can't encode character '—' in position 19
+```
+
+`.py` 파일뿐 아니라 **일회성 `python -c "..."`와 heredoc에도 매번 첫 줄에 넣어야 한다**
+(에러의 `File "<string>", line N`이 인라인 실행이라는 뜻이다):
+
+```python
+import sys; sys.stdout.reconfigure(encoding="utf-8", errors="replace")
+```
+
+실측(2026-09-23, 이 저장소 세션 전수 조사): **9개 세션에 걸쳐 30회** 재발했다. 출력 한 줄 보려다
+명령을 두 번 돌리게 되므로, 디버깅 중이라면 그만큼 왕복이 늘어난다.
+
+곁들여: 정규식이나 문자열에 `\u`를 직접 쓰지 마라. 셸 → 파이썬을 거치며 백슬래시가 한 겹
+벗겨져 `re.error: incomplete escape \u`로 죽는다. `chr(92)`로 백슬래시를 만들어 쓸 것.
+
 ## 7. "부분 실패를 조용히 전체 성공으로 보고"하는 안티패턴
 
 여러 항목을 순회하며 개별 실패를 로그만 남기고 넘어가는 함수(`for ... try/except: log`)는,
