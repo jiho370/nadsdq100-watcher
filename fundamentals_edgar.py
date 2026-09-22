@@ -413,10 +413,21 @@ def factor_values(rec: dict, date_iso: str, price: float) -> dict:
     if debt_now is not None and debt_prev is not None and assets not in (None, 0):
         out["debt_issuance"] = -((debt_now - debt_prev) / assets)
     # R&D 집약도 + 무형조정 수익성·가치 (R&D 자본화 문헌, Berkin et al. 2024)
+    # 2026-09-22 실측(us_factor_value_vs_rank.py 재검증 중 발견): rnd 태그가 없으면 두 팩터
+    # 다 통째로 결측 처리돼 왔는데, R&D 태그가 없는 압도적 다수는 "데이터를 못 구함"이 아니라
+    # "그 업종(식당·소매·여행예약 등)은 R&D 비용을 아예 보고할 일이 없음"인 경우다(전체
+    # S&P500 스냅샷의 56.9%가 int_gp_assets·rd_mktcap 둘 다 결측 — CMG·ORLY·BKNG처럼 R&D와
+    # 무관한 대형 우량주까지 걸려 있었음, GrossProfit 폴백 때와 동일한 성격의 문제). R&D
+    # 태그가 없으면 0(R&D 미보고 업종)으로 간주 — gross·assets만 있으면 int_gp_assets를
+    # 그대로 계산(0을 더해도 값이 안 바뀜), rd_mktcap도 0(R&D 집약도 없음)으로 정직하게
+    # 표시한다. 태그가 있는데 값만 0인 경우와 결과적으로 구분이 안 되지만, "결측→중립(0)
+    # 처리"보다 "실제 0"이 더 정확한 해석이다.
     rnd = g("rnd")
-    if rnd is not None and mktcap:
+    if rnd is None:
+        rnd = 0.0
+    if mktcap:
         out["rd_mktcap"] = rnd / mktcap
-    if rnd is not None and gross is not None and assets not in (None, 0):
+    if gross is not None and assets not in (None, 0):
         out["int_gp_assets"] = (gross + rnd) / assets   # R&D는 비용처리돼 이익을 깎으므로 가산
     k_int = _intangible_capital(rec, date_iso)
     if k_int is not None and eq is not None and mktcap:
