@@ -1183,5 +1183,8 @@ def render_report_html(report, as_of="", metrics_by_sym=None, market_html="", si
         f'{holdings_html}'
         f'<div style="font-size:11px;color:#9ca3af;margin-top:14px;line-height:1.5">'
         f'&#9888;&#65039; {_esc(report.get("risks"))}<br>정보 제공용이며 투자 권유가 아닙니다. 판단·책임은 본인에게 있습니다.<br>'
-        f'매도 규칙: 6개월 정기 재평가 또는 200일선 -3% 이탈 (미국·한국 공통). 전략 근거: HISTORY.md</div>'
+        f'매도 규칙: 가격 개입 없이 정기 재평가만(미국 6개월·한국 3개월 — 200일선 -3% 이탈 매도는 '
+        f'2026-07 검증 후 비활성, 100일선 이탈·목표가 익절도 2026-09 검증 후 도입 안 함). '
+        f'매수 후보 필터: 미국은 점수하한(3.25)+100일선 위 종목만, 한국은 점수상한(6.0, 밸류트랩 구간 제외). '
+        f'전략 근거: HISTORY.md</div>'
         f'</div>')
