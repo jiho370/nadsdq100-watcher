@@ -1,0 +1,56 @@
+{
+  "n_events": 20,
+  "hold_days": 126,
+  "topn": 10,
+  "floor": 3.25,
+  "always_hold_mean_excess_pct": 8.181,
+  "always_hold_win_rate_pct": 85.0,
+  "thresholds": [
+    {
+      "threshold_pct": 10.0,
+      "n_events": 20,
+      "exit_mean_excess_pct": 1.042,
+      "exit_win_rate_pct": 55.0,
+      "paired_diff_vs_always_hold_pct": -7.139,
+      "paired_t_stat": -3.324,
+      "pct_positions_that_hit_threshold_during_hold": 73.0
+    },
+    {
+      "threshold_pct": 15.0,
+      "n_events": 20,
+      "exit_mean_excess_pct": 3.367,
+      "exit_win_rate_pct": 75.0,
+      "paired_diff_vs_always_hold_pct": -4.815,
+      "paired_t_stat": -2.332,
+      "pct_positions_that_hit_threshold_during_hold": 62.0
+    },
+    {
+      "threshold_pct": 20.0,
+      "n_events": 20,
+      "exit_mean_excess_pct": 4.696,
+      "exit_win_rate_pct": 80.0,
+      "paired_diff_vs_always_hold_pct": -3.485,
+      "paired_t_stat": -1.906,
+      "pct_positions_that_hit_threshold_during_hold": 53.5
+    },
+    {
+      "threshold_pct": 25.0,
+      "n_events": 20,
+      "exit_mean_excess_pct": 5.183,
+      "exit_win_rate_pct": 80.0,
+      "paired_diff_vs_always_hold_pct": -2.999,
+      "paired_t_stat": -2.044,
+      "pct_positions_that_hit_threshold_during_hold": 42.5
+    },
+    {
+      "threshold_pct": 30.0,
+      "n_events": 20,
+      "exit_mean_excess_pct": 6.414,
+      "exit_win_rate_pct": 85.0,
+      "paired_diff_vs_always_hold_pct": -1.768,
+      "paired_t_stat": -1.341,
+      "pct_positions_that_hit_threshold_during_hold": 37.5
+    }
+  ],
+  "method": "floor=3.25+100일선필터 통과 topn10을 126거래일 보유 vs 목표수익률 T(10~30%) 도달 즉시 매도 후 잔여기간 현금(0%) 취급 — 같은 126일 창 안에서 T별 독립 페어드 비교. us_ma100_exit_check.py(손절 방향)와 대칭."
+}

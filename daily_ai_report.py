@@ -275,12 +275,18 @@ def _holdings_section(hstate, ind_map, price_map, bench_dates, bench_closes, ind
     for r in summary:
         closes = (price_map.get(r["symbol"]) or {}).get("closes") or []
         r["dod_pct"] = (closes[-1] / closes[-2] - 1) * 100 if len(closes) >= 2 and closes[-2] else None
-    series = H.portfolio_series(summary, price_map, bench_dates, bench_closes)
+    # 2026-09-23(지호 님 — "누적수익률 그래프에 실현손익도 반영해라"): 청산된 포지션도
+    # 그래프·헤드라인 총계에 들어가도록 portfolio_series에 realized_trades를 넘긴다
+    # (holdings.portfolio_series 문서 참고 — 매도일까지 실가격, 이후 실현수익률로 고정).
+    realized_list = H.realized_trades(market=market)
+    series = H.portfolio_series(summary, price_map, bench_dates, bench_closes,
+                                realized_trades=realized_list)
     images, chart_cid, totals = [], None, None
     if series:
         extra_line = None
         if extra_index and extra_index.get("dates") and extra_index.get("closes"):
-            series2 = H.portfolio_series(summary, price_map, extra_index["dates"], extra_index["closes"])
+            series2 = H.portfolio_series(summary, price_map, extra_index["dates"], extra_index["closes"],
+                                         realized_trades=realized_list)
             if series2:
                 by_date = dict(zip(series2["dates"], series2["bench"]))
                 vals = [by_date.get(d) for d in series["dates"]]
@@ -288,7 +294,8 @@ def _holdings_section(hstate, ind_map, price_map, bench_dates, bench_closes, ind
                     extra_line = {"label": extra_index["label"], "values": vals}
         blend_line = None
         if blend_index and blend_index.get("dates") and blend_index.get("closes"):
-            series3 = H.portfolio_series(summary, price_map, blend_index["dates"], blend_index["closes"])
+            series3 = H.portfolio_series(summary, price_map, blend_index["dates"], blend_index["closes"],
+                                         realized_trades=realized_list)
             if series3:
                 by_date3 = dict(zip(series3["dates"], series3["bench"]))
                 ratio = blend_index.get("ratio", 0.7)
@@ -320,9 +327,8 @@ def _holdings_section(hstate, ind_map, price_map, bench_dates, bench_closes, ind
               f"보유종목 최소편입일={since_min}, 벤치마크 마지막날짜={bench_dates[-1] if bench_dates else None}",
               file=sys.stderr)
     realized = H.realized_summary(market=market)
-    blended = H.blended_average(summary, market=market)
     return AR.holdings_table_html(summary, krw=krw, chart_cid=chart_cid, totals=totals, realized=realized,
-                                  blended=blended, name_map=name_map), images
+                                  name_map=name_map), images
 
 
 # ------------------------- 공용 헬퍼 -------------------------
@@ -565,9 +571,12 @@ def run_kr(no_email: bool = False, force: bool = False):
                     bench_dates, bench_closes = fresh_kospi["dates"], fresh_kospi["closes"]
             except Exception:
                 pass
+            # 2026-09-23("누적수익률 그래프에 실현손익도 반영해라", 미장과 동일 조치):
+            # 청산종목도 매도일까지의 가격이 필요하므로 trade_log 심볼도 같이 채운다.
+            kr_realized_syms = {t["symbol"] for t in H.realized_trades(market="KR")}
             price_map = {sym: {"dates": (kr["ind_map"].get(sym) or {}).get("dates") or [],
                                "closes": (kr["ind_map"].get(sym) or {}).get("closes") or []}
-                         for sym in kr_state.get("holdings", {})}
+                         for sym in set(kr_state.get("holdings", {})) | kr_realized_syms}
             # 보유현황 표 종목명: 종목코드(숫자)만으론 못 알아보므로 이름으로 치환(2026-07-15).
             # 오늘 후보풀(kr_cands)엔 있지만, 보유 중인데 오늘 후보풀 밖으로 밀린 종목은 코스피200
             # 캐시(kr_stocks._cached_universe)로 보강 — 그래도 없으면 표시 단계에서 코드 그대로.
@@ -724,7 +733,11 @@ def run_us(no_email: bool = False, force: bool = False):
         bench_dates = [d.date().isoformat() for d in s.index]
         bench_closes = [float(v) for v in s.tolist()]
     price_map = {}
-    for sym in hstate.get("holdings", {}):
+    # 2026-09-23(지호 님 — "누적수익률 그래프에 실현손익도 반영해라"): 청산된(더 이상 보유
+    # 안 하는) 종목도 매도일까지의 실제 가격 흐름을 그래프에 반영하려면 그 심볼의 가격
+    # 히스토리가 필요하다 — 보유종목뿐 아니라 trade_log의 청산종목도 같이 채운다.
+    realized_syms = {t["symbol"] for t in H.realized_trades(market="US")}
+    for sym in set(hstate.get("holdings", {})) | realized_syms:
         hs = data["hist"].get(sym)
         if hs is not None and len(hs):
             hs = hs.dropna()

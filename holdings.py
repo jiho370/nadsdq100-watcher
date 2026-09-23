@@ -105,6 +105,13 @@ def _append_trade_log(sells: list, market: str, until: str, path=TRADE_LOG):
         json.dump(log, f, ensure_ascii=False, indent=2)
 
 
+def realized_trades(market: str | None = None, path=TRADE_LOG) -> list:
+    """청산 완료된 매매 원장을 요약 없이 그대로 반환(market 필터만) — portfolio_series()의
+    realized_trades 인자로 바로 넘기는 용도(2026-09-23)."""
+    return [t for t in _load_trade_log(path) if t.get("ret_pct") is not None
+            and (market is None or t.get("market") == market)]
+
+
 def realized_summary(market: str | None = None, path=TRADE_LOG) -> dict | None:
     """청산 완료된 매매의 실현손익 요약(건수·평균 수익률). market="US"/"KR"로 필터,
     None이면 전체. 표본 없으면 None(호출부가 섹션 자체를 생략하도록)."""
@@ -113,22 +120,6 @@ def realized_summary(market: str | None = None, path=TRADE_LOG) -> dict | None:
     if not trades:
         return None
     return {"n": len(trades), "avg_pct": sum(t["ret_pct"] for t in trades) / len(trades)}
-
-
-def blended_average(summary: list, market: str | None = None, path=TRADE_LOG) -> dict | None:
-    """2026-09-23(지호 님 지적 — "실현 수익은 포함해야지"): 보유 중(미실현, live_summary
-    결과) + 이미 청산한(실현, trade_log) 포지션을 전부 동일비중으로 묶은 평균 수익률.
-    이 프로젝트 전체가 '포지션마다 동일 금액 진입'을 가정하므로(portfolio_series 등과 동일
-    가정) 청산분도 그냥 한 자리로 쳐서 단순평균 낸다 — 매도 이후 그 자금이 재투자됐는지는
-    추적하지 않는 근사치. totals(미실현만)와 이 값을 같이 보여줘서 "우리가 이미 판 큰 승자가
-    수익률에 안 잡히는" 착시를 없앤다."""
-    held = [r["ret_pct"] for r in (summary or []) if r.get("ret_pct") is not None]
-    trades = [t["ret_pct"] for t in _load_trade_log(path) if t.get("ret_pct") is not None
-              and (market is None or t.get("market") == market)]
-    all_r = held + trades
-    if not all_r:
-        return None
-    return {"n_held": len(held), "n_realized": len(trades), "avg_pct": sum(all_r) / len(all_r)}
 
 
 def update(state: dict, buy_now_syms: list, ind_map: dict, today: str, pool_syms=None, market: str = "US"):
@@ -260,14 +251,26 @@ def live_summary(state: dict, ind_map: dict) -> list:
     return rows
 
 
-def portfolio_series(summary: list, price_map: dict, bench_dates: list, bench_closes: list) -> dict:
+def portfolio_series(summary: list, price_map: dict, bench_dates: list, bench_closes: list,
+                     realized_trades: list | None = None) -> dict:
     """'각 보유종목을 진입일에 동일 금액씩 샀다' 가정의 포트폴리오 누적수익률(%) 시계열과,
     같은 날짜들에 같은 금액을 지수에 넣었을 때의 시계열(라이브 트래킹 그래프용).
     price_map: {sym: {"dates":[...], "closes":[...]}} — 종목별 일별 종가(오름차순).
     지수 달력(bench_dates)을 마스터로 쓰고, 종목 종가가 빠진 날은 직전가를 유지한다.
+    realized_trades(2026-09-23, 지호 님 지적 — "누적수익률 그래프에 실현손익도 반영해라"):
+    trade_log 항목 리스트([{"symbol","since","until","entry","ret_pct"}]). 진입일~매도일까지는
+    실제 가격 흐름 그대로 반영하고, 매도일 이후는 그 실현수익률로 고정(us_ma100_exit_check.py
+    등 이번 세션 백테스트의 "매도 후 잔여기간 그 시점 수익률 고정"과 동일 취급 — 판 돈이
+    다른 데 재투자됐는지는 추적 안 하고, 그 슬롯은 확정 손익을 낸 채 그대로 있다고 가정).
+    보유·청산 종목이 같은 심볼일 수 있어(재매수 등) 내부 인덱싱은 symbol이 아니라
+    entry dict의 object id로 한다.
     반환: {"dates","portfolio","bench"} 또는 {} (비교 불가)."""
     import bisect
     entries = [r for r in summary if r.get("since") and r.get("entry")]
+    for t in (realized_trades or []):
+        if t.get("since") and t.get("entry") and t.get("until") and t.get("ret_pct") is not None:
+            entries.append({"symbol": t["symbol"], "since": t["since"], "entry": t["entry"],
+                           "until": t["until"], "frozen_ret": t["ret_pct"]})
     if not entries or not bench_dates or len(bench_dates) != len(bench_closes):
         return {}
     start = min(r["since"] for r in entries)
@@ -285,7 +288,7 @@ def portfolio_series(summary: list, price_map: dict, bench_dates: list, bench_cl
     # 결과에서 통째로 빠진다 — 그럴 때만(진짜 도달 불가능할 때만) 달력의 마지막 날짜로
     # clamp한다(dates[0]로 당기면 원래 유효했던 최근 편입일까지 왜곡되므로 dates[-1] 사용).
     dlast = dates[-1]
-    since_capped = {r["symbol"]: (dlast if r["since"] > dlast else r["since"]) for r in entries}
+    since_capped = {id(r): (dlast if r["since"] > dlast else r["since"]) for r in entries}
     aligned = {}
     for r in entries:
         pm = price_map.get(r["symbol"]) or {}
@@ -297,7 +300,7 @@ def portfolio_series(summary: list, price_map: dict, bench_dates: list, bench_cl
             while j < len(d) and d[j] <= day:
                 lastv = c[j]; j += 1
             arr.append(lastv)
-        aligned[r["symbol"]] = arr
+        aligned[id(r)] = arr
     # 2026-07-26(지호 님 발견 — 개별 종목 표와 상단 합계가 안 맞음): 한때(2026-07-17) 기준가를
     # entry_price 대신 재조회 시계열의 '매수일 종가'로 바꿔 썼었다(배당락 조정 드리프트 보정
     # 목적). 그런데 매수 당일 장중 체결가와 그날 종가가 크게 벌어지는 경우(예: 당일 급락한
@@ -317,28 +320,35 @@ def portfolio_series(summary: list, price_map: dict, bench_dates: list, bench_cl
     # 소스가 되어 배당 조정 여부와 무관하게 일관됨).
     anchor = {}
     for r in entries:
-        arr = aligned.get(r["symbol"])
+        arr = aligned.get(id(r))
         if not arr:
             continue
-        since = since_capped[r["symbol"]]
+        since = since_capped[id(r)]
         try:
             k0 = dates.index(since)
         except ValueError:
             continue
         if arr[k0]:
-            anchor[r["symbol"]] = arr[k0]
+            anchor[id(r)] = arr[k0]
 
     port, bench = [], []
     for k, day in enumerate(dates):
         rs, bs = [], []
         for r in entries:
-            since = since_capped[r["symbol"]]
+            since = since_capped[id(r)]
             if since > day:
                 continue
-            arr = aligned.get(r["symbol"])
-            base = anchor.get(r["symbol"])
-            if arr and arr[k] and base:
-                rs.append((arr[k] / base - 1) * 100)
+            frozen_ret, until = r.get("frozen_ret"), r.get("until")
+            if frozen_ret is not None and until and day > until:
+                rs.append(frozen_ret)   # 매도일 지남 — 실현수익률로 고정
+            else:
+                arr = aligned.get(id(r))
+                base = anchor.get(id(r))
+                if arr and arr[k] and base:
+                    rs.append((arr[k] / base - 1) * 100)
+                elif frozen_ret is not None:
+                    # 매도 전 구간 가격 데이터를 못 구했으면(과거 히스토리 없음) 실현수익률로 즉시 고정
+                    rs.append(frozen_ret)
             bi = bisect.bisect_right(bench_dates, since) - 1
             if bi >= 0 and bench_closes[bi]:
                 bs.append((bench_closes[i0 + k] / bench_closes[bi] - 1) * 100)
