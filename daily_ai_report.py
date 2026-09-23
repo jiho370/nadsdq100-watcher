@@ -106,6 +106,33 @@ def _pool_stats_html(stats: dict) -> str:
         f'<b>{after}종목</b></div>')
 
 
+def _watch_summary_html(watch: list, n: int = 5) -> str:
+    """2026-09-23(지호 님 요청 — "10종목 되기 전 얘들도 시총순으로 나열해서 5개 정도만
+    한줄이라도"): floor·100일선 필터는 통과했지만 최종 매수 10위 밖인 후보를 시총
+    내림차순 상위 n개만 종목명·한줄설명·최근 1개월 수익률로 짧게 노출. 팩터 랭킹(실제
+    매수 선정)은 그대로 유지 — 시총순은 어디까지나 이 요약 목록의 나열 순서일 뿐이다.
+    us_topn_by_mktcap.py 백테스트(2026-09-23)에서 실제 선정을 시총순으로 바꾸면 수익이
+    깎이는 걸 확인했으므로 선정 로직 자체는 건드리지 않는다."""
+    ranked = sorted([c for c in (watch or []) if c.get("market_cap")],
+                    key=lambda c: c["market_cap"], reverse=True)[:n]
+    if not ranked:
+        return ""
+    profiles = AR._profile_parts()
+    rows = []
+    for c in ranked:
+        sym = c.get("symbol") or ""
+        one_liner = (profiles.get(sym) or ("", ""))[0]
+        ret1m = (c.get("ret") or {}).get("1m")
+        ret_s = f"{ret1m:+.1f}%" if ret1m is not None else "—"
+        desc = f" — {AR._esc(one_liner)}" if one_liner else ""
+        rows.append(f'<div style="margin:2px 0"><b>{AR._esc(sym)}</b> '
+                    f'{AR._esc(c.get("name") or "")}{desc} · 최근 1개월 {ret_s}</div>')
+    return (
+        '<div style="background:#f8fafc;border-left:3px solid #94a3b8;padding:7px 12px;'
+        'font-size:12px;color:#475569;margin:6px 0 10px;line-height:1.6">'
+        '<div>📎 통과했지만 이번엔 상위 10위 밖(시총 큰 순)</div>' + "".join(rows) + '</div>')
+
+
 def _stock_chart_png(closes, ticker, big=False, display_days=None):
     """종가 + 이동평균선(20/50/200) 차트 PNG. 이동평균은 closes 전체(표시구간보다 앞선
     과거분 포함)로 계산한 뒤 최근 display_days만 잘라 그린다 — display_days만큼만 미리
@@ -743,10 +770,11 @@ def run_us(no_email: bool = False, force: bool = False):
     images += sig_images
 
     # 전일 시장 요약 표는 국장 메일 전용 — 미장 메일엔 안 붙인다. market_html은 대신
-    # 2026-09-23부터 스크리닝 제외 요약(pool_stats)을 표시하는 데 재사용.
+    # 2026-09-23부터 스크리닝 제외 요약(pool_stats) + 상위10위 밖 후보 요약을 표시하는 데 재사용.
     signals_html = MS.signal_cards_html(signals, sig_cids, when="us") if signals else ""
     html = AR.render_report_html(report, as_of, metrics,
-                                 market_html=_pool_stats_html(pool_stats), signals_html=signals_html,
+                                 market_html=_pool_stats_html(pool_stats) + _watch_summary_html(watch),
+                                 signals_html=signals_html,
                                  banner=banner, show_spy=bool(spy_closes),
                                  title="🇺🇸 미국장 개장 점검 · S&P500 매수·매도 후보",
                                  holdings_html=holdings_html)
