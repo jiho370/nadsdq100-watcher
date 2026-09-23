@@ -1963,6 +1963,106 @@
       "severity": "일시적",
       "reason": "8/14 보도: 자회사 신세계건설의 미분양 대손충당금 여파로 2분기 연결 영업손실 430억원 적자전환, 하나증권 투자의견 매수→중립·목표가 11만→8.2만원 하향. 한국신용평가도 잔여 공사대금·우발채무로 추가 손실 가능성을 배제하지 않는다고 경고.",
       "price": 72200.0
+    },
+    {
+      "date": "2026-09-22",
+      "market": "us",
+      "symbol": "BKNG",
+      "name": "Booking Holdings Inc.",
+      "verdict": "매수유지",
+      "severity": "",
+      "reason": "",
+      "price": 168.52
+    },
+    {
+      "date": "2026-09-22",
+      "market": "us",
+      "symbol": "INCY",
+      "name": "Incyte Corporation",
+      "verdict": "매수유지",
+      "severity": "",
+      "reason": "",
+      "price": 124.65
+    },
+    {
+      "date": "2026-09-22",
+      "market": "us",
+      "symbol": "BMY",
+      "name": "Bristol-Myers Squibb Company",
+      "verdict": "매수유지",
+      "severity": "",
+      "reason": "",
+      "price": 62.62
+    },
+    {
+      "date": "2026-09-22",
+      "market": "us",
+      "symbol": "KLAC",
+      "name": "KLA Corporation",
+      "verdict": "매수유지",
+      "severity": "",
+      "reason": "",
+      "price": 183.97
+    },
+    {
+      "date": "2026-09-22",
+      "market": "us",
+      "symbol": "GM",
+      "name": "General Motors Company",
+      "verdict": "매수유지",
+      "severity": "",
+      "reason": "",
+      "price": 83.95
+    },
+    {
+      "date": "2026-09-22",
+      "market": "us",
+      "symbol": "XYZ",
+      "name": "Block, Inc.",
+      "verdict": "매수유지",
+      "severity": "",
+      "reason": "",
+      "price": 77.91
+    },
+    {
+      "date": "2026-09-22",
+      "market": "us",
+      "symbol": "SWKS",
+      "name": "Skyworks Solutions, Inc.",
+      "verdict": "매수유지",
+      "severity": "",
+      "reason": "",
+      "price": 88.74
+    },
+    {
+      "date": "2026-09-22",
+      "market": "us",
+      "symbol": "CMI",
+      "name": "Cummins Inc.",
+      "verdict": "매수유지",
+      "severity": "",
+      "reason": "",
+      "price": 534.78
+    },
+    {
+      "date": "2026-09-22",
+      "market": "us",
+      "symbol": "META",
+      "name": "Meta Platforms, Inc.",
+      "verdict": "매수유지",
+      "severity": "",
+      "reason": "",
+      "price": 741.25
+    },
+    {
+      "date": "2026-09-22",
+      "market": "us",
+      "symbol": "QCOM",
+      "name": "QUALCOMM Incorporated",
+      "verdict": "매수유지",
+      "severity": "",
+      "reason": "",
+      "price": 194.23
     }
   ]
 }

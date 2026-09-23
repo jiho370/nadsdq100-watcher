@@ -236,7 +236,8 @@ def _load_funds():
 
 def select_by_weights(weights: dict, ind_map: dict, n: int, funds: dict | None = None,
                       cross: dict | None = None, sector_map: dict | None = None,
-                      sector_cap: int | None = 2, floor: float | None = None) -> list[tuple]:
+                      sector_cap: int | None = 2, floor: float | None = None,
+                      require_above_ma100: bool = False) -> list[tuple]:
     """지표 z-score 가중합성점수로 상위 n 선정 — 백테스트(backtest_weights)와 '동일 지표·정의' 사용.
        모멘텀=ind_map, 펀더멘탈=fundamentals_edgar.factor_values, 크로스오버=tech_factors(cross).
     floor(2026-09-23, 지호 님 반영 — us_smoothed_floor.py 백테스트): 종합점수가 floor
@@ -244,6 +245,12 @@ def select_by_weights(weights: dict, ind_map: dict, n: int, funds: dict | None =
        34스냅샷 동안 실제로 한 번도 topn8을 바꾼 적이 없음(n_binding=0, 0%) — 평소엔
        무비용이고, 하락장에서 후보풀이 얇아져 약한 종목이 섞여 들어오는 걸 막는 보험
        성격. floor=None이면 기존 동작(무제한).
+    require_above_ma100(2026-09-23, 지호 님 반영 — us_momentum_overlay.py·
+       us_ma100_ret3m_weight_sweep.py 백테스트): 100일선 아래인 종목을 후보에서 제외.
+       단독검증 DSR 0.9999·PBO 23.5%(topn8 기준 +10.63%p vs 무필터 +9.43%p, 승률 94.1%
+       vs 85.3%). 연속가중치가 아니라 문턱 필터인 이유: 이격도가 클수록 계속 좋아지는
+       "정도" 효과는 워크포워드 재검증에서 유의하지 않았음(us_ma100_magnitude_check.py,
+       n=8·t=-0.26) — "위/아래"만 유의해서 필터로만 반영.
     sector_cap(기본 2, 2026-07-17 지호 님 결정 — us_sector_cap_sweep.py 백테스트 반영):
        rd_mktcap(R&D/시가총액) 팩터가 구조적으로 바이오/제약을 편애(REGN 0.539로 전체 1위,
        2위의 2배)해 실제로 상위 8종목 중 4종목이 Health Care로 쏠리는 걸 실측 확인 — 임상
@@ -286,6 +293,13 @@ def select_by_weights(weights: dict, ind_map: dict, n: int, funds: dict | None =
         if n_excluded:
             print(f"[export] 점수하한({floor}) 미달로 {n_excluded}종목 제외", file=sys.stderr)
         comp = comp[comp >= floor]
+    if require_above_ma100 and "ma100_gap" in df.columns:
+        gap = df["ma100_gap"].reindex(comp.index)
+        below = gap <= 0
+        n_excluded = int(below.sum())
+        if n_excluded:
+            print(f"[export] 100일선 아래로 {n_excluded}종목 제외", file=sys.stderr)
+        comp = comp[~below.fillna(False)]
     lbl = "가중합성(" + "·".join(f"{k}{v}" for k, v in weights.items() if v) + ")"
     scored_all = [(s, float(comp[s]), lbl) for s in comp.index]
     if sector_cap is not None and sector_map:
@@ -365,7 +379,7 @@ def select_pool(data: dict, n: int):
         # 자체를 22개로 눌러버려 AI가 볼 재료가 부족해지던 문제).
         scored = select_by_weights(w, data["ind_map"], n, funds=funds, cross=cross,
                                    sector_map=data.get("sector_map"), sector_cap=None,
-                                   floor=3.25)
+                                   floor=3.25, require_above_ma100=True)
         label = ("weights " + "·".join(f"{k}{v}" for k, v in w.items() if v)
                  + ("" if funds else " [펀더멘탈캐시 없음:모멘텀만]"))
     else:

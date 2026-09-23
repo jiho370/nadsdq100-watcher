@@ -14,5 +14,361 @@
   "AGN": {
     "marked": "2026-09-23",
     "reason": "no_data"
+  },
+  "ALXN": {
+    "marked": "2026-09-23",
+    "reason": "no_data"
+  },
+  "ANDV": {
+    "marked": "2026-09-23",
+    "reason": "no_data"
+  },
+  "ANSS": {
+    "marked": "2026-09-23",
+    "reason": "no_data"
+  },
+  "ATVI": {
+    "marked": "2026-09-23",
+    "reason": "no_data"
+  },
+  "BCR": {
+    "marked": "2026-09-23",
+    "reason": "no_data"
+  },
+  "BK": {
+    "marked": "2026-09-23",
+    "reason": "no_data"
+  },
+  "CA": {
+    "marked": "2026-09-23",
+    "reason": "no_data"
+  },
+  "CBS": {
+    "marked": "2026-09-23",
+    "reason": "no_data"
+  },
+  "CDAY": {
+    "marked": "2026-09-23",
+    "reason": "no_data"
+  },
+  "CELG": {
+    "marked": "2026-09-23",
+    "reason": "no_data"
+  },
+  "CERN": {
+    "marked": "2026-09-23",
+    "reason": "no_data"
+  },
+  "CHK": {
+    "marked": "2026-09-23",
+    "reason": "no_data"
+  },
+  "CMA": {
+    "marked": "2026-09-23",
+    "reason": "no_data"
+  },
+  "COL": {
+    "marked": "2026-09-23",
+    "reason": "no_data"
+  },
+  "CTLT": {
+    "marked": "2026-09-23",
+    "reason": "no_data"
+  },
+  "CTRA": {
+    "marked": "2026-09-23",
+    "reason": "no_data"
+  },
+  "CTXS": {
+    "marked": "2026-09-23",
+    "reason": "no_data"
+  },
+  "CXO": {
+    "marked": "2026-09-23",
+    "reason": "no_data"
+  },
+  "DAY": {
+    "marked": "2026-09-23",
+    "reason": "no_data"
+  },
+  "DFS": {
+    "marked": "2026-09-23",
+    "reason": "no_data"
+  },
+  "DISCK": {
+    "marked": "2026-09-23",
+    "reason": "no_data"
+  },
+  "DISH": {
+    "marked": "2026-09-23",
+    "reason": "no_data"
+  },
+  "DNB": {
+    "marked": "2026-09-23",
+    "reason": "no_data"
+  },
+  "DO": {
+    "marked": "2026-09-23",
+    "reason": "no_data"
+  },
+  "DRE": {
+    "marked": "2026-09-23",
+    "reason": "no_data"
+  },
+  "DWDP": {
+    "marked": "2026-09-23",
+    "reason": "no_data"
+  },
+  "ENDP": {
+    "marked": "2026-09-23",
+    "reason": "no_data"
+  },
+  "ESRX": {
+    "marked": "2026-09-23",
+    "reason": "no_data"
+  },
+  "ETFC": {
+    "marked": "2026-09-23",
+    "reason": "no_data"
+  },
+  "EVHC": {
+    "marked": "2026-09-23",
+    "reason": "no_data"
+  },
+  "FI": {
+    "marked": "2026-09-23",
+    "reason": "no_data"
+  },
+  "FL": {
+    "marked": "2026-09-23",
+    "reason": "no_data"
+  },
+  "FLIR": {
+    "marked": "2026-09-23",
+    "reason": "no_data"
+  },
+  "FRC": {
+    "marked": "2026-09-23",
+    "reason": "no_data"
+  },
+  "FTR": {
+    "marked": "2026-09-23",
+    "reason": "no_data"
+  },
+  "GGP": {
+    "marked": "2026-09-23",
+    "reason": "no_data"
+  },
+  "HAR": {
+    "marked": "2026-09-23",
+    "reason": "no_data"
+  },
+  "HBI": {
+    "marked": "2026-09-23",
+    "reason": "no_data"
+  },
+  "HCP": {
+    "marked": "2026-09-23",
+    "reason": "no_data"
+  },
+  "HES": {
+    "marked": "2026-09-23",
+    "reason": "no_data"
+  },
+  "HOLX": {
+    "marked": "2026-09-23",
+    "reason": "no_data"
+  },
+  "IPG": {
+    "marked": "2026-09-23",
+    "reason": "no_data"
+  },
+  "JNPR": {
+    "marked": "2026-09-23",
+    "reason": "no_data"
+  },
+  "JWN": {
+    "marked": "2026-09-23",
+    "reason": "no_data"
+  },
+  "K": {
+    "marked": "2026-09-23",
+    "reason": "no_data"
+  },
+  "KSU": {
+    "marked": "2026-09-23",
+    "reason": "no_data"
+  },
+  "LLL": {
+    "marked": "2026-09-23",
+    "reason": "no_data"
+  },
+  "LLTC": {
+    "marked": "2026-09-23",
+    "reason": "no_data"
+  },
+  "LM": {
+    "marked": "2026-09-23",
+    "reason": "no_data"
+  },
+  "LVLT": {
+    "marked": "2026-09-23",
+    "reason": "no_data"
+  },
+  "MJN": {
+    "marked": "2026-09-23",
+    "reason": "no_data"
+  },
+  "MNK": {
+    "marked": "2026-09-23",
+    "reason": "no_data"
+  },
+  "MON": {
+    "marked": "2026-09-23",
+    "reason": "no_data"
+  },
+  "MRO": {
+    "marked": "2026-09-23",
+    "reason": "no_data"
+  },
+  "MXIM": {
+    "marked": "2026-09-23",
+    "reason": "no_data"
+  },
+  "NBL": {
+    "marked": "2026-09-23",
+    "reason": "no_data"
+  },
+  "NLOK": {
+    "marked": "2026-09-23",
+    "reason": "no_data"
+  },
+  "NLSN": {
+    "marked": "2026-09-23",
+    "reason": "no_data"
+  },
+  "PBCT": {
+    "marked": "2026-09-23",
+    "reason": "no_data"
+  },
+  "PDCO": {
+    "marked": "2026-09-23",
+    "reason": "no_data"
+  },
+  "PEAK": {
+    "marked": "2026-09-23",
+    "reason": "no_data"
+  },
+  "PX": {
+    "marked": "2026-09-23",
+    "reason": "no_data"
+  },
+  "PXD": {
+    "marked": "2026-09-23",
+    "reason": "no_data"
+  },
+  "RAI": {
+    "marked": "2026-09-23",
+    "reason": "no_data"
+  },
+  "RHT": {
+    "marked": "2026-09-23",
+    "reason": "no_data"
+  },
+  "RTN": {
+    "marked": "2026-09-23",
+    "reason": "no_data"
+  },
+  "SATS": {
+    "marked": "2026-09-23",
+    "reason": "no_data"
+  },
+  "SCG": {
+    "marked": "2026-09-23",
+    "reason": "no_data"
+  },
+  "SEE": {
+    "marked": "2026-09-23",
+    "reason": "no_data"
+  },
+  "SIVB": {
+    "marked": "2026-09-23",
+    "reason": "no_data"
+  },
+  "SNI": {
+    "marked": "2026-09-23",
+    "reason": "no_data"
+  },
+  "SRCL": {
+    "marked": "2026-09-23",
+    "reason": "no_data"
+  },
+  "STJ": {
+    "marked": "2026-09-23",
+    "reason": "no_data"
+  },
+  "SWN": {
+    "marked": "2026-09-23",
+    "reason": "no_data"
+  },
+  "TGNA": {
+    "marked": "2026-09-23",
+    "reason": "no_data"
+  },
+  "TIF": {
+    "marked": "2026-09-23",
+    "reason": "no_data"
+  },
+  "TSS": {
+    "marked": "2026-09-23",
+    "reason": "no_data"
+  },
+  "TWTR": {
+    "marked": "2026-09-23",
+    "reason": "no_data"
+  },
+  "TWX": {
+    "marked": "2026-09-23",
+    "reason": "no_data"
+  },
+  "VAR": {
+    "marked": "2026-09-23",
+    "reason": "no_data"
+  },
+  "VIAB": {
+    "marked": "2026-09-23",
+    "reason": "no_data"
+  },
+  "VIAC": {
+    "marked": "2026-09-23",
+    "reason": "no_data"
+  },
+  "WBA": {
+    "marked": "2026-09-23",
+    "reason": "no_data"
+  },
+  "WCG": {
+    "marked": "2026-09-23",
+    "reason": "no_data"
+  },
+  "WFM": {
+    "marked": "2026-09-23",
+    "reason": "no_data"
+  },
+  "WRK": {
+    "marked": "2026-09-23",
+    "reason": "no_data"
+  },
+  "XEC": {
+    "marked": "2026-09-23",
+    "reason": "no_data"
+  },
+  "XL": {
+    "marked": "2026-09-23",
+    "reason": "no_data"
+  },
+  "XLNX": {
+    "marked": "2026-09-23",
+    "reason": "no_data"
   }
 }
