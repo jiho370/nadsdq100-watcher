@@ -320,8 +320,9 @@ def _holdings_section(hstate, ind_map, price_map, bench_dates, bench_closes, ind
               f"보유종목 최소편입일={since_min}, 벤치마크 마지막날짜={bench_dates[-1] if bench_dates else None}",
               file=sys.stderr)
     realized = H.realized_summary(market=market)
+    blended = H.blended_average(summary, market=market)
     return AR.holdings_table_html(summary, krw=krw, chart_cid=chart_cid, totals=totals, realized=realized,
-                                  name_map=name_map), images
+                                  blended=blended, name_map=name_map), images
 
 
 # ------------------------- 공용 헬퍼 -------------------------

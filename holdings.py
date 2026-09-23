@@ -115,6 +115,22 @@ def realized_summary(market: str | None = None, path=TRADE_LOG) -> dict | None:
     return {"n": len(trades), "avg_pct": sum(t["ret_pct"] for t in trades) / len(trades)}
 
 
+def blended_average(summary: list, market: str | None = None, path=TRADE_LOG) -> dict | None:
+    """2026-09-23(지호 님 지적 — "실현 수익은 포함해야지"): 보유 중(미실현, live_summary
+    결과) + 이미 청산한(실현, trade_log) 포지션을 전부 동일비중으로 묶은 평균 수익률.
+    이 프로젝트 전체가 '포지션마다 동일 금액 진입'을 가정하므로(portfolio_series 등과 동일
+    가정) 청산분도 그냥 한 자리로 쳐서 단순평균 낸다 — 매도 이후 그 자금이 재투자됐는지는
+    추적하지 않는 근사치. totals(미실현만)와 이 값을 같이 보여줘서 "우리가 이미 판 큰 승자가
+    수익률에 안 잡히는" 착시를 없앤다."""
+    held = [r["ret_pct"] for r in (summary or []) if r.get("ret_pct") is not None]
+    trades = [t["ret_pct"] for t in _load_trade_log(path) if t.get("ret_pct") is not None
+              and (market is None or t.get("market") == market)]
+    all_r = held + trades
+    if not all_r:
+        return None
+    return {"n_held": len(held), "n_realized": len(trades), "avg_pct": sum(all_r) / len(all_r)}
+
+
 def update(state: dict, buy_now_syms: list, ind_map: dict, today: str, pool_syms=None, market: str = "US"):
     """보유 갱신 + 매도 시그널 산출. 반환: sells[list].  state 는 제자리 수정.
     매도 규칙(2026-07-15 재검증 반영): ①200일선 -3% 이탈은 기본 비활성(SELL_MA200_BACKUP=1
