@@ -1,0 +1,17 @@
+{
+  "n_events": 39,
+  "n_skipped_thin_mktcap": 0,
+  "topn": 5,
+  "cap": 6.0,
+  "baseline_score_mean_excess_pct": 2.035,
+  "baseline_score_win_rate_pct": 61.5,
+  "mktcap_order_mean_excess_pct": 1.427,
+  "mktcap_order_win_rate_pct": 53.8,
+  "paired_diff_mean_pct": -0.608,
+  "paired_t_stat": -0.217,
+  "avg_overlap_frac": 0.01,
+  "mktcap_rank_ic_spearman_mean": 0.0701,
+  "mktcap_rank_ic_t_stat": 3.042,
+  "mktcap_rank_ic_n_snaps": 39,
+  "method": "cap=6.0 밴드 통과 풀에서 topN(=5)을 종합점수순 vs 시총(pykrx 실측)순으로 뽑아 페어드 비교. mktcap_rank_ic = 밴드 내 시총순위와 개별종목 향후초과수익의 스피어만 상관."
+}

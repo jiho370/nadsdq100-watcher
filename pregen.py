@@ -205,13 +205,15 @@ def run_us() -> str:
         _log(f"이미 {for_kst}치 생성 완료 — 재시도 스킵"); return "done"
     R._require_yf()
     data = R.gather_universe_data(with_volume=True)
-    scored, info, _m = E.select_pool(data, int(os.environ.get("REPORT_MAX_CANDIDATES", "60")))
+    scored, info, _m, _stats = E.select_pool(data, int(os.environ.get("REPORT_MAX_CANDIDATES", "60")))
     cands = E.build_candidates(data, info, scored, 60)
-    # 관찰(watch) 섹션은 화면엔 안 보이지만(2026-07-13), AI 제외 시 백필 예비군 검증 캐시로
-    # 씀(2026-07-19, daily_ai_report.run_us와 동일 수정 — pregen 캐시에도 예비군 verdict가
-    # 있어야 발송 시점에 API 재호출 없이 백필 가능).
+    # 관찰(watch) 후보도 검증은 해 둔다(화면엔 안 보임, 2026-07-13). 2026-09-23: AI '제외'가
+    # 더 이상 buy_now에서 후보를 빼지 않으므로(ai_report._apply_verdicts) 예비군 백필 용도는
+    # 없어졌지만, n_watch(FINAL_WATCH)가 나중에 다시 켜질 가능성을 감안해 그대로 둔다.
     pool_k = int(os.environ.get("REPORT_POOL", "10")) + POOL_BUFFER
-    buy, watch = E.split_by_entry(cands, k=pool_k)
+    # 2026-09-23: daily_ai_report.run_us와 동일하게 섹터캡 무제한 — pregen 캐시가 실제
+    # 발송 내용과 달라지면 AI 검증이 엉뚱한 종목 대상으로 이뤄짐.
+    buy, watch = E.split_by_entry(cands, k=pool_k, sector_cap=None)
     _headlines(buy + watch)
     groups = {"buy_now": buy, "watch": watch,
               "sells": _holding_syms("state/ai_holdings.json")}

@@ -89,6 +89,23 @@ def _ma(arr, w):
     return out
 
 
+def _pool_stats_html(stats: dict) -> str:
+    """2026-09-23(지호 님 요청 — "누락된 것도 요약버전으로 보여주기"): 점수하한·100일선
+    필터로 제외된 종목 수를 이메일에 짧게 표시(기존엔 서버 로그에만 남았음)."""
+    if not stats or not stats.get("pool_before"):
+        return ""
+    before = stats["pool_before"]
+    after = stats.get("pool_after", before)
+    floor_ex = stats.get("floor_excluded", 0)
+    ma100_ex = stats.get("ma100_excluded", 0)
+    return (
+        '<div style="background:#f8fafc;border-left:3px solid #94a3b8;padding:7px 12px;'
+        'font-size:12px;color:#475569;margin:6px 0 10px;line-height:1.6">'
+        f'📋 스크리닝: 모멘텀 결측 제외 후 {before}종목 → 점수하한(3.25) 미달 '
+        f'{floor_ex}종목 제외 → 100일선 아래 {ma100_ex}종목 제외 → 최종 후보 '
+        f'<b>{after}종목</b></div>')
+
+
 def _stock_chart_png(closes, ticker, big=False, display_days=None):
     """종가 + 이동평균선(20/50/200) 차트 PNG. 이동평균은 closes 전체(표시구간보다 앞선
     과거분 포함)로 계산한 뒤 최근 display_days만 잘라 그린다 — display_days만큼만 미리
@@ -602,7 +619,7 @@ def run_us(no_email: bool = False, force: bool = False):
     if as_of and last.get("us_as_of") == as_of:
         banner = f"미국 휴장 — 직전 거래일({as_of}) 종가 기준입니다."
 
-    scored, info, model_used = E.select_pool(data, MAX_CANDIDATES)
+    scored, info, model_used, pool_stats = E.select_pool(data, MAX_CANDIDATES)
     print(f"[선정] 방식='{model_used}' 로 후보 {len(scored)}종목", file=sys.stderr)
     candidates = {"as_of": as_of, "candidates": E.build_candidates(data, info, scored, MAX_CANDIDATES)}
     market = {"as_of": as_of, **E.build_market(data)}
@@ -611,10 +628,26 @@ def run_us(no_email: bool = False, force: bool = False):
     # 제외될 때 백필할 예비군으로는 씀(2026-07-19 버그수정 — 후보풀 60개인데 예비군이 없어서
     # 제외분만큼 최종 매수가 목표치에 못 미치던 문제, 지호 님 지적).
     pool_k = int(os.environ.get("REPORT_POOL", "10"))
-    buy_now, watch = E.split_by_entry(candidates["candidates"], k=pool_k)
+    # 2026-09-23(지호 님 결정 — us_sector_cap_with_ma100.py 재검증): floor+100일선 필터
+    # 적용 후엔 섹터캡=2가 무제한보다 수익도 낮고 MDD도 오히려 나빠 무제한으로 전환.
+    buy_now, watch = E.split_by_entry(candidates["candidates"], k=pool_k, sector_cap=None)
 
     import holdings as H
     hstate = H.load()
+    # 2026-09-23(지호 님 — 메리츠 실계좌 보유종목 반영): 보유종목이 S&P500 유니버스 밖(ETF 등,
+    # 예: VOO)이면 gather_universe_data가 애초에 안 받아와 data["hist"]/ind_map에 없다 —
+    # 그대로 두면 보유현황 표·수익률 그래프에서 그 종목만 조용히 빠진다(holdings.live_summary/
+    # portfolio_series가 가격 없는 종목을 그냥 skip). 유니버스 밖 보유종목만 개별 보충 조회.
+    missing = [s for s in hstate.get("holdings", {}) if s not in data["hist"]]
+    if missing:
+        extra_hist, extra_vol = R.download_histories(missing, with_volume=True)
+        for s, c in extra_hist.items():
+            data["hist"][s] = c
+            ind = R.compute_indicators(c)
+            if ind:
+                data["ind_map"][s] = ind
+        data["vol"].update(extra_vol)
+        print(f"[보유] 유니버스 밖 보유종목 {len(missing)}개 보충 조회: {missing}", file=sys.stderr)
     # 이미 보유 중인 후보엔 배지를 다르게(2026-07-17, 지호 님 요청 — 국장은 이미 하고 있던
     # "보유중" 표기를 미장에도 동일 적용, ai_report._card()가 already_held를 그대로 씀).
     held_syms_us = set((hstate.get("holdings") or {}).keys())
@@ -643,9 +676,11 @@ def run_us(no_email: bool = False, force: bool = False):
         print("[정보] AI 실패 → 지표+계획 기반 리포트로 발송", file=sys.stderr)
         report = AR.deterministic_report(groups, market)
 
-    # 편입: 보유 상한 10 + 동일 회사 복수 클래스(GOOG/GOOGL 등) 중복 배제 — 팔아야 산다
+    # 편입: 보유 상한 10(2026-09-23, 지호 님 결정 — 8→10 확대. 이 세션의 floor·100일선·
+    # 섹터캡 백테스트는 전부 topn=8 기준이라 10종목 자체는 별도 검증된 값은 아님) +
+    # 동일 회사 복수 클래스(GOOG/GOOGL 등) 중복 배제 — 팔아야 산다
     H.add(hstate, [r["symbol"] for r in report.get("buy_now", [])], data["ind_map"], as_of,
-          max_n=int(os.environ.get("US_MAX_HOLD", "8")))
+          max_n=int(os.environ.get("US_MAX_HOLD", "10")))
     H.save(hstate)
 
     # 보유현황(라이브 트래킹): 전체 투입자산 기준 누적수익률 vs SPY(동일시점·동일금액) 시계열
@@ -707,10 +742,11 @@ def run_us(no_email: bool = False, force: bool = False):
     sig_images, sig_cids = _signal_images(signals, when="us")
     images += sig_images
 
-    # 전일 시장 요약 표는 국장 메일 전용 — 미장 메일엔 안 붙인다(market_html="").
+    # 전일 시장 요약 표는 국장 메일 전용 — 미장 메일엔 안 붙인다. market_html은 대신
+    # 2026-09-23부터 스크리닝 제외 요약(pool_stats)을 표시하는 데 재사용.
     signals_html = MS.signal_cards_html(signals, sig_cids, when="us") if signals else ""
     html = AR.render_report_html(report, as_of, metrics,
-                                 market_html="", signals_html=signals_html,
+                                 market_html=_pool_stats_html(pool_stats), signals_html=signals_html,
                                  banner=banner, show_spy=bool(spy_closes),
                                  title="🇺🇸 미국장 개장 점검 · S&P500 매수·매도 후보",
                                  holdings_html=holdings_html)

@@ -1,0 +1,17 @@
+{
+  "n_events": 20,
+  "n_skipped_thin_mktcap": 0,
+  "topn": 10,
+  "floor": 3.25,
+  "baseline_score_mean_excess_pct": 8.181,
+  "baseline_score_win_rate_pct": 85.0,
+  "mktcap_order_mean_excess_pct": 6.213,
+  "mktcap_order_win_rate_pct": 75.0,
+  "paired_diff_mean_pct": -1.968,
+  "paired_t_stat": -1.226,
+  "avg_overlap_frac": 0.65,
+  "mktcap_rank_ic_spearman_mean": 0.0708,
+  "mktcap_rank_ic_t_stat": 1.098,
+  "mktcap_rank_ic_n_snaps": 20,
+  "method": "floor=3.25+100일선필터 통과 풀에서 topN을 종합점수순 vs 시총(EPS 역산 근사)순으로 뽑아 페어드 비교. mktcap_rank_ic = 풀 내 시총순위와 개별종목 향후수익의 스피어만 상관(양수면 대형주가 유리, 음수면 소형주가 유리 — 부호 자체가 힌트)."
+}

@@ -237,7 +237,7 @@ def _load_funds():
 def select_by_weights(weights: dict, ind_map: dict, n: int, funds: dict | None = None,
                       cross: dict | None = None, sector_map: dict | None = None,
                       sector_cap: int | None = 2, floor: float | None = None,
-                      require_above_ma100: bool = False) -> list[tuple]:
+                      require_above_ma100: bool = False, stats: dict | None = None) -> list[tuple]:
     """지표 z-score 가중합성점수로 상위 n 선정 — 백테스트(backtest_weights)와 '동일 지표·정의' 사용.
        모멘텀=ind_map, 펀더멘탈=fundamentals_edgar.factor_values, 크로스오버=tech_factors(cross).
     floor(2026-09-23, 지호 님 반영 — us_smoothed_floor.py 백테스트): 종합점수가 floor
@@ -259,7 +259,14 @@ def select_by_weights(weights: dict, ind_map: dict, n: int, funds: dict | None =
        한국(Stage 4, 캡이 사실상 공짜)과 달리 여기선 실질적 트레이드오프이고 PBO도 93.5%로
        높아(3후보 중 뭐가 진짜 나은지 이 백테스트로 확정 못 함) 순수 수익 극대화 관점에선
        무제한이 유리하나, 분산을 우선한 지호 님 선택 — CAGR 저하는 감수. sector_cap=None이면
-       기존 동작(무제한)."""
+       기존 동작(무제한).
+    2026-09-23 재검증(us_sector_cap_with_ma100.py, floor+100일선 필터 적용 후): 위 트레이드
+       오프가 반전됨 — 필터 통과 풀이 26→16으로 얇아지면서 캡=2가 오히려 무제한보다 MDD도
+       나쁘고(-31.65% vs -29.69%) 수익도 낮음(+7.40%p vs +9.15%p, DSR 최고시행=무제한
+       0.9972). cap=1은 낙폭이 제일 좋아 보이지만 8종목을 거의 못 채움(평균 4.26/8, 완전
+       채움 2.9%) — 실용성 없어 기각. 지호 님 결정으로 무제한(sector_cap=None) 전환.
+    stats(선택): dict를 넘기면 제외 건수를 채워 넣는다({"floor_excluded":N,
+       "ma100_excluded":N, "pool_before":N}) — 라이브 리포트에 요약 표시용."""
     import numpy as _np, pandas as _pd, datetime as _dt
     today = _dt.date.today().isoformat()
     try:
@@ -288,10 +295,14 @@ def select_by_weights(weights: dict, ind_map: dict, n: int, funds: dict | None =
     comp = sum(float(weights[f]) * z(f) for f in active) if active else _pd.Series(0.0, index=df.index)
     valid = df["mom6"].notna() | df["mom12_1"].notna()   # 모멘텀 결측 종목 제외
     comp = comp[valid].sort_values(ascending=False)
+    if stats is not None:
+        stats["pool_before"] = int(len(comp))
     if floor is not None:
         n_excluded = int((comp < floor).sum())
         if n_excluded:
             print(f"[export] 점수하한({floor}) 미달로 {n_excluded}종목 제외", file=sys.stderr)
+        if stats is not None:
+            stats["floor_excluded"] = n_excluded
         comp = comp[comp >= floor]
     if require_above_ma100 and "ma100_gap" in df.columns:
         gap = df["ma100_gap"].reindex(comp.index)
@@ -299,7 +310,11 @@ def select_by_weights(weights: dict, ind_map: dict, n: int, funds: dict | None =
         n_excluded = int(below.sum())
         if n_excluded:
             print(f"[export] 100일선 아래로 {n_excluded}종목 제외", file=sys.stderr)
+        if stats is not None:
+            stats["ma100_excluded"] = n_excluded
         comp = comp[~below.fillna(False)]
+    if stats is not None:
+        stats["pool_after"] = int(len(comp))
     lbl = "가중합성(" + "·".join(f"{k}{v}" for k, v in weights.items() if v) + ")"
     scored_all = [(s, float(comp[s]), lbl) for s in comp.index]
     if sector_cap is not None and sector_map:
@@ -364,8 +379,10 @@ def split_by_entry(candidates: list, k: int = 5, sector_cap: int | None = 2):
 
 def select_pool(data: dict, n: int):
     """일일 후보 선정 진입점 — 우선순위: 최적가중치(모멘텀+펀더멘탈) > 최우수모델 > 하이브리드.
-       반환: (scored, info, method_label)."""
+       반환: (scored, info, method_label, stats) — stats={"pool_before","floor_excluded",
+       "ma100_excluded","pool_after"} 또는 weights 경로가 아니면 {}(리포트 요약 표시용)."""
     w = load_best_weights()
+    stats = {}
     if w:
         funds = _load_funds()
         cross = None
@@ -379,7 +396,7 @@ def select_pool(data: dict, n: int):
         # 자체를 22개로 눌러버려 AI가 볼 재료가 부족해지던 문제).
         scored = select_by_weights(w, data["ind_map"], n, funds=funds, cross=cross,
                                    sector_map=data.get("sector_map"), sector_cap=None,
-                                   floor=3.25, require_above_ma100=True)
+                                   floor=3.25, require_above_ma100=True, stats=stats)
         label = ("weights " + "·".join(f"{k}{v}" for k, v in w.items() if v)
                  + ("" if funds else " [펀더멘탈캐시 없음:모멘텀만]"))
     else:
@@ -388,9 +405,9 @@ def select_pool(data: dict, n: int):
         label = f"model {model}"
     if not scored:                       # 최후 폴백: 퀄리티+모멘텀 하이브리드
         scored, info = _score_pool(data)
-        return scored, info, "hybrid(score_reco)"
+        return scored, info, "hybrid(score_reco)", stats
     info = R.get_info_for([s for s, _, _ in scored])
-    return scored, info, label
+    return scored, info, label, stats
 
 
 def run(out_dir="data", max_candidates=60):

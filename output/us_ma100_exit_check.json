@@ -1,0 +1,12 @@
+{
+  "n_events": 25,
+  "hold_days": 126,
+  "always_hold_mean_excess_pct": 8.79,
+  "always_hold_win_rate_pct": 88.0,
+  "exit_on_ma100_break_mean_excess_pct": -0.535,
+  "exit_on_ma100_break_win_rate_pct": 44.0,
+  "paired_diff_mean_pct": -9.324,
+  "paired_t_stat": -3.631,
+  "pct_positions_that_breached_ma100_during_hold": 91.0,
+  "method": "진입 시점 floor+100일선 통과 topn8을 126거래일 보유 vs 보유 중 100일선 이탈 시 그 시점 가격으로 매도 후 잔여기간 현금(0%) 취급 — 같은 126일 창 안에서 페어드 비교. 종목별 일별 추적."
+}

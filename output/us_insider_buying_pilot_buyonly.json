@@ -1,0 +1,19 @@
+{
+  "n_observations": 138,
+  "n_months": 14,
+  "mean_monthly_ic": -0.3879,
+  "ic_std": 0.3729,
+  "ic_tstat": -3.89,
+  "group_avg_fwd_return": {
+    "net_buy_group": {
+      "n": 138,
+      "mean_fwd_ret_pct": 7.56
+    },
+    "net_sell_group": {
+      "n": 0,
+      "mean_fwd_ret_pct": null
+    }
+  },
+  "note": "파일럿 스코프 — PBO/DSR 등 이 프로젝트 정식 게이트는 미실시. 표본·생존편향 한계는 docstring 참고.",
+  "signal_mode": "buy_only"
+}

@@ -62,7 +62,9 @@ MODEL_VERIFY = _no_opus(os.environ.get("REPORT_MODEL_VERIFY",
 MODEL_WRITE  = _no_opus(os.environ.get("REPORT_MODEL_WRITE", "claude-haiku-4-5"), "claude-haiku-4-5")
 
 # 최종 채택 수(코드가 확정) — 관찰 폐지(2026-07-13): 관찰 슬롯을 매수 후보로 전환.
-# 미국 4+4 → 매수 8, 한국 3+2 → 매수 5. AI 강등분은 관찰 대신 '제외된 후보' 박스에 사유 표기.
+# 미국 4+4 → 매수 8, 한국 3+2 → 매수 5.
+# 2026-09-23(지호 님 결정): AI '제외' 강등은 더 이상 후보풀에서 빼지 않는다(_apply_verdicts
+# 참고) — 카드에 유의사항으로만 표기.
 # 2026-07-17(지호 님 요청): 미국 추천폭을 8→10으로 확대(판단의 폭을 넓히기 위해) — 보유
 # 상한(daily_ai_report.py US_MAX_HOLD)은 8로 그대로 둠, 추천(추천풀)과 실제 편입은 별개.
 FINAL_BUY      = int(os.environ.get("REPORT_FINAL_BUY", "10"))
@@ -161,6 +163,13 @@ def attach_plans(groups: dict):
 # 큐레이터가 아니다. 근거: 이 프로젝트의 2단계 재랭킹 백테스트에서 검증 안 된 재정렬은
 # 전부 원래 팩터 신호보다 나빴다(HISTORY.md §3 "2단계 재랭킹 검증"). 종목 간 비교·상대
 # 우열 판단을 금지해야 그 결론과 충돌하지 않는다.
+# 2026-09-23 추가 축소(지호 님 — us_topn_by_mktcap.py 등 이번 세션 백테스트 전부와 동일
+# 맥락): veto조차 후보풀 멤버십을 바꾸지 않는다 — verdict='제외'가 찾아내는 뉴스·이슈는
+# 이미 주가에 선반영돼 있을 가능성이 크고, 무엇보다 이 프로젝트의 모든 백테스트(floor·
+# 100일선·섹터캡 등)가 이 AI 게이트 없이 순수 팩터 선정만으로 검증됐다 — 게이트가 실제로
+# 수익을 개선하는지는 한 번도 백테스트되지 않았다. 그래서 '제외'는 이제 후보를 빼지 않고
+# 카드에 유의사항(⚠️)으로만 노출한다(_apply_verdicts). severity(구조적/일시적) 분류는
+# 그대로 유지 — 표시 문구의 무게를 정하는 데 여전히 쓰인다.
 _V_SYSTEM = (
     "당신은 규칙 기반으로 선정된 주식 후보를 '최신 정보로 검증'하는 애널리스트다. 한국어로 답한다.\n"
     "임무: 각 후보의 심각한 악재(실적 쇼크·가이던스 하향·소송/규제·회계 이슈·공매도 리포트)와 "
@@ -171,15 +180,19 @@ _V_SYSTEM = (
     "2) verdict은 종목마다 독립적으로 판단한다 — 다른 후보와 비교하거나 상대적으로 더/덜 "
     "매력적인지 순위를 매기지 않는다(정량 팩터 랭킹이 이미 그 역할을 함, 당신은 순위를 "
     "재조정하는 게 아니라 개별종목 결격사유만 확인).\n"
-    "3) verdict은 둘 중 하나다(관찰·보류 같은 중간 등급 없음 — 애매하게 남겨두지 말고 결정할 것):\n"
+    "3) verdict은 둘 중 하나다(관찰·보류 같은 중간 등급 없음 — 애매하게 남겨두지 말고 결정할 것). "
+    "주의: '제외'로 판정해도 그 종목은 매수 후보 목록에서 빠지지 않는다 — 카드에 '⚠️ 유의' "
+    "문구로만 노출되고 최종 판단은 사람 몫이다(2026-09-23부로 자동 배제 폐지). 그러니 신중해야 "
+    "할 이유는 '남발하면 근거 없는 경고 문구가 쌓여 독자가 무시하게 된다'는 것이지, 후보가 "
+    "빠지는 불이익이 아니다.\n"
     "   - '매수유지': 확인된 악재가 없거나, 하락이 그 종목만의 문제가 아니라 시장·업종 전반의 "
     "조정 때문임이 확인된 경우.\n"
     "   - '제외': 그 종목 고유의 검증된 부정적 정보 — 실적 쇼크·가이던스 하향·거버넌스 훼손"
     "(예: 자사주 매입 후 소각 대신 교환사채 발행 등으로 주주환원 기대를 저버림)·소송/규제·회계 "
     "이슈·공매도 리포트 등 매수 논거를 약화시키는 사안. 회계부정·상장폐지처럼 극단적인 사안만 "
     "해당하는 게 아니다 — '이걸 알고도 이 종목을 사겠는가'라는 질문에 아니라고 답하게 되는 "
-    "사안이면 제외한다. 애매하면 매수유지 쪽으로 밀어붙이지 말고 제외한다(제외되면 다음 순위 "
-    "후보가 자동으로 채워지므로 신중한 제외에 대한 부담이 없음). 사유 필수.\n"
+    "사안이면 제외한다. 다만 단정할 문서화된 사실이 없는 소문·추측 수준이면 매수유지로 둔다 "
+    "(경고 문구는 근거가 있을 때만 가치가 있다). 사유 필수.\n"
     "3-1) verdict='제외'면 severity를 반드시 붙인다(매수유지면 빈칸). 이건 '얼마나 심각해 "
     "보이는가'라는 인상이 아니라 사건의 유형을 규칙대로 분류하는 것이다. 판별축 두 가지: "
     "(A)확정성 — 문서화된 사건(절차 개시·판결·공시·규제조치)인가, 아니면 주장·전망·의견·수급"
@@ -196,10 +209,10 @@ _V_SYSTEM = (
     "가이던스 하향, 애널리스트 의견·목표가 하향, 공매도 리포트 등 제3자 주장(규제기관·감사인이 "
     "확인하기 전), 내부자 매도·외국인 매도세 등 수급, 섹터·거시·관세 역풍, 비핵심 파이프라인·"
     "단일 수주의 실패, 주가 급락 그 자체.\n"
-    "   방향에 주의: verdict는 애매하면 '제외'지만 severity는 애매하면 '일시적'이다 — 구조적 "
-    "판정은 보유 종목 매도로까지 이어질 수 있는 별도의 무거운 결정이므로, 문서화된 사실을 "
-    "특정할 수 없으면 절대 구조적으로 올리지 않는다. 구조적이면 verdict_reason에 근거 사건과 "
-    "날짜를 반드시 명시한다.\n"
+    "   방향에 주의: verdict는 애매하면 '매수유지'고(위 3번 참고, 문서화된 사실이 없으면 경고를 "
+    "붙이지 않는다) severity는 애매하면 '일시적'이다 — 구조적 판정은 보유 종목 매도로까지 "
+    "이어질 수 있는 별도의 무거운 결정이므로, 문서화된 사실을 특정할 수 없으면 절대 구조적으로 "
+    "올리지 않는다. 구조적이면 verdict_reason에 근거 사건과 날짜를 반드시 명시한다.\n"
     "4) 확인 안 된 내용은 쓰지 않는다. 수치를 지어내지 않는다.\n"
     "5) 출력은 지정된 JSON 하나만. 문장은 짧게(뉴스·촉매 각 한 줄).\n"
     "6) 종목 데이터에 prev_verdict(전날 판정)가 있으면 오늘 판정이 그것과 달라질 때만 "
@@ -516,46 +529,20 @@ def _apply_sticky_exclusion(vmap: dict, pool: list, market: str, as_of: str,
             v["change_reason"] = f"점착 유지 — {since} 제외 이후 {days_elapsed}일 경과(<{limit}일), 복귀 근거 없음"
 
 
-# ------------------------- verdict 적용(기존 로직 유지) -------------------------
+# ------------------------- verdict 적용 -------------------------
 def _apply_verdicts(buy_pool, watch_pool, vmap, n_buy, n_watch):
-    """1단계 verdict 반영해 최종 목록 확정. AI가 없으면 전원 '유지'로 동작.
-    2026-07-16 2차 수정(지호 님 피드백 — KCC 사례: 실적 부진+자사주 소각 기대를 저버린 거버넌스
-    이슈를 '관찰강등'으로 분류해 매수 목록에 그대로 남긴 게 부적절했음, "관찰 없어졌으니 강등이면
-    빠지는 게 맞다"). 관찰(watch) 슬롯이 폐지된 지금은 '강등'이 갈 곳이 없다 — verdict가
-    '매수유지'가 아니면(제외든 구버전 캐시의 관찰강등이든) 전부 빼고, 넓힌 풀(watch_pool =
-    buy_pool 다음 순위 예비군)에서 팩터 랭킹 순으로 결정론적으로 채운다(AI가 고르는 게 아니라
-    팩터 랭킹이 그대로 채움).
-    2026-07-19 버그 수정(지호 님 지적 — "후보풀 60개인데 왜 10종목이 안 채워지나"): 이 백필
-    로직은 문서에만 있고 실제로는 구현이 안 돼 있었다(watch_pool도 daily_ai_report.py에서
-    항상 빈 리스트로 넘어옴) — final_buy가 그냥 survivors[:n_buy]라 제외분만큼 그대로
-    shortfall이 되던 버그. watch_pool을 실제 예비군으로 채워 넘기고, 여기서 부족분을
-    watch_keep에서 랭킹순으로 채운다.
-    반환 4번째 값은 shortfall — 예비군까지 다 써도 n_buy에 못 미치면 양수(그 경우 억지로
-    더 아래 순위까지 끌어오지 않는다 — 그런 날은 이례적인 상황이니 경보로 다루는 게 숫자를
-    맞추는 것보다 유용)."""
-    survivors, excluded = [], []
-    for c in buy_pool:
-        v = ((vmap.get(str(c["symbol"])) or {}).get("verdict") or "매수유지").strip()
-        if v == "매수유지":
-            survivors.append(c)
-        else:
-            excluded.append(c)   # '제외'든 구버전 '관찰강등' 캐시든 전부 뺀다
-    watch_keep = []
-    for c in watch_pool:
-        v = ((vmap.get(str(c["symbol"])) or {}).get("verdict") or "").strip()
-        if v and v != "매수유지":
-            excluded.append(c)
-        else:
-            watch_keep.append(c)
-    final_buy = list(survivors[:n_buy])
-    if len(final_buy) < n_buy:                    # 부족분을 예비군에서 랭킹순으로 백필
-        need = n_buy - len(final_buy)
-        final_buy.extend(watch_keep[:need])
-        watch_keep = watch_keep[need:]
+    """1단계 verdict 반영해 최종 목록 확정.
+    2026-09-23 재설계(지호 님 결정): verdict='제외'가 더 이상 후보를 빼지 않는다 — 이 프로젝트의
+    모든 백테스트(floor·100일선·섹터캡 등)가 이 AI 게이트 없이 순수 팩터 선정만으로 검증됐고,
+    AI가 잡아내는 뉴스·이슈는 이미 주가에 선반영돼 있을 가능성이 커서 배제 자체가 검증된 엣지가
+    아니다(_V_SYSTEM 상단 주석 참고). 최종 목록은 팩터 랭킹(buy_pool 순서) 그대로 상위 n_buy —
+    verdict는 _mk_item에서 카드의 유의사항(⚠️) 문구로만 쓰인다. excluded는 항상 빈 리스트로
+    반환(호출부 호환용 — ai_excluded 박스는 자연히 비게 된다). shortfall은 여전히 유효한 신호다
+    (AI 판정과 무관하게 후보풀 자체가 n_buy보다 얇을 때만 양수)."""
+    final_buy = list(buy_pool[:n_buy])
+    final_watch = list(watch_pool[:n_watch])
     shortfall = max(0, n_buy - len(final_buy))
-    used = {c["symbol"] for c in final_buy}
-    final_watch = [c for c in watch_keep if c["symbol"] not in used][:n_watch]
-    return final_buy, final_watch, excluded, shortfall
+    return final_buy, final_watch, [], shortfall
 
 
 # ------------------------- 조립 -------------------------
@@ -577,6 +564,7 @@ def _mk_item(c, kind, vmap, wmap):
             "catalyst": (v.get("catalyst") or "").strip(),
             "comment": (w.get("comment") or "").strip(),
             "verdict_reason": (v.get("verdict_reason") or "").strip(),
+            "verdict_severity": (v.get("severity") or "").strip(),
             "plan": c.get("plan") or {}, "hot": bool(c.get("hot")),
             "rank": c.get("rank"), "pool_size": c.get("pool_size"),
             "already_held": bool(c.get("already_held"))}
@@ -673,13 +661,15 @@ def build_report(groups: dict, market: dict, pregen: dict | None = None) -> dict
         # 않고 대신 눈에 띄게 경고한다(기존 ⚠️ 고지 줄에 자연히 노출됨, 별도 템플릿 수정 불필요).
         # buy_pool이 비어있으면 그 시장은 애초에 이번 실행 대상이 아니었던 것(예: --kr 단독
         # 실행 시 미국 그룹은 원래 빈 채로 들어옴) — AI가 다 걸러낸 것과 구분해야 오탐이 안 남.
+        # 2026-09-23: AI 제외가 더 이상 후보를 빼지 않으므로(_apply_verdicts) 이 shortfall은
+        # 순수하게 후보풀 자체가 n_buy보다 얇을 때만 발생 — 문구도 그에 맞게 수정.
         warn_bits = []
         if kr_buy_pool and len(kfb) < MIN_BUY:
             warn_bits.append(f"한국 매수 후보가 {len(kfb)}종목으로 최소기준({MIN_BUY}) 미달")
         if buy_pool and len(fb) < MIN_BUY:
             warn_bits.append(f"미국 매수 후보가 {len(fb)}종목으로 최소기준({MIN_BUY}) 미달")
         if warn_bits:
-            risks_text = ("[AI 제외 급증] " + " · ".join(warn_bits) + " — 시장 상황 점검 요망. "
+            risks_text = ("[매수후보 부족] " + " · ".join(warn_bits) + " — 시장 상황 점검 요망. "
                            + risks_text)
 
         out = {
@@ -953,6 +943,16 @@ def _card(i, r, metrics_by_sym, kind, is_kr=False):
             if (_nw and fl != "중립" and "확인" not in _nw) else "")
     cata = (f'<div style="color:#7c3aed;font-size:11px;margin-top:3px;line-height:1.5">&#128197; {_esc(r.get("catalyst"))}</div>'
             if r.get("catalyst") else "")
+    # 2026-09-23(지호 님 결정): AI 검증에서 '제외' 판정이 나와도 후보에서 빼지 않고(_apply_verdicts
+    # 참고) 여기 유의사항으로만 표시한다 — 최종 판단은 사람 몫.
+    _vr = (r.get("verdict_reason") or "").strip()
+    caution = ""
+    if _vr:
+        _sev = (r.get("verdict_severity") or "").strip()
+        _sev_badge = (' <span style="font-size:10px;font-weight:700">[구조적]</span>' if _sev == "구조적"
+                     else ' <span style="font-size:10px;opacity:.75">[일시적]</span>' if _sev == "일시적" else "")
+        caution = (f'<div style="font-size:12px;color:#991b1b;background:#fef2f2;border-radius:6px;'
+                  f'padding:5px 8px;margin-top:6px">&#9888; AI 검증 유의사항: {_esc(_vr)}{_sev_badge}</div>')
     chart = f'<img src="cid:chart_{sym}" style="width:100%;border-radius:6px">'
     header = (f'{i}. {_esc(r.get("name"))}' if is_kr else
               f'{i}. {_esc(sym)} '
@@ -964,7 +964,7 @@ def _card(i, r, metrics_by_sym, kind, is_kr=False):
         f'<div style="font-size:15px;font-weight:700">{header}</div>'
         f'<div style="margin:4px 0 2px">{cat_chip}{held_chip}{hot_chip}{flag_chip}</div>'
         f'<div style="font-size:13px;color:#111;margin-top:4px;line-height:1.5">{_esc(r.get("summary"))}</div>'
-        f'{fact_html}{pts_html}{act}{news}{cata}</td>'
+        f'{caution}{fact_html}{pts_html}{act}{news}{cata}</td>'
         f'<td width="44%" valign="top" style="padding:12px 12px 12px 0">{chart}'
         f'<div style="margin-top:6px">{_metric_chips(m)}</div></td></tr></table>')
 

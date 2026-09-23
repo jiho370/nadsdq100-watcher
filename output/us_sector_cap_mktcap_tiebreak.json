@@ -1,0 +1,58 @@
+{
+  "n_snaps": 34,
+  "topn": 10,
+  "floor": 3.25,
+  "cap_grid": [
+    1,
+    2,
+    3,
+    4
+  ],
+  "rows": [
+    {
+      "sector_cap": 1,
+      "n_events": 20,
+      "score_order_mean_excess_pct": 6.422,
+      "score_order_win_rate_pct": 80.0,
+      "mktcap_tiebreak_mean_excess_pct": 4.688,
+      "mktcap_tiebreak_win_rate_pct": 65.0,
+      "paired_diff_mean_pct": -1.734,
+      "paired_t_stat": -1.098,
+      "avg_overlap_frac": 0.24
+    },
+    {
+      "sector_cap": 2,
+      "n_events": 20,
+      "score_order_mean_excess_pct": 6.602,
+      "score_order_win_rate_pct": 80.0,
+      "mktcap_tiebreak_mean_excess_pct": 4.773,
+      "mktcap_tiebreak_win_rate_pct": 65.0,
+      "paired_diff_mean_pct": -1.829,
+      "paired_t_stat": -1.154,
+      "avg_overlap_frac": 0.535
+    },
+    {
+      "sector_cap": 3,
+      "n_events": 20,
+      "score_order_mean_excess_pct": 8.122,
+      "score_order_win_rate_pct": 80.0,
+      "mktcap_tiebreak_mean_excess_pct": 6.614,
+      "mktcap_tiebreak_win_rate_pct": 90.0,
+      "paired_diff_mean_pct": -1.508,
+      "paired_t_stat": -1.032,
+      "avg_overlap_frac": 0.62
+    },
+    {
+      "sector_cap": 4,
+      "n_events": 20,
+      "score_order_mean_excess_pct": 8.209,
+      "score_order_win_rate_pct": 85.0,
+      "mktcap_tiebreak_mean_excess_pct": 7.26,
+      "mktcap_tiebreak_win_rate_pct": 90.0,
+      "paired_diff_mean_pct": -0.949,
+      "paired_t_stat": -0.625,
+      "avg_overlap_frac": 0.68
+    }
+  ],
+  "method": "floor=3.25+100일선필터 통과 풀에서 섹터캡을 적용하되, 섹터 구성 우선순위(어느 섹터가 먼저 자리를 채우는가)는 점수순으로 동일하게 두고, 캡 때문에 한 섹터 안에서 실제로 어떤 종목이 뽑히는지만 점수순 vs 시총순으로 바꿔 비교. sector_map은 현재 시점 위키피디아 GICS(point-in-time 아님)."
+}

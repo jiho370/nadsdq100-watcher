@@ -1,0 +1,96 @@
+{
+  "n_snaps": 34,
+  "topn": 8,
+  "floor": 3.25,
+  "cap_grid": [
+    null,
+    1,
+    2,
+    3,
+    4
+  ],
+  "rows": [
+    {
+      "sector_cap": "무제한",
+      "n_events": 34,
+      "mean_excess_pct": 9.152,
+      "win_rate_pct": 76.5,
+      "mdd_proxy_pct": -29.69,
+      "avg_n_sectors_in_top8": 3.53
+    },
+    {
+      "sector_cap": 1,
+      "n_events": 34,
+      "mean_excess_pct": 6.712,
+      "win_rate_pct": 67.6,
+      "mdd_proxy_pct": -21.21,
+      "avg_n_sectors_in_top8": 4.26
+    },
+    {
+      "sector_cap": 2,
+      "n_events": 34,
+      "mean_excess_pct": 7.395,
+      "win_rate_pct": 70.6,
+      "mdd_proxy_pct": -31.65,
+      "avg_n_sectors_in_top8": 4.03
+    },
+    {
+      "sector_cap": 3,
+      "n_events": 34,
+      "mean_excess_pct": 8.703,
+      "win_rate_pct": 70.6,
+      "mdd_proxy_pct": -31.83,
+      "avg_n_sectors_in_top8": 3.71
+    },
+    {
+      "sector_cap": 4,
+      "n_events": 34,
+      "mean_excess_pct": 8.796,
+      "win_rate_pct": 73.5,
+      "mdd_proxy_pct": -29.69,
+      "avg_n_sectors_in_top8": 3.62
+    }
+  ],
+  "pbo_dsr": {
+    "input": {
+      "horizon": "6m",
+      "universe": "US_floor_ma100_top8",
+      "cost": "gross(이벤트 평균)"
+    },
+    "n_trials": 5,
+    "n_events": 34,
+    "pbo": {
+      "pbo": 0.3106,
+      "embargo": 1,
+      "purged_events_total": 5544,
+      "n_combos": 924,
+      "n_blocks": 12,
+      "lambda_mean": 0.6728,
+      "is_sharpe_mean": 0.628,
+      "oos_sharpe_mean": 0.7314,
+      "degradation_slope": -1.4566,
+      "prob_oos_loss": 0.0141
+    },
+    "pbo_verdict": "중간(주의)",
+    "dsr": {
+      "sr": 0.5976,
+      "sr0": 0.072,
+      "dsr": 0.9972,
+      "dsr_uncorrected": 1.0,
+      "skew": 1.624,
+      "kurtosis": 7.141,
+      "T": 34,
+      "T_eff": 17,
+      "N": 5,
+      "best_trial": "capNone"
+    },
+    "dsr_verdict": "95% 신뢰수준 통과",
+    "passed": true,
+    "references": [
+      "Bailey et al. 2017 (PBO/CSCV)",
+      "Bailey & López de Prado 2014 (DSR)"
+    ],
+    "note": "조합 간 상관으로 N이 과대계상될 수 있어 DSR은 보수적(실제보다 낮게) 추정됨."
+  },
+  "method": "floor=3.25+100일선필터 통과 후보에서 섹터캡 무제한/1/2/3/4 스윕. mdd_proxy_pct = 이벤트 초과수익을 순서대로 복리연결한 누적곡선의 최대낙폭(overfit_stats._mdd, 몬테카를로 검정과 동일 정의) — 전체 NAV 재시뮬레이션 아닌 근사치. sector_map은 현재 시점 위키피디아 GICS (point-in-time 아님, 원 검증 us_sector_cap_sweep.py와 동일 한계)."
+}
