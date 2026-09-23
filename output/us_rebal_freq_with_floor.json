@@ -1,0 +1,52 @@
+{
+  "floor": 3.25,
+  "topn": 8,
+  "by_freq": {
+    "1m": {
+      "n_events": 107,
+      "mean_excess_pct": 1.161,
+      "win_rate_pct": 63.6,
+      "excess_sharpe": 1.237,
+      "rebal_per_year_approx": 12.0,
+      "round_trip_cost_bp": 10.28,
+      "annualized_gross_excess_pct_approx": 13.93,
+      "annualized_cost_drag_pct_approx": 1.23,
+      "annualized_net_excess_pct_approx": 12.7
+    },
+    "3m": {
+      "n_events": 35,
+      "mean_excess_pct": 3.678,
+      "win_rate_pct": 80.0,
+      "excess_sharpe": 1.374,
+      "rebal_per_year_approx": 4.0,
+      "round_trip_cost_bp": 10.28,
+      "annualized_gross_excess_pct_approx": 14.71,
+      "annualized_cost_drag_pct_approx": 0.41,
+      "annualized_net_excess_pct_approx": 14.3
+    },
+    "6m": {
+      "n_events": 17,
+      "mean_excess_pct": 8.651,
+      "win_rate_pct": 88.2,
+      "excess_sharpe": 1.33,
+      "rebal_per_year_approx": 2.0,
+      "round_trip_cost_bp": 10.28,
+      "annualized_gross_excess_pct_approx": 17.3,
+      "annualized_cost_drag_pct_approx": 0.21,
+      "annualized_net_excess_pct_approx": 17.1
+    },
+    "12m": {
+      "n_events": 8,
+      "mean_excess_pct": 18.152,
+      "win_rate_pct": 100.0,
+      "excess_sharpe": 1.561,
+      "rebal_per_year_approx": 1.0,
+      "round_trip_cost_bp": 10.28,
+      "annualized_gross_excess_pct_approx": 18.15,
+      "annualized_cost_drag_pct_approx": 0.1,
+      "annualized_net_excess_pct_approx": 18.05
+    }
+  },
+  "best_by_annualized_net_excess": "12m",
+  "method": "재평가 주기=보유기간으로 맞춰(라이브 방식 그대로) 스냅샷을 다시 만들고 floor=3.25 topn8 이벤트 평균 초과수익을 구한 뒤, 주기가 짧을수록 늘어나는 왕복비용(연 재평가횟수×비용)을 선형근사로 차감한 연환산 순초과수익으로 비교. 절대수익 주장이 아니라 주기 간 상대순위용 근사치."
+}

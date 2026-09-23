@@ -1,0 +1,48 @@
+{
+  "cap": 6.0,
+  "topn": 5,
+  "by_freq": {
+    "1m": {
+      "n_events": 116,
+      "mean_excess_pct": 0.365,
+      "win_rate_pct": 49.1,
+      "excess_sharpe": 0.246,
+      "rebal_per_year_approx": 12.0,
+      "annualized_gross_excess_pct_approx": 4.38,
+      "annualized_cost_drag_pct_approx": 2.4,
+      "annualized_net_excess_pct_approx": 1.98
+    },
+    "3m": {
+      "n_events": 39,
+      "mean_excess_pct": 2.146,
+      "win_rate_pct": 59.0,
+      "excess_sharpe": 0.416,
+      "rebal_per_year_approx": 4.0,
+      "annualized_gross_excess_pct_approx": 8.58,
+      "annualized_cost_drag_pct_approx": 0.8,
+      "annualized_net_excess_pct_approx": 7.78
+    },
+    "6m": {
+      "n_events": 20,
+      "mean_excess_pct": 2.082,
+      "win_rate_pct": 60.0,
+      "excess_sharpe": 0.218,
+      "rebal_per_year_approx": 2.0,
+      "annualized_gross_excess_pct_approx": 4.16,
+      "annualized_cost_drag_pct_approx": 0.4,
+      "annualized_net_excess_pct_approx": 3.76
+    },
+    "12m": {
+      "n_events": 10,
+      "mean_excess_pct": -5.792,
+      "win_rate_pct": 50.0,
+      "excess_sharpe": -0.295,
+      "rebal_per_year_approx": 1.0,
+      "annualized_gross_excess_pct_approx": -5.79,
+      "annualized_cost_drag_pct_approx": 0.2,
+      "annualized_net_excess_pct_approx": -5.99
+    }
+  },
+  "best_by_annualized_net_excess": "3m",
+  "method": "재평가 주기=보유기간으로 맞춰(라이브 방식 그대로) 스냅샷을 다시 만들고 cap=6.0 밴드 내 topn5 이벤트 평균 초과수익을 구한 뒤, 주기가 짧을수록 늘어나는 회전비용(연 재평가횟수×코스피 매도세 20bp)을 선형근사로 차감한 연환산 순초과수익으로 비교. 절대수익 주장이 아니라 주기 간 상대순위용 근사치."
+}

@@ -1,0 +1,1037 @@
+{
+  "n_snaps": 39,
+  "topn": 5,
+  "method": "팩터종합점수(valuediv 동일가중) topn5 기준 후보군에, 팩터와 독립인 모멘텀 신호(mom6·mom12_1·1개월수익률·N일선이격도)를 MA필터·수익률틸트· 결합점수로 적용 — 같은 점수를 반으로 가르는 것과 달리 순환논리 없음. 이 변형들을 시행으로 삼아 PBO/DSR 판정.",
+  "summary": [
+    {
+      "label": "baseline_factor_only",
+      "n_events": 39,
+      "mean_excess_pct": -0.011,
+      "win_rate_pct": 48.7
+    },
+    {
+      "label": "ma20_filter",
+      "n_events": 39,
+      "mean_excess_pct": -0.365,
+      "win_rate_pct": 46.2
+    },
+    {
+      "label": "ma50_filter",
+      "n_events": 39,
+      "mean_excess_pct": -0.583,
+      "win_rate_pct": 46.2
+    },
+    {
+      "label": "ma100_filter",
+      "n_events": 39,
+      "mean_excess_pct": -0.364,
+      "win_rate_pct": 43.6
+    },
+    {
+      "label": "ma150_filter",
+      "n_events": 39,
+      "mean_excess_pct": 0.809,
+      "win_rate_pct": 53.8
+    },
+    {
+      "label": "ma200_filter",
+      "n_events": 39,
+      "mean_excess_pct": 0.619,
+      "win_rate_pct": 53.8
+    },
+    {
+      "label": "tilt_top_half_ret_1m",
+      "n_events": 39,
+      "mean_excess_pct": -2.982,
+      "win_rate_pct": 46.2
+    },
+    {
+      "label": "tilt_bottom_half_ret_1m(역추세)",
+      "n_events": 39,
+      "mean_excess_pct": 3.181,
+      "win_rate_pct": 53.8
+    },
+    {
+      "label": "tilt_top_half_mom6",
+      "n_events": 39,
+      "mean_excess_pct": 1.091,
+      "win_rate_pct": 51.3
+    },
+    {
+      "label": "tilt_bottom_half_mom6(역추세)",
+      "n_events": 39,
+      "mean_excess_pct": -1.383,
+      "win_rate_pct": 43.6
+    },
+    {
+      "label": "tilt_top_half_mom12_1",
+      "n_events": 39,
+      "mean_excess_pct": 1.456,
+      "win_rate_pct": 56.4
+    },
+    {
+      "label": "tilt_bottom_half_mom12_1(역추세)",
+      "n_events": 39,
+      "mean_excess_pct": -2.854,
+      "win_rate_pct": 43.6
+    },
+    {
+      "label": "combo_factor_plus_mom6",
+      "n_events": 39,
+      "mean_excess_pct": -0.767,
+      "win_rate_pct": 51.3
+    }
+  ],
+  "paired_vs_baseline": [
+    {
+      "label": "ma20_filter",
+      "mean_diff_pct": -0.354,
+      "t_stat": -0.705,
+      "n": 39
+    },
+    {
+      "label": "ma50_filter",
+      "mean_diff_pct": -0.572,
+      "t_stat": -0.903,
+      "n": 39
+    },
+    {
+      "label": "ma100_filter",
+      "mean_diff_pct": -0.353,
+      "t_stat": -0.414,
+      "n": 39
+    },
+    {
+      "label": "ma150_filter",
+      "mean_diff_pct": 0.82,
+      "t_stat": 0.873,
+      "n": 39
+    },
+    {
+      "label": "ma200_filter",
+      "mean_diff_pct": 0.63,
+      "t_stat": 0.596,
+      "n": 39
+    },
+    {
+      "label": "tilt_top_half_ret_1m",
+      "mean_diff_pct": -2.971,
+      "t_stat": -1.457,
+      "n": 39
+    },
+    {
+      "label": "tilt_bottom_half_ret_1m(역추세)",
+      "mean_diff_pct": 3.192,
+      "t_stat": 1.289,
+      "n": 39
+    },
+    {
+      "label": "tilt_top_half_mom6",
+      "mean_diff_pct": 1.102,
+      "t_stat": 0.602,
+      "n": 39
+    },
+    {
+      "label": "tilt_bottom_half_mom6(역추세)",
+      "mean_diff_pct": -1.372,
+      "t_stat": -0.719,
+      "n": 39
+    },
+    {
+      "label": "tilt_top_half_mom12_1",
+      "mean_diff_pct": 1.467,
+      "t_stat": 0.717,
+      "n": 39
+    },
+    {
+      "label": "tilt_bottom_half_mom12_1(역추세)",
+      "mean_diff_pct": -2.843,
+      "t_stat": -1.566,
+      "n": 39
+    },
+    {
+      "label": "combo_factor_plus_mom6",
+      "mean_diff_pct": -0.756,
+      "t_stat": -0.304,
+      "n": 39
+    }
+  ],
+  "pbo_dsr": {
+    "input": {
+      "horizon": "6m",
+      "universe": "KR_top5",
+      "cost": "gross(이벤트 평균)"
+    },
+    "n_trials": 13,
+    "n_events": 39,
+    "pbo": {
+      "pbo": 0.54,
+      "embargo": 1,
+      "purged_events_total": 5544,
+      "n_combos": 924,
+      "n_blocks": 12,
+      "lambda_mean": -0.0585,
+      "is_sharpe_mean": 0.2743,
+      "oos_sharpe_mean": -0.17,
+      "degradation_slope": -1.068,
+      "prob_oos_loss": 0.7457
+    },
+    "pbo_verdict": "높음(IS 1등이 운일 확률 높음 — 채택 보류 권장)",
+    "dsr": {
+      "sr": 0.1698,
+      "sr0": 0.1598,
+      "dsr": 0.5183,
+      "dsr_uncorrected": 0.5259,
+      "skew": 0.628,
+      "kurtosis": 2.666,
+      "T": 39,
+      "T_eff": 20,
+      "N": 13,
+      "best_trial": "tilt_bottom_half_ret_1m(역추세)"
+    },
+    "dsr_verdict": "통과 실패(다중검정 감안 시 샤프가 유의하지 않음)",
+    "passed": false,
+    "references": [
+      "Bailey et al. 2017 (PBO/CSCV)",
+      "Bailey & López de Prado 2014 (DSR)"
+    ],
+    "note": "조합 간 상관으로 N이 과대계상될 수 있어 DSR은 보수적(실제보다 낮게) 추정됨."
+  },
+  "momentum_ic_and_buckets": {
+    "ic": {
+      "ma20_gap": {
+        "mean_spearman": -0.0179,
+        "t_stat": -0.233,
+        "n_snaps": 39
+      },
+      "ma50_gap": {
+        "mean_spearman": 0.0615,
+        "t_stat": 0.798,
+        "n_snaps": 39
+      },
+      "ma100_gap": {
+        "mean_spearman": 0.2436,
+        "t_stat": 3.506,
+        "n_snaps": 39
+      },
+      "ma150_gap": {
+        "mean_spearman": 0.2949,
+        "t_stat": 4.162,
+        "n_snaps": 39
+      },
+      "ma200_gap": {
+        "mean_spearman": 0.2846,
+        "t_stat": 4.138,
+        "n_snaps": 39
+      },
+      "ret_1m": {
+        "mean_spearman": 0.0436,
+        "t_stat": 0.547,
+        "n_snaps": 39
+      },
+      "mom6": {
+        "mean_spearman": 0.2795,
+        "t_stat": 4.265,
+        "n_snaps": 39
+      },
+      "mom12_1": {
+        "mean_spearman": 0.1846,
+        "t_stat": 2.378,
+        "n_snaps": 39
+      }
+    },
+    "buckets": {
+      "ma20_gap": [
+        {
+          "range": "[-0.017, 0.002]",
+          "mean_excess_pct": -0.419,
+          "n": 39
+        },
+        {
+          "range": "[-0.039, -0.017]",
+          "mean_excess_pct": 2.741,
+          "n": 39
+        },
+        {
+          "range": "[-0.129, -0.039]",
+          "mean_excess_pct": -2.395,
+          "n": 39
+        },
+        {
+          "range": "[0.002, 0.023]",
+          "mean_excess_pct": 6.173,
+          "n": 39
+        },
+        {
+          "range": "[0.023, 0.112]",
+          "mean_excess_pct": -6.155,
+          "n": 39
+        }
+      ],
+      "ma50_gap": [
+        {
+          "range": "[-0.030, 0.005]",
+          "mean_excess_pct": 5.798,
+          "n": 39
+        },
+        {
+          "range": "[-0.077, -0.030]",
+          "mean_excess_pct": -0.338,
+          "n": 39
+        },
+        {
+          "range": "[-0.363, -0.077]",
+          "mean_excess_pct": -1.683,
+          "n": 39
+        },
+        {
+          "range": "[0.005, 0.046]",
+          "mean_excess_pct": -1.198,
+          "n": 39
+        },
+        {
+          "range": "[0.046, 0.158]",
+          "mean_excess_pct": -2.634,
+          "n": 39
+        }
+      ],
+      "ma100_gap": [
+        {
+          "range": "[-0.006, 0.043]",
+          "mean_excess_pct": -0.725,
+          "n": 39
+        },
+        {
+          "range": "[-0.056, -0.006]",
+          "mean_excess_pct": 6.853,
+          "n": 39
+        },
+        {
+          "range": "[-0.114, -0.056]",
+          "mean_excess_pct": -1.849,
+          "n": 39
+        },
+        {
+          "range": "[-0.556, -0.114]",
+          "mean_excess_pct": -3.907,
+          "n": 39
+        },
+        {
+          "range": "[0.043, 0.206]",
+          "mean_excess_pct": -0.428,
+          "n": 39
+        }
+      ],
+      "ma150_gap": [
+        {
+          "range": "[-0.018, 0.041]",
+          "mean_excess_pct": 4.026,
+          "n": 39
+        },
+        {
+          "range": "[-0.076, -0.018]",
+          "mean_excess_pct": -0.477,
+          "n": 39
+        },
+        {
+          "range": "[-0.150, -0.076]",
+          "mean_excess_pct": -1.77,
+          "n": 39
+        },
+        {
+          "range": "[-0.620, -0.150]",
+          "mean_excess_pct": -4.451,
+          "n": 39
+        },
+        {
+          "range": "[0.041, 0.287]",
+          "mean_excess_pct": 2.616,
+          "n": 39
+        }
+      ],
+      "ma200_gap": [
+        {
+          "range": "[-0.031, 0.049]",
+          "mean_excess_pct": 7.773,
+          "n": 39
+        },
+        {
+          "range": "[-0.104, -0.031]",
+          "mean_excess_pct": -2.562,
+          "n": 39
+        },
+        {
+          "range": "[-0.195, -0.104]",
+          "mean_excess_pct": -2.755,
+          "n": 39
+        },
+        {
+          "range": "[-0.668, -0.195]",
+          "mean_excess_pct": -5.417,
+          "n": 39
+        },
+        {
+          "range": "[0.049, 0.402]",
+          "mean_excess_pct": 2.905,
+          "n": 39
+        }
+      ],
+      "ret_1m": [
+        {
+          "range": "[-0.002, 0.044]",
+          "mean_excess_pct": 0.32,
+          "n": 39
+        },
+        {
+          "range": "[-0.035, -0.002]",
+          "mean_excess_pct": 1.506,
+          "n": 39
+        },
+        {
+          "range": "[-0.076, -0.035]",
+          "mean_excess_pct": 3.847,
+          "n": 39
+        },
+        {
+          "range": "[-0.351, -0.076]",
+          "mean_excess_pct": -2.523,
+          "n": 39
+        },
+        {
+          "range": "[0.044, 0.177]",
+          "mean_excess_pct": -3.206,
+          "n": 39
+        }
+      ],
+      "mom6": [
+        {
+          "range": "[-0.025, 0.057]",
+          "mean_excess_pct": 5.135,
+          "n": 39
+        },
+        {
+          "range": "[-0.125, -0.025]",
+          "mean_excess_pct": -4.162,
+          "n": 39
+        },
+        {
+          "range": "[-0.235, -0.125]",
+          "mean_excess_pct": -1.996,
+          "n": 39
+        },
+        {
+          "range": "[-0.702, -0.235]",
+          "mean_excess_pct": -4.584,
+          "n": 39
+        },
+        {
+          "range": "[0.057, 0.753]",
+          "mean_excess_pct": 5.551,
+          "n": 39
+        }
+      ],
+      "mom12_1": [
+        {
+          "range": "[-0.074, 0.131]",
+          "mean_excess_pct": 2.235,
+          "n": 39
+        },
+        {
+          "range": "[-0.194, -0.074]",
+          "mean_excess_pct": -0.134,
+          "n": 39
+        },
+        {
+          "range": "[-0.327, -0.194]",
+          "mean_excess_pct": -4.285,
+          "n": 39
+        },
+        {
+          "range": "[-0.815, -0.327]",
+          "mean_excess_pct": -4.419,
+          "n": 39
+        },
+        {
+          "range": "[0.131, 1.217]",
+          "mean_excess_pct": 6.548,
+          "n": 39
+        }
+      ]
+    }
+  },
+  "regime_diagnosis": {
+    "rows": [
+      {
+        "date": "2015-10-06",
+        "bench_fwd_6m_pct": 0.08,
+        "strategy_excess_pct": 6.03
+      },
+      {
+        "date": "2016-01-07",
+        "bench_fwd_6m_pct": 6.9,
+        "strategy_excess_pct": 6.31
+      },
+      {
+        "date": "2016-04-11",
+        "bench_fwd_6m_pct": 5.86,
+        "strategy_excess_pct": 0.53
+      },
+      {
+        "date": "2016-07-13",
+        "bench_fwd_6m_pct": 6.55,
+        "strategy_excess_pct": 0.3
+      },
+      {
+        "date": "2016-10-17",
+        "bench_fwd_6m_pct": 7.85,
+        "strategy_excess_pct": -14.44
+      },
+      {
+        "date": "2017-01-13",
+        "bench_fwd_6m_pct": 20.91,
+        "strategy_excess_pct": -11.48
+      },
+      {
+        "date": "2017-04-17",
+        "bench_fwd_6m_pct": 18.74,
+        "strategy_excess_pct": -16.53
+      },
+      {
+        "date": "2017-07-20",
+        "bench_fwd_6m_pct": 3.6,
+        "strategy_excess_pct": -3.42
+      },
+      {
+        "date": "2017-10-27",
+        "bench_fwd_6m_pct": -4.13,
+        "strategy_excess_pct": 3.02
+      },
+      {
+        "date": "2018-01-30",
+        "bench_fwd_6m_pct": -10.86,
+        "strategy_excess_pct": -7.25
+      },
+      {
+        "date": "2018-05-03",
+        "bench_fwd_6m_pct": -14.26,
+        "strategy_excess_pct": -14.96
+      },
+      {
+        "date": "2018-08-06",
+        "bench_fwd_6m_pct": -4.44,
+        "strategy_excess_pct": 8.81
+      },
+      {
+        "date": "2018-11-09",
+        "bench_fwd_6m_pct": -2.43,
+        "strategy_excess_pct": 22.5
+      },
+      {
+        "date": "2019-02-14",
+        "bench_fwd_6m_pct": -10.17,
+        "strategy_excess_pct": -12.25
+      },
+      {
+        "date": "2019-05-17",
+        "bench_fwd_6m_pct": 6.51,
+        "strategy_excess_pct": -15.12
+      },
+      {
+        "date": "2019-08-16",
+        "bench_fwd_6m_pct": 10.16,
+        "strategy_excess_pct": -21.11
+      },
+      {
+        "date": "2019-11-19",
+        "bench_fwd_6m_pct": -5.16,
+        "strategy_excess_pct": -15.99
+      },
+      {
+        "date": "2020-02-21",
+        "bench_fwd_6m_pct": 11.59,
+        "strategy_excess_pct": -10.05
+      },
+      {
+        "date": "2020-05-26",
+        "bench_fwd_6m_pct": 31.56,
+        "strategy_excess_pct": -4.47
+      },
+      {
+        "date": "2020-08-24",
+        "bench_fwd_6m_pct": 34.02,
+        "strategy_excess_pct": -13.79
+      },
+      {
+        "date": "2020-11-25",
+        "bench_fwd_6m_pct": 22.16,
+        "strategy_excess_pct": 14.84
+      },
+      {
+        "date": "2021-03-02",
+        "bench_fwd_6m_pct": -0.11,
+        "strategy_excess_pct": 30.5
+      },
+      {
+        "date": "2021-06-01",
+        "bench_fwd_6m_pct": -8.88,
+        "strategy_excess_pct": 8.63
+      },
+      {
+        "date": "2021-08-30",
+        "bench_fwd_6m_pct": -15.36,
+        "strategy_excess_pct": 27.26
+      },
+      {
+        "date": "2021-12-02",
+        "bench_fwd_6m_pct": -16.26,
+        "strategy_excess_pct": 22.39
+      },
+      {
+        "date": "2022-03-10",
+        "bench_fwd_6m_pct": -11.98,
+        "strategy_excess_pct": 3.29
+      },
+      {
+        "date": "2022-06-13",
+        "bench_fwd_6m_pct": -4.57,
+        "strategy_excess_pct": -3.56
+      },
+      {
+        "date": "2022-09-13",
+        "bench_fwd_6m_pct": -0.21,
+        "strategy_excess_pct": 8.35
+      },
+      {
+        "date": "2022-12-13",
+        "bench_fwd_6m_pct": 9.37,
+        "strategy_excess_pct": -4.5
+      },
+      {
+        "date": "2023-03-16",
+        "bench_fwd_6m_pct": 9.16,
+        "strategy_excess_pct": -2.3
+      },
+      {
+        "date": "2023-06-19",
+        "bench_fwd_6m_pct": 1.81,
+        "strategy_excess_pct": 9.97
+      },
+      {
+        "date": "2023-09-15",
+        "bench_fwd_6m_pct": 9.81,
+        "strategy_excess_pct": -3.63
+      },
+      {
+        "date": "2023-12-20",
+        "bench_fwd_6m_pct": 10.2,
+        "strategy_excess_pct": -3.77
+      },
+      {
+        "date": "2024-03-26",
+        "bench_fwd_6m_pct": -8.65,
+        "strategy_excess_pct": 8.91
+      },
+      {
+        "date": "2024-06-28",
+        "bench_fwd_6m_pct": -13.91,
+        "strategy_excess_pct": 14.74
+      },
+      {
+        "date": "2024-10-02",
+        "bench_fwd_6m_pct": -5.68,
+        "strategy_excess_pct": 3.75
+      },
+      {
+        "date": "2025-01-06",
+        "bench_fwd_6m_pct": 30.3,
+        "strategy_excess_pct": 22.38
+      },
+      {
+        "date": "2025-04-10",
+        "bench_fwd_6m_pct": 68.34,
+        "strategy_excess_pct": -20.07
+      },
+      {
+        "date": "2025-07-15",
+        "bench_fwd_6m_pct": 67.52,
+        "strategy_excess_pct": -24.28
+      }
+    ],
+    "spearman_bench_fwdret_vs_strategy_excess": -0.4235,
+    "recent_4_mean_excess_pct": -4.555,
+    "earlier_mean_excess_pct": 0.507,
+    "note": "bench_fwd_6m_pct가 아주 크면(예: 2025년 이후처럼 +60%대) 벤치마크 자체가 소수 종목 쏠림으로 급등했다는 신호 — 음의 상관이면 '지수가 쏠려서 뜨거울수록 밸류·배당 팩터가 더 뒤처진다'는 구조적 설명이 성립. 데이터를 제외하지 않고 그대로 둔 채 원인만 진단."
+  },
+  "ex_giants_benchmark_check": {
+    "n_events": 39,
+    "rows": [
+      {
+        "date": "2015-10-06",
+        "official_bench_fwd_pct": 0.08,
+        "reconstructed_capw_incl_giants_pct": 1.3,
+        "reconstructed_capw_excl_giants_pct": 1.73,
+        "strategy_fwd_pct": 6.11,
+        "excess_vs_official_pct": 6.03,
+        "excess_vs_excl_giants_pct": 4.38
+      },
+      {
+        "date": "2016-01-07",
+        "official_bench_fwd_pct": 6.9,
+        "reconstructed_capw_incl_giants_pct": 5.54,
+        "reconstructed_capw_excl_giants_pct": 0.48,
+        "strategy_fwd_pct": 13.21,
+        "excess_vs_official_pct": 6.31,
+        "excess_vs_excl_giants_pct": 12.72
+      },
+      {
+        "date": "2016-04-11",
+        "official_bench_fwd_pct": 5.86,
+        "reconstructed_capw_incl_giants_pct": 4.71,
+        "reconstructed_capw_excl_giants_pct": -0.96,
+        "strategy_fwd_pct": 6.38,
+        "excess_vs_official_pct": 0.53,
+        "excess_vs_excl_giants_pct": 7.34
+      },
+      {
+        "date": "2016-07-13",
+        "official_bench_fwd_pct": 6.55,
+        "reconstructed_capw_incl_giants_pct": 6.23,
+        "reconstructed_capw_excl_giants_pct": 0.36,
+        "strategy_fwd_pct": 6.85,
+        "excess_vs_official_pct": 0.3,
+        "excess_vs_excl_giants_pct": 6.49
+      },
+      {
+        "date": "2016-10-17",
+        "official_bench_fwd_pct": 7.85,
+        "reconstructed_capw_incl_giants_pct": 7.75,
+        "reconstructed_capw_excl_giants_pct": 0.36,
+        "strategy_fwd_pct": -6.59,
+        "excess_vs_official_pct": -14.44,
+        "excess_vs_excl_giants_pct": -6.95
+      },
+      {
+        "date": "2017-01-13",
+        "official_bench_fwd_pct": 20.91,
+        "reconstructed_capw_incl_giants_pct": 20.07,
+        "reconstructed_capw_excl_giants_pct": 12.5,
+        "strategy_fwd_pct": 9.42,
+        "excess_vs_official_pct": -11.48,
+        "excess_vs_excl_giants_pct": -3.07
+      },
+      {
+        "date": "2017-04-17",
+        "official_bench_fwd_pct": 18.74,
+        "reconstructed_capw_incl_giants_pct": 17.89,
+        "reconstructed_capw_excl_giants_pct": 11.53,
+        "strategy_fwd_pct": 2.22,
+        "excess_vs_official_pct": -16.53,
+        "excess_vs_excl_giants_pct": -9.31
+      },
+      {
+        "date": "2017-07-20",
+        "official_bench_fwd_pct": 3.6,
+        "reconstructed_capw_incl_giants_pct": 5.79,
+        "reconstructed_capw_excl_giants_pct": 8.29,
+        "strategy_fwd_pct": 0.18,
+        "excess_vs_official_pct": -3.42,
+        "excess_vs_excl_giants_pct": -8.11
+      },
+      {
+        "date": "2017-10-27",
+        "official_bench_fwd_pct": -4.13,
+        "reconstructed_capw_incl_giants_pct": -1.49,
+        "reconstructed_capw_excl_giants_pct": -1.58,
+        "strategy_fwd_pct": -1.1,
+        "excess_vs_official_pct": 3.02,
+        "excess_vs_excl_giants_pct": 0.48
+      },
+      {
+        "date": "2018-01-30",
+        "official_bench_fwd_pct": -10.86,
+        "reconstructed_capw_incl_giants_pct": -10.43,
+        "reconstructed_capw_excl_giants_pct": -13.13,
+        "strategy_fwd_pct": -18.11,
+        "excess_vs_official_pct": -7.25,
+        "excess_vs_excl_giants_pct": -4.98
+      },
+      {
+        "date": "2018-05-03",
+        "official_bench_fwd_pct": -14.26,
+        "reconstructed_capw_incl_giants_pct": -14.79,
+        "reconstructed_capw_excl_giants_pct": -16.13,
+        "strategy_fwd_pct": -29.22,
+        "excess_vs_official_pct": -14.96,
+        "excess_vs_excl_giants_pct": -13.09
+      },
+      {
+        "date": "2018-08-06",
+        "official_bench_fwd_pct": -4.44,
+        "reconstructed_capw_incl_giants_pct": -2.69,
+        "reconstructed_capw_excl_giants_pct": -3.39,
+        "strategy_fwd_pct": 4.37,
+        "excess_vs_official_pct": 8.81,
+        "excess_vs_excl_giants_pct": 7.76
+      },
+      {
+        "date": "2018-11-09",
+        "official_bench_fwd_pct": -2.43,
+        "reconstructed_capw_incl_giants_pct": -0.22,
+        "reconstructed_capw_excl_giants_pct": 1.67,
+        "strategy_fwd_pct": 20.06,
+        "excess_vs_official_pct": 22.5,
+        "excess_vs_excl_giants_pct": 18.39
+      },
+      {
+        "date": "2019-02-14",
+        "official_bench_fwd_pct": -10.17,
+        "reconstructed_capw_incl_giants_pct": -10.56,
+        "reconstructed_capw_excl_giants_pct": -13.43,
+        "strategy_fwd_pct": -22.42,
+        "excess_vs_official_pct": -12.25,
+        "excess_vs_excl_giants_pct": -8.98
+      },
+      {
+        "date": "2019-05-17",
+        "official_bench_fwd_pct": 6.51,
+        "reconstructed_capw_incl_giants_pct": 5.96,
+        "reconstructed_capw_excl_giants_pct": -0.39,
+        "strategy_fwd_pct": -8.61,
+        "excess_vs_official_pct": -15.12,
+        "excess_vs_excl_giants_pct": -8.22
+      },
+      {
+        "date": "2019-08-16",
+        "official_bench_fwd_pct": 10.16,
+        "reconstructed_capw_incl_giants_pct": 10.67,
+        "reconstructed_capw_excl_giants_pct": 1.84,
+        "strategy_fwd_pct": -10.95,
+        "excess_vs_official_pct": -21.11,
+        "excess_vs_excl_giants_pct": -12.79
+      },
+      {
+        "date": "2019-11-19",
+        "official_bench_fwd_pct": -5.16,
+        "reconstructed_capw_incl_giants_pct": -3.61,
+        "reconstructed_capw_excl_giants_pct": -4.18,
+        "strategy_fwd_pct": -21.15,
+        "excess_vs_official_pct": -15.99,
+        "excess_vs_excl_giants_pct": -16.97
+      },
+      {
+        "date": "2020-02-21",
+        "official_bench_fwd_pct": 11.59,
+        "reconstructed_capw_incl_giants_pct": 13.22,
+        "reconstructed_capw_excl_giants_pct": 21.87,
+        "strategy_fwd_pct": 1.54,
+        "excess_vs_official_pct": -10.05,
+        "excess_vs_excl_giants_pct": -20.34
+      },
+      {
+        "date": "2020-05-26",
+        "official_bench_fwd_pct": 31.56,
+        "reconstructed_capw_incl_giants_pct": 30.97,
+        "reconstructed_capw_excl_giants_pct": 29.05,
+        "strategy_fwd_pct": 27.1,
+        "excess_vs_official_pct": -4.47,
+        "excess_vs_excl_giants_pct": -1.95
+      },
+      {
+        "date": "2020-08-24",
+        "official_bench_fwd_pct": 34.02,
+        "reconstructed_capw_incl_giants_pct": 34.91,
+        "reconstructed_capw_excl_giants_pct": 25.14,
+        "strategy_fwd_pct": 20.23,
+        "excess_vs_official_pct": -13.79,
+        "excess_vs_excl_giants_pct": -4.91
+      },
+      {
+        "date": "2020-11-25",
+        "official_bench_fwd_pct": 22.16,
+        "reconstructed_capw_incl_giants_pct": 24.09,
+        "reconstructed_capw_excl_giants_pct": 24.48,
+        "strategy_fwd_pct": 37.0,
+        "excess_vs_official_pct": 14.84,
+        "excess_vs_excl_giants_pct": 12.52
+      },
+      {
+        "date": "2021-03-02",
+        "official_bench_fwd_pct": -0.11,
+        "reconstructed_capw_incl_giants_pct": 0.56,
+        "reconstructed_capw_excl_giants_pct": 6.39,
+        "strategy_fwd_pct": 30.39,
+        "excess_vs_official_pct": 30.5,
+        "excess_vs_excl_giants_pct": 24.0
+      },
+      {
+        "date": "2021-06-01",
+        "official_bench_fwd_pct": -8.88,
+        "reconstructed_capw_incl_giants_pct": -8.98,
+        "reconstructed_capw_excl_giants_pct": -10.38,
+        "strategy_fwd_pct": -0.25,
+        "excess_vs_official_pct": 8.63,
+        "excess_vs_excl_giants_pct": 10.13
+      },
+      {
+        "date": "2021-08-30",
+        "official_bench_fwd_pct": -15.36,
+        "reconstructed_capw_incl_giants_pct": -14.85,
+        "reconstructed_capw_excl_giants_pct": -18.6,
+        "strategy_fwd_pct": 11.9,
+        "excess_vs_official_pct": 27.26,
+        "excess_vs_excl_giants_pct": 30.5
+      },
+      {
+        "date": "2021-12-02",
+        "official_bench_fwd_pct": -16.26,
+        "reconstructed_capw_incl_giants_pct": -14.25,
+        "reconstructed_capw_excl_giants_pct": -13.14,
+        "strategy_fwd_pct": 6.14,
+        "excess_vs_official_pct": 22.39,
+        "excess_vs_excl_giants_pct": 19.28
+      },
+      {
+        "date": "2022-03-10",
+        "official_bench_fwd_pct": -11.98,
+        "reconstructed_capw_incl_giants_pct": -10.06,
+        "reconstructed_capw_excl_giants_pct": -6.49,
+        "strategy_fwd_pct": -8.69,
+        "excess_vs_official_pct": 3.29,
+        "excess_vs_excl_giants_pct": -2.2
+      },
+      {
+        "date": "2022-06-13",
+        "official_bench_fwd_pct": -4.57,
+        "reconstructed_capw_incl_giants_pct": -2.92,
+        "reconstructed_capw_excl_giants_pct": -2.69,
+        "strategy_fwd_pct": -8.13,
+        "excess_vs_official_pct": -3.56,
+        "excess_vs_excl_giants_pct": -5.44
+      },
+      {
+        "date": "2022-09-13",
+        "official_bench_fwd_pct": -0.21,
+        "reconstructed_capw_incl_giants_pct": 1.22,
+        "reconstructed_capw_excl_giants_pct": -0.47,
+        "strategy_fwd_pct": 8.14,
+        "excess_vs_official_pct": 8.35,
+        "excess_vs_excl_giants_pct": 8.6
+      },
+      {
+        "date": "2022-12-13",
+        "official_bench_fwd_pct": 9.37,
+        "reconstructed_capw_incl_giants_pct": 10.23,
+        "reconstructed_capw_excl_giants_pct": 5.87,
+        "strategy_fwd_pct": 4.87,
+        "excess_vs_official_pct": -4.5,
+        "excess_vs_excl_giants_pct": -1.0
+      },
+      {
+        "date": "2023-03-16",
+        "official_bench_fwd_pct": 9.16,
+        "reconstructed_capw_incl_giants_pct": 7.65,
+        "reconstructed_capw_excl_giants_pct": 3.61,
+        "strategy_fwd_pct": 6.87,
+        "excess_vs_official_pct": -2.3,
+        "excess_vs_excl_giants_pct": 3.26
+      },
+      {
+        "date": "2023-06-19",
+        "official_bench_fwd_pct": 1.81,
+        "reconstructed_capw_incl_giants_pct": 0.23,
+        "reconstructed_capw_excl_giants_pct": -3.1,
+        "strategy_fwd_pct": 11.78,
+        "excess_vs_official_pct": 9.97,
+        "excess_vs_excl_giants_pct": 14.88
+      },
+      {
+        "date": "2023-09-15",
+        "official_bench_fwd_pct": 9.81,
+        "reconstructed_capw_incl_giants_pct": 9.18,
+        "reconstructed_capw_excl_giants_pct": 4.23,
+        "strategy_fwd_pct": 6.18,
+        "excess_vs_official_pct": -3.63,
+        "excess_vs_excl_giants_pct": 1.95
+      },
+      {
+        "date": "2023-12-20",
+        "official_bench_fwd_pct": 10.2,
+        "reconstructed_capw_incl_giants_pct": 10.17,
+        "reconstructed_capw_excl_giants_pct": 5.36,
+        "strategy_fwd_pct": 6.42,
+        "excess_vs_official_pct": -3.77,
+        "excess_vs_excl_giants_pct": 1.07
+      },
+      {
+        "date": "2024-03-26",
+        "official_bench_fwd_pct": -8.65,
+        "reconstructed_capw_incl_giants_pct": -5.66,
+        "reconstructed_capw_excl_giants_pct": 0.25,
+        "strategy_fwd_pct": 0.26,
+        "excess_vs_official_pct": 8.91,
+        "excess_vs_excl_giants_pct": 0.02
+      },
+      {
+        "date": "2024-06-28",
+        "official_bench_fwd_pct": -13.91,
+        "reconstructed_capw_incl_giants_pct": -10.87,
+        "reconstructed_capw_excl_giants_pct": -2.63,
+        "strategy_fwd_pct": 0.83,
+        "excess_vs_official_pct": 14.74,
+        "excess_vs_excl_giants_pct": 3.46
+      },
+      {
+        "date": "2024-10-02",
+        "official_bench_fwd_pct": -5.68,
+        "reconstructed_capw_incl_giants_pct": -4.41,
+        "reconstructed_capw_excl_giants_pct": -4.31,
+        "strategy_fwd_pct": -1.93,
+        "excess_vs_official_pct": 3.75,
+        "excess_vs_excl_giants_pct": 2.38
+      },
+      {
+        "date": "2025-01-06",
+        "official_bench_fwd_pct": 30.3,
+        "reconstructed_capw_incl_giants_pct": 29.79,
+        "reconstructed_capw_excl_giants_pct": 30.16,
+        "strategy_fwd_pct": 52.68,
+        "excess_vs_official_pct": 22.38,
+        "excess_vs_excl_giants_pct": 22.52
+      },
+      {
+        "date": "2025-04-10",
+        "official_bench_fwd_pct": 68.34,
+        "reconstructed_capw_incl_giants_pct": 63.67,
+        "reconstructed_capw_excl_giants_pct": 48.55,
+        "strategy_fwd_pct": 48.27,
+        "excess_vs_official_pct": -20.07,
+        "excess_vs_excl_giants_pct": -0.28
+      },
+      {
+        "date": "2025-07-15",
+        "official_bench_fwd_pct": 67.52,
+        "reconstructed_capw_incl_giants_pct": 60.75,
+        "reconstructed_capw_excl_giants_pct": 31.91,
+        "strategy_fwd_pct": 43.25,
+        "excess_vs_official_pct": -24.28,
+        "excess_vs_excl_giants_pct": 11.33
+      }
+    ],
+    "sanity_check_mean_gap_reconstructed_vs_official_pct": 0.28,
+    "mean_excess_vs_official_bench_pct": -0.012,
+    "win_rate_vs_official_pct": 48.7,
+    "mean_excess_vs_excl_giants_bench_pct": 2.433,
+    "win_rate_vs_excl_giants_pct": 56.4,
+    "note": "재구성 벤치마크는 시작시점 시총가중 고정(재조정 없음) 근사치 — sanity_check가 official과 크게 벌어지면 재구성 자체의 신뢰도가 낮다는 뜻이니 함께 확인."
+  },
+  "combo_wide_topn12": {
+    "n_events": 39,
+    "topn": 12,
+    "baseline_factor_only_mean_excess_pct": 0.506,
+    "baseline_win_rate_pct": 56.4,
+    "combo_factor_plus_mom6_mean_excess_pct": 1.633,
+    "combo_win_rate_pct": 51.3,
+    "paired_diff_mean_pct": 1.127,
+    "paired_t_stat": 0.567
+  }
+}

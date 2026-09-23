@@ -1,0 +1,515 @@
+{
+  "n_snaps": 34,
+  "topn": 8,
+  "method": "팩터종합점수(1:2:2) topn8 기준 후보군에, 팩터와 독립인 모멘텀 신호를 실제로 다르게 설계될 수 있었던 변형(MA필터·수익률틸트·결합점수)으로 적용 — 같은 점수를 반으로 가르는 것과 달리 순환논리 없음. 이 변형들을 시행으로 삼아 PBO/DSR 판정.",
+  "summary": [
+    {
+      "label": "baseline_factor_only",
+      "n_events": 34,
+      "mean_excess_pct": 9.174,
+      "win_rate_pct": 85.3
+    },
+    {
+      "label": "ma20_filter",
+      "n_events": 34,
+      "mean_excess_pct": 11.32,
+      "win_rate_pct": 82.4
+    },
+    {
+      "label": "ma50_filter",
+      "n_events": 34,
+      "mean_excess_pct": 10.298,
+      "win_rate_pct": 82.4
+    },
+    {
+      "label": "ma100_filter",
+      "n_events": 34,
+      "mean_excess_pct": 10.466,
+      "win_rate_pct": 85.3
+    },
+    {
+      "label": "ma150_filter",
+      "n_events": 34,
+      "mean_excess_pct": 10.238,
+      "win_rate_pct": 88.2
+    },
+    {
+      "label": "ma200_filter",
+      "n_events": 34,
+      "mean_excess_pct": 9.541,
+      "win_rate_pct": 85.3
+    },
+    {
+      "label": "tilt_top_half_1m",
+      "n_events": 34,
+      "mean_excess_pct": 11.631,
+      "win_rate_pct": 67.6
+    },
+    {
+      "label": "tilt_bottom_half_1m(역추세)",
+      "n_events": 34,
+      "mean_excess_pct": 6.717,
+      "win_rate_pct": 64.7
+    },
+    {
+      "label": "tilt_top_half_3m",
+      "n_events": 34,
+      "mean_excess_pct": 10.74,
+      "win_rate_pct": 85.3
+    },
+    {
+      "label": "tilt_bottom_half_3m(역추세)",
+      "n_events": 34,
+      "mean_excess_pct": 7.608,
+      "win_rate_pct": 67.6
+    },
+    {
+      "label": "tilt_top_half_6m",
+      "n_events": 34,
+      "mean_excess_pct": 8.36,
+      "win_rate_pct": 70.6
+    },
+    {
+      "label": "tilt_bottom_half_6m(역추세)",
+      "n_events": 34,
+      "mean_excess_pct": 9.989,
+      "win_rate_pct": 79.4
+    },
+    {
+      "label": "combo_factor_plus_mom6m",
+      "n_events": 34,
+      "mean_excess_pct": 9.904,
+      "win_rate_pct": 70.6
+    },
+    {
+      "label": "ma100_then_top_half_1m",
+      "n_events": 34,
+      "mean_excess_pct": 10.212,
+      "win_rate_pct": 64.7
+    },
+    {
+      "label": "ma100_then_top_half_3m",
+      "n_events": 34,
+      "mean_excess_pct": 10.991,
+      "win_rate_pct": 82.4
+    },
+    {
+      "label": "ma100_then_top_half_6m",
+      "n_events": 34,
+      "mean_excess_pct": 8.827,
+      "win_rate_pct": 73.5
+    }
+  ],
+  "paired_vs_baseline": [
+    {
+      "label": "ma20_filter",
+      "mean_diff_pct": 2.146,
+      "t_stat": 1.995,
+      "n": 34
+    },
+    {
+      "label": "ma50_filter",
+      "mean_diff_pct": 1.123,
+      "t_stat": 0.857,
+      "n": 34
+    },
+    {
+      "label": "ma100_filter",
+      "mean_diff_pct": 1.291,
+      "t_stat": 1.344,
+      "n": 34
+    },
+    {
+      "label": "ma150_filter",
+      "mean_diff_pct": 1.064,
+      "t_stat": 0.957,
+      "n": 34
+    },
+    {
+      "label": "ma200_filter",
+      "mean_diff_pct": 0.366,
+      "t_stat": 0.309,
+      "n": 34
+    },
+    {
+      "label": "tilt_top_half_1m",
+      "mean_diff_pct": 2.457,
+      "t_stat": 1.265,
+      "n": 34
+    },
+    {
+      "label": "tilt_bottom_half_1m(역추세)",
+      "mean_diff_pct": -2.457,
+      "t_stat": -1.265,
+      "n": 34
+    },
+    {
+      "label": "tilt_top_half_3m",
+      "mean_diff_pct": 1.566,
+      "t_stat": 0.853,
+      "n": 34
+    },
+    {
+      "label": "tilt_bottom_half_3m(역추세)",
+      "mean_diff_pct": -1.566,
+      "t_stat": -0.853,
+      "n": 34
+    },
+    {
+      "label": "tilt_top_half_6m",
+      "mean_diff_pct": -0.814,
+      "t_stat": -0.455,
+      "n": 34
+    },
+    {
+      "label": "tilt_bottom_half_6m(역추세)",
+      "mean_diff_pct": 0.814,
+      "t_stat": 0.455,
+      "n": 34
+    },
+    {
+      "label": "combo_factor_plus_mom6m",
+      "mean_diff_pct": 0.73,
+      "t_stat": 0.297,
+      "n": 34
+    },
+    {
+      "label": "ma100_then_top_half_1m",
+      "mean_diff_pct": 1.038,
+      "t_stat": 0.464,
+      "n": 34
+    },
+    {
+      "label": "ma100_then_top_half_3m",
+      "mean_diff_pct": 1.816,
+      "t_stat": 0.831,
+      "n": 34
+    },
+    {
+      "label": "ma100_then_top_half_6m",
+      "mean_diff_pct": -0.347,
+      "t_stat": -0.174,
+      "n": 34
+    }
+  ],
+  "pbo_dsr": {
+    "input": {
+      "horizon": "6m",
+      "universe": "US_top8",
+      "cost": "gross(이벤트 평균)"
+    },
+    "n_trials": 16,
+    "n_events": 34,
+    "pbo": {
+      "pbo": 0.3626,
+      "embargo": 1,
+      "purged_events_total": 5544,
+      "n_combos": 924,
+      "n_blocks": 12,
+      "lambda_mean": 0.2864,
+      "is_sharpe_mean": 1.2417,
+      "oos_sharpe_mean": 0.9499,
+      "degradation_slope": -0.9006,
+      "prob_oos_loss": 0.0054
+    },
+    "pbo_verdict": "중간(주의)",
+    "dsr": {
+      "sr": 1.0846,
+      "sr0": 0.3628,
+      "dsr": 0.9937,
+      "dsr_uncorrected": 0.9998,
+      "skew": 0.065,
+      "kurtosis": 2.394,
+      "T": 34,
+      "T_eff": 17,
+      "N": 16,
+      "best_trial": "ma100_filter"
+    },
+    "dsr_verdict": "95% 신뢰수준 통과",
+    "passed": true,
+    "references": [
+      "Bailey et al. 2017 (PBO/CSCV)",
+      "Bailey & López de Prado 2014 (DSR)"
+    ],
+    "note": "조합 간 상관으로 N이 과대계상될 수 있어 DSR은 보수적(실제보다 낮게) 추정됨."
+  },
+  "momentum_ic_and_buckets": {
+    "ic": {
+      "ma20_gap": {
+        "mean_spearman": 0.056,
+        "t_stat": 0.737,
+        "n_snaps": 34
+      },
+      "ma50_gap": {
+        "mean_spearman": 0.1282,
+        "t_stat": 1.542,
+        "n_snaps": 34
+      },
+      "ma100_gap": {
+        "mean_spearman": 0.1394,
+        "t_stat": 1.78,
+        "n_snaps": 34
+      },
+      "ma150_gap": {
+        "mean_spearman": 0.131,
+        "t_stat": 1.716,
+        "n_snaps": 34
+      },
+      "ma200_gap": {
+        "mean_spearman": 0.1148,
+        "t_stat": 1.433,
+        "n_snaps": 34
+      },
+      "ret_1m": {
+        "mean_spearman": 0.0777,
+        "t_stat": 0.972,
+        "n_snaps": 34
+      },
+      "ret_3m": {
+        "mean_spearman": 0.1261,
+        "t_stat": 1.627,
+        "n_snaps": 34
+      },
+      "ret_6m": {
+        "mean_spearman": 0.0833,
+        "t_stat": 1.14,
+        "n_snaps": 34
+      }
+    },
+    "buckets": {
+      "ma20_gap": [
+        {
+          "range": "[-0.008, 0.012]",
+          "mean_excess_pct": 10.596,
+          "n": 54
+        },
+        {
+          "range": "[-0.037, -0.008]",
+          "mean_excess_pct": 8.73,
+          "n": 54
+        },
+        {
+          "range": "[-0.163, -0.037]",
+          "mean_excess_pct": 7.371,
+          "n": 55
+        },
+        {
+          "range": "[0.012, 0.039]",
+          "mean_excess_pct": 8.406,
+          "n": 54
+        },
+        {
+          "range": "[0.039, 0.143]",
+          "mean_excess_pct": 10.773,
+          "n": 55
+        }
+      ],
+      "ma50_gap": [
+        {
+          "range": "[-0.013, 0.029]",
+          "mean_excess_pct": 6.257,
+          "n": 54
+        },
+        {
+          "range": "[-0.054, -0.013]",
+          "mean_excess_pct": 9.024,
+          "n": 54
+        },
+        {
+          "range": "[-0.266, -0.054]",
+          "mean_excess_pct": 10.195,
+          "n": 55
+        },
+        {
+          "range": "[0.029, 0.071]",
+          "mean_excess_pct": 8.252,
+          "n": 54
+        },
+        {
+          "range": "[0.071, 0.208]",
+          "mean_excess_pct": 12.071,
+          "n": 55
+        }
+      ],
+      "ma100_gap": [
+        {
+          "range": "[-0.003, 0.058]",
+          "mean_excess_pct": 6.861,
+          "n": 54
+        },
+        {
+          "range": "[-0.073, -0.003]",
+          "mean_excess_pct": 10.133,
+          "n": 54
+        },
+        {
+          "range": "[-0.404, -0.073]",
+          "mean_excess_pct": 5.855,
+          "n": 55
+        },
+        {
+          "range": "[0.058, 0.123]",
+          "mean_excess_pct": 11.038,
+          "n": 54
+        },
+        {
+          "range": "[0.123, 0.404]",
+          "mean_excess_pct": 11.994,
+          "n": 55
+        }
+      ],
+      "ma150_gap": [
+        {
+          "range": "[-0.090, 0.014]",
+          "mean_excess_pct": 6.6,
+          "n": 54
+        },
+        {
+          "range": "[-0.464, -0.090]",
+          "mean_excess_pct": 5.783,
+          "n": 55
+        },
+        {
+          "range": "[0.014, 0.076]",
+          "mean_excess_pct": 7.201,
+          "n": 54
+        },
+        {
+          "range": "[0.076, 0.161]",
+          "mean_excess_pct": 15.439,
+          "n": 54
+        },
+        {
+          "range": "[0.161, 0.566]",
+          "mean_excess_pct": 10.879,
+          "n": 55
+        }
+      ],
+      "ma200_gap": [
+        {
+          "range": "[-0.097, 0.024]",
+          "mean_excess_pct": 7.946,
+          "n": 54
+        },
+        {
+          "range": "[-0.555, -0.097]",
+          "mean_excess_pct": 6.308,
+          "n": 55
+        },
+        {
+          "range": "[0.024, 0.103]",
+          "mean_excess_pct": 6.985,
+          "n": 54
+        },
+        {
+          "range": "[0.103, 0.218]",
+          "mean_excess_pct": 13.005,
+          "n": 54
+        },
+        {
+          "range": "[0.218, 0.573]",
+          "mean_excess_pct": 11.635,
+          "n": 55
+        }
+      ],
+      "ret_1m": [
+        {
+          "range": "[-0.006, 0.036]",
+          "mean_excess_pct": 6.452,
+          "n": 54
+        },
+        {
+          "range": "[-0.065, -0.006]",
+          "mean_excess_pct": 6.435,
+          "n": 54
+        },
+        {
+          "range": "[-0.245, -0.065]",
+          "mean_excess_pct": 12.258,
+          "n": 55
+        },
+        {
+          "range": "[0.036, 0.075]",
+          "mean_excess_pct": 6.536,
+          "n": 54
+        },
+        {
+          "range": "[0.075, 0.350]",
+          "mean_excess_pct": 14.042,
+          "n": 55
+        }
+      ],
+      "ret_3m": [
+        {
+          "range": "[-0.016, 0.090]",
+          "mean_excess_pct": 11.17,
+          "n": 54
+        },
+        {
+          "range": "[-0.091, -0.016]",
+          "mean_excess_pct": 11.057,
+          "n": 54
+        },
+        {
+          "range": "[-0.505, -0.091]",
+          "mean_excess_pct": 3.12,
+          "n": 55
+        },
+        {
+          "range": "[0.090, 0.203]",
+          "mean_excess_pct": 9.871,
+          "n": 54
+        },
+        {
+          "range": "[0.203, 0.911]",
+          "mean_excess_pct": 10.736,
+          "n": 55
+        }
+      ],
+      "ret_6m": [
+        {
+          "range": "[-0.125, 0.026]",
+          "mean_excess_pct": 15.012,
+          "n": 54
+        },
+        {
+          "range": "[-0.623, -0.125]",
+          "mean_excess_pct": 4.81,
+          "n": 55
+        },
+        {
+          "range": "[0.026, 0.159]",
+          "mean_excess_pct": 4.116,
+          "n": 54
+        },
+        {
+          "range": "[0.159, 0.343]",
+          "mean_excess_pct": 8.064,
+          "n": 54
+        },
+        {
+          "range": "[0.343, 1.644]",
+          "mean_excess_pct": 13.865,
+          "n": 55
+        }
+      ]
+    }
+  },
+  "combo_wide_topn15": {
+    "n_events": 34,
+    "topn": 15,
+    "baseline_factor_only_mean_excess_pct": 8.341,
+    "baseline_win_rate_pct": 79.4,
+    "combo_factor_plus_mom6m_mean_excess_pct": 8.257,
+    "combo_win_rate_pct": 79.4,
+    "paired_diff_mean_pct": -0.084,
+    "paired_t_stat": -0.046
+  },
+  "monte_carlo_baseline": {
+    "observed_sharpe_order_invariant": 1.0833,
+    "observed_mdd_pct": -15.17,
+    "n_permutations": 1000,
+    "pct_permutations_with_mdd_at_least_as_bad": 0.1,
+    "note": "수익률 평균·샤프는 순서를 섞어도 안 변한다 — 이 검정은 순서가 낙폭(MDD) 패턴에 미치는 영향만 본다. 실제 순서의 MDD가 무작위 순서 대부분보다 덜 나쁘면(비율 낮음) 손실 시점이 시간적으로 잘 분산됐다는 뜻, 비율이 높으면(예: 50%+) 실제 순서가 무작위와 다를 바 없다는 뜻."
+  }
+}
