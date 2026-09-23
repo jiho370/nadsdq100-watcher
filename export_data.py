@@ -236,9 +236,14 @@ def _load_funds():
 
 def select_by_weights(weights: dict, ind_map: dict, n: int, funds: dict | None = None,
                       cross: dict | None = None, sector_map: dict | None = None,
-                      sector_cap: int | None = 2) -> list[tuple]:
+                      sector_cap: int | None = 2, floor: float | None = None) -> list[tuple]:
     """지표 z-score 가중합성점수로 상위 n 선정 — 백테스트(backtest_weights)와 '동일 지표·정의' 사용.
        모멘텀=ind_map, 펀더멘탈=fundamentals_edgar.factor_values, 크로스오버=tech_factors(cross).
+    floor(2026-09-23, 지호 님 반영 — us_smoothed_floor.py 백테스트): 종합점수가 floor
+       미만인 종목은 후보에서 제외. 현재 라이브 가중치(1:2:2) 기준 floor=3.25는 10년
+       34스냅샷 동안 실제로 한 번도 topn8을 바꾼 적이 없음(n_binding=0, 0%) — 평소엔
+       무비용이고, 하락장에서 후보풀이 얇아져 약한 종목이 섞여 들어오는 걸 막는 보험
+       성격. floor=None이면 기존 동작(무제한).
     sector_cap(기본 2, 2026-07-17 지호 님 결정 — us_sector_cap_sweep.py 백테스트 반영):
        rd_mktcap(R&D/시가총액) 팩터가 구조적으로 바이오/제약을 편애(REGN 0.539로 전체 1위,
        2위의 2배)해 실제로 상위 8종목 중 4종목이 Health Care로 쏠리는 걸 실측 확인 — 임상
@@ -276,6 +281,11 @@ def select_by_weights(weights: dict, ind_map: dict, n: int, funds: dict | None =
     comp = sum(float(weights[f]) * z(f) for f in active) if active else _pd.Series(0.0, index=df.index)
     valid = df["mom6"].notna() | df["mom12_1"].notna()   # 모멘텀 결측 종목 제외
     comp = comp[valid].sort_values(ascending=False)
+    if floor is not None:
+        n_excluded = int((comp < floor).sum())
+        if n_excluded:
+            print(f"[export] 점수하한({floor}) 미달로 {n_excluded}종목 제외", file=sys.stderr)
+        comp = comp[comp >= floor]
     lbl = "가중합성(" + "·".join(f"{k}{v}" for k, v in weights.items() if v) + ")"
     scored_all = [(s, float(comp[s]), lbl) for s in comp.index]
     if sector_cap is not None and sector_map:
@@ -354,7 +364,8 @@ def select_pool(data: dict, n: int):
         # split_by_entry에서 최종 매수 k종목을 뽑을 때만 적용(지호 님 지적: 캡이 후보풀
         # 자체를 22개로 눌러버려 AI가 볼 재료가 부족해지던 문제).
         scored = select_by_weights(w, data["ind_map"], n, funds=funds, cross=cross,
-                                   sector_map=data.get("sector_map"), sector_cap=None)
+                                   sector_map=data.get("sector_map"), sector_cap=None,
+                                   floor=3.25)
         label = ("weights " + "·".join(f"{k}{v}" for k, v in w.items() if v)
                  + ("" if funds else " [펀더멘탈캐시 없음:모멘텀만]"))
     else:

@@ -11,7 +11,9 @@ kr_stocks.py — 코스피200 개별 종목 선별 (HISTORY.md §3, 2026-07-14 v
     — "밸류×주주환원" 계열. 코어-새틀라이트 구조(§2-F, HISTORY.md §3)의 새틀라이트 역할.
   · 매수 후보 풀 5(순위순, 2026-07-16 6→5 변경 — topn 정밀검증 Stage 3.1·3.2 결과 반영,
     HISTORY.md §3 참고). 보유 상한 5
-  · 매도: 6개월 정기 재평가(후보풀 이탈)만 활성 — 200일선 백업은 2026-07-15부로 기본
+  · 매도: 3개월 정기 재평가(후보풀 이탈)만 활성(2026-09-23, 6개월→3개월 변경 —
+    kr_rebal_freq_with_cap.py 백테스트, cap=6 반영 후 재검증에서 3개월이 연환산 순초과
+    수익 뚜렷이 우위·holdings.KR_REEVAL_DAYS) — 200일선 백업은 2026-07-15부로 기본
     비활성(holdings.py SELL_MA200_BACKUP, 근거는 HISTORY.md §3 Stage 6)
     (state/kr_holdings.json 자동 추적)
 
@@ -43,6 +45,12 @@ KR_HOLDINGS = "state/kr_holdings.json"
 N_BUY = int(os.environ.get("KR_POOL_BUY", "8"))
 N_WATCH = int(os.environ.get("KR_POOL_WATCH", "0"))
 MAX_HOLD = int(os.environ.get("KR_MAX_HOLD", "5"))   # 보유 상한(팔아야 산다) — 최종 채택 수와 동일
+# 2026-09-23(지호 님 반영 — kr_factor_cap_extreme.py 백테스트): 종합점수가 SCORE_CAP을
+# 넘는 종목은 후보에서 제외. 6.5점 근처부터 초과수익이 역전되는 밸류트랩 구간이 실측
+# 확인됐고(고PER/PBR·저배당 소형주가 회계상 비율만 극단적으로 좋아 보이는 경우), 그
+# 구간을 잘라낸 밴드(<=6) 안에서는 점수가 높을수록 여전히 유의하게 더 좋았다(밴드 내
+# top5 vs 밴드 전체평균 페어드 t=2.85). topn5 기준 초과수익 -0.01%p → +2.04%p 개선.
+SCORE_CAP = float(os.environ.get("KR_SCORE_CAP", "6.0"))
 
 
 def _log(m): print(f"[KR] {m}", file=sys.stderr)
@@ -201,7 +209,11 @@ def select(yf) -> dict:
                              + (f" · PBR {c['pbr']:.2f}" if c.get("pbr") else "")
                              + (f" · 배당수익률 {c['div_yield']:.1f}%" if c.get("div_yield") else ""))
         c["hot"] = _hot(c)
-    ranked = sorted(cands.values(), key=lambda x: x["score"], reverse=True)
+    n_excluded = sum(1 for c in cands.values() if c["score"] > SCORE_CAP)
+    if n_excluded:
+        _log(f"점수상한({SCORE_CAP}) 초과로 {n_excluded}종목 제외(밸류트랩 구간)")
+    pool = [c for c in cands.values() if c["score"] <= SCORE_CAP]
+    ranked = sorted(pool, key=lambda x: x["score"], reverse=True)
     # 관찰 폐지(2026-07-13): 눌림/상승지속 구분 없이 팩터 순위 그대로 매수 후보
     # (미국 backtest_entry_gate와 동일 취지 — 기술 게이트가 성과를 깎음. hot 태그는 분할계획용 유지)
     buy = ranked[:N_BUY]
@@ -214,7 +226,7 @@ def select(yf) -> dict:
 
 # ------------------------- 보유 추적(매도 시그널) -------------------------
 def update_holdings(buy_syms: list, ind_map: dict, today: str, pool_syms=None) -> list:
-    """holdings.py 와 동일 규칙(6개월 재평가/200일선 -3%)을 한국 종목에 적용.
+    """holdings.py 와 동일 규칙(2026-09-23부로 한국은 3개월 재평가·KR_REEVAL_DAYS/200일선 -3%)을 적용.
     2026-07-14 수정: pool_syms를 안 넘겨서 6개월 정기 재평가가 한국에서는 한 번도 발동하지
     않고 있었다(HISTORY.md '미국과 동일' 명시와 불일치) — select()의 pool을 받도록 확장."""
     import holdings as H

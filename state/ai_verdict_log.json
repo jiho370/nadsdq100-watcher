@@ -3,11 +3,11 @@
     {
       "date": "2026-07-13",
       "market": "us",
-      "symbol": "GM",
-      "name": "General Motors Company",
-      "verdict": "매수유지",
-      "reason": "",
-      "price": 76.65
+      "symbol": "APTV",
+      "name": "Aptiv PLC",
+      "verdict": "관찰유지",
+      "reason": "200일선 이탈로 관찰 전환, 다만 확인된 기업고유 악재는 없음",
+      "price": 59.5
     },
     {
       "date": "2026-07-13",
@@ -21,15 +21,6 @@
     {
       "date": "2026-07-13",
       "market": "us",
-      "symbol": "MRNA",
-      "name": "Moderna, Inc.",
-      "verdict": "관찰강등",
-      "reason": "JPMorgan 매도의견 재확인(7/10) 이후 바이오섹터 전반 조정(XBI -4%)에 동반 급락, 기업고유 악재는 미확인이나 FDA 결정 대기로 단기 변동성 큼",
-      "price": 67.69
-    },
-    {
-      "date": "2026-07-13",
-      "market": "us",
       "symbol": "BMY",
       "name": "Bristol-Myers Squibb Company",
       "verdict": "매수유지",
@@ -39,38 +30,11 @@
     {
       "date": "2026-07-13",
       "market": "us",
-      "symbol": "SWKS",
-      "name": "Skyworks Solutions, Inc.",
-      "verdict": "관찰강등",
-      "reason": "고객 집중도·매출 둔화 우려로 밸류에이션 부담 지속, 반도체 섹터 전반 약세 동반(1개월 -16.7%)",
-      "price": 58.57
-    },
-    {
-      "date": "2026-07-13",
-      "market": "us",
-      "symbol": "INCY",
-      "name": "Incyte Corporation",
+      "symbol": "GM",
+      "name": "General Motors Company",
       "verdict": "매수유지",
       "reason": "",
-      "price": 114.55
-    },
-    {
-      "date": "2026-07-13",
-      "market": "us",
-      "symbol": "REGN",
-      "name": "Regeneron Pharmaceuticals, Inc.",
-      "verdict": "제외",
-      "reason": "흑색종 3상에서 Keytruda 대비 통계적 유의성 미달(p=0.0627)로 12%대 급락, Citi 매수→중립 하향 등 다수 애널리스트 목표가 하향, 200일선도 이탈",
-      "price": 660.93
-    },
-    {
-      "date": "2026-07-13",
-      "market": "us",
-      "symbol": "APTV",
-      "name": "Aptiv PLC",
-      "verdict": "관찰유지",
-      "reason": "200일선 이탈로 관찰 전환, 다만 확인된 기업고유 악재는 없음",
-      "price": 59.5
+      "price": 76.65
     },
     {
       "date": "2026-07-13",
@@ -84,128 +48,47 @@
     {
       "date": "2026-07-13",
       "market": "us",
+      "symbol": "INCY",
+      "name": "Incyte Corporation",
+      "verdict": "매수유지",
+      "reason": "",
+      "price": 114.55
+    },
+    {
+      "date": "2026-07-13",
+      "market": "us",
+      "symbol": "MRNA",
+      "name": "Moderna, Inc.",
+      "verdict": "관찰강등",
+      "reason": "JPMorgan 매도의견 재확인(7/10) 이후 바이오섹터 전반 조정(XBI -4%)에 동반 급락, 기업고유 악재는 미확인이나 FDA 결정 대기로 단기 변동성 큼",
+      "price": 67.69
+    },
+    {
+      "date": "2026-07-13",
+      "market": "us",
+      "symbol": "REGN",
+      "name": "Regeneron Pharmaceuticals, Inc.",
+      "verdict": "제외",
+      "reason": "흑색종 3상에서 Keytruda 대비 통계적 유의성 미달(p=0.0627)로 12%대 급락, Citi 매수→중립 하향 등 다수 애널리스트 목표가 하향, 200일선도 이탈",
+      "price": 660.93
+    },
+    {
+      "date": "2026-07-13",
+      "market": "us",
+      "symbol": "SWKS",
+      "name": "Skyworks Solutions, Inc.",
+      "verdict": "관찰강등",
+      "reason": "고객 집중도·매출 둔화 우려로 밸류에이션 부담 지속, 반도체 섹터 전반 약세 동반(1개월 -16.7%)",
+      "price": 58.57
+    },
+    {
+      "date": "2026-07-13",
+      "market": "us",
       "symbol": "WDAY",
       "name": "Workday, Inc.",
       "verdict": "관찰유지",
       "reason": "200일선 이탈로 관찰 전환, Salesforce Agentforce 실망감에 SaaS 섹터 전반 약세 동반됐으나 WDAY 자체 주가는 최근 1주 +5.9%로 견조",
       "price": 146.13
-    },
-    {
-      "date": "2026-07-15",
-      "market": "kr",
-      "symbol": "071320",
-      "name": "지역난방공사",
-      "verdict": "매수유지",
-      "reason": "",
-      "price": 64700.0
-    },
-    {
-      "date": "2026-07-15",
-      "market": "kr",
-      "symbol": "015760",
-      "name": "한국전력",
-      "verdict": "관찰강등",
-      "reason": "1주 -7.8% 급락에도 명확한 개별 악재는 미확인 — 호르무즈 사태發 유가 급등에 따른 연료비 부담 우려가 반영된 것으로 추정, 단기 불확실성 확대",
-      "price": 33900.0
-    },
-    {
-      "date": "2026-07-15",
-      "market": "kr",
-      "symbol": "002380",
-      "name": "KCC",
-      "verdict": "매수유지",
-      "reason": "",
-      "price": 431500.0
-    },
-    {
-      "date": "2026-07-15",
-      "market": "kr",
-      "symbol": "006040",
-      "name": "동원산업",
-      "verdict": "매수유지",
-      "reason": "",
-      "price": 33150.0
-    },
-    {
-      "date": "2026-07-15",
-      "market": "kr",
-      "symbol": "003030",
-      "name": "세아제강지주",
-      "verdict": "관찰강등",
-      "reason": "미국 관세·건설경기 침체로 수익성 악화(영업이익 -2.7%, 순이익 -16.5%), 외국인 매도세 지속 — 단기 불확실성 확대",
-      "price": 99500.0
-    },
-    {
-      "date": "2026-07-15",
-      "market": "kr",
-      "symbol": "002030",
-      "name": "아세아",
-      "verdict": "관찰강등",
-      "reason": "7/8 미-이란 충돌 우려발 코스피 전반 투매에 동반 급락, 개별 악재 아님(같은 날 코스피 -5.35%)",
-      "price": 174700.0
-    },
-    {
-      "date": "2026-07-15",
-      "market": "kr",
-      "symbol": "024110",
-      "name": "기업은행",
-      "verdict": "매수유지",
-      "reason": "",
-      "price": 21250.0
-    },
-    {
-      "date": "2026-07-15",
-      "market": "kr",
-      "symbol": "139480",
-      "name": "이마트",
-      "verdict": "관찰유지",
-      "reason": "",
-      "price": 79400.0
-    },
-    {
-      "date": "2026-07-14",
-      "market": "kr",
-      "symbol": "071320",
-      "name": "지역난방공사",
-      "verdict": "매수유지",
-      "reason": "",
-      "price": 65500.0
-    },
-    {
-      "date": "2026-07-14",
-      "market": "kr",
-      "symbol": "015760",
-      "name": "한국전력",
-      "verdict": "관찰강등",
-      "reason": "역대 최대 영업이익 발표에도 전기요금 정상화 지연·200조원 이상 부채 부담 우려로 주가 약세(1주 -7.8%, 1개월 -14.8%) — 명백한 악재는 아니나 단기 불확실성 존재",
-      "price": 33950.0
-    },
-    {
-      "date": "2026-07-14",
-      "market": "kr",
-      "symbol": "002380",
-      "name": "KCC",
-      "verdict": "관찰강등",
-      "reason": "2026년 1분기 영업이익 전년比 -14.8%(실리콘 부문 중국 저가경쟁 압박) + 자사주 대부분을 교환사채(EB) 발행에 활용키로 하며 주주환원(소각) 기대 저버려 신뢰 훼손 — 명백한 소송·회계 이슈는 아니나 실적·거버넌스 불확실성 존재",
-      "price": 418500.0
-    },
-    {
-      "date": "2026-07-14",
-      "market": "kr",
-      "symbol": "006040",
-      "name": "동원산업",
-      "verdict": "매수유지",
-      "reason": "",
-      "price": 33150.0
-    },
-    {
-      "date": "2026-07-14",
-      "market": "kr",
-      "symbol": "003030",
-      "name": "세아제강지주",
-      "verdict": "제외",
-      "reason": "트럼프발 50% 철강관세 및 국내 건설경기 부진으로 4분기 매출·영업이익 큰 폭 감소가 확인됨, 1개월 -33.1% 급락과 부합하는 명백한 실적 악화 요인 존재",
-      "price": 98700.0
     },
     {
       "date": "2026-07-14",
@@ -219,6 +102,42 @@
     {
       "date": "2026-07-14",
       "market": "kr",
+      "symbol": "002380",
+      "name": "KCC",
+      "verdict": "관찰강등",
+      "reason": "2026년 1분기 영업이익 전년比 -14.8%(실리콘 부문 중국 저가경쟁 압박) + 자사주 대부분을 교환사채(EB) 발행에 활용키로 하며 주주환원(소각) 기대 저버려 신뢰 훼손 — 명백한 소송·회계 이슈는 아니나 실적·거버넌스 불확실성 존재",
+      "price": 418500.0
+    },
+    {
+      "date": "2026-07-14",
+      "market": "kr",
+      "symbol": "003030",
+      "name": "세아제강지주",
+      "verdict": "제외",
+      "reason": "트럼프발 50% 철강관세 및 국내 건설경기 부진으로 4분기 매출·영업이익 큰 폭 감소가 확인됨, 1개월 -33.1% 급락과 부합하는 명백한 실적 악화 요인 존재",
+      "price": 98700.0
+    },
+    {
+      "date": "2026-07-14",
+      "market": "kr",
+      "symbol": "006040",
+      "name": "동원산업",
+      "verdict": "매수유지",
+      "reason": "",
+      "price": 33150.0
+    },
+    {
+      "date": "2026-07-14",
+      "market": "kr",
+      "symbol": "015760",
+      "name": "한국전력",
+      "verdict": "관찰강등",
+      "reason": "역대 최대 영업이익 발표에도 전기요금 정상화 지연·200조원 이상 부채 부담 우려로 주가 약세(1주 -7.8%, 1개월 -14.8%) — 명백한 악재는 아니나 단기 불확실성 존재",
+      "price": 33950.0
+    },
+    {
+      "date": "2026-07-14",
+      "market": "kr",
       "symbol": "024110",
       "name": "기업은행",
       "verdict": "매수유지",
@@ -228,11 +147,92 @@
     {
       "date": "2026-07-14",
       "market": "kr",
+      "symbol": "071320",
+      "name": "지역난방공사",
+      "verdict": "매수유지",
+      "reason": "",
+      "price": 65500.0
+    },
+    {
+      "date": "2026-07-14",
+      "market": "kr",
       "symbol": "139480",
       "name": "이마트",
       "verdict": "매수유지",
       "reason": "",
       "price": 80300.0
+    },
+    {
+      "date": "2026-07-15",
+      "market": "kr",
+      "symbol": "002030",
+      "name": "아세아",
+      "verdict": "관찰강등",
+      "reason": "7/8 미-이란 충돌 우려발 코스피 전반 투매에 동반 급락, 개별 악재 아님(같은 날 코스피 -5.35%)",
+      "price": 174700.0
+    },
+    {
+      "date": "2026-07-15",
+      "market": "kr",
+      "symbol": "002380",
+      "name": "KCC",
+      "verdict": "매수유지",
+      "reason": "",
+      "price": 431500.0
+    },
+    {
+      "date": "2026-07-15",
+      "market": "kr",
+      "symbol": "003030",
+      "name": "세아제강지주",
+      "verdict": "관찰강등",
+      "reason": "미국 관세·건설경기 침체로 수익성 악화(영업이익 -2.7%, 순이익 -16.5%), 외국인 매도세 지속 — 단기 불확실성 확대",
+      "price": 99500.0
+    },
+    {
+      "date": "2026-07-15",
+      "market": "kr",
+      "symbol": "006040",
+      "name": "동원산업",
+      "verdict": "매수유지",
+      "reason": "",
+      "price": 33150.0
+    },
+    {
+      "date": "2026-07-15",
+      "market": "kr",
+      "symbol": "015760",
+      "name": "한국전력",
+      "verdict": "관찰강등",
+      "reason": "1주 -7.8% 급락에도 명확한 개별 악재는 미확인 — 호르무즈 사태發 유가 급등에 따른 연료비 부담 우려가 반영된 것으로 추정, 단기 불확실성 확대",
+      "price": 33900.0
+    },
+    {
+      "date": "2026-07-15",
+      "market": "kr",
+      "symbol": "024110",
+      "name": "기업은행",
+      "verdict": "매수유지",
+      "reason": "",
+      "price": 21250.0
+    },
+    {
+      "date": "2026-07-15",
+      "market": "kr",
+      "symbol": "071320",
+      "name": "지역난방공사",
+      "verdict": "매수유지",
+      "reason": "",
+      "price": 64700.0
+    },
+    {
+      "date": "2026-07-15",
+      "market": "kr",
+      "symbol": "139480",
+      "name": "이마트",
+      "verdict": "관찰유지",
+      "reason": "",
+      "price": 79400.0
     },
     {
       "date": "2026-07-17",
@@ -247,12 +247,12 @@
     {
       "date": "2026-07-17",
       "market": "us",
-      "symbol": "INCY",
-      "name": "Incyte Corporation",
+      "symbol": "DD",
+      "name": "DuPont de Nemours, Inc.",
       "verdict": "매수유지",
       "severity": "",
       "reason": "",
-      "price": 117.25
+      "price": 135.29
     },
     {
       "date": "2026-07-17",
@@ -263,6 +263,26 @@
       "severity": "",
       "reason": "",
       "price": 76.07
+    },
+    {
+      "date": "2026-07-17",
+      "market": "us",
+      "symbol": "INCY",
+      "name": "Incyte Corporation",
+      "verdict": "매수유지",
+      "severity": "",
+      "reason": "",
+      "price": 117.25
+    },
+    {
+      "date": "2026-07-17",
+      "market": "us",
+      "symbol": "META",
+      "name": "Meta Platforms, Inc.",
+      "verdict": "매수유지",
+      "severity": "",
+      "reason": "",
+      "price": 646.01
     },
     {
       "date": "2026-07-17",
@@ -287,16 +307,6 @@
     {
       "date": "2026-07-17",
       "market": "us",
-      "symbol": "WDAY",
-      "name": "Workday, Inc.",
-      "verdict": "매수유지",
-      "severity": "",
-      "reason": "",
-      "price": 144.78
-    },
-    {
-      "date": "2026-07-17",
-      "market": "us",
       "symbol": "TTD",
       "name": "The Trade Desk, Inc.",
       "verdict": "제외",
@@ -307,82 +317,22 @@
     {
       "date": "2026-07-17",
       "market": "us",
+      "symbol": "WDAY",
+      "name": "Workday, Inc.",
+      "verdict": "매수유지",
+      "severity": "",
+      "reason": "",
+      "price": 144.78
+    },
+    {
+      "date": "2026-07-17",
+      "market": "us",
       "symbol": "XYZ",
       "name": "Block, Inc.",
       "verdict": "매수유지",
       "severity": "",
       "reason": "",
       "price": 79.94
-    },
-    {
-      "date": "2026-07-17",
-      "market": "us",
-      "symbol": "META",
-      "name": "Meta Platforms, Inc.",
-      "verdict": "매수유지",
-      "severity": "",
-      "reason": "",
-      "price": 646.01
-    },
-    {
-      "date": "2026-07-17",
-      "market": "us",
-      "symbol": "DD",
-      "name": "DuPont de Nemours, Inc.",
-      "verdict": "매수유지",
-      "severity": "",
-      "reason": "",
-      "price": 135.29
-    },
-    {
-      "date": "2026-07-22",
-      "market": "kr",
-      "symbol": "071320",
-      "name": "지역난방공사",
-      "verdict": "매수유지",
-      "severity": "",
-      "reason": "",
-      "price": 64000.0
-    },
-    {
-      "date": "2026-07-22",
-      "market": "kr",
-      "symbol": "015760",
-      "name": "한국전력",
-      "verdict": "매수유지",
-      "severity": "",
-      "reason": "",
-      "price": 33900.0
-    },
-    {
-      "date": "2026-07-22",
-      "market": "kr",
-      "symbol": "002380",
-      "name": "KCC",
-      "verdict": "매수유지",
-      "severity": "",
-      "reason": "",
-      "price": 419500.0
-    },
-    {
-      "date": "2026-07-22",
-      "market": "kr",
-      "symbol": "006040",
-      "name": "동원산업",
-      "verdict": "매수유지",
-      "severity": "",
-      "reason": "",
-      "price": 33450.0
-    },
-    {
-      "date": "2026-07-22",
-      "market": "kr",
-      "symbol": "003030",
-      "name": "세아제강지주",
-      "verdict": "매수유지",
-      "severity": "",
-      "reason": "",
-      "price": 98500.0
     },
     {
       "date": "2026-07-22",
@@ -397,6 +347,46 @@
     {
       "date": "2026-07-22",
       "market": "kr",
+      "symbol": "002380",
+      "name": "KCC",
+      "verdict": "매수유지",
+      "severity": "",
+      "reason": "",
+      "price": 419500.0
+    },
+    {
+      "date": "2026-07-22",
+      "market": "kr",
+      "symbol": "003030",
+      "name": "세아제강지주",
+      "verdict": "매수유지",
+      "severity": "",
+      "reason": "",
+      "price": 98500.0
+    },
+    {
+      "date": "2026-07-22",
+      "market": "kr",
+      "symbol": "006040",
+      "name": "동원산업",
+      "verdict": "매수유지",
+      "severity": "",
+      "reason": "",
+      "price": 33450.0
+    },
+    {
+      "date": "2026-07-22",
+      "market": "kr",
+      "symbol": "015760",
+      "name": "한국전력",
+      "verdict": "매수유지",
+      "severity": "",
+      "reason": "",
+      "price": 33900.0
+    },
+    {
+      "date": "2026-07-22",
+      "market": "kr",
       "symbol": "024110",
       "name": "기업은행",
       "verdict": "매수유지",
@@ -407,92 +397,22 @@
     {
       "date": "2026-07-22",
       "market": "kr",
+      "symbol": "071320",
+      "name": "지역난방공사",
+      "verdict": "매수유지",
+      "severity": "",
+      "reason": "",
+      "price": 64000.0
+    },
+    {
+      "date": "2026-07-22",
+      "market": "kr",
       "symbol": "139480",
       "name": "이마트",
       "verdict": "매수유지",
       "severity": "",
       "reason": "",
       "price": 81700.0
-    },
-    {
-      "date": "2026-07-23",
-      "market": "kr",
-      "symbol": "071320",
-      "name": "지역난방공사",
-      "verdict": "매수유지",
-      "severity": "",
-      "reason": "",
-      "price": 65400.0
-    },
-    {
-      "date": "2026-07-23",
-      "market": "kr",
-      "symbol": "015760",
-      "name": "한국전력",
-      "verdict": "매수유지",
-      "severity": "",
-      "reason": "",
-      "price": 35600.0
-    },
-    {
-      "date": "2026-07-23",
-      "market": "kr",
-      "symbol": "002380",
-      "name": "KCC",
-      "verdict": "매수유지",
-      "severity": "",
-      "reason": "",
-      "price": 440500.0
-    },
-    {
-      "date": "2026-07-23",
-      "market": "kr",
-      "symbol": "006040",
-      "name": "동원산업",
-      "verdict": "매수유지",
-      "severity": "",
-      "reason": "",
-      "price": 34350.0
-    },
-    {
-      "date": "2026-07-23",
-      "market": "kr",
-      "symbol": "002030",
-      "name": "아세아",
-      "verdict": "매수유지",
-      "severity": "",
-      "reason": "",
-      "price": 182300.0
-    },
-    {
-      "date": "2026-07-23",
-      "market": "kr",
-      "symbol": "003030",
-      "name": "세아제강지주",
-      "verdict": "매수유지",
-      "severity": "",
-      "reason": "",
-      "price": 112000.0
-    },
-    {
-      "date": "2026-07-23",
-      "market": "kr",
-      "symbol": "024110",
-      "name": "기업은행",
-      "verdict": "매수유지",
-      "severity": "",
-      "reason": "",
-      "price": 21050.0
-    },
-    {
-      "date": "2026-07-23",
-      "market": "kr",
-      "symbol": "139480",
-      "name": "이마트",
-      "verdict": "제외",
-      "severity": "일시적",
-      "reason": "자회사 SCK컴퍼니(스타벅스코리아) '5·18 탱크데이' 마케팅 논란(5/20)으로 대표이사 경질, 불매운동 확산 — 후속 여파로 2분기 연결 영업이익 컨센서스가 3개월 전 대비 19.6% 하향(611억원, 7월 기준), SCK 수익성 악화가 주원인으로 명시됨",
-      "price": 83400.0
     },
     {
       "date": "2026-07-22",
@@ -507,12 +427,12 @@
     {
       "date": "2026-07-22",
       "market": "us",
-      "symbol": "INCY",
-      "name": "Incyte Corporation",
+      "symbol": "DD",
+      "name": "DuPont de Nemours, Inc.",
       "verdict": "매수유지",
       "severity": "",
       "reason": "",
-      "price": 115.79
+      "price": 139.64
     },
     {
       "date": "2026-07-22",
@@ -523,6 +443,26 @@
       "severity": "",
       "reason": "",
       "price": 82.13
+    },
+    {
+      "date": "2026-07-22",
+      "market": "us",
+      "symbol": "INCY",
+      "name": "Incyte Corporation",
+      "verdict": "매수유지",
+      "severity": "",
+      "reason": "",
+      "price": 115.79
+    },
+    {
+      "date": "2026-07-22",
+      "market": "us",
+      "symbol": "META",
+      "name": "Meta Platforms, Inc.",
+      "verdict": "매수유지",
+      "severity": "",
+      "reason": "",
+      "price": 627.17
     },
     {
       "date": "2026-07-22",
@@ -547,22 +487,22 @@
     {
       "date": "2026-07-22",
       "market": "us",
-      "symbol": "WDAY",
-      "name": "Workday, Inc.",
-      "verdict": "매수유지",
-      "severity": "",
-      "reason": "",
-      "price": 132.42
-    },
-    {
-      "date": "2026-07-22",
-      "market": "us",
       "symbol": "TTD",
       "name": "The Trade Desk, Inc.",
       "verdict": "제외",
       "severity": "일시적",
       "reason": "올해 CFO 두 차례 교체 및 최대고객 퍼블리시스 감사발 플랫폼 추천 중단 이력(6월 합의로 봉합)에 더해 성장둔화·경쟁심화 우려 지속, 거버넌스·매출성장 논거 훼손",
       "price": 17.58
+    },
+    {
+      "date": "2026-07-22",
+      "market": "us",
+      "symbol": "WDAY",
+      "name": "Workday, Inc.",
+      "verdict": "매수유지",
+      "severity": "",
+      "reason": "",
+      "price": 132.42
     },
     {
       "date": "2026-07-22",
@@ -575,24 +515,84 @@
       "price": 77.46
     },
     {
-      "date": "2026-07-22",
-      "market": "us",
-      "symbol": "META",
-      "name": "Meta Platforms, Inc.",
+      "date": "2026-07-23",
+      "market": "kr",
+      "symbol": "002030",
+      "name": "아세아",
       "verdict": "매수유지",
       "severity": "",
       "reason": "",
-      "price": 627.17
+      "price": 182300.0
     },
     {
-      "date": "2026-07-22",
-      "market": "us",
-      "symbol": "DD",
-      "name": "DuPont de Nemours, Inc.",
+      "date": "2026-07-23",
+      "market": "kr",
+      "symbol": "002380",
+      "name": "KCC",
       "verdict": "매수유지",
       "severity": "",
       "reason": "",
-      "price": 139.64
+      "price": 440500.0
+    },
+    {
+      "date": "2026-07-23",
+      "market": "kr",
+      "symbol": "003030",
+      "name": "세아제강지주",
+      "verdict": "매수유지",
+      "severity": "",
+      "reason": "",
+      "price": 112000.0
+    },
+    {
+      "date": "2026-07-23",
+      "market": "kr",
+      "symbol": "006040",
+      "name": "동원산업",
+      "verdict": "매수유지",
+      "severity": "",
+      "reason": "",
+      "price": 34350.0
+    },
+    {
+      "date": "2026-07-23",
+      "market": "kr",
+      "symbol": "015760",
+      "name": "한국전력",
+      "verdict": "매수유지",
+      "severity": "",
+      "reason": "",
+      "price": 35600.0
+    },
+    {
+      "date": "2026-07-23",
+      "market": "kr",
+      "symbol": "024110",
+      "name": "기업은행",
+      "verdict": "매수유지",
+      "severity": "",
+      "reason": "",
+      "price": 21050.0
+    },
+    {
+      "date": "2026-07-23",
+      "market": "kr",
+      "symbol": "071320",
+      "name": "지역난방공사",
+      "verdict": "매수유지",
+      "severity": "",
+      "reason": "",
+      "price": 65400.0
+    },
+    {
+      "date": "2026-07-23",
+      "market": "kr",
+      "symbol": "139480",
+      "name": "이마트",
+      "verdict": "제외",
+      "severity": "일시적",
+      "reason": "자회사 SCK컴퍼니(스타벅스코리아) '5·18 탱크데이' 마케팅 논란(5/20)으로 대표이사 경질, 불매운동 확산 — 후속 여파로 2분기 연결 영업이익 컨센서스가 3개월 전 대비 19.6% 하향(611억원, 7월 기준), SCK 수익성 악화가 주원인으로 명시됨",
+      "price": 83400.0
     },
     {
       "date": "2026-08-21",
@@ -607,22 +607,22 @@
     {
       "date": "2026-08-21",
       "market": "us",
-      "symbol": "INCY",
-      "name": "Incyte Corporation",
+      "symbol": "BMY",
+      "name": "Bristol-Myers Squibb Company",
       "verdict": "매수유지",
       "severity": "",
       "reason": "",
-      "price": 127.81
+      "price": 67.01
     },
     {
       "date": "2026-08-21",
       "market": "us",
-      "symbol": "TTD",
-      "name": "The Trade Desk, Inc.",
+      "symbol": "CMI",
+      "name": "Cummins Inc.",
       "verdict": "매수유지",
       "severity": "",
       "reason": "",
-      "price": 13.18
+      "price": 587.68
     },
     {
       "date": "2026-08-21",
@@ -637,42 +637,12 @@
     {
       "date": "2026-08-21",
       "market": "us",
-      "symbol": "BMY",
-      "name": "Bristol-Myers Squibb Company",
+      "symbol": "INCY",
+      "name": "Incyte Corporation",
       "verdict": "매수유지",
       "severity": "",
       "reason": "",
-      "price": 67.01
-    },
-    {
-      "date": "2026-08-21",
-      "market": "us",
-      "symbol": "SWKS",
-      "name": "Skyworks Solutions, Inc.",
-      "verdict": "매수유지",
-      "severity": "",
-      "reason": "",
-      "price": 67.14
-    },
-    {
-      "date": "2026-08-21",
-      "market": "us",
-      "symbol": "QCOM",
-      "name": "QUALCOMM Incorporated",
-      "verdict": "매수유지",
-      "severity": "",
-      "reason": "",
-      "price": 160.75
-    },
-    {
-      "date": "2026-08-21",
-      "market": "us",
-      "symbol": "XYZ",
-      "name": "Block, Inc.",
-      "verdict": "매수유지",
-      "severity": "",
-      "reason": "",
-      "price": 82.16
+      "price": 127.81
     },
     {
       "date": "2026-08-21",
@@ -687,32 +657,42 @@
     {
       "date": "2026-08-21",
       "market": "us",
-      "symbol": "CMI",
-      "name": "Cummins Inc.",
+      "symbol": "QCOM",
+      "name": "QUALCOMM Incorporated",
       "verdict": "매수유지",
       "severity": "",
       "reason": "",
-      "price": 587.68
+      "price": 160.75
     },
     {
-      "date": "2026-09-04",
-      "market": "kr",
-      "symbol": "071320",
-      "name": "지역난방공사",
+      "date": "2026-08-21",
+      "market": "us",
+      "symbol": "SWKS",
+      "name": "Skyworks Solutions, Inc.",
       "verdict": "매수유지",
       "severity": "",
       "reason": "",
-      "price": 75600.0
+      "price": 67.14
     },
     {
-      "date": "2026-09-04",
-      "market": "kr",
-      "symbol": "015760",
-      "name": "한국전력",
-      "verdict": "제외",
-      "severity": "일시적",
-      "reason": "8/12 공시된 2분기 영업이익이 1조1286억원으로 시장 컨센서스(약 2조원) 대비 대폭 미달, 전년동기比 47.2% 감소한 어닝쇼크. 중동發 LNG가격 급등으로 발전자회사 연료비가 8177억원 늘어난 것이 주원인이며 상반기 누적 영업이익도 전년比 16.6% 감소.",
-      "price": 32150.0
+      "date": "2026-08-21",
+      "market": "us",
+      "symbol": "TTD",
+      "name": "The Trade Desk, Inc.",
+      "verdict": "매수유지",
+      "severity": "",
+      "reason": "",
+      "price": 13.18
+    },
+    {
+      "date": "2026-08-21",
+      "market": "us",
+      "symbol": "XYZ",
+      "name": "Block, Inc.",
+      "verdict": "매수유지",
+      "severity": "",
+      "reason": "",
+      "price": 82.16
     },
     {
       "date": "2026-09-04",
@@ -737,16 +717,6 @@
     {
       "date": "2026-09-04",
       "market": "kr",
-      "symbol": "138930",
-      "name": "BNK금융지주",
-      "verdict": "매수유지",
-      "severity": "",
-      "reason": "",
-      "price": 15390.0
-    },
-    {
-      "date": "2026-09-04",
-      "market": "kr",
       "symbol": "006040",
       "name": "동원산업",
       "verdict": "매수유지",
@@ -757,12 +727,42 @@
     {
       "date": "2026-09-04",
       "market": "kr",
+      "symbol": "015760",
+      "name": "한국전력",
+      "verdict": "제외",
+      "severity": "일시적",
+      "reason": "8/12 공시된 2분기 영업이익이 1조1286억원으로 시장 컨센서스(약 2조원) 대비 대폭 미달, 전년동기比 47.2% 감소한 어닝쇼크. 중동發 LNG가격 급등으로 발전자회사 연료비가 8177억원 늘어난 것이 주원인이며 상반기 누적 영업이익도 전년比 16.6% 감소.",
+      "price": 32150.0
+    },
+    {
+      "date": "2026-09-04",
+      "market": "kr",
       "symbol": "024110",
       "name": "기업은행",
       "verdict": "매수유지",
       "severity": "",
       "reason": "",
       "price": 20700.0
+    },
+    {
+      "date": "2026-09-04",
+      "market": "kr",
+      "symbol": "071320",
+      "name": "지역난방공사",
+      "verdict": "매수유지",
+      "severity": "",
+      "reason": "",
+      "price": 75600.0
+    },
+    {
+      "date": "2026-09-04",
+      "market": "kr",
+      "symbol": "138930",
+      "name": "BNK금융지주",
+      "verdict": "매수유지",
+      "severity": "",
+      "reason": "",
+      "price": 15390.0
     },
     {
       "date": "2026-09-04",
@@ -787,12 +787,22 @@
     {
       "date": "2026-09-04",
       "market": "us",
-      "symbol": "INCY",
-      "name": "Incyte Corporation",
+      "symbol": "BMY",
+      "name": "Bristol-Myers Squibb Company",
       "verdict": "매수유지",
       "severity": "",
       "reason": "",
-      "price": 126.75
+      "price": 66.82
+    },
+    {
+      "date": "2026-09-04",
+      "market": "us",
+      "symbol": "CMI",
+      "name": "Cummins Inc.",
+      "verdict": "매수유지",
+      "severity": "",
+      "reason": "",
+      "price": 560.75
     },
     {
       "date": "2026-09-04",
@@ -807,22 +817,12 @@
     {
       "date": "2026-09-04",
       "market": "us",
-      "symbol": "TTD",
-      "name": "The Trade Desk, Inc.",
-      "verdict": "제외",
-      "severity": "일시적",
-      "reason": "2Q 매출·EPS 컨센서스 하회(매출 -4.9%), 3Q 가이던스 전년비 -12% 시사, CFO·CMO·상업총괄 동시 교체, 9/3 인력 15% 감원 발표 — 자체 실적쇼크·가이던스 하향 확정",
-      "price": 14.43
-    },
-    {
-      "date": "2026-09-04",
-      "market": "us",
-      "symbol": "BMY",
-      "name": "Bristol-Myers Squibb Company",
+      "symbol": "INCY",
+      "name": "Incyte Corporation",
       "verdict": "매수유지",
       "severity": "",
       "reason": "",
-      "price": 66.82
+      "price": 126.75
     },
     {
       "date": "2026-09-04",
@@ -837,26 +837,6 @@
     {
       "date": "2026-09-04",
       "market": "us",
-      "symbol": "QCOM",
-      "name": "QUALCOMM Incorporated",
-      "verdict": "매수유지",
-      "severity": "",
-      "reason": "",
-      "price": 168.74
-    },
-    {
-      "date": "2026-09-04",
-      "market": "us",
-      "symbol": "XYZ",
-      "name": "Block, Inc.",
-      "verdict": "매수유지",
-      "severity": "",
-      "reason": "",
-      "price": 82.76
-    },
-    {
-      "date": "2026-09-04",
-      "market": "us",
       "symbol": "META",
       "name": "Meta Platforms, Inc.",
       "verdict": "매수유지",
@@ -867,12 +847,32 @@
     {
       "date": "2026-09-04",
       "market": "us",
-      "symbol": "CMI",
-      "name": "Cummins Inc.",
+      "symbol": "QCOM",
+      "name": "QUALCOMM Incorporated",
       "verdict": "매수유지",
       "severity": "",
       "reason": "",
-      "price": 560.75
+      "price": 168.74
+    },
+    {
+      "date": "2026-09-04",
+      "market": "us",
+      "symbol": "TTD",
+      "name": "The Trade Desk, Inc.",
+      "verdict": "제외",
+      "severity": "일시적",
+      "reason": "2Q 매출·EPS 컨센서스 하회(매출 -4.9%), 3Q 가이던스 전년비 -12% 시사, CFO·CMO·상업총괄 동시 교체, 9/3 인력 15% 감원 발표 — 자체 실적쇼크·가이던스 하향 확정",
+      "price": 14.43
+    },
+    {
+      "date": "2026-09-04",
+      "market": "us",
+      "symbol": "XYZ",
+      "name": "Block, Inc.",
+      "verdict": "매수유지",
+      "severity": "",
+      "reason": "",
+      "price": 82.76
     },
     {
       "date": "2026-09-10",
@@ -887,12 +887,22 @@
     {
       "date": "2026-09-10",
       "market": "us",
-      "symbol": "INCY",
-      "name": "Incyte Corporation",
+      "symbol": "BMY",
+      "name": "Bristol-Myers Squibb Company",
       "verdict": "매수유지",
       "severity": "",
       "reason": "",
-      "price": 125.99
+      "price": 64.25
+    },
+    {
+      "date": "2026-09-10",
+      "market": "us",
+      "symbol": "CMI",
+      "name": "Cummins Inc.",
+      "verdict": "매수유지",
+      "severity": "",
+      "reason": "",
+      "price": 550.68
     },
     {
       "date": "2026-09-10",
@@ -907,22 +917,12 @@
     {
       "date": "2026-09-10",
       "market": "us",
-      "symbol": "TTD",
-      "name": "The Trade Desk, Inc.",
-      "verdict": "제외",
-      "severity": "일시적",
-      "reason": "9/3 전 직원 약 15%(500명 이상) 감원 발표, 3900만~5100만달러 구조조정 비용, 직전 2Q 매출 +3%로 컨센 하회 — 자체 실적 부진·구조조정 확정(9/3).",
-      "price": 13.77
-    },
-    {
-      "date": "2026-09-10",
-      "market": "us",
-      "symbol": "BMY",
-      "name": "Bristol-Myers Squibb Company",
+      "symbol": "INCY",
+      "name": "Incyte Corporation",
       "verdict": "매수유지",
       "severity": "",
       "reason": "",
-      "price": 64.25
+      "price": 125.99
     },
     {
       "date": "2026-09-10",
@@ -937,26 +937,6 @@
     {
       "date": "2026-09-10",
       "market": "us",
-      "symbol": "QCOM",
-      "name": "QUALCOMM Incorporated",
-      "verdict": "매수유지",
-      "severity": "",
-      "reason": "",
-      "price": 172.32
-    },
-    {
-      "date": "2026-09-10",
-      "market": "us",
-      "symbol": "XYZ",
-      "name": "Block, Inc.",
-      "verdict": "매수유지",
-      "severity": "",
-      "reason": "",
-      "price": 78.67
-    },
-    {
-      "date": "2026-09-10",
-      "market": "us",
       "symbol": "META",
       "name": "Meta Platforms, Inc.",
       "verdict": "매수유지",
@@ -967,12 +947,32 @@
     {
       "date": "2026-09-10",
       "market": "us",
-      "symbol": "CMI",
-      "name": "Cummins Inc.",
+      "symbol": "QCOM",
+      "name": "QUALCOMM Incorporated",
       "verdict": "매수유지",
       "severity": "",
       "reason": "",
-      "price": 550.68
+      "price": 172.32
+    },
+    {
+      "date": "2026-09-10",
+      "market": "us",
+      "symbol": "TTD",
+      "name": "The Trade Desk, Inc.",
+      "verdict": "제외",
+      "severity": "일시적",
+      "reason": "9/3 전 직원 약 15%(500명 이상) 감원 발표, 3900만~5100만달러 구조조정 비용, 직전 2Q 매출 +3%로 컨센 하회 — 자체 실적 부진·구조조정 확정(9/3).",
+      "price": 13.77
+    },
+    {
+      "date": "2026-09-10",
+      "market": "us",
+      "symbol": "XYZ",
+      "name": "Block, Inc.",
+      "verdict": "매수유지",
+      "severity": "",
+      "reason": "",
+      "price": 78.67
     },
     {
       "date": "2026-09-11",
@@ -987,12 +987,22 @@
     {
       "date": "2026-09-11",
       "market": "us",
-      "symbol": "INCY",
-      "name": "Incyte Corporation",
+      "symbol": "BMY",
+      "name": "Bristol-Myers Squibb Company",
       "verdict": "매수유지",
       "severity": "",
       "reason": "",
-      "price": 122.49
+      "price": 63.46
+    },
+    {
+      "date": "2026-09-11",
+      "market": "us",
+      "symbol": "CMI",
+      "name": "Cummins Inc.",
+      "verdict": "매수유지",
+      "severity": "",
+      "reason": "",
+      "price": 556.42
     },
     {
       "date": "2026-09-11",
@@ -1007,22 +1017,12 @@
     {
       "date": "2026-09-11",
       "market": "us",
-      "symbol": "TTD",
-      "name": "The Trade Desk, Inc.",
-      "verdict": "제외",
-      "severity": "일시적",
-      "reason": "2Q 매출·EPS 컨센 하회(EPS 34c vs 40c), 9/3 인력 약 15% 감원 발표($39~51M 구조조정 비용)와 매출 급둔화 — 자체 실적쇼크·수요 둔화 확정",
-      "price": 14.2
-    },
-    {
-      "date": "2026-09-11",
-      "market": "us",
-      "symbol": "BMY",
-      "name": "Bristol-Myers Squibb Company",
+      "symbol": "INCY",
+      "name": "Incyte Corporation",
       "verdict": "매수유지",
       "severity": "",
       "reason": "",
-      "price": 63.46
+      "price": 122.49
     },
     {
       "date": "2026-09-11",
@@ -1037,26 +1037,6 @@
     {
       "date": "2026-09-11",
       "market": "us",
-      "symbol": "QCOM",
-      "name": "QUALCOMM Incorporated",
-      "verdict": "매수유지",
-      "severity": "",
-      "reason": "",
-      "price": 182.51
-    },
-    {
-      "date": "2026-09-11",
-      "market": "us",
-      "symbol": "XYZ",
-      "name": "Block, Inc.",
-      "verdict": "매수유지",
-      "severity": "",
-      "reason": "",
-      "price": 79.64
-    },
-    {
-      "date": "2026-09-11",
-      "market": "us",
       "symbol": "META",
       "name": "Meta Platforms, Inc.",
       "verdict": "매수유지",
@@ -1067,32 +1047,32 @@
     {
       "date": "2026-09-11",
       "market": "us",
-      "symbol": "CMI",
-      "name": "Cummins Inc.",
+      "symbol": "QCOM",
+      "name": "QUALCOMM Incorporated",
       "verdict": "매수유지",
       "severity": "",
       "reason": "",
-      "price": 556.42
+      "price": 182.51
     },
     {
-      "date": "2026-09-14",
-      "market": "kr",
-      "symbol": "071320",
-      "name": "지역난방공사",
-      "verdict": "매수유지",
-      "severity": "",
-      "reason": "",
-      "price": 74700.0
-    },
-    {
-      "date": "2026-09-14",
-      "market": "kr",
-      "symbol": "015760",
-      "name": "한국전력",
+      "date": "2026-09-11",
+      "market": "us",
+      "symbol": "TTD",
+      "name": "The Trade Desk, Inc.",
       "verdict": "제외",
       "severity": "일시적",
-      "reason": "KB증권 등 증권가는 LNG·석탄 연료비 상승 지속으로 2026·2027년 영업이익 전망을 각각 35.2%·27.3% 축소, 3분기도 연료비조정단가 kWh당 5원으로 2분기와 동일해 원가 부담 지속 확인.",
-      "price": 32300.0
+      "reason": "2Q 매출·EPS 컨센 하회(EPS 34c vs 40c), 9/3 인력 약 15% 감원 발표($39~51M 구조조정 비용)와 매출 급둔화 — 자체 실적쇼크·수요 둔화 확정",
+      "price": 14.2
+    },
+    {
+      "date": "2026-09-11",
+      "market": "us",
+      "symbol": "XYZ",
+      "name": "Block, Inc.",
+      "verdict": "매수유지",
+      "severity": "",
+      "reason": "",
+      "price": 79.64
     },
     {
       "date": "2026-09-14",
@@ -1127,6 +1107,16 @@
     {
       "date": "2026-09-14",
       "market": "kr",
+      "symbol": "015760",
+      "name": "한국전력",
+      "verdict": "제외",
+      "severity": "일시적",
+      "reason": "KB증권 등 증권가는 LNG·석탄 연료비 상승 지속으로 2026·2027년 영업이익 전망을 각각 35.2%·27.3% 축소, 3분기도 연료비조정단가 kWh당 5원으로 2분기와 동일해 원가 부담 지속 확인.",
+      "price": 32300.0
+    },
+    {
+      "date": "2026-09-14",
+      "market": "kr",
       "symbol": "024110",
       "name": "기업은행",
       "verdict": "매수유지",
@@ -1143,6 +1133,16 @@
       "severity": "",
       "reason": "",
       "price": 45200.0
+    },
+    {
+      "date": "2026-09-14",
+      "market": "kr",
+      "symbol": "071320",
+      "name": "지역난방공사",
+      "verdict": "매수유지",
+      "severity": "",
+      "reason": "",
+      "price": 74700.0
     },
     {
       "date": "2026-09-14",
@@ -1167,12 +1167,22 @@
     {
       "date": "2026-09-14",
       "market": "us",
-      "symbol": "INCY",
-      "name": "Incyte Corporation",
+      "symbol": "BMY",
+      "name": "Bristol-Myers Squibb Company",
       "verdict": "매수유지",
       "severity": "",
       "reason": "",
-      "price": 122.34
+      "price": 64.21
+    },
+    {
+      "date": "2026-09-14",
+      "market": "us",
+      "symbol": "CMI",
+      "name": "Cummins Inc.",
+      "verdict": "매수유지",
+      "severity": "",
+      "reason": "",
+      "price": 538.85
     },
     {
       "date": "2026-09-14",
@@ -1187,22 +1197,12 @@
     {
       "date": "2026-09-14",
       "market": "us",
-      "symbol": "TTD",
-      "name": "The Trade Desk, Inc.",
-      "verdict": "제외",
-      "severity": "일시적",
-      "reason": "9/3 인력 15% 감원, 2분기 EPS·매출 컨센서스 대폭 하회로 다수 애널리스트 목표가 급락(Guggenheim, HSBC, MoffettNathanson 등) — 전일 판정과 동일 사실, 변동 없음",
-      "price": 14.68
-    },
-    {
-      "date": "2026-09-14",
-      "market": "us",
-      "symbol": "BMY",
-      "name": "Bristol-Myers Squibb Company",
+      "symbol": "INCY",
+      "name": "Incyte Corporation",
       "verdict": "매수유지",
       "severity": "",
       "reason": "",
-      "price": 64.21
+      "price": 122.34
     },
     {
       "date": "2026-09-14",
@@ -1217,26 +1217,6 @@
     {
       "date": "2026-09-14",
       "market": "us",
-      "symbol": "QCOM",
-      "name": "QUALCOMM Incorporated",
-      "verdict": "매수유지",
-      "severity": "",
-      "reason": "",
-      "price": 177.34
-    },
-    {
-      "date": "2026-09-14",
-      "market": "us",
-      "symbol": "XYZ",
-      "name": "Block, Inc.",
-      "verdict": "매수유지",
-      "severity": "",
-      "reason": "",
-      "price": 79.56
-    },
-    {
-      "date": "2026-09-14",
-      "market": "us",
       "symbol": "META",
       "name": "Meta Platforms, Inc.",
       "verdict": "매수유지",
@@ -1247,12 +1227,32 @@
     {
       "date": "2026-09-14",
       "market": "us",
-      "symbol": "CMI",
-      "name": "Cummins Inc.",
+      "symbol": "QCOM",
+      "name": "QUALCOMM Incorporated",
       "verdict": "매수유지",
       "severity": "",
       "reason": "",
-      "price": 538.85
+      "price": 177.34
+    },
+    {
+      "date": "2026-09-14",
+      "market": "us",
+      "symbol": "TTD",
+      "name": "The Trade Desk, Inc.",
+      "verdict": "제외",
+      "severity": "일시적",
+      "reason": "9/3 인력 15% 감원, 2분기 EPS·매출 컨센서스 대폭 하회로 다수 애널리스트 목표가 급락(Guggenheim, HSBC, MoffettNathanson 등) — 전일 판정과 동일 사실, 변동 없음",
+      "price": 14.68
+    },
+    {
+      "date": "2026-09-14",
+      "market": "us",
+      "symbol": "XYZ",
+      "name": "Block, Inc.",
+      "verdict": "매수유지",
+      "severity": "",
+      "reason": "",
+      "price": 79.56
     },
     {
       "date": "2026-09-15",
@@ -1267,12 +1267,22 @@
     {
       "date": "2026-09-15",
       "market": "us",
-      "symbol": "INCY",
-      "name": "Incyte Corporation",
+      "symbol": "BMY",
+      "name": "Bristol-Myers Squibb Company",
       "verdict": "매수유지",
       "severity": "",
       "reason": "",
-      "price": 120.5
+      "price": 63.5
+    },
+    {
+      "date": "2026-09-15",
+      "market": "us",
+      "symbol": "CMI",
+      "name": "Cummins Inc.",
+      "verdict": "매수유지",
+      "severity": "",
+      "reason": "",
+      "price": 533.74
     },
     {
       "date": "2026-09-15",
@@ -1287,22 +1297,12 @@
     {
       "date": "2026-09-15",
       "market": "us",
-      "symbol": "TTD",
-      "name": "The Trade Desk, Inc.",
-      "verdict": "제외",
-      "severity": "일시적",
-      "reason": "9/3 인력 약15% 감원·직전분기 실적 부진(전일 판정과 동일 사유)에 더해 S&P500 편출(9/21 발효) 추가 확인.",
-      "price": 14.86
-    },
-    {
-      "date": "2026-09-15",
-      "market": "us",
-      "symbol": "BMY",
-      "name": "Bristol-Myers Squibb Company",
+      "symbol": "INCY",
+      "name": "Incyte Corporation",
       "verdict": "매수유지",
       "severity": "",
       "reason": "",
-      "price": 63.5
+      "price": 120.5
     },
     {
       "date": "2026-09-15",
@@ -1317,26 +1317,6 @@
     {
       "date": "2026-09-15",
       "market": "us",
-      "symbol": "QCOM",
-      "name": "QUALCOMM Incorporated",
-      "verdict": "매수유지",
-      "severity": "",
-      "reason": "",
-      "price": 186.72
-    },
-    {
-      "date": "2026-09-15",
-      "market": "us",
-      "symbol": "XYZ",
-      "name": "Block, Inc.",
-      "verdict": "매수유지",
-      "severity": "",
-      "reason": "",
-      "price": 78.29
-    },
-    {
-      "date": "2026-09-15",
-      "market": "us",
       "symbol": "META",
       "name": "Meta Platforms, Inc.",
       "verdict": "매수유지",
@@ -1347,32 +1327,32 @@
     {
       "date": "2026-09-15",
       "market": "us",
-      "symbol": "CMI",
-      "name": "Cummins Inc.",
+      "symbol": "QCOM",
+      "name": "QUALCOMM Incorporated",
       "verdict": "매수유지",
       "severity": "",
       "reason": "",
-      "price": 533.74
+      "price": 186.72
     },
     {
-      "date": "2026-09-16",
-      "market": "kr",
-      "symbol": "071320",
-      "name": "지역난방공사",
-      "verdict": "매수유지",
-      "severity": "",
-      "reason": "",
-      "price": 74200.0
-    },
-    {
-      "date": "2026-09-16",
-      "market": "kr",
-      "symbol": "015760",
-      "name": "한국전력",
+      "date": "2026-09-15",
+      "market": "us",
+      "symbol": "TTD",
+      "name": "The Trade Desk, Inc.",
       "verdict": "제외",
       "severity": "일시적",
-      "reason": "2Q26 영업이익 전년 대비 -47.16%(매출 219,188억원, 영업이익 11,285억원), 3Q 연료비조정단가도 2분기와 동일한 kWh당 5원 유지로 원가 부담 지속 확인.",
-      "price": 31200.0
+      "reason": "9/3 인력 약15% 감원·직전분기 실적 부진(전일 판정과 동일 사유)에 더해 S&P500 편출(9/21 발효) 추가 확인.",
+      "price": 14.86
+    },
+    {
+      "date": "2026-09-15",
+      "market": "us",
+      "symbol": "XYZ",
+      "name": "Block, Inc.",
+      "verdict": "매수유지",
+      "severity": "",
+      "reason": "",
+      "price": 78.29
     },
     {
       "date": "2026-09-16",
@@ -1387,6 +1367,16 @@
     {
       "date": "2026-09-16",
       "market": "kr",
+      "symbol": "003030",
+      "name": "세아제강지주",
+      "verdict": "매수유지",
+      "severity": "",
+      "reason": "",
+      "price": 105800.0
+    },
+    {
+      "date": "2026-09-16",
+      "market": "kr",
       "symbol": "006040",
       "name": "동원산업",
       "verdict": "매수유지",
@@ -1397,12 +1387,12 @@
     {
       "date": "2026-09-16",
       "market": "kr",
-      "symbol": "003030",
-      "name": "세아제강지주",
-      "verdict": "매수유지",
-      "severity": "",
-      "reason": "",
-      "price": 105800.0
+      "symbol": "015760",
+      "name": "한국전력",
+      "verdict": "제외",
+      "severity": "일시적",
+      "reason": "2Q26 영업이익 전년 대비 -47.16%(매출 219,188억원, 영업이익 11,285억원), 3Q 연료비조정단가도 2분기와 동일한 kWh당 5원 유지로 원가 부담 지속 확인.",
+      "price": 31200.0
     },
     {
       "date": "2026-09-16",
@@ -1427,6 +1417,16 @@
     {
       "date": "2026-09-16",
       "market": "kr",
+      "symbol": "071320",
+      "name": "지역난방공사",
+      "verdict": "매수유지",
+      "severity": "",
+      "reason": "",
+      "price": 74200.0
+    },
+    {
+      "date": "2026-09-16",
+      "market": "kr",
       "symbol": "139480",
       "name": "이마트",
       "verdict": "매수유지",
@@ -1447,12 +1447,22 @@
     {
       "date": "2026-09-16",
       "market": "us",
-      "symbol": "INCY",
-      "name": "Incyte Corporation",
+      "symbol": "BMY",
+      "name": "Bristol-Myers Squibb Company",
       "verdict": "매수유지",
       "severity": "",
       "reason": "",
-      "price": 122.9
+      "price": 63.94
+    },
+    {
+      "date": "2026-09-16",
+      "market": "us",
+      "symbol": "CMI",
+      "name": "Cummins Inc.",
+      "verdict": "매수유지",
+      "severity": "",
+      "reason": "",
+      "price": 534.36
     },
     {
       "date": "2026-09-16",
@@ -1467,22 +1477,12 @@
     {
       "date": "2026-09-16",
       "market": "us",
-      "symbol": "TTD",
-      "name": "The Trade Desk, Inc.",
-      "verdict": "제외",
-      "severity": "일시적",
-      "reason": "9/3 인력 15% 감원 및 2분기 실적 컨센서스 대폭 하회 지속, 자체 펀더멘털 개선 근거 없음",
-      "price": 14.89
-    },
-    {
-      "date": "2026-09-16",
-      "market": "us",
-      "symbol": "BMY",
-      "name": "Bristol-Myers Squibb Company",
+      "symbol": "INCY",
+      "name": "Incyte Corporation",
       "verdict": "매수유지",
       "severity": "",
       "reason": "",
-      "price": 63.94
+      "price": 122.9
     },
     {
       "date": "2026-09-16",
@@ -1497,26 +1497,6 @@
     {
       "date": "2026-09-16",
       "market": "us",
-      "symbol": "QCOM",
-      "name": "QUALCOMM Incorporated",
-      "verdict": "매수유지",
-      "severity": "",
-      "reason": "",
-      "price": 189.37
-    },
-    {
-      "date": "2026-09-16",
-      "market": "us",
-      "symbol": "XYZ",
-      "name": "Block, Inc.",
-      "verdict": "매수유지",
-      "severity": "",
-      "reason": "",
-      "price": 78.25
-    },
-    {
-      "date": "2026-09-16",
-      "market": "us",
       "symbol": "META",
       "name": "Meta Platforms, Inc.",
       "verdict": "매수유지",
@@ -1527,32 +1507,32 @@
     {
       "date": "2026-09-16",
       "market": "us",
-      "symbol": "CMI",
-      "name": "Cummins Inc.",
+      "symbol": "QCOM",
+      "name": "QUALCOMM Incorporated",
       "verdict": "매수유지",
       "severity": "",
       "reason": "",
-      "price": 534.36
+      "price": 189.37
     },
     {
-      "date": "2026-09-17",
-      "market": "kr",
-      "symbol": "071320",
-      "name": "지역난방공사",
-      "verdict": "매수유지",
-      "severity": "",
-      "reason": "",
-      "price": 74700.0
-    },
-    {
-      "date": "2026-09-17",
-      "market": "kr",
-      "symbol": "015760",
-      "name": "한국전력",
+      "date": "2026-09-16",
+      "market": "us",
+      "symbol": "TTD",
+      "name": "The Trade Desk, Inc.",
       "verdict": "제외",
       "severity": "일시적",
-      "reason": "3분기 전기요금 동결로 연료비조정단가 +5원 유지, 국제 에너지가 상승에 원가부담 지속되며 2026·2027 영업이익 전망 축소.",
-      "price": 30950.0
+      "reason": "9/3 인력 15% 감원 및 2분기 실적 컨센서스 대폭 하회 지속, 자체 펀더멘털 개선 근거 없음",
+      "price": 14.89
+    },
+    {
+      "date": "2026-09-16",
+      "market": "us",
+      "symbol": "XYZ",
+      "name": "Block, Inc.",
+      "verdict": "매수유지",
+      "severity": "",
+      "reason": "",
+      "price": 78.25
     },
     {
       "date": "2026-09-17",
@@ -1567,6 +1547,16 @@
     {
       "date": "2026-09-17",
       "market": "kr",
+      "symbol": "003030",
+      "name": "세아제강지주",
+      "verdict": "매수유지",
+      "severity": "",
+      "reason": "",
+      "price": 105400.0
+    },
+    {
+      "date": "2026-09-17",
+      "market": "kr",
       "symbol": "006040",
       "name": "동원산업",
       "verdict": "매수유지",
@@ -1577,12 +1567,12 @@
     {
       "date": "2026-09-17",
       "market": "kr",
-      "symbol": "003030",
-      "name": "세아제강지주",
-      "verdict": "매수유지",
-      "severity": "",
-      "reason": "",
-      "price": 105400.0
+      "symbol": "015760",
+      "name": "한국전력",
+      "verdict": "제외",
+      "severity": "일시적",
+      "reason": "3분기 전기요금 동결로 연료비조정단가 +5원 유지, 국제 에너지가 상승에 원가부담 지속되며 2026·2027 영업이익 전망 축소.",
+      "price": 30950.0
     },
     {
       "date": "2026-09-17",
@@ -1607,32 +1597,22 @@
     {
       "date": "2026-09-17",
       "market": "kr",
+      "symbol": "071320",
+      "name": "지역난방공사",
+      "verdict": "매수유지",
+      "severity": "",
+      "reason": "",
+      "price": 74700.0
+    },
+    {
+      "date": "2026-09-17",
+      "market": "kr",
       "symbol": "138930",
       "name": "BNK금융지주",
       "verdict": "매수유지",
       "severity": "",
       "reason": "",
       "price": 15770.0
-    },
-    {
-      "date": "2026-09-18",
-      "market": "kr",
-      "symbol": "071320",
-      "name": "지역난방공사",
-      "verdict": "매수유지",
-      "severity": "",
-      "reason": "",
-      "price": 74900.0
-    },
-    {
-      "date": "2026-09-18",
-      "market": "kr",
-      "symbol": "015760",
-      "name": "한국전력",
-      "verdict": "제외",
-      "severity": "일시적",
-      "reason": "3분기 전기요금 연료비조정단가 kWh당 5원 동결이 재확인되어 2Q 영업이익 -47% 부진에 이어 원가 부담이 지속되는 상태(전날 판정과 동일 사실).",
-      "price": 31000.0
     },
     {
       "date": "2026-09-18",
@@ -1647,6 +1627,16 @@
     {
       "date": "2026-09-18",
       "market": "kr",
+      "symbol": "003030",
+      "name": "세아제강지주",
+      "verdict": "매수유지",
+      "severity": "",
+      "reason": "",
+      "price": 105100.0
+    },
+    {
+      "date": "2026-09-18",
+      "market": "kr",
       "symbol": "006040",
       "name": "동원산업",
       "verdict": "매수유지",
@@ -1657,12 +1647,12 @@
     {
       "date": "2026-09-18",
       "market": "kr",
-      "symbol": "003030",
-      "name": "세아제강지주",
-      "verdict": "매수유지",
-      "severity": "",
-      "reason": "",
-      "price": 105100.0
+      "symbol": "015760",
+      "name": "한국전력",
+      "verdict": "제외",
+      "severity": "일시적",
+      "reason": "3분기 전기요금 연료비조정단가 kWh당 5원 동결이 재확인되어 2Q 영업이익 -47% 부진에 이어 원가 부담이 지속되는 상태(전날 판정과 동일 사실).",
+      "price": 31000.0
     },
     {
       "date": "2026-09-18",
@@ -1687,6 +1677,16 @@
     {
       "date": "2026-09-18",
       "market": "kr",
+      "symbol": "071320",
+      "name": "지역난방공사",
+      "verdict": "매수유지",
+      "severity": "",
+      "reason": "",
+      "price": 74900.0
+    },
+    {
+      "date": "2026-09-18",
+      "market": "kr",
       "symbol": "138930",
       "name": "BNK금융지주",
       "verdict": "매수유지",
@@ -1707,62 +1707,12 @@
     {
       "date": "2026-09-21",
       "market": "us",
-      "symbol": "INCY",
-      "name": "Incyte Corporation",
-      "verdict": "매수유지",
-      "severity": "",
-      "reason": "",
-      "price": 124.65
-    },
-    {
-      "date": "2026-09-21",
-      "market": "us",
       "symbol": "BMY",
       "name": "Bristol-Myers Squibb Company",
       "verdict": "매수유지",
       "severity": "",
       "reason": "",
       "price": 62.62
-    },
-    {
-      "date": "2026-09-21",
-      "market": "us",
-      "symbol": "KLAC",
-      "name": "KLA Corporation",
-      "verdict": "매수유지",
-      "severity": "",
-      "reason": "",
-      "price": 183.97
-    },
-    {
-      "date": "2026-09-21",
-      "market": "us",
-      "symbol": "GM",
-      "name": "General Motors Company",
-      "verdict": "매수유지",
-      "severity": "",
-      "reason": "",
-      "price": 83.95
-    },
-    {
-      "date": "2026-09-21",
-      "market": "us",
-      "symbol": "XYZ",
-      "name": "Block, Inc.",
-      "verdict": "매수유지",
-      "severity": "",
-      "reason": "",
-      "price": 77.91
-    },
-    {
-      "date": "2026-09-21",
-      "market": "us",
-      "symbol": "SWKS",
-      "name": "Skyworks Solutions, Inc.",
-      "verdict": "매수유지",
-      "severity": "",
-      "reason": "",
-      "price": 88.74
     },
     {
       "date": "2026-09-21",
@@ -1777,12 +1727,52 @@
     {
       "date": "2026-09-21",
       "market": "us",
+      "symbol": "GM",
+      "name": "General Motors Company",
+      "verdict": "매수유지",
+      "severity": "",
+      "reason": "",
+      "price": 83.95
+    },
+    {
+      "date": "2026-09-21",
+      "market": "us",
+      "symbol": "INCY",
+      "name": "Incyte Corporation",
+      "verdict": "매수유지",
+      "severity": "",
+      "reason": "",
+      "price": 124.65
+    },
+    {
+      "date": "2026-09-21",
+      "market": "us",
+      "symbol": "KLAC",
+      "name": "KLA Corporation",
+      "verdict": "매수유지",
+      "severity": "",
+      "reason": "",
+      "price": 183.97
+    },
+    {
+      "date": "2026-09-21",
+      "market": "us",
       "symbol": "META",
       "name": "Meta Platforms, Inc.",
       "verdict": "매수유지",
       "severity": "",
       "reason": "",
       "price": 741.25
+    },
+    {
+      "date": "2026-09-21",
+      "market": "us",
+      "symbol": "SWKS",
+      "name": "Skyworks Solutions, Inc.",
+      "verdict": "매수유지",
+      "severity": "",
+      "reason": "",
+      "price": 88.74
     },
     {
       "date": "2026-09-21",
@@ -1795,24 +1785,94 @@
       "price": 79.41
     },
     {
-      "date": "2026-09-23",
-      "market": "kr",
-      "symbol": "071320",
-      "name": "지역난방공사",
+      "date": "2026-09-21",
+      "market": "us",
+      "symbol": "XYZ",
+      "name": "Block, Inc.",
       "verdict": "매수유지",
       "severity": "",
       "reason": "",
-      "price": 78800.0
+      "price": 77.91
     },
     {
-      "date": "2026-09-23",
+      "date": "2026-09-22",
+      "market": "kr",
+      "symbol": "002380",
+      "name": "KCC",
+      "verdict": "매수유지",
+      "severity": "",
+      "reason": "",
+      "price": 467500.0
+    },
+    {
+      "date": "2026-09-22",
+      "market": "kr",
+      "symbol": "003030",
+      "name": "세아제강지주",
+      "verdict": "매수유지",
+      "severity": "",
+      "reason": "",
+      "price": 107500.0
+    },
+    {
+      "date": "2026-09-22",
+      "market": "kr",
+      "symbol": "006040",
+      "name": "동원산업",
+      "verdict": "매수유지",
+      "severity": "",
+      "reason": "",
+      "price": 35200.0
+    },
+    {
+      "date": "2026-09-22",
       "market": "kr",
       "symbol": "015760",
       "name": "한국전력",
       "verdict": "제외",
       "severity": "일시적",
       "reason": "3분기 전기요금 연료비조정단가 kWh당 5원 동결이 재확인되어 원가 부담이 지속되는 상태(전날과 동일 사실 유지).",
-      "price": 30650.0
+      "price": 30850.0
+    },
+    {
+      "date": "2026-09-22",
+      "market": "kr",
+      "symbol": "024110",
+      "name": "기업은행",
+      "verdict": "매수유지",
+      "severity": "",
+      "reason": "",
+      "price": 20000.0
+    },
+    {
+      "date": "2026-09-22",
+      "market": "kr",
+      "symbol": "029780",
+      "name": "삼성카드",
+      "verdict": "제외",
+      "severity": "일시적",
+      "reason": "카드업계 1위 순익에도 이익 상당분이 최대주주 삼성생명으로 귀속되고 자사주 소각이 유보되는 등 주주환원 기대를 저버리는 지배구조 이슈(전날과 동일 사실 유지).",
+      "price": 42850.0
+    },
+    {
+      "date": "2026-09-22",
+      "market": "kr",
+      "symbol": "138930",
+      "name": "BNK금융지주",
+      "verdict": "매수유지",
+      "severity": "",
+      "reason": "",
+      "price": 15630.0
+    },
+    {
+      "date": "2026-09-22",
+      "market": "kr",
+      "symbol": "139480",
+      "name": "이마트",
+      "verdict": "제외",
+      "severity": "일시적",
+      "reason": "8/14 보도: 자회사 신세계건설의 미분양 대손충당금 여파로 2분기 연결 영업손실 430억원 적자전환, 하나증권 투자의견 매수→중립·목표가 11만→8.2만원 하향. 한국신용평가도 잔여 공사대금·우발채무로 추가 손실 가능성을 배제하지 않는다고 경고.",
+      "price": 72700.0
     },
     {
       "date": "2026-09-23",
@@ -1822,7 +1882,17 @@
       "verdict": "매수유지",
       "severity": "",
       "reason": "",
-      "price": 478000.0
+      "price": 475500.0
+    },
+    {
+      "date": "2026-09-23",
+      "market": "kr",
+      "symbol": "003030",
+      "name": "세아제강지주",
+      "verdict": "매수유지",
+      "severity": "",
+      "reason": "",
+      "price": 105000.0
     },
     {
       "date": "2026-09-23",
@@ -1837,22 +1907,12 @@
     {
       "date": "2026-09-23",
       "market": "kr",
-      "symbol": "003030",
-      "name": "세아제강지주",
-      "verdict": "매수유지",
-      "severity": "",
-      "reason": "",
-      "price": 103900.0
-    },
-    {
-      "date": "2026-09-23",
-      "market": "kr",
-      "symbol": "029780",
-      "name": "삼성카드",
+      "symbol": "015760",
+      "name": "한국전력",
       "verdict": "제외",
       "severity": "일시적",
-      "reason": "카드업계 1위 순익에도 이익 상당분이 최대주주 삼성생명으로 귀속되고 자사주 소각이 유보되는 등 주주환원 기대를 저버리는 지배구조 이슈(전날과 동일 사실 유지).",
-      "price": 43050.0
+      "reason": "3분기 전기요금 연료비조정단가 kWh당 5원 동결이 재확인되어 원가 부담이 지속되는 상태(전날과 동일 사실 유지).",
+      "price": 30550.0
     },
     {
       "date": "2026-09-23",
@@ -1863,6 +1923,36 @@
       "severity": "",
       "reason": "",
       "price": 20450.0
+    },
+    {
+      "date": "2026-09-23",
+      "market": "kr",
+      "symbol": "029780",
+      "name": "삼성카드",
+      "verdict": "제외",
+      "severity": "일시적",
+      "reason": "카드업계 1위 순익에도 이익 상당분이 최대주주 삼성생명으로 귀속되고 자사주 소각이 유보되는 등 주주환원 기대를 저버리는 지배구조 이슈(전날과 동일 사실 유지).",
+      "price": 43150.0
+    },
+    {
+      "date": "2026-09-23",
+      "market": "kr",
+      "symbol": "071320",
+      "name": "지역난방공사",
+      "verdict": "매수유지",
+      "severity": "",
+      "reason": "",
+      "price": 78800.0
+    },
+    {
+      "date": "2026-09-23",
+      "market": "kr",
+      "symbol": "138930",
+      "name": "BNK금융지주",
+      "verdict": "매수유지",
+      "severity": "",
+      "reason": "",
+      "price": 16260.0
     },
     {
       "date": "2026-09-23",

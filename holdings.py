@@ -51,7 +51,11 @@ MA200_BACKUP = os.environ.get("SELL_MA200_BACKUP", "0") == "1"
 # "state_gated"(기본, 안전) = 매수 시 이미 버퍼 아래면 면제, 이후 버퍼 위로 한 번 회복해야
 # 재이탈 시 매도. "unconditional" = 예전 무조건 규칙(버그 재현용, 쓰지 말 것).
 MA_STOP_MODE = os.environ.get("SELL_MA_STOP_MODE", "state_gated")
-REEVAL_DAYS = int(os.environ.get("SELL_REEVAL_DAYS", "180"))  # ≈6개월(달력일) — 검증된 보유기간
+REEVAL_DAYS = int(os.environ.get("SELL_REEVAL_DAYS", "180"))  # 미국 ≈6개월(달력일) — 검증된 보유기간
+# 2026-09-23(지호 님 반영 — kr_rebal_freq_with_cap.py 백테스트, cap=6 반영 후 재검증):
+# 한국은 3개월이 6개월보다 연환산 순초과수익이 뚜렷이 높다(+7.78%p vs +3.76%p, n=39·비용조정
+# 포함). 미국은 반대로 보유기간이 길수록 유리한 추세라 180일 유지(us_rebal_freq_with_floor.py).
+KR_REEVAL_DAYS = int(os.environ.get("KR_SELL_REEVAL_DAYS", "90"))   # ≈3개월(달력일)
 # 2026-07-26(지호 님 지적 — "보유현황 수익률에 예전에 사고 판 것도 포함되는거지?"): 아니었다.
 # update()/remove_excluded()는 매도 종목을 state에서 지우기만 하고 어디에도 남기지 않아,
 # live_summary()/portfolio_series() 기반의 '전체 투입자산 기준' 수익률은 항상 "지금 보유 중인
@@ -143,9 +147,11 @@ def update(state: dict, buy_now_syms: list, ind_map: dict, today: str, pool_syms
         elif TRAIL > 0 and h.get("peak") and price <= h["peak"] * (1 - TRAIL):
             drop = (price / h["peak"] - 1) * 100
             reason = f"고점 대비 {drop:.0f}% 하락 (트레일링 -{int(TRAIL*100)}%)"
-        elif (pool_syms is not None and held_days is not None and held_days >= REEVAL_DAYS
+        elif (pool_syms is not None and held_days is not None
+              and held_days >= (KR_REEVAL_DAYS if market == "KR" else REEVAL_DAYS)
               and sym not in pool_syms):
-            reason = (f"6개월 정기 재평가 — 보유 {held_days}일 경과, 현재 팩터 후보풀 밖 "
+            reeval_days = KR_REEVAL_DAYS if market == "KR" else REEVAL_DAYS
+            reason = (f"정기 재평가({reeval_days}일) — 보유 {held_days}일 경과, 현재 팩터 후보풀 밖 "
                       f"(검증된 보유기간 종료 후 순환매)")
         if reason:
             ret = ((price / h["entry_price"] - 1) * 100) if h.get("entry_price") else None
