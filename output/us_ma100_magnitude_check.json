@@ -1,0 +1,18 @@
+{
+  "n_snaps": 34,
+  "ic_gap_magnitude_within_above_ma100": {
+    "mean_spearman": 0.1734,
+    "t_stat": 2.542,
+    "n_snaps": 26
+  },
+  "walkforward_deep_above_vs_above": {
+    "n_events": 8,
+    "above_ma100_topn_mean_excess_pct": 7.409,
+    "above_ma100_topn_win_rate_pct": 75.0,
+    "deep_above_only_mean_excess_pct": 6.629,
+    "deep_above_only_win_rate_pct": 62.5,
+    "paired_diff_mean_pct": -0.78,
+    "paired_t_stat": -0.258
+  },
+  "method": "100일선 위 후보군에서만(양음 효과 제거) 이격도 크기와 forward 초과수익의 순위상관 — '정도'만 따로 검정. 워크포워드는 확장윈도우(미래정보 유출 없음)로 이격도 상위 절반만 추가로 걸렀을 때 실제 개선되는지 재확인."
+}

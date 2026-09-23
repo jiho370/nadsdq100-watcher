@@ -1,0 +1,35 @@
+{
+  "n_events": 24,
+  "min_history": 10,
+  "bonus_table": {
+    "ma150_gap": [
+      0.0,
+      0.2,
+      0.4,
+      0.6,
+      0.5
+    ],
+    "ma200_gap": [
+      0.0,
+      0.1,
+      0.1,
+      0.5,
+      0.4
+    ],
+    "ret_3m": [
+      0.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0
+    ]
+  },
+  "method": "확장윈도우 워크포워드 — 각 시점의 분위구간 경계는 그 이전 스냅샷들의 풀링 데이터로만 계산(미래정보 유출 없음). 가점표 숫자 자체는 지호 님이 전체표본 버킷곡선을 보고 지정한 값이라 그 선택 자체엔 사전 정보가 섞여있음 — 완전한 사전등록은 아니지만, 분위 경계 계산은 매 시점 정직하게 그 시점까지의 데이터만 사용.",
+  "baseline_mean_excess_pct": 9.97,
+  "baseline_win_rate_pct": 83.3,
+  "bonus_mean_excess_pct": 9.948,
+  "bonus_win_rate_pct": 87.5,
+  "paired_diff_mean_pct": -0.021,
+  "paired_t_stat": -0.024,
+  "n_wins_bonus_over_baseline": 9
+}

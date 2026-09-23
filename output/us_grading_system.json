@@ -1,0 +1,297 @@
+{
+  "n_snaps": 34,
+  "topn": 8,
+  "floor": 3.25,
+  "n_trials": 16,
+  "method": "floor=3.25 이상 후보군에서 10개 독립조건(추세5+수익률4+점수위치1)을 단독/그룹으로 필터해 종합점수 topN을 재선정 — 같은 점수 반쪼개기가 아니라 실제로 다르게 설계될 수 있었던 후보 전략들이라 PBO/DSR 다중검정 보정이 유효함.",
+  "summary": [
+    {
+      "label": "baseline_floor_topn",
+      "n_events": 24,
+      "mean_excess_pct": 9.317,
+      "win_rate_pct": 83.3
+    },
+    {
+      "label": "cond_score_top",
+      "n_events": 24,
+      "mean_excess_pct": 9.317,
+      "win_rate_pct": 83.3
+    },
+    {
+      "label": "cond_ma20",
+      "n_events": 24,
+      "mean_excess_pct": 9.655,
+      "win_rate_pct": 83.3
+    },
+    {
+      "label": "cond_ma50",
+      "n_events": 24,
+      "mean_excess_pct": 9.399,
+      "win_rate_pct": 87.5
+    },
+    {
+      "label": "cond_ma100",
+      "n_events": 24,
+      "mean_excess_pct": 10.129,
+      "win_rate_pct": 91.7
+    },
+    {
+      "label": "cond_ma150",
+      "n_events": 24,
+      "mean_excess_pct": 8.888,
+      "win_rate_pct": 87.5
+    },
+    {
+      "label": "cond_ma200",
+      "n_events": 24,
+      "mean_excess_pct": 9.216,
+      "win_rate_pct": 87.5
+    },
+    {
+      "label": "cond_ret_1m_pos",
+      "n_events": 24,
+      "mean_excess_pct": 9.498,
+      "win_rate_pct": 87.5
+    },
+    {
+      "label": "cond_ret_3m_pos",
+      "n_events": 24,
+      "mean_excess_pct": 9.899,
+      "win_rate_pct": 91.7
+    },
+    {
+      "label": "cond_ret_6m_pos",
+      "n_events": 24,
+      "mean_excess_pct": 7.282,
+      "win_rate_pct": 83.3
+    },
+    {
+      "label": "cond_rev1m",
+      "n_events": 24,
+      "mean_excess_pct": 8.417,
+      "win_rate_pct": 66.7
+    },
+    {
+      "label": "grade_trend_half",
+      "n_events": 24,
+      "mean_excess_pct": 9.442,
+      "win_rate_pct": 87.5
+    },
+    {
+      "label": "grade_trend_high",
+      "n_events": 24,
+      "mean_excess_pct": 9.611,
+      "win_rate_pct": 87.5
+    },
+    {
+      "label": "grade_ret_half",
+      "n_events": 24,
+      "mean_excess_pct": 9.003,
+      "win_rate_pct": 83.3
+    },
+    {
+      "label": "grade_ret_all",
+      "n_events": 24,
+      "mean_excess_pct": 8.867,
+      "win_rate_pct": 91.7
+    },
+    {
+      "label": "grade_all_half",
+      "n_events": 24,
+      "mean_excess_pct": 9.132,
+      "win_rate_pct": 87.5
+    }
+  ],
+  "paired_vs_baseline": [
+    {
+      "label": "cond_score_top",
+      "mean_diff_pct": 0.0,
+      "t_stat": null,
+      "n": 24
+    },
+    {
+      "label": "cond_ma20",
+      "mean_diff_pct": 0.338,
+      "t_stat": 0.214,
+      "n": 24
+    },
+    {
+      "label": "cond_ma50",
+      "mean_diff_pct": 0.081,
+      "t_stat": 0.081,
+      "n": 24
+    },
+    {
+      "label": "cond_ma100",
+      "mean_diff_pct": 0.812,
+      "t_stat": 0.659,
+      "n": 24
+    },
+    {
+      "label": "cond_ma150",
+      "mean_diff_pct": -0.43,
+      "t_stat": -0.37,
+      "n": 24
+    },
+    {
+      "label": "cond_ma200",
+      "mean_diff_pct": -0.101,
+      "t_stat": -0.076,
+      "n": 24
+    },
+    {
+      "label": "cond_ret_1m_pos",
+      "mean_diff_pct": 0.18,
+      "t_stat": 0.166,
+      "n": 24
+    },
+    {
+      "label": "cond_ret_3m_pos",
+      "mean_diff_pct": 0.582,
+      "t_stat": 0.347,
+      "n": 24
+    },
+    {
+      "label": "cond_ret_6m_pos",
+      "mean_diff_pct": -2.036,
+      "t_stat": -1.311,
+      "n": 24
+    },
+    {
+      "label": "cond_rev1m",
+      "mean_diff_pct": -0.9,
+      "t_stat": -0.429,
+      "n": 24
+    },
+    {
+      "label": "grade_trend_half",
+      "mean_diff_pct": 0.125,
+      "t_stat": 0.132,
+      "n": 24
+    },
+    {
+      "label": "grade_trend_high",
+      "mean_diff_pct": 0.294,
+      "t_stat": 0.241,
+      "n": 24
+    },
+    {
+      "label": "grade_ret_half",
+      "mean_diff_pct": -0.315,
+      "t_stat": -0.25,
+      "n": 24
+    },
+    {
+      "label": "grade_ret_all",
+      "mean_diff_pct": -0.451,
+      "t_stat": -0.321,
+      "n": 24
+    },
+    {
+      "label": "grade_all_half",
+      "mean_diff_pct": -0.186,
+      "t_stat": -0.165,
+      "n": 24
+    }
+  ],
+  "ic": {
+    "score_top": {
+      "mean_spearman": 0.1155,
+      "t_stat": 3.529,
+      "n_snaps": 24
+    },
+    "ma20": {
+      "mean_spearman": 0.095,
+      "t_stat": 1.938,
+      "n_snaps": 23
+    },
+    "ma50": {
+      "mean_spearman": 0.0881,
+      "t_stat": 1.484,
+      "n_snaps": 23
+    },
+    "ma100": {
+      "mean_spearman": 0.075,
+      "t_stat": 1.433,
+      "n_snaps": 24
+    },
+    "ma150": {
+      "mean_spearman": 0.0737,
+      "t_stat": 1.329,
+      "n_snaps": 24
+    },
+    "ma200": {
+      "mean_spearman": 0.0719,
+      "t_stat": 1.101,
+      "n_snaps": 23
+    },
+    "ret_1m_pos": {
+      "mean_spearman": 0.0749,
+      "t_stat": 1.664,
+      "n_snaps": 24
+    },
+    "ret_3m_pos": {
+      "mean_spearman": 0.0743,
+      "t_stat": 1.458,
+      "n_snaps": 24
+    },
+    "ret_6m_pos": {
+      "mean_spearman": 0.0645,
+      "t_stat": 1.152,
+      "n_snaps": 24
+    },
+    "rev1m": {
+      "mean_spearman": -0.0423,
+      "t_stat": -0.796,
+      "n_snaps": 24
+    }
+  },
+  "pbo_dsr": {
+    "input": {
+      "horizon": "6m",
+      "universe": "US_floor_top8",
+      "cost": "gross(이벤트 평균)"
+    },
+    "n_trials": 16,
+    "n_events": 24,
+    "pbo": {
+      "pbo": 0.5824,
+      "embargo": 1,
+      "purged_events_total": 5544,
+      "n_combos": 862,
+      "n_blocks": 12,
+      "lambda_mean": 0.0272,
+      "is_sharpe_mean": 1.4059,
+      "oos_sharpe_mean": 1.2499,
+      "degradation_slope": -0.8942,
+      "prob_oos_loss": 0.0267
+    },
+    "pbo_verdict": "높음(IS 1등이 운일 확률 높음 — 채택 보류 권장)",
+    "dsr": {
+      "sr": 1.1236,
+      "sr0": 0.2634,
+      "dsr": 0.9955,
+      "dsr_uncorrected": 0.9999,
+      "skew": 0.173,
+      "kurtosis": 2.223,
+      "T": 24,
+      "T_eff": 12,
+      "N": 16,
+      "best_trial": "cond_ma100"
+    },
+    "dsr_verdict": "95% 신뢰수준 통과",
+    "passed": false,
+    "references": [
+      "Bailey et al. 2017 (PBO/CSCV)",
+      "Bailey & López de Prado 2014 (DSR)"
+    ],
+    "note": "조합 간 상관으로 N이 과대계상될 수 있어 DSR은 보수적(실제보다 낮게) 추정됨."
+  },
+  "monte_carlo_baseline": {
+    "observed_sharpe_order_invariant": 1.0885,
+    "observed_mdd_pct": -15.17,
+    "n_permutations": 1000,
+    "pct_permutations_with_mdd_at_least_as_bad": 0.2,
+    "note": "수익률 평균·샤프는 순서를 섞어도 안 변한다 — 이 검정은 순서가 낙폭(MDD) 패턴에 미치는 영향만 본다. 실제 순서의 MDD가 무작위 순서 대부분보다 덜 나쁘면(비율 낮음) 손실 시점이 시간적으로 잘 분산됐다는 뜻, 비율이 높으면(예: 50%+) 실제 순서가 무작위와 다를 바 없다는 뜻."
+  }
+}
