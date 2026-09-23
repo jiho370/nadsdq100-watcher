@@ -176,6 +176,37 @@ def analyze(data: dict, n_blocks=12, save=True):
     return report
 
 
+# ------------------------- 몬테카를로 순열검정(경로의존성) -------------------------
+def _mdd(arr: np.ndarray) -> float:
+    curve = np.cumprod(1.0 + arr)
+    peak = np.maximum.accumulate(curve)
+    return float((curve / peak - 1.0).min())
+
+
+def monte_carlo_test(returns, n: int = 1000, seed: int | None = None) -> dict:
+    """경로의존성 검정(HKUDS/Vibe-Trading agent/backtest/validation.py::monte_carlo_test
+    설계 차용, 2026-09-23) — PBO(조합 간 과최적화)·DSR(다중검정 보정)과는 다른 축을 본다.
+    주의: 평균·샤프는 이벤트 순서를 바꿔도 불변이라(합·표준편차는 순서 무관) 그 자체로는
+    순열검정 대상이 못 된다 — 순서가 실제로 영향을 주는 낙폭(MDD, 경로의존적 지표)을
+    검정 대상으로 쓴다. 실제 이벤트 순서로 만든 자본곡선의 MDD가, 같은 수익률들을
+    무작위로 섞은 자본곡선들의 MDD 분포에서 어디쯤인지를 본다."""
+    x = np.asarray(returns, dtype=float)
+    if len(x) < 4:
+        return {"note": "표본 부족(4개 미만) — 순열검정 생략"}
+    rng = np.random.default_rng(seed)
+    observed_mdd = _mdd(x)
+    perm_mdd = np.array([_mdd(rng.permutation(x)) for _ in range(n)])
+    pct_as_bad_or_worse = float((perm_mdd <= observed_mdd).mean())
+    return {"observed_sharpe_order_invariant": round(_sharpe(x), 4),
+           "observed_mdd_pct": round(100 * observed_mdd, 2),
+           "n_permutations": n,
+           "pct_permutations_with_mdd_at_least_as_bad": round(100 * pct_as_bad_or_worse, 1),
+           "note": ("수익률 평균·샤프는 순서를 섞어도 안 변한다 — 이 검정은 순서가 낙폭(MDD) "
+                   "패턴에 미치는 영향만 본다. 실제 순서의 MDD가 무작위 순서 대부분보다 "
+                   "덜 나쁘면(비율 낮음) 손실 시점이 시간적으로 잘 분산됐다는 뜻, 비율이 "
+                   "높으면(예: 50%+) 실제 순서가 무작위와 다를 바 없다는 뜻.")}
+
+
 # ------------------------- self-test -------------------------
 def self_test():
     """순수 노이즈 vs 진짜 알파 시나리오에서 PBO/DSR 방향성 점검(시드 5개 평균 —
