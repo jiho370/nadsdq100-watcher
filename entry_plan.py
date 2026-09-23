@@ -169,8 +169,10 @@ def plan_text(plan: dict) -> str:
     krw = plan.get("krw", False)
     parts = [f'{t["label"]} {_fmt(t["price"], krw)} {t["pct"]}%({t["basis"]})'
              for t in plan.get("tranches", [])]
+    # 2026-09-24: stop.price가 없으면(가격 개입 규칙 비활성 — 기본값) "손절"을 안 붙인다
+    # (ai_report._plan_table과 동일 조치 — 가짜 가격 트리거처럼 보이지 않게).
     stop = plan.get("stop") or {}
-    if stop:
+    if stop.get("price") is not None:
         parts.append(f'손절 {_fmt(stop.get("price"), krw)}({stop.get("basis")})')
     return " → ".join(parts)
 

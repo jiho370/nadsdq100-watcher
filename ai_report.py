@@ -890,11 +890,17 @@ def _plan_table(plan: dict, comment: str = ""):
         f'<td style="padding:2px 8px">{t["pct"]}%</td>'
         f'<td style="padding:2px 8px;color:#6b7280">{_esc(t["basis"])}</td></tr>'
         for t in plan["tranches"])
+    # 2026-09-24(지호 님 지적 — "매수계획 폐기해야지"): stop은 MA200_BACKUP=1이거나 TRAIL>0일
+    # 때만 실제 가격을 담고(entry_plan.buy_plan 참고), 둘 다 기본 비활성인 지금은 항상
+    # {"price": None, "basis": "6개월 후 정기 재평가 시 판단"}이 온다. 예전엔 그래도 "손절"
+    # 행을 빨간색·"전량"으로 그려서 마치 활성 가격 트리거가 있는 것처럼 보였다 — 실제 가격이
+    # 있을 때만(=정말로 가격 개입 규칙이 켜져 있을 때만) 이 행을 그린다.
     stop = plan.get("stop") or {}
     stop_row = (f'<tr><td style="padding:2px 8px;color:#b91c1c">손절</td>'
                 f'<td style="padding:2px 8px;font-weight:700;color:#b91c1c">{EP._fmt(stop.get("price"), krw)}</td>'
                 f'<td style="padding:2px 8px;color:#b91c1c">전량</td>'
-                f'<td style="padding:2px 8px;color:#b91c1c">{_esc(stop.get("basis"))}</td></tr>') if stop else ""
+                f'<td style="padding:2px 8px;color:#b91c1c">{_esc(stop.get("basis"))}</td></tr>'
+               if stop.get("price") is not None else "")
     note = (f'<div style="font-size:11px;color:#6b7280;margin-top:2px">{_esc(plan.get("note"))}</div>'
             if plan.get("note") else "")
     cmt = (f'<div style="font-size:12px;color:#1d4ed8;margin-top:3px">💬 {_esc(comment)}</div>'
