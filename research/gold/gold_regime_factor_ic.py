@@ -38,16 +38,16 @@ gold_regime_factor_ic.py — 금 배분타이밍 레짐신호 보완1: 팩터별
     대신 단순(iid) 부트스트랩을 씀 — 잔여 자기상관을 다소 과소평가할 수 있음
     (한계로 명시).
 
-실행: python gold_regime_factor_ic.py            # output/gold_regime_factor_ic.json
-      python gold_regime_factor_ic.py --self-test
+실행: python -m research.gold.gold_regime_factor_ic            # output/gold_regime_factor_ic.json
+      python -m research.gold.gold_regime_factor_ic --self-test
 """
 from __future__ import annotations
 import os, sys, json, argparse
 import numpy as np
 import pandas as pd
 
-from gold_regime_data import load_or_build
-from gold_regime_signal import DEFAULT_CORR_THRESHOLD
+from research.gold.gold_regime_data import load_or_build
+from research.gold.gold_regime_signal import DEFAULT_CORR_THRESHOLD
 
 OUTPUT_PATH = "output/gold_regime_factor_ic.json"
 BLOCK_BY_HORIZON = {"4w": 8, "12w": 16}   # 각 horizon의 2배 — 겹치는 선행수익률 자기상관 커버

@@ -1,0 +1,523 @@
+{
+  "factor_ic": [
+    {
+      "factor": "gold_consensus",
+      "horizon": "4w",
+      "era": "전체",
+      "n": 1179,
+      "ic": 0.0309,
+      "ic_ci90": [
+        -0.0519,
+        0.1181
+      ],
+      "significant": false
+    },
+    {
+      "factor": "gold_consensus",
+      "horizon": "4w",
+      "era": "2022이전",
+      "n": 940,
+      "ic": 0.0068,
+      "ic_ci90": [
+        -0.0885,
+        0.1035
+      ],
+      "significant": false
+    },
+    {
+      "factor": "gold_consensus",
+      "horizon": "4w",
+      "era": "2022이후",
+      "n": 239,
+      "ic": 0.0563,
+      "ic_ci90": [
+        -0.1676,
+        0.2926
+      ],
+      "significant": false
+    },
+    {
+      "factor": "dxy_consensus",
+      "horizon": "4w",
+      "era": "전체",
+      "n": 1179,
+      "ic": 0.0382,
+      "ic_ci90": [
+        -0.0437,
+        0.1149
+      ],
+      "significant": false
+    },
+    {
+      "factor": "dxy_consensus",
+      "horizon": "4w",
+      "era": "2022이전",
+      "n": 940,
+      "ic": 0.0498,
+      "ic_ci90": [
+        -0.0417,
+        0.1425
+      ],
+      "significant": false
+    },
+    {
+      "factor": "dxy_consensus",
+      "horizon": "4w",
+      "era": "2022이후",
+      "n": 239,
+      "ic": -0.0292,
+      "ic_ci90": [
+        -0.2348,
+        0.1675
+      ],
+      "significant": false
+    },
+    {
+      "factor": "realrate_consensus",
+      "horizon": "4w",
+      "era": "전체",
+      "n": 1179,
+      "ic": 0.0443,
+      "ic_ci90": [
+        -0.0431,
+        0.1232
+      ],
+      "significant": false
+    },
+    {
+      "factor": "realrate_consensus",
+      "horizon": "4w",
+      "era": "2022이전",
+      "n": 940,
+      "ic": 0.0483,
+      "ic_ci90": [
+        -0.0368,
+        0.1453
+      ],
+      "significant": false
+    },
+    {
+      "factor": "realrate_consensus",
+      "horizon": "4w",
+      "era": "2022이후",
+      "n": 239,
+      "ic": -0.1003,
+      "ic_ci90": [
+        -0.3103,
+        0.1166
+      ],
+      "significant": false
+    },
+    {
+      "factor": "ief_sync",
+      "horizon": "4w",
+      "era": "전체",
+      "n": 1179,
+      "ic": 0.0542,
+      "ic_ci90": [
+        -0.0232,
+        0.1347
+      ],
+      "significant": false
+    },
+    {
+      "factor": "ief_sync",
+      "horizon": "4w",
+      "era": "2022이전",
+      "n": 940,
+      "ic": 0.0189,
+      "ic_ci90": [
+        -0.0698,
+        0.1074
+      ],
+      "significant": false
+    },
+    {
+      "factor": "ief_sync",
+      "horizon": "4w",
+      "era": "2022이후",
+      "n": 239,
+      "ic": 0.1715,
+      "ic_ci90": [
+        -0.0293,
+        0.3584
+      ],
+      "significant": false
+    },
+    {
+      "factor": "gold_consensus",
+      "horizon": "12w",
+      "era": "전체",
+      "n": 1171,
+      "ic": 0.0865,
+      "ic_ci90": [
+        -0.0424,
+        0.1995
+      ],
+      "significant": false
+    },
+    {
+      "factor": "gold_consensus",
+      "horizon": "12w",
+      "era": "2022이전",
+      "n": 940,
+      "ic": 0.0506,
+      "ic_ci90": [
+        -0.0834,
+        0.1751
+      ],
+      "significant": false
+    },
+    {
+      "factor": "gold_consensus",
+      "horizon": "12w",
+      "era": "2022이후",
+      "n": 231,
+      "ic": 0.1497,
+      "ic_ci90": [
+        -0.1705,
+        0.3849
+      ],
+      "significant": false
+    },
+    {
+      "factor": "dxy_consensus",
+      "horizon": "12w",
+      "era": "전체",
+      "n": 1171,
+      "ic": 0.1058,
+      "ic_ci90": [
+        -0.0242,
+        0.2422
+      ],
+      "significant": false
+    },
+    {
+      "factor": "dxy_consensus",
+      "horizon": "12w",
+      "era": "2022이전",
+      "n": 940,
+      "ic": 0.1289,
+      "ic_ci90": [
+        -0.0033,
+        0.2609
+      ],
+      "significant": false
+    },
+    {
+      "factor": "dxy_consensus",
+      "horizon": "12w",
+      "era": "2022이후",
+      "n": 231,
+      "ic": 0.016,
+      "ic_ci90": [
+        -0.3163,
+        0.3792
+      ],
+      "significant": false
+    },
+    {
+      "factor": "realrate_consensus",
+      "horizon": "12w",
+      "era": "전체",
+      "n": 1171,
+      "ic": 0.0896,
+      "ic_ci90": [
+        -0.0382,
+        0.2183
+      ],
+      "significant": false
+    },
+    {
+      "factor": "realrate_consensus",
+      "horizon": "12w",
+      "era": "2022이전",
+      "n": 940,
+      "ic": 0.106,
+      "ic_ci90": [
+        -0.0367,
+        0.2489
+      ],
+      "significant": false
+    },
+    {
+      "factor": "realrate_consensus",
+      "horizon": "12w",
+      "era": "2022이후",
+      "n": 231,
+      "ic": -0.186,
+      "ic_ci90": [
+        -0.5008,
+        0.1042
+      ],
+      "significant": false
+    },
+    {
+      "factor": "ief_sync",
+      "horizon": "12w",
+      "era": "전체",
+      "n": 1171,
+      "ic": 0.0637,
+      "ic_ci90": [
+        -0.06,
+        0.1851
+      ],
+      "significant": false
+    },
+    {
+      "factor": "ief_sync",
+      "horizon": "12w",
+      "era": "2022이전",
+      "n": 940,
+      "ic": 0.0191,
+      "ic_ci90": [
+        -0.1055,
+        0.1442
+      ],
+      "significant": false
+    },
+    {
+      "factor": "ief_sync",
+      "horizon": "12w",
+      "era": "2022이후",
+      "n": 231,
+      "ic": 0.2234,
+      "ic_ci90": [
+        -0.1255,
+        0.4876
+      ],
+      "significant": false
+    }
+  ],
+  "adoption_verdict": [
+    {
+      "factor": "dxy_consensus",
+      "validated": false,
+      "checks": [
+        {
+          "horizon": "4w",
+          "era": "전체",
+          "significant": false,
+          "ic": 0.0382
+        },
+        {
+          "horizon": "4w",
+          "era": "2022이전",
+          "significant": false,
+          "ic": 0.0498
+        },
+        {
+          "horizon": "12w",
+          "era": "전체",
+          "significant": false,
+          "ic": 0.1058
+        },
+        {
+          "horizon": "12w",
+          "era": "2022이전",
+          "significant": false,
+          "ic": 0.1289
+        }
+      ],
+      "post2022_reference": [
+        {
+          "horizon": "4w",
+          "ic": -0.0292,
+          "significant": false
+        },
+        {
+          "horizon": "12w",
+          "ic": 0.016,
+          "significant": false
+        }
+      ]
+    },
+    {
+      "factor": "gold_consensus",
+      "validated": false,
+      "checks": [
+        {
+          "horizon": "4w",
+          "era": "전체",
+          "significant": false,
+          "ic": 0.0309
+        },
+        {
+          "horizon": "4w",
+          "era": "2022이전",
+          "significant": false,
+          "ic": 0.0068
+        },
+        {
+          "horizon": "12w",
+          "era": "전체",
+          "significant": false,
+          "ic": 0.0865
+        },
+        {
+          "horizon": "12w",
+          "era": "2022이전",
+          "significant": false,
+          "ic": 0.0506
+        }
+      ],
+      "post2022_reference": [
+        {
+          "horizon": "4w",
+          "ic": 0.0563,
+          "significant": false
+        },
+        {
+          "horizon": "12w",
+          "ic": 0.1497,
+          "significant": false
+        }
+      ]
+    },
+    {
+      "factor": "ief_sync",
+      "validated": false,
+      "checks": [
+        {
+          "horizon": "4w",
+          "era": "전체",
+          "significant": false,
+          "ic": 0.0542
+        },
+        {
+          "horizon": "4w",
+          "era": "2022이전",
+          "significant": false,
+          "ic": 0.0189
+        },
+        {
+          "horizon": "12w",
+          "era": "전체",
+          "significant": false,
+          "ic": 0.0637
+        },
+        {
+          "horizon": "12w",
+          "era": "2022이전",
+          "significant": false,
+          "ic": 0.0191
+        }
+      ],
+      "post2022_reference": [
+        {
+          "horizon": "4w",
+          "ic": 0.1715,
+          "significant": false
+        },
+        {
+          "horizon": "12w",
+          "ic": 0.2234,
+          "significant": false
+        }
+      ]
+    },
+    {
+      "factor": "realrate_consensus",
+      "validated": false,
+      "checks": [
+        {
+          "horizon": "4w",
+          "era": "전체",
+          "significant": false,
+          "ic": 0.0443
+        },
+        {
+          "horizon": "4w",
+          "era": "2022이전",
+          "significant": false,
+          "ic": 0.0483
+        },
+        {
+          "horizon": "12w",
+          "era": "전체",
+          "significant": false,
+          "ic": 0.0896
+        },
+        {
+          "horizon": "12w",
+          "era": "2022이전",
+          "significant": false,
+          "ic": 0.106
+        }
+      ],
+      "post2022_reference": [
+        {
+          "horizon": "4w",
+          "ic": -0.1003,
+          "significant": false
+        },
+        {
+          "horizon": "12w",
+          "ic": -0.186,
+          "significant": false
+        }
+      ]
+    }
+  ],
+  "corr_gate_conditional_ic": [
+    {
+      "factor": "dxy_consensus",
+      "corr_state": "살아있음",
+      "n": 797,
+      "ic": 0.1114,
+      "ic_ci90": [
+        0.0539,
+        0.1741
+      ],
+      "significant": true,
+      "note": "단순(iid) 부트스트랩 — non-contiguous 부분집합이라 잔여 자기상관 과소평가 가능성 있음"
+    },
+    {
+      "factor": "dxy_consensus",
+      "corr_state": "죽음",
+      "n": 374,
+      "ic": 0.0952,
+      "ic_ci90": [
+        0.0106,
+        0.1729
+      ],
+      "significant": true,
+      "note": "단순(iid) 부트스트랩 — non-contiguous 부분집합이라 잔여 자기상관 과소평가 가능성 있음"
+    },
+    {
+      "factor": "realrate_consensus",
+      "corr_state": "살아있음",
+      "n": 359,
+      "ic": 0.1358,
+      "ic_ci90": [
+        0.0485,
+        0.2211
+      ],
+      "significant": true,
+      "note": "단순(iid) 부트스트랩 — non-contiguous 부분집합이라 잔여 자기상관 과소평가 가능성 있음"
+    },
+    {
+      "factor": "realrate_consensus",
+      "corr_state": "죽음",
+      "n": 812,
+      "ic": 0.0764,
+      "ic_ci90": [
+        0.016,
+        0.1369
+      ],
+      "significant": true,
+      "note": "단순(iid) 부트스트랩 — non-contiguous 부분집합이라 잔여 자기상관 과소평가 가능성 있음"
+    }
+  ],
+  "horizons": {
+    "4w": 4,
+    "12w": 12
+  },
+  "block_by_horizon": {
+    "4w": 8,
+    "12w": 16
+  },
+  "era_split": "2022-01-01",
+  "n_boot": 2000,
+  "adoption_criterion": "전체기간+2022이전 구간에서 4주·12주 모두 유의(90%CI가 0 제외)+부호일관 — 2022이후는 참고용, 채택기준 아님"
+}
