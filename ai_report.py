@@ -675,6 +675,10 @@ def build_report(groups: dict, market: dict, pregen: dict | None = None) -> dict
         out = {
             "market_overview": pick("market_overview"), "macro": pick("macro"),
             "signal_note": pick("signal_note"), "risks": risks_text,
+            # 2026-09-24(ChatGPT 리뷰로 발견 — "AI가 확인" 문구랑 "AI 검증 생략" 문구가 동시에
+            # 뜨는 모순): 여기 도달했다는 건 verify_stage/pregen 중 하나로 실제 검증이 됐다는
+            # 뜻 — us_note의 "최신 뉴스·리스크는 AI가 추가로 확인합니다" 문장을 이 값으로 켠다.
+            "ai_verified": True,
             "buy_now": [_mk_item(c, "buy", vmap, wmap) for c in fb],
             "watch": [_mk_item(c, "watch", vmap, wmap) for c in fw],
             "kr_buy": [_mk_item(c, "buy", vmap, wmap) for c in kfb],
@@ -841,6 +845,7 @@ def deterministic_report(groups: dict, market: dict) -> dict:
     sells = (groups.get("sells") or []) + (groups.get("kr_sells") or [])
     return {"market_overview": mo, "macro": "", "signal_note": "",
             "risks": "지표 기반 자동본(AI 검증 생략). 투자 권유 아님.",
+            "ai_verified": False,   # 2026-09-24: us_note의 "AI가 확인" 문구를 여기 맞춰 끈다
             "buy_now": [item(c, "buy") for c in (groups.get("buy_now") or [])[:FINAL_BUY]],
             "watch": [item(c, "watch") for c in (groups.get("watch") or [])[:FINAL_WATCH]],
             "kr_buy": [item(c, "buy") for c in (groups.get("kr_buy") or [])[:KR_FINAL_BUY]],
@@ -1150,12 +1155,17 @@ def render_report_html(report, as_of="", metrics_by_sym=None, market_html="", si
             + (kr_buy_cards or '<div style="font-size:12px;color:#6b7280">해당 없음</div>')
             + ('<h3 style="margin:18px 0 2px">&#127472;&#127479; 코스피200 관찰 · 내려오면 매수</h3>' + kr_watch_cards if kr_watch_cards else ""))
     # 미국 섹션도 (한국처럼) 카드가 있을 때만 — KR 전용 메일에서 빈 헤더 방지
+    # 2026-09-24(ChatGPT 리뷰로 발견): "최신 뉴스·리스크는 AI가 추가로 확인합니다"를 무조건
+    # 박아두면, AI 검증이 생략된 실행(GitHub Actions 기본 AI_ENABLED=0 등— 드물지 않음)에서
+    # 맨 아래 "AI 검증 생략" 고지와 한 리포트 안에서 서로 모순되게 보였다. report에 실려오는
+    # ai_verified(build_report=True/deterministic_report=False)로 그 문장만 켜고 끈다.
+    ai_note = "최신 뉴스·리스크는 AI가 추가로 확인합니다." if report.get("ai_verified") else \
+             "최신 뉴스·리스크 확인은 이번엔 생략됐습니다(아래 고지 참고)."
     us_note = (
         '<div style="font-size:12px;color:#374151;background:#f8fafc;border-radius:6px;'
         'padding:6px 9px;margin:2px 0 8px;line-height:1.5">퀄리티·주주환원 팩터(자산 대비 '
         '수익성·연구개발 집약도·자사주매입 등 계량 지표) 점수 상위 종목입니다. 과최적화 '
-        '위험(PBO)과 통계적 유의성(DSR) 검증을 통과한 가중치로 순위를 매기고, 최신 뉴스·'
-        '리스크는 AI가 추가로 확인합니다.</div>')
+        f'위험(PBO)과 통계적 유의성(DSR) 검증을 통과한 가중치로 순위를 매기고, {ai_note}</div>')
     us_sec = ""
     if buy_cards or watch_cards:
         us_sec = (
