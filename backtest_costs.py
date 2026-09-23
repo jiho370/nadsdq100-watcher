@@ -27,7 +27,7 @@ backtest_costs.py — STRATEGY_UPGRADE_PROPOSAL.md 6장 로드맵 1~2단계.
       output/trial_returns.json         (조합별 이벤트 수익률 행렬 — overfit_stats.py 입력)
 """
 from __future__ import annotations
-import os, re, sys, json, csv, time, argparse, bisect, warnings
+import os, re, sys, json, csv, argparse, bisect, warnings
 import numpy as np
 import pandas as pd
 
@@ -154,30 +154,13 @@ def pit_union(pit, start_iso: str) -> list[str]:
 
 
 # ------------------------- 패널 구축 (PIT 합집합 유니버스) -------------------------
-def _purge_yf_cache():
-    """yfinance는 조회 실패 티커를 로컬 캐시(tkr-tz.db)에 저장해, 첫 실행에서
-    rate-limit로 실패한 멀쩡한 티커(예: MMC, CTRA)를 이후 실행에서 재조회 없이
-    '상장폐지'로 처리한다. 재시도 전에 캐시를 삭제해 재조회를 강제한다(자동 재생성됨)."""
-    import shutil
-    cands = []
-    try:
-        import appdirs
-        cands.append(os.path.join(appdirs.user_cache_dir(), "py-yfinance"))
-    except Exception:
-        pass
-    home = os.path.expanduser("~")
-    cands += [os.path.join(home, ".cache", "py-yfinance"),
-              os.path.join(os.environ.get("LOCALAPPDATA", ""), "py-yfinance")]
-    for d in dict.fromkeys(cands):
-        if d and os.path.isdir(d):
-            try:
-                shutil.rmtree(d)
-                _log(f"[PIT] yfinance 실패-캐시 삭제: {d}")
-            except Exception:
-                pass
-
-
 def build_panel_pit(years, pit):
+    """시세 수집은 market_data.py(캐시·영구실패목록·stooq 폴백)에 위임 — 2026-09-23
+    이전엔 여기서 매번 yfinance 자체 실패-캐시를 통째로 지우고 15초 대기 후 재시도했는데
+    그래도 반복 재빌드 시 커버리지가 607/703→108/703까지 무너지는 사고가 여러 번
+    있었다. 이제 download_histories() 안에서 확정구간은 로컬에 캐시로 유지하고 최근만
+    재확인하므로, 첫 성공 이후의 재빌드는 대부분 캐시에서 나와 이 문제 자체가 줄어든다
+    — 수동 퍼지+슬립+재시도 로직은 필요 없어져 제거."""
     import sp500_daily_report as R
     R._require_yf()
     start = (pd.Timestamp.today() - pd.DateOffset(years=int(years))).date().isoformat()
@@ -190,16 +173,6 @@ def build_panel_pit(years, pit):
          f"(재사용-접미사 티커 {n_suf}개 제외 — 야후에 없음)…")
     hist = R.download_histories(universe, period=f"{int(years)}y")
     panel = pd.DataFrame({s: c for s, c in hist.items() if c is not None and len(c)}).sort_index()
-    missing = [s for s in universe if s not in panel.columns]
-    if missing:                                    # 야후 대량요청 rate-limit 오탐 구제(1회 재시도)
-        _purge_yf_cache()                          # 실패가 로컬 캐시에 박제되는 것 방지
-        _log(f"[PIT] 실패 {len(missing)}종목 15초 후 재시도(rate-limit 오탐 구제)…")
-        time.sleep(15)
-        hist2 = R.download_histories(missing, period=f"{int(years)}y")
-        add = {s: c for s, c in (hist2 or {}).items() if c is not None and len(c)}
-        if add:
-            panel = pd.concat([panel, pd.DataFrame(add)], axis=1).sort_index()
-            _log(f"[PIT] 재시도로 {len(add)}종목 추가 확보: {sorted(add)}")
     spy = R.download_histories(["SPY"], period=f"{int(years)}y").get("SPY")
     opens = None
     try:

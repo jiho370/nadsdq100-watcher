@@ -58,25 +58,18 @@ def _log(m): print(f"[레짐백테스트] {m}", file=sys.stderr)
 
 
 # ------------------------- 데이터 -------------------------
-def fetch(ticker: str, cache_path: str, max_stale_days: int = 5) -> pd.Series:
-    """캐시가 있으면 재사용하되, 마지막 데이터가 max_stale_days일(달력일) 이상 지났으면
-    재다운로드한다. (2026-08-22 재검증: 캐시가 무기한 재사용돼 gold/btc/eth 등 여러 자산이
-    5주 넘게 stale한 채로 '검증'되고 있었음이 발견됨 — 무조건 재다운로드는 비용이 크니
-    작은 여유(주말·휴장 감안 5일)만 허용.)"""
-    if os.path.exists(cache_path):
-        s = pd.read_pickle(cache_path)
-        stale_days = (pd.Timestamp.now().normalize() - s.index.max().normalize()).days
-        if stale_days <= max_stale_days:
-            _log(f"{ticker}: 캐시 사용({cache_path}, {len(s)}일, 최신 {s.index.max().date()})")
-            return s
-        _log(f"{ticker}: 캐시 stale(최신 {s.index.max().date()}, {stale_days}일 경과) — 재다운로드")
-    import yfinance as yf
-    df = yf.download(ticker, period="max", auto_adjust=True, interval="1d", progress=False)
-    s = df["Close"][ticker] if isinstance(df.columns, pd.MultiIndex) else df["Close"]
-    s = s.dropna()
-    os.makedirs("output", exist_ok=True)
-    s.to_pickle(cache_path)
-    _log(f"{ticker}: 신규 다운로드({s.index.min().date()}~{s.index.max().date()}, {len(s)}일)")
+def fetch(ticker: str, cache_path: str = None, max_stale_days: int = 5) -> pd.Series:
+    """시세 수집·캐시는 sp500_daily_report.download_histories()에 위임(공용 캐시
+    계층 — market_data.py, 2026-09-23) — 예전엔 이 파일이 자체 stale-check 캐시를
+    따로 들고 있었는데(2026-08-22 추가), 이제 공용 계층이 확정구간 캐시+최근 자동
+    재확인을 다 해주므로 중복 로직을 없앴다. cache_path/max_stale_days는 20여 개
+    기존 호출부(research/legacy_cost_30bp 등)와의 호환을 위해 인자만 받고 쓰지 않는다
+    (공용 계층은 티커 단위로 자체 캐시 경로를 관리함)."""
+    import sp500_daily_report as R
+    s = R.download_histories([ticker], period="max").get(ticker)
+    if s is None or s.empty:
+        raise RuntimeError(f"{ticker}: 시세 조회 실패")
+    _log(f"{ticker}: {s.index.min().date()}~{s.index.max().date()}, {len(s)}일")
     return s
 
 
@@ -296,7 +289,7 @@ def pbo_gate(closes: np.ndarray, grid: dict, cost_bps: float, month=21, n_blocks
 # ------------------------- 실행 -------------------------
 def run_asset(name: str, ticker: str, current: dict, grid: dict, mom_current: str, mom_grid: list,
              cost_bps: float, do_bootstrap=True, do_eth_check=False) -> dict:
-    closes = fetch(ticker, f"output/regime_price_cache_{name}.pkl").to_numpy()
+    closes = fetch(ticker).to_numpy()
     stage1 = run_stage1(closes, grid, current, cost_bps, name)
     payload = {"asset": name, "ticker": ticker, "n_days": len(closes),
               "date_range": None, "stage1": stage1, "current_params": current}
@@ -333,7 +326,7 @@ def main():
     btc = run_asset("btc", "BTC-USD", BTC_CURRENT, BTC_GRID, BTC_MOM_CURRENT, BTC_MOM_GRID,
                     COST_BPS["btc"], do_bootstrap=True)
     # BTC 반기 분할(2014-19 / 2020-) — Fable 5 §2 요구
-    closes_btc = fetch("BTC-USD", "output/regime_price_cache_btc.pkl")
+    closes_btc = fetch("BTC-USD")
     split_date = "2020-01-01"
     half1 = closes_btc[closes_btc.index < split_date].to_numpy()
     half2 = closes_btc[closes_btc.index >= split_date].to_numpy()
@@ -347,7 +340,7 @@ def main():
             "2020_now":  {"score": composite_score(m2), "ulcer": round(m2["ulcer"], 2), "cagr": round(m2["cagr"], 2)}}
         # ETH-USD 확인용(전용 튜닝 없이 BTC 최우수 파라미터 그대로 적용)
         try:
-            eth_closes = fetch("ETH-USD", "output/regime_price_cache_eth.pkl").to_numpy()
+            eth_closes = fetch("ETH-USD").to_numpy()
             m_eth = simulate(eth_closes, regime_series(eth_closes, **bp), COST_BPS["btc"])
             m_eth_cur = simulate(eth_closes, regime_series(eth_closes, **BTC_CURRENT), COST_BPS["btc"])
             btc["eth_confirmatory_check"] = {

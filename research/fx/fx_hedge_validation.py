@@ -55,17 +55,9 @@ def _is_fresh(path: str, max_stale_days: int = 5) -> bool:
 
 
 def fetch_spy() -> pd.Series:
-    path = "output/regime_price_cache_spy_hedge.pkl"
-    if _is_fresh(path):
-        return pd.read_pickle(path)
-    import yfinance as yf
-    df = yf.download("SPY", period="max", auto_adjust=True, interval="1d", progress=False)
-    s = df["Close"]
-    s = s.iloc[:, 0] if hasattr(s, "columns") else s
-    s = s.dropna()
-    os.makedirs("output", exist_ok=True)
-    s.to_pickle(path)
-    return s
+    """야후 시세는 공용 캐시 계층(market_data.py, 2026-09-23)에 위임 — 이 파일 자체
+    stale-check 캐시는 없앰(backtest_regime_assets.fetch()와 동일 정리)."""
+    return RA.fetch("SPY")
 
 
 def fetch_fred(series_id: str) -> pd.Series:
@@ -84,7 +76,7 @@ def fetch_fred(series_id: str) -> pd.Series:
 def build_calendar_frame(start=None, end=None) -> dict:
     """SPY 거래일을 기준 달력으로 SPY·KRW=X·한미 3개월 금리차(캐리)를 정렬(ffill)."""
     spy = fetch_spy()
-    fx = RA.fetch("KRW=X", "output/regime_price_cache_fx.pkl")
+    fx = RA.fetch("KRW=X")
     us_rate = fetch_fred("DTB3")              # % 단위, 일별
     kr_rate = fetch_fred("IR3TIB01KRM156N")   # % 단위, 월별
 
@@ -151,7 +143,7 @@ def build_ensemble_h(grid: dict = FX_GRID_WIDE, use_cache: bool = True) -> dict:
     cache_path = "output/fx_ensemble_h_cache.pkl"
     if use_cache and os.path.exists(cache_path):
         return pd.read_pickle(cache_path)
-    fx = RA.fetch("KRW=X", "output/regime_price_cache_fx.pkl")
+    fx = RA.fetch("KRW=X")
     closes = fx.to_numpy()
     combos = [(tm, b, c) for tm in grid["trend_ma"] for b in grid["band"] for c in grid["confirm"]]
     exp_mat = np.full((len(combos), len(closes)), np.nan)

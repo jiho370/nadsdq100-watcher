@@ -668,53 +668,80 @@ def _news_pub_dt(item: dict):
             continue
     return None
 
-def download_histories(symbols: list[str], period: str = HISTORY_PERIOD,
-                       with_volume: bool = False):
-    """종가 시계열 수집. with_volume=True 이면 (종가맵, 거래량맵) 튜플 반환.
-    거래량은 같은 yf.download 배치의 Volume 컬럼에서 확보(추가 API 콜 없음).
-    기존 호출부(with_volume 미지정)는 종가맵만 반환하므로 동작 불변."""
+def _yf_batch_fetch(symbols: list[str], period: str) -> dict[str, pd.Series]:
+    """실제 야후 호출 1회분(배치 + 개별 폴백) — market_data.fetch_batch가 캐시 상태별로
+    나눠 필요한 만큼만 이 함수를 호출한다."""
     _require_yf()
     out = {}
-    vol_out = {}
     try:
         data = yf.download(symbols, period=period, interval="1d", auto_adjust=True, group_by="ticker", threads=True, progress=False)
     except:
         data = None
-
     if data is not None and not data.empty:
         for sym in symbols:
             try:
                 if isinstance(data.columns, pd.MultiIndex):
                     if sym not in data.columns.get_level_values(0): continue
-                    sub = data[sym]
-                    close = sub["Close"]
-                    vol = sub["Volume"] if "Volume" in sub.columns else None
+                    close = data[sym]["Close"]
                 else:
                     close = data["Close"]
-                    vol = data["Volume"] if "Volume" in data.columns else None
                 close = _clean_close(close)
                 if not close.empty: out[sym] = close
-                if with_volume and vol is not None:
-                    v = _clean_volume(vol)
-                    if not v.empty: vol_out[sym] = v
             except: continue
-
-    missing = [s for s in symbols if s not in out]
-    for sym in missing:
+    for sym in [s for s in symbols if s not in out]:
         try:
             raw = yf.Ticker(sym).history(period=period, interval="1d", auto_adjust=True)
             if raw is not None and not raw.empty and "Close" in raw.columns:
                 close = _clean_close(raw["Close"])
                 if not close.empty: out[sym] = close
-                if with_volume and "Volume" in raw.columns:
-                    v = _clean_volume(raw["Volume"])
-                    if not v.empty: vol_out[sym] = v
         except: continue
-    fresh = _filter_stale(out, MAX_STALE_DAYS)
+    return out
+
+
+def download_histories(symbols: list[str], period: str = HISTORY_PERIOD,
+                       with_volume: bool = False):
+    """종가 시계열 수집(공용 캐시·재시도·폴백은 market_data.py — 2026-09-23).
+    with_volume=True 이면 (종가맵, 거래량맵) 튜플 반환 — 유일한 호출부(라이브 미국
+    유니버스 수집, gather_universe_data)라 이 경로만 캐시를 거치지 않고 기존 방식대로
+    직접 받는다(볼륨은 아직 캐시 계층이 다루지 않음)."""
+    _require_yf()
     if with_volume:
-        vol_out = {s: v for s, v in vol_out.items() if s in fresh}
-        return fresh, vol_out
-    return fresh
+        out, vol_out = {}, {}
+        try:
+            data = yf.download(symbols, period=period, interval="1d", auto_adjust=True, group_by="ticker", threads=True, progress=False)
+        except:
+            data = None
+        if data is not None and not data.empty:
+            for sym in symbols:
+                try:
+                    if isinstance(data.columns, pd.MultiIndex):
+                        if sym not in data.columns.get_level_values(0): continue
+                        sub = data[sym]
+                        close, vol = sub["Close"], sub.get("Volume")
+                    else:
+                        close, vol = data["Close"], data.get("Volume")
+                    close = _clean_close(close)
+                    if not close.empty: out[sym] = close
+                    if vol is not None:
+                        v = _clean_volume(vol)
+                        if not v.empty: vol_out[sym] = v
+                except: continue
+        for sym in [s for s in symbols if s not in out]:
+            try:
+                raw = yf.Ticker(sym).history(period=period, interval="1d", auto_adjust=True)
+                if raw is not None and not raw.empty and "Close" in raw.columns:
+                    close = _clean_close(raw["Close"])
+                    if not close.empty: out[sym] = close
+                    if "Volume" in raw.columns:
+                        v = _clean_volume(raw["Volume"])
+                        if not v.empty: vol_out[sym] = v
+            except: continue
+        fresh = _filter_stale(out, MAX_STALE_DAYS)
+        return fresh, {s: v for s, v in vol_out.items() if s in fresh}
+
+    import market_data as MD
+    out = MD.fetch_batch(symbols, period, _yf_batch_fetch)
+    return _filter_stale(out, MAX_STALE_DAYS)
 
 def _clean_volume(vol: pd.Series) -> pd.Series:
     s = pd.to_numeric(vol, errors="coerce")
