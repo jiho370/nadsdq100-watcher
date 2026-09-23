@@ -1113,7 +1113,11 @@ def render_report_html(report, as_of="", metrics_by_sym=None, market_html="", si
         kr_sell_cards = "".join(_sell_card(i, s, is_kr=True) for i, s in enumerate(kr_sells, 1))
         kr_sell_html = ('<h3 style="margin:18px 0 2px">&#128308; 한국 매도 후보 · 차익실현 <span style="color:#9ca3af;font-size:12px">'
                         '(보유 종목 중 추세 이탈)</span></h3>' + kr_sell_cards)
-    sub = f' <span style="color:#9ca3af;font-size:12px">({_esc(as_of)} 종가 기준)</span>' if as_of else ""
+    # 2026-09-24(ChatGPT 교차검증으로 지호 님이 발견): "종가 기준"은 2026-07-28에 이미
+    # 사실이 아니게 됐다(HISTORY.md §7) — 발송 시각이 종가→개장 30분~90분(미국)/1시간(한국)
+    # 후 장중가 기준으로 바뀌었는데 이 라벨만 안 고쳐져 있었다. 시가/장중가 둘 다 아우르는
+    # 중립적 표현으로 교체.
+    sub = f' <span style="color:#9ca3af;font-size:12px">({_esc(as_of)} 기준)</span>' if as_of else ""
     spy = ('<img src="cid:spy_chart" style="width:100%;max-width:640px;border-radius:8px;margin:8px 0">'
            if show_spy else "")
     banner_html = (f'<div style="background:#fffbeb;border:1px solid #fcd34d;border-radius:8px;padding:7px 11px;'
