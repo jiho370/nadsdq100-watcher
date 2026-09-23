@@ -1,0 +1,285 @@
+{
+  "as_of": "2025-07-15",
+  "n_snaps": 39,
+  "floor": 3.5,
+  "cap": 7.0,
+  "step1_within_band_ic": {
+    "full_range": {
+      "n_snapshots": 39,
+      "mean_pearson": 0.0552,
+      "mean_spearman": 0.1232,
+      "pearson_t_stat": 2.115,
+      "spearman_t_stat": 4.264
+    },
+    "within_band_only": {
+      "n_snapshots": 27,
+      "mean_pearson": 0.099,
+      "mean_spearman": 0.0973,
+      "pearson_t_stat": 1.871,
+      "spearman_t_stat": 1.678
+    }
+  },
+  "step2_pbo_dsr_within_band": {
+    "input": {
+      "horizon": "within_band",
+      "universe": "kr_topn_candidates",
+      "cost": "5bp(단순화, 실매매 아님)"
+    },
+    "n_trials": 3,
+    "n_events": 39,
+    "pbo": {
+      "pbo": 0.0,
+      "embargo": 1,
+      "purged_events_total": 280,
+      "n_combos": 70,
+      "n_blocks": 8,
+      "lambda_mean": 1.0986,
+      "is_sharpe_mean": 0.1885,
+      "oos_sharpe_mean": 0.326,
+      "degradation_slope": -0.4811,
+      "prob_oos_loss": 0.0429
+    },
+    "pbo_verdict": "낮음(과최적화 가능성 작음)",
+    "dsr": {
+      "sr": 0.183,
+      "sr0": 0.0,
+      "dsr": 0.7696,
+      "dsr_uncorrected": 0.8515,
+      "skew": -0.791,
+      "kurtosis": 4.099,
+      "T": 39,
+      "T_eff": 20,
+      "N": 3,
+      "best_trial": "binwidth_0.25"
+    },
+    "dsr_verdict": "통과 실패(다중검정 감안 시 샤프가 유의하지 않음)",
+    "passed": false,
+    "references": [
+      "Bailey et al. 2017 (PBO/CSCV)",
+      "Bailey & López de Prado 2014 (DSR)"
+    ],
+    "note": "조합 간 상관으로 N이 과대계상될 수 있어 DSR은 보수적(실제보다 낮게) 추정됨."
+  },
+  "step3_walkforward_approx": {
+    "n_oos": 9,
+    "mean_top_minus_bottom_pct": 0.371,
+    "pct_positive": 55.6
+  },
+  "step4_oos_holdout": {
+    "n_calib_snaps": 31,
+    "n_holdout_snaps": 8,
+    "holdout_dates": [
+      "2023-09-15",
+      "2023-12-20",
+      "2024-03-26",
+      "2024-06-28",
+      "2024-10-02",
+      "2025-01-06",
+      "2025-04-10",
+      "2025-07-15"
+    ],
+    "mean_top_minus_bottom_pct": -0.848,
+    "n_events": 8
+  },
+  "step5_latest_candidates_with_confidence": [
+    {
+      "symbol": "036460",
+      "composite_score": 5.08,
+      "within_band": true,
+      "tier": "매수",
+      "n_factors_present": 3,
+      "n_factors_total": 3,
+      "confidence_pct": 100.0
+    },
+    {
+      "symbol": "000270",
+      "composite_score": 5.02,
+      "within_band": true,
+      "tier": "매수",
+      "n_factors_present": 3,
+      "n_factors_total": 3,
+      "confidence_pct": 100.0
+    },
+    {
+      "symbol": "005380",
+      "composite_score": 4.8,
+      "within_band": true,
+      "tier": "매수",
+      "n_factors_present": 3,
+      "n_factors_total": 3,
+      "confidence_pct": 100.0
+    },
+    {
+      "symbol": "023530",
+      "composite_score": 4.44,
+      "within_band": true,
+      "tier": "매수",
+      "n_factors_present": 2,
+      "n_factors_total": 3,
+      "confidence_pct": 66.7
+    },
+    {
+      "symbol": "009240",
+      "composite_score": 3.89,
+      "within_band": true,
+      "tier": "매수",
+      "n_factors_present": 3,
+      "n_factors_total": 3,
+      "confidence_pct": 100.0
+    },
+    {
+      "symbol": "088350",
+      "composite_score": 3.79,
+      "within_band": true,
+      "tier": "매수",
+      "n_factors_present": 3,
+      "n_factors_total": 3,
+      "confidence_pct": 100.0
+    },
+    {
+      "symbol": "456040",
+      "composite_score": 3.71,
+      "within_band": true,
+      "tier": "관찰",
+      "n_factors_present": 3,
+      "n_factors_total": 3,
+      "confidence_pct": 100.0
+    },
+    {
+      "symbol": "161390",
+      "composite_score": 3.66,
+      "within_band": true,
+      "tier": "관찰",
+      "n_factors_present": 3,
+      "n_factors_total": 3,
+      "confidence_pct": 100.0
+    },
+    {
+      "symbol": "005850",
+      "composite_score": 3.65,
+      "within_band": true,
+      "tier": "관찰",
+      "n_factors_present": 3,
+      "n_factors_total": 3,
+      "confidence_pct": 100.0
+    },
+    {
+      "symbol": "071320",
+      "composite_score": 3.56,
+      "within_band": true,
+      "tier": "관찰",
+      "n_factors_present": 3,
+      "n_factors_total": 3,
+      "confidence_pct": 100.0
+    },
+    {
+      "symbol": "078930",
+      "composite_score": 3.54,
+      "within_band": true,
+      "tier": "관찰",
+      "n_factors_present": 3,
+      "n_factors_total": 3,
+      "confidence_pct": 100.0
+    },
+    {
+      "symbol": "011170",
+      "composite_score": 3.5,
+      "within_band": true,
+      "tier": "관찰",
+      "n_factors_present": 2,
+      "n_factors_total": 3,
+      "confidence_pct": 66.7
+    },
+    {
+      "symbol": "003240",
+      "composite_score": 3.39,
+      "within_band": false,
+      "tier": "제외",
+      "n_factors_present": 3,
+      "n_factors_total": 3,
+      "confidence_pct": 100.0
+    },
+    {
+      "symbol": "009970",
+      "composite_score": 3.31,
+      "within_band": false,
+      "tier": "제외",
+      "n_factors_present": 3,
+      "n_factors_total": 3,
+      "confidence_pct": 100.0
+    },
+    {
+      "symbol": "005830",
+      "composite_score": 3.31,
+      "within_band": false,
+      "tier": "제외",
+      "n_factors_present": 3,
+      "n_factors_total": 3,
+      "confidence_pct": 100.0
+    }
+  ],
+  "step6_sector_concentration": {
+    "recent_n_snapshots": 10,
+    "top_k_per_snapshot": 5,
+    "total_picks": 50,
+    "sector_distribution": [
+      {
+        "sector": "기타금융",
+        "count": 24,
+        "pct": 48.0
+      },
+      {
+        "sector": "유통",
+        "count": 8,
+        "pct": 16.0
+      },
+      {
+        "sector": "의료·정밀기기",
+        "count": 3,
+        "pct": 6.0
+      },
+      {
+        "sector": "보험",
+        "count": 3,
+        "pct": 6.0
+      },
+      {
+        "sector": "전기·가스",
+        "count": 2,
+        "pct": 4.0
+      },
+      {
+        "sector": "은행",
+        "count": 2,
+        "pct": 4.0
+      },
+      {
+        "sector": "운송·창고",
+        "count": 2,
+        "pct": 4.0
+      },
+      {
+        "sector": "건설",
+        "count": 2,
+        "pct": 4.0
+      },
+      {
+        "sector": "운송장비·부품",
+        "count": 2,
+        "pct": 4.0
+      },
+      {
+        "sector": "증권",
+        "count": 1,
+        "pct": 2.0
+      },
+      {
+        "sector": "금속",
+        "count": 1,
+        "pct": 2.0
+      }
+    ]
+  },
+  "verdict": "유효밴드 내 상관관계가 통계적으로 불확실 — 세밀한 점수보다 통과/미통과 이분법이 더 정직함",
+  "band_significant": false
+}

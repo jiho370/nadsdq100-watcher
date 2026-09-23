@@ -1,0 +1,125 @@
+{
+  "n_snaps": 34,
+  "topn": 8,
+  "reference_cap": 9.0,
+  "rank_stats": [
+    {
+      "rank": 1,
+      "n": 34,
+      "mean_score": 14.13,
+      "median_score": 14.22,
+      "min_score": 9.31,
+      "max_score": 16.97,
+      "pct_over_refcap": 100.0
+    },
+    {
+      "rank": 2,
+      "n": 34,
+      "mean_score": 12.44,
+      "median_score": 11.67,
+      "min_score": 9.31,
+      "max_score": 16.89,
+      "pct_over_refcap": 100.0
+    },
+    {
+      "rank": 3,
+      "n": 34,
+      "mean_score": 10.67,
+      "median_score": 10.55,
+      "min_score": 7.01,
+      "max_score": 16.73,
+      "pct_over_refcap": 88.2
+    },
+    {
+      "rank": 4,
+      "n": 34,
+      "mean_score": 9.44,
+      "median_score": 9.66,
+      "min_score": 6.19,
+      "max_score": 13.86,
+      "pct_over_refcap": 70.6
+    },
+    {
+      "rank": 5,
+      "n": 34,
+      "mean_score": 8.27,
+      "median_score": 8.95,
+      "min_score": 5.56,
+      "max_score": 10.42,
+      "pct_over_refcap": 50.0
+    },
+    {
+      "rank": 6,
+      "n": 34,
+      "mean_score": 7.01,
+      "median_score": 6.7,
+      "min_score": 4.71,
+      "max_score": 9.93,
+      "pct_over_refcap": 23.5
+    },
+    {
+      "rank": 7,
+      "n": 34,
+      "mean_score": 5.98,
+      "median_score": 5.85,
+      "min_score": 4.37,
+      "max_score": 8.89,
+      "pct_over_refcap": 0.0
+    },
+    {
+      "rank": 8,
+      "n": 34,
+      "mean_score": 5.25,
+      "median_score": 5.27,
+      "min_score": 4.01,
+      "max_score": 7.24,
+      "pct_over_refcap": 0.0
+    },
+    {
+      "rank": 9,
+      "n": 34,
+      "mean_score": 4.79,
+      "median_score": 4.82,
+      "min_score": 3.32,
+      "max_score": 6.62,
+      "pct_over_refcap": 0.0
+    },
+    {
+      "rank": 10,
+      "n": 34,
+      "mean_score": 4.37,
+      "median_score": 4.45,
+      "min_score": 2.55,
+      "max_score": 5.98,
+      "pct_over_refcap": 0.0
+    },
+    {
+      "rank": 11,
+      "n": 34,
+      "mean_score": 4.05,
+      "median_score": 4.08,
+      "min_score": 2.36,
+      "max_score": 5.77,
+      "pct_over_refcap": 0.0
+    },
+    {
+      "rank": 12,
+      "n": 34,
+      "mean_score": 3.78,
+      "median_score": 3.72,
+      "min_score": 2.36,
+      "max_score": 5.52,
+      "pct_over_refcap": 0.0
+    },
+    {
+      "rank": 13,
+      "n": 34,
+      "mean_score": 3.56,
+      "median_score": 3.56,
+      "min_score": 2.2,
+      "max_score": 5.38,
+      "pct_over_refcap": 0.0
+    }
+  ],
+  "note": "미국은 캡을 걸어도 성과가 개선되지 않았음(us_factor_cap_extreme.py) — 이 분포는 참고용(한국과 비교 목적)이며 배제 규칙 채택 근거는 아님."
+}

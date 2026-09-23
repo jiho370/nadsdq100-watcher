@@ -1,0 +1,148 @@
+{
+  "as_of": "2025-07-15",
+  "n_snaps_used_for_curve": 39,
+  "method": "kr_smoothed_floor.build_bucket_curve 재사용 — 점수구간별 평활초과수익을 선형보간해 0~10점 환산. 전체표본 기반(워크포워드 아님, 프로토타입). 6.5점 근처 역전(밸류트랩)이 자동 반영됨.",
+  "top20_recommendations": [
+    {
+      "symbol": "036460",
+      "composite_score": 5.08,
+      "raw_score_rank": 1,
+      "expected_excess_pct": 4.23,
+      "recommendation_0_10": 8.1
+    },
+    {
+      "symbol": "000270",
+      "composite_score": 5.02,
+      "raw_score_rank": 2,
+      "expected_excess_pct": 4.03,
+      "recommendation_0_10": 8.1
+    },
+    {
+      "symbol": "005380",
+      "composite_score": 4.8,
+      "raw_score_rank": 3,
+      "expected_excess_pct": 3.33,
+      "recommendation_0_10": 8.1
+    },
+    {
+      "symbol": "023530",
+      "composite_score": 4.44,
+      "raw_score_rank": 4,
+      "expected_excess_pct": 2.31,
+      "recommendation_0_10": 7.6
+    },
+    {
+      "symbol": "009240",
+      "composite_score": 3.89,
+      "raw_score_rank": 5,
+      "expected_excess_pct": 1.0,
+      "recommendation_0_10": 7.1
+    },
+    {
+      "symbol": "088350",
+      "composite_score": 3.79,
+      "raw_score_rank": 6,
+      "expected_excess_pct": 0.78,
+      "recommendation_0_10": 7.1
+    },
+    {
+      "symbol": "456040",
+      "composite_score": 3.71,
+      "raw_score_rank": 7,
+      "expected_excess_pct": 0.6,
+      "recommendation_0_10": 6.7
+    },
+    {
+      "symbol": "161390",
+      "composite_score": 3.66,
+      "raw_score_rank": 8,
+      "expected_excess_pct": 0.45,
+      "recommendation_0_10": 6.7
+    },
+    {
+      "symbol": "005850",
+      "composite_score": 3.65,
+      "raw_score_rank": 9,
+      "expected_excess_pct": 0.43,
+      "recommendation_0_10": 6.7
+    },
+    {
+      "symbol": "071320",
+      "composite_score": 3.56,
+      "raw_score_rank": 10,
+      "expected_excess_pct": 0.19,
+      "recommendation_0_10": 6.7
+    },
+    {
+      "symbol": "078930",
+      "composite_score": 3.54,
+      "raw_score_rank": 11,
+      "expected_excess_pct": 0.15,
+      "recommendation_0_10": 6.7
+    },
+    {
+      "symbol": "011170",
+      "composite_score": 3.5,
+      "raw_score_rank": 12,
+      "expected_excess_pct": 0.04,
+      "recommendation_0_10": 6.7
+    },
+    {
+      "symbol": "003240",
+      "composite_score": 3.39,
+      "raw_score_rank": 13,
+      "expected_excess_pct": -0.25,
+      "recommendation_0_10": 6.7
+    },
+    {
+      "symbol": "009970",
+      "composite_score": 3.31,
+      "raw_score_rank": 14,
+      "expected_excess_pct": -0.46,
+      "recommendation_0_10": 6.7
+    },
+    {
+      "symbol": "005830",
+      "composite_score": 3.31,
+      "raw_score_rank": 15,
+      "expected_excess_pct": -0.46,
+      "recommendation_0_10": 6.7
+    },
+    {
+      "symbol": "007340",
+      "composite_score": 3.04,
+      "raw_score_rank": 16,
+      "expected_excess_pct": -0.6,
+      "recommendation_0_10": 6.2
+    },
+    {
+      "symbol": "024110",
+      "composite_score": 3.02,
+      "raw_score_rank": 17,
+      "expected_excess_pct": -0.6,
+      "recommendation_0_10": 6.2
+    },
+    {
+      "symbol": "004020",
+      "composite_score": 3.0,
+      "raw_score_rank": 18,
+      "expected_excess_pct": -0.59,
+      "recommendation_0_10": 6.2
+    },
+    {
+      "symbol": "001450",
+      "composite_score": 2.87,
+      "raw_score_rank": 19,
+      "expected_excess_pct": -0.58,
+      "recommendation_0_10": 6.2
+    },
+    {
+      "symbol": "138930",
+      "composite_score": 2.76,
+      "raw_score_rank": 20,
+      "expected_excess_pct": -0.57,
+      "recommendation_0_10": 6.2
+    }
+  ],
+  "n_top20_diverge_ge_2pt_from_naive_percentile": 0
+}

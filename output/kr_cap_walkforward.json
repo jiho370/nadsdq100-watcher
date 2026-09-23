@@ -1,0 +1,151 @@
+{
+  "n_snaps": 39,
+  "min_history": 12,
+  "walkforward_adaptive_cap": {
+    "n_oos_events": 27,
+    "mean_excess_pct": 1.942,
+    "win_rate_pct": 63.0,
+    "chosen_cap_distribution": {
+      "4": 1,
+      "5.5": 12,
+      "5": 5,
+      "6": 4,
+      "6.5": 5
+    }
+  },
+  "same_window_baseline_no_cap": {
+    "n_oos_events": 27,
+    "mean_excess_pct": 1.579
+  },
+  "same_window_fixed_cap_6_5_lookahead_reference": {
+    "n_oos_events": 27,
+    "mean_excess_pct": 3.263,
+    "note": "고정 6.5는 전체표본으로 사후에 찾은 값 — look-ahead 있음, 참고용"
+  },
+  "penalty_scoring_all_rows": [
+    {
+      "theta": 5.5,
+      "lambda": 2.0,
+      "n_events": 39,
+      "mean_excess_pct": 1.948,
+      "win_rate_pct": 56.4
+    },
+    {
+      "theta": 5.5,
+      "lambda": 1.0,
+      "n_events": 39,
+      "mean_excess_pct": 1.458,
+      "win_rate_pct": 56.4
+    },
+    {
+      "theta": 6,
+      "lambda": 2.0,
+      "n_events": 39,
+      "mean_excess_pct": 1.386,
+      "win_rate_pct": 56.4
+    },
+    {
+      "theta": 6.5,
+      "lambda": 2.0,
+      "n_events": 39,
+      "mean_excess_pct": 0.49,
+      "win_rate_pct": 53.8
+    },
+    {
+      "theta": 6,
+      "lambda": 1.0,
+      "n_events": 39,
+      "mean_excess_pct": 0.49,
+      "win_rate_pct": 53.8
+    },
+    {
+      "theta": 5.5,
+      "lambda": 0.6,
+      "n_events": 39,
+      "mean_excess_pct": 0.201,
+      "win_rate_pct": 53.8
+    },
+    {
+      "theta": 7,
+      "lambda": 2.0,
+      "n_events": 39,
+      "mean_excess_pct": 0.134,
+      "win_rate_pct": 51.3
+    },
+    {
+      "theta": 6.5,
+      "lambda": 1.0,
+      "n_events": 39,
+      "mean_excess_pct": 0.134,
+      "win_rate_pct": 51.3
+    },
+    {
+      "theta": 6,
+      "lambda": 0.6,
+      "n_events": 39,
+      "mean_excess_pct": 0.134,
+      "win_rate_pct": 51.3
+    },
+    {
+      "theta": 7,
+      "lambda": 0.3,
+      "n_events": 39,
+      "mean_excess_pct": -0.011,
+      "win_rate_pct": 48.7
+    },
+    {
+      "theta": 7,
+      "lambda": 0.6,
+      "n_events": 39,
+      "mean_excess_pct": -0.011,
+      "win_rate_pct": 48.7
+    },
+    {
+      "theta": 7,
+      "lambda": 1.0,
+      "n_events": 39,
+      "mean_excess_pct": -0.011,
+      "win_rate_pct": 48.7
+    },
+    {
+      "theta": 6.5,
+      "lambda": 0.3,
+      "n_events": 39,
+      "mean_excess_pct": -0.011,
+      "win_rate_pct": 48.7
+    },
+    {
+      "theta": 6.5,
+      "lambda": 0.6,
+      "n_events": 39,
+      "mean_excess_pct": -0.011,
+      "win_rate_pct": 48.7
+    },
+    {
+      "theta": 6,
+      "lambda": 0.3,
+      "n_events": 39,
+      "mean_excess_pct": -0.011,
+      "win_rate_pct": 48.7
+    },
+    {
+      "theta": 5.5,
+      "lambda": 0.3,
+      "n_events": 39,
+      "mean_excess_pct": -0.024,
+      "win_rate_pct": 48.7
+    }
+  ],
+  "penalty_scoring_best": {
+    "theta": 5.5,
+    "lambda": 2.0,
+    "n_events": 39,
+    "mean_excess_pct": 1.948,
+    "win_rate_pct": 56.4
+  },
+  "hardcap_6_5_full_sample_reference": {
+    "cap": 6.5,
+    "mean_excess_pct": 2.521
+  },
+  "note": "(A)는 미래 참조 없이 매 시점 과거 데이터만으로 캡을 다시 고른 정직한 검정 — 고정 6.5(전체표본 사후 최적값)보다 낮게 나오는 게 정상(그게 look-ahead의 크기). (B)는 하드컷 대신 초과분에 비례한 연속 벌점을 준 재점수화 — θ·λ 그리드 중 최우수를 보여줌."
+}

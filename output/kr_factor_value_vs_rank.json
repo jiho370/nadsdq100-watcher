@@ -1,0 +1,348 @@
+{
+  "n_snaps": 39,
+  "factors": [
+    "value",
+    "pbr_inv",
+    "div_yield",
+    "composite_valuediv"
+  ],
+  "horizon": "6m",
+  "method": "us_factor_value_vs_rank.py와 동일 방법론 — 절대값IC=Pearson(원값/라이브클립z) vs 순위IC=Spearman, 10분위 스프레드는 스냅샷 단위 블록부트스트랩 90%CI. live_ok(EPS/ROE/PER/200MA) 필터는 적용 안 함(라이브 재현이 아니라 팩터 자체 예측력 확인이 목적).",
+  "results": {
+    "value": {
+      "ic": {
+        "n_snaps_used": 39,
+        "mean_pearson_raw": 0.0034,
+        "mean_pearson_zclip": 0.0109,
+        "mean_spearman_rank": 0.0848,
+        "pearson_raw_minus_spearman": -0.0814
+      },
+      "decile_spread": {
+        "n_events": 39,
+        "deciles": [
+          {
+            "decile": 1,
+            "n_snaps": 39,
+            "mean_fwd_ret_pct": 4.461,
+            "std_fwd_ret_pct": 21.079
+          },
+          {
+            "decile": 2,
+            "n_snaps": 39,
+            "mean_fwd_ret_pct": 3.936,
+            "std_fwd_ret_pct": 15.993
+          },
+          {
+            "decile": 3,
+            "n_snaps": 39,
+            "mean_fwd_ret_pct": 3.826,
+            "std_fwd_ret_pct": 19.157
+          },
+          {
+            "decile": 4,
+            "n_snaps": 39,
+            "mean_fwd_ret_pct": 3.404,
+            "std_fwd_ret_pct": 16.407
+          },
+          {
+            "decile": 5,
+            "n_snaps": 39,
+            "mean_fwd_ret_pct": 1.964,
+            "std_fwd_ret_pct": 11.153
+          },
+          {
+            "decile": 6,
+            "n_snaps": 39,
+            "mean_fwd_ret_pct": 3.841,
+            "std_fwd_ret_pct": 14.194
+          },
+          {
+            "decile": 7,
+            "n_snaps": 39,
+            "mean_fwd_ret_pct": 3.014,
+            "std_fwd_ret_pct": 14.011
+          },
+          {
+            "decile": 8,
+            "n_snaps": 39,
+            "mean_fwd_ret_pct": 6.4,
+            "std_fwd_ret_pct": 15.007
+          },
+          {
+            "decile": 9,
+            "n_snaps": 39,
+            "mean_fwd_ret_pct": 7.606,
+            "std_fwd_ret_pct": 18.212
+          },
+          {
+            "decile": 10,
+            "n_snaps": 39,
+            "mean_fwd_ret_pct": 3.418,
+            "std_fwd_ret_pct": 14.061
+          }
+        ],
+        "top_vs_bottom_ci90": {
+          "top_decile": 10,
+          "bottom_decile": 1,
+          "spread_pct_ci90": [
+            -7.647,
+            5.392
+          ],
+          "excludes_zero": false
+        },
+        "strictly_monotonic": false
+      }
+    },
+    "pbr_inv": {
+      "ic": {
+        "n_snaps_used": 39,
+        "mean_pearson_raw": 0.0546,
+        "mean_pearson_zclip": 0.0562,
+        "mean_spearman_rank": 0.1106,
+        "pearson_raw_minus_spearman": -0.056
+      },
+      "decile_spread": {
+        "n_events": 39,
+        "deciles": [
+          {
+            "decile": 1,
+            "n_snaps": 39,
+            "mean_fwd_ret_pct": 0.379,
+            "std_fwd_ret_pct": 17.43
+          },
+          {
+            "decile": 2,
+            "n_snaps": 39,
+            "mean_fwd_ret_pct": 3.108,
+            "std_fwd_ret_pct": 17.535
+          },
+          {
+            "decile": 3,
+            "n_snaps": 39,
+            "mean_fwd_ret_pct": 4.523,
+            "std_fwd_ret_pct": 14.779
+          },
+          {
+            "decile": 4,
+            "n_snaps": 39,
+            "mean_fwd_ret_pct": 4.175,
+            "std_fwd_ret_pct": 14.602
+          },
+          {
+            "decile": 5,
+            "n_snaps": 39,
+            "mean_fwd_ret_pct": 3.225,
+            "std_fwd_ret_pct": 13.833
+          },
+          {
+            "decile": 6,
+            "n_snaps": 39,
+            "mean_fwd_ret_pct": 3.895,
+            "std_fwd_ret_pct": 12.806
+          },
+          {
+            "decile": 7,
+            "n_snaps": 39,
+            "mean_fwd_ret_pct": 4.173,
+            "std_fwd_ret_pct": 15.366
+          },
+          {
+            "decile": 8,
+            "n_snaps": 39,
+            "mean_fwd_ret_pct": 5.061,
+            "std_fwd_ret_pct": 17.768
+          },
+          {
+            "decile": 9,
+            "n_snaps": 39,
+            "mean_fwd_ret_pct": 8.391,
+            "std_fwd_ret_pct": 20.288
+          },
+          {
+            "decile": 10,
+            "n_snaps": 39,
+            "mean_fwd_ret_pct": 6.158,
+            "std_fwd_ret_pct": 18.134
+          }
+        ],
+        "top_vs_bottom_ci90": {
+          "top_decile": 10,
+          "bottom_decile": 1,
+          "spread_pct_ci90": [
+            -0.501,
+            12.354
+          ],
+          "excludes_zero": false
+        },
+        "strictly_monotonic": false
+      }
+    },
+    "div_yield": {
+      "ic": {
+        "n_snaps_used": 39,
+        "mean_pearson_raw": 0.0604,
+        "mean_pearson_zclip": 0.0569,
+        "mean_spearman_rank": 0.112,
+        "pearson_raw_minus_spearman": -0.0515
+      },
+      "decile_spread": {
+        "n_events": 39,
+        "deciles": [
+          {
+            "decile": 1,
+            "n_snaps": 39,
+            "mean_fwd_ret_pct": 4.996,
+            "std_fwd_ret_pct": 18.304
+          },
+          {
+            "decile": 2,
+            "n_snaps": 39,
+            "mean_fwd_ret_pct": 1.994,
+            "std_fwd_ret_pct": 17.413
+          },
+          {
+            "decile": 3,
+            "n_snaps": 39,
+            "mean_fwd_ret_pct": 3.857,
+            "std_fwd_ret_pct": 17.569
+          },
+          {
+            "decile": 4,
+            "n_snaps": 39,
+            "mean_fwd_ret_pct": 3.031,
+            "std_fwd_ret_pct": 16.238
+          },
+          {
+            "decile": 5,
+            "n_snaps": 39,
+            "mean_fwd_ret_pct": 4.412,
+            "std_fwd_ret_pct": 18.387
+          },
+          {
+            "decile": 6,
+            "n_snaps": 39,
+            "mean_fwd_ret_pct": 2.81,
+            "std_fwd_ret_pct": 13.073
+          },
+          {
+            "decile": 7,
+            "n_snaps": 39,
+            "mean_fwd_ret_pct": 4.279,
+            "std_fwd_ret_pct": 15.353
+          },
+          {
+            "decile": 8,
+            "n_snaps": 39,
+            "mean_fwd_ret_pct": 5.399,
+            "std_fwd_ret_pct": 13.348
+          },
+          {
+            "decile": 9,
+            "n_snaps": 39,
+            "mean_fwd_ret_pct": 6.858,
+            "std_fwd_ret_pct": 13.322
+          },
+          {
+            "decile": 10,
+            "n_snaps": 0,
+            "mean_fwd_ret_pct": null
+          }
+        ],
+        "top_vs_bottom_ci90": {
+          "top_decile": 9,
+          "bottom_decile": 1,
+          "spread_pct_ci90": [
+            -3.892,
+            7.595
+          ],
+          "excludes_zero": false
+        },
+        "strictly_monotonic": false
+      }
+    },
+    "composite_valuediv": {
+      "ic": {
+        "n_snaps_used": 39,
+        "mean_pearson_raw": 0.0552,
+        "mean_pearson_zclip": 0.0563,
+        "mean_spearman_rank": 0.1232,
+        "pearson_raw_minus_spearman": -0.068
+      },
+      "decile_spread": {
+        "n_events": 39,
+        "deciles": [
+          {
+            "decile": 1,
+            "n_snaps": 39,
+            "mean_fwd_ret_pct": 3.473,
+            "std_fwd_ret_pct": 20.308
+          },
+          {
+            "decile": 2,
+            "n_snaps": 39,
+            "mean_fwd_ret_pct": 5.204,
+            "std_fwd_ret_pct": 19.819
+          },
+          {
+            "decile": 3,
+            "n_snaps": 39,
+            "mean_fwd_ret_pct": -0.648,
+            "std_fwd_ret_pct": 12.59
+          },
+          {
+            "decile": 4,
+            "n_snaps": 39,
+            "mean_fwd_ret_pct": 4.198,
+            "std_fwd_ret_pct": 15.115
+          },
+          {
+            "decile": 5,
+            "n_snaps": 39,
+            "mean_fwd_ret_pct": 3.732,
+            "std_fwd_ret_pct": 15.041
+          },
+          {
+            "decile": 6,
+            "n_snaps": 39,
+            "mean_fwd_ret_pct": 4.821,
+            "std_fwd_ret_pct": 15.975
+          },
+          {
+            "decile": 7,
+            "n_snaps": 39,
+            "mean_fwd_ret_pct": 4.472,
+            "std_fwd_ret_pct": 13.769
+          },
+          {
+            "decile": 8,
+            "n_snaps": 39,
+            "mean_fwd_ret_pct": 4.166,
+            "std_fwd_ret_pct": 15.381
+          },
+          {
+            "decile": 9,
+            "n_snaps": 39,
+            "mean_fwd_ret_pct": 6.264,
+            "std_fwd_ret_pct": 16.742
+          },
+          {
+            "decile": 10,
+            "n_snaps": 39,
+            "mean_fwd_ret_pct": 6.888,
+            "std_fwd_ret_pct": 17.182
+          }
+        ],
+        "top_vs_bottom_ci90": {
+          "top_decile": 10,
+          "bottom_decile": 1,
+          "spread_pct_ci90": [
+            -3.525,
+            10.176
+          ],
+          "excludes_zero": false
+        },
+        "strictly_monotonic": false
+      }
+    }
+  }
+}

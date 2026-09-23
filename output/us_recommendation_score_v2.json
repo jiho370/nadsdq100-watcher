@@ -1,0 +1,244 @@
+{
+  "as_of": "2025-12-31",
+  "n_snaps": 34,
+  "floor": 3.25,
+  "step1_within_band_ic": {
+    "full_range": {
+      "n_snapshots": 34,
+      "mean_pearson": 0.0802,
+      "mean_spearman": 0.0387,
+      "pearson_t_stat": 5.088,
+      "spearman_t_stat": 2.715
+    },
+    "within_band_only": {
+      "n_snapshots": 27,
+      "mean_pearson": 0.0858,
+      "mean_spearman": 0.1374,
+      "pearson_t_stat": 3.258,
+      "spearman_t_stat": 3.845
+    }
+  },
+  "step2_pbo_dsr_within_band": {
+    "input": {
+      "horizon": "within_band",
+      "universe": "us_topn_candidates",
+      "cost": "5.0bp(단순화, 실매매 아님)"
+    },
+    "n_trials": 3,
+    "n_events": 34,
+    "pbo": {
+      "pbo": 0.0,
+      "embargo": 1,
+      "purged_events_total": 280,
+      "n_combos": 70,
+      "n_blocks": 8,
+      "lambda_mean": 1.0986,
+      "is_sharpe_mean": 0.508,
+      "oos_sharpe_mean": 0.4398,
+      "degradation_slope": -1.2043,
+      "prob_oos_loss": 0.0
+    },
+    "pbo_verdict": "낮음(과최적화 가능성 작음)",
+    "dsr": {
+      "sr": 0.4964,
+      "sr0": 0.0,
+      "dsr": 0.9653,
+      "dsr_uncorrected": 0.9954,
+      "skew": -0.122,
+      "kurtosis": 3.195,
+      "T": 34,
+      "T_eff": 17,
+      "N": 3,
+      "best_trial": "binwidth_0.25"
+    },
+    "dsr_verdict": "95% 신뢰수준 통과",
+    "passed": true,
+    "references": [
+      "Bailey et al. 2017 (PBO/CSCV)",
+      "Bailey & López de Prado 2014 (DSR)"
+    ],
+    "note": "조합 간 상관으로 N이 과대계상될 수 있어 DSR은 보수적(실제보다 낮게) 추정됨."
+  },
+  "step3_walkforward_approx": {
+    "n_oos": 22,
+    "mean_top_minus_bottom_pct": 4.567,
+    "pct_positive": 68.2
+  },
+  "step4_oos_holdout": {
+    "n_calib_snaps": 27,
+    "n_holdout_snaps": 7,
+    "holdout_dates": [
+      "2024-06-28",
+      "2024-09-27",
+      "2024-12-27",
+      "2025-04-01",
+      "2025-07-02",
+      "2025-10-01",
+      "2025-12-31"
+    ],
+    "mean_top_minus_bottom_pct": 2.19,
+    "n_events": 7
+  },
+  "step5_latest_candidates_with_confidence": [
+    {
+      "symbol": "BKNG",
+      "composite_score": 9.86,
+      "above_floor": true,
+      "n_factors_present": 3,
+      "n_factors_total": 3,
+      "confidence_pct": 100.0
+    },
+    {
+      "symbol": "INCY",
+      "composite_score": 9.0,
+      "above_floor": true,
+      "n_factors_present": 3,
+      "n_factors_total": 3,
+      "confidence_pct": 100.0
+    },
+    {
+      "symbol": "MTCH",
+      "composite_score": 8.99,
+      "above_floor": true,
+      "n_factors_present": 3,
+      "n_factors_total": 3,
+      "confidence_pct": 100.0
+    },
+    {
+      "symbol": "MRNA",
+      "composite_score": 6.29,
+      "above_floor": true,
+      "n_factors_present": 3,
+      "n_factors_total": 3,
+      "confidence_pct": 100.0
+    },
+    {
+      "symbol": "BMY",
+      "composite_score": 6.28,
+      "above_floor": true,
+      "n_factors_present": 3,
+      "n_factors_total": 3,
+      "confidence_pct": 100.0
+    },
+    {
+      "symbol": "KLAC",
+      "composite_score": 5.88,
+      "above_floor": true,
+      "n_factors_present": 3,
+      "n_factors_total": 3,
+      "confidence_pct": 100.0
+    },
+    {
+      "symbol": "MCHP",
+      "composite_score": 5.3,
+      "above_floor": true,
+      "n_factors_present": 3,
+      "n_factors_total": 3,
+      "confidence_pct": 100.0
+    },
+    {
+      "symbol": "GM",
+      "composite_score": 5.27,
+      "above_floor": true,
+      "n_factors_present": 2,
+      "n_factors_total": 3,
+      "confidence_pct": 66.7
+    },
+    {
+      "symbol": "NOW",
+      "composite_score": 5.06,
+      "above_floor": true,
+      "n_factors_present": 3,
+      "n_factors_total": 3,
+      "confidence_pct": 100.0
+    },
+    {
+      "symbol": "F",
+      "composite_score": 5.05,
+      "above_floor": true,
+      "n_factors_present": 3,
+      "n_factors_total": 3,
+      "confidence_pct": 100.0
+    },
+    {
+      "symbol": "INTC",
+      "composite_score": 4.83,
+      "above_floor": true,
+      "n_factors_present": 3,
+      "n_factors_total": 3,
+      "confidence_pct": 100.0
+    },
+    {
+      "symbol": "BIIB",
+      "composite_score": 4.68,
+      "above_floor": true,
+      "n_factors_present": 3,
+      "n_factors_total": 3,
+      "confidence_pct": 100.0
+    },
+    {
+      "symbol": "MRK",
+      "composite_score": 4.52,
+      "above_floor": true,
+      "n_factors_present": 3,
+      "n_factors_total": 3,
+      "confidence_pct": 100.0
+    },
+    {
+      "symbol": "SWKS",
+      "composite_score": 4.47,
+      "above_floor": true,
+      "n_factors_present": 3,
+      "n_factors_total": 3,
+      "confidence_pct": 100.0
+    },
+    {
+      "symbol": "HPQ",
+      "composite_score": 4.14,
+      "above_floor": true,
+      "n_factors_present": 3,
+      "n_factors_total": 3,
+      "confidence_pct": 100.0
+    }
+  ],
+  "step6_sector_concentration": {
+    "recent_n_snapshots": 10,
+    "top_k_per_snapshot": 8,
+    "total_picks": 80,
+    "sector_distribution": [
+      {
+        "sector": "Information Technology",
+        "count": 26,
+        "pct": 32.5
+      },
+      {
+        "sector": "Health Care",
+        "count": 25,
+        "pct": 31.2
+      },
+      {
+        "sector": "Consumer Discretionary",
+        "count": 15,
+        "pct": 18.8
+      },
+      {
+        "sector": "Unknown",
+        "count": 11,
+        "pct": 13.8
+      },
+      {
+        "sector": "Materials",
+        "count": 2,
+        "pct": 2.5
+      },
+      {
+        "sector": "Industrials",
+        "count": 1,
+        "pct": 1.2
+      }
+    ]
+  },
+  "verdict": "유효구간 내에서도 점수가 유의하게 수익률과 상관 — 연속적(세밀한) 0~10점 부여 타당",
+  "band_significant": true,
+  "replaces": "score_calibration.py(구v2, 단순 백분위 가정) 대체 제안 — 게이트/스냅샷단위 t검정 관례는 계승"
+}

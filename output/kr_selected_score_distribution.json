@@ -1,0 +1,100 @@
+{
+  "n_snaps": 39,
+  "topn": 5,
+  "cap_reference": 6.5,
+  "rank_stats": [
+    {
+      "rank": 1,
+      "n": 39,
+      "mean_score": 6.87,
+      "median_score": 6.89,
+      "min_score": 4.17,
+      "max_score": 9.0,
+      "pct_over_cap": 64.1
+    },
+    {
+      "rank": 2,
+      "n": 39,
+      "mean_score": 5.98,
+      "median_score": 6.25,
+      "min_score": 4.15,
+      "max_score": 8.23,
+      "pct_over_cap": 33.3
+    },
+    {
+      "rank": 3,
+      "n": 39,
+      "mean_score": 5.47,
+      "median_score": 5.6,
+      "min_score": 3.3,
+      "max_score": 8.14,
+      "pct_over_cap": 23.1
+    },
+    {
+      "rank": 4,
+      "n": 39,
+      "mean_score": 5.03,
+      "median_score": 5.05,
+      "min_score": 3.27,
+      "max_score": 6.58,
+      "pct_over_cap": 2.6
+    },
+    {
+      "rank": 5,
+      "n": 39,
+      "mean_score": 4.69,
+      "median_score": 4.7,
+      "min_score": 3.23,
+      "max_score": 6.22,
+      "pct_over_cap": 0.0
+    },
+    {
+      "rank": 6,
+      "n": 39,
+      "mean_score": 4.47,
+      "median_score": 4.59,
+      "min_score": 3.21,
+      "max_score": 5.72,
+      "pct_over_cap": 0.0
+    },
+    {
+      "rank": 7,
+      "n": 39,
+      "mean_score": 4.27,
+      "median_score": 4.28,
+      "min_score": 2.83,
+      "max_score": 5.69,
+      "pct_over_cap": 0.0
+    },
+    {
+      "rank": 8,
+      "n": 39,
+      "mean_score": 4.13,
+      "median_score": 4.24,
+      "min_score": 2.67,
+      "max_score": 5.48,
+      "pct_over_cap": 0.0
+    },
+    {
+      "rank": 9,
+      "n": 39,
+      "mean_score": 3.97,
+      "median_score": 3.87,
+      "min_score": 2.64,
+      "max_score": 5.42,
+      "pct_over_cap": 0.0
+    },
+    {
+      "rank": 10,
+      "n": 39,
+      "mean_score": 3.78,
+      "median_score": 3.56,
+      "min_score": 2.6,
+      "max_score": 5.11,
+      "pct_over_cap": 0.0
+    }
+  ],
+  "cap_binds_pct_of_snaps": 64.1,
+  "mean_n_excluded_per_snap_from_top5": 1.23,
+  "note": "6~10등도 참고로 같이 보여줌 — 캡으로 top5에서 빠진 자리를 채울 '다음 대기 종목'들의 점수가 어느 수준인지 확인용."
+}

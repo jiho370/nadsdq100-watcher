@@ -1,0 +1,197 @@
+{
+  "n_snaps": 34,
+  "bin_width": 0.5,
+  "smooth_window": 5,
+  "bucket_curve": [
+    {
+      "n": 20,
+      "mean_excess": 0.001464134364148495,
+      "bin_mid": -4.25,
+      "smoothed_excess": -0.022843025673858475
+    },
+    {
+      "n": 29,
+      "mean_excess": -0.08591947034812354,
+      "bin_mid": -3.75,
+      "smoothed_excess": -0.011198628116818515
+    },
+    {
+      "n": 46,
+      "mean_excess": 0.01592625896239962,
+      "bin_mid": -3.25,
+      "smoothed_excess": -0.009992963530018141
+    },
+    {
+      "n": 98,
+      "mean_excess": 0.02373456455430136,
+      "bin_mid": -2.75,
+      "smoothed_excess": -0.014055545883788073
+    },
+    {
+      "n": 365,
+      "mean_excess": -0.005170305182816643,
+      "bin_mid": -2.25,
+      "smoothed_excess": -0.0013974375608690657
+    },
+    {
+      "n": 1337,
+      "mean_excess": -0.01884877740470116,
+      "bin_mid": -1.75,
+      "smoothed_excess": -0.008584831600158268
+    },
+    {
+      "n": 2104,
+      "mean_excess": -0.02262892873352851,
+      "bin_mid": -1.25,
+      "smoothed_excess": -0.017357971399989
+    },
+    {
+      "n": 4843,
+      "mean_excess": -0.020010711234046394,
+      "bin_mid": -0.75,
+      "smoothed_excess": -0.021356905024626057
+    },
+    {
+      "n": 2421,
+      "mean_excess": -0.020131134444852306,
+      "bin_mid": -0.25,
+      "smoothed_excess": -0.018634528702797293
+    },
+    {
+      "n": 1243,
+      "mean_excess": -0.025164973306001922,
+      "bin_mid": 0.25,
+      "smoothed_excess": -0.012442254041443813
+    },
+    {
+      "n": 860,
+      "mean_excess": -0.005236895795557341,
+      "bin_mid": 0.75,
+      "smoothed_excess": -0.008695957972274503
+    },
+    {
+      "n": 610,
+      "mean_excess": 0.008332444573238897,
+      "bin_mid": 1.25,
+      "smoothed_excess": -0.002012215608893972
+    },
+    {
+      "n": 425,
+      "mean_excess": -0.0012792308881998439,
+      "bin_mid": 1.75,
+      "smoothed_excess": 0.011620697896862046
+    },
+    {
+      "n": 360,
+      "mean_excess": 0.013287577372050349,
+      "bin_mid": 2.25,
+      "smoothed_excess": 0.0032084019728374864
+    },
+    {
+      "n": 151,
+      "mean_excess": 0.042999594222778166,
+      "bin_mid": 2.75,
+      "smoothed_excess": -0.002394110710765773
+    },
+    {
+      "n": 119,
+      "mean_excess": -0.04729837541568014,
+      "bin_mid": 3.25,
+      "smoothed_excess": 0.00811658702326551
+    },
+    {
+      "n": 83,
+      "mean_excess": -0.019680118844777394,
+      "bin_mid": 3.75,
+      "smoothed_excess": 0.02503032459659893
+    },
+    {
+      "n": 77,
+      "mean_excess": 0.05127425778195657,
+      "bin_mid": 4.25,
+      "smoothed_excess": 0.023438325866382875
+    },
+    {
+      "n": 60,
+      "mean_excess": 0.09785626523871746,
+      "bin_mid": 4.75,
+      "smoothed_excess": 0.058484860698106586
+    },
+    {
+      "n": 83,
+      "mean_excess": 0.03503960057169787,
+      "bin_mid": 5.25,
+      "smoothed_excess": 0.07657132731642892
+    },
+    {
+      "n": 44,
+      "mean_excess": 0.1279342987429384,
+      "bin_mid": 5.75,
+      "smoothed_excess": 0.08352200390383416
+    },
+    {
+      "n": 60,
+      "mean_excess": 0.07075221424683428,
+      "bin_mid": 6.25,
+      "smoothed_excess": 0.07029131350008003
+    },
+    {
+      "n": 47,
+      "mean_excess": 0.08602764071898276,
+      "bin_mid": 6.75,
+      "smoothed_excess": 0.07993845889531614
+    },
+    {
+      "n": 27,
+      "mean_excess": 0.03170281321994685,
+      "bin_mid": 7.25,
+      "smoothed_excess": 0.09209764406333532
+    },
+    {
+      "n": 24,
+      "mean_excess": 0.08327532754787845,
+      "bin_mid": 7.75,
+      "smoothed_excess": 0.10128639598025006
+    },
+    {
+      "n": 18,
+      "mean_excess": 0.18873022458303423,
+      "bin_mid": 8.75,
+      "smoothed_excess": 0.09358734216277123
+    },
+    {
+      "n": 31,
+      "mean_excess": 0.116695973831408,
+      "bin_mid": 9.25,
+      "smoothed_excess": 0.10075745051714273
+    },
+    {
+      "n": 23,
+      "mean_excess": 0.047532371631588674,
+      "bin_mid": 9.75,
+      "smoothed_excess": 0.1051279812594588
+    },
+    {
+      "n": 23,
+      "mean_excess": 0.06755335499180433,
+      "bin_mid": 10.25,
+      "smoothed_excess": 0.077260566818267
+    }
+  ],
+  "robust_floor_candidate": 3.25,
+  "baseline_no_floor": {
+    "floor": null,
+    "mean_excess_pct": 9.427,
+    "win_rate_pct": 85.3,
+    "n_binding": 0
+  },
+  "with_robust_floor": {
+    "floor": 3.25,
+    "mean_excess_pct": 9.427,
+    "win_rate_pct": 85.3,
+    "n_binding": 0,
+    "n_snaps": 34,
+    "pct_binding": 0.0
+  },
+  "note": "평활 하한은 역사적으로 거의 발동 안 해도(=공짜 보험) 정상 — 발동률이 낮다고 '의미없다'가 아니라, 침체장 등 예외 상황에서만 작동하는 안전판을 찾는 게 목적이었음."
+}

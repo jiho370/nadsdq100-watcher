@@ -1,0 +1,350 @@
+{
+  "period": "2015-01-02~2026-09-15",
+  "n_days": 2872,
+  "params": {
+    "trend_ma": 200,
+    "band": 0.01,
+    "confirm": 3,
+    "cost_bps": 20
+  },
+  "rotation_portfolio": {
+    "cagr_pct": 0.68,
+    "sharpe": 0.13,
+    "mdd_pct": -54.2,
+    "ulcer": 28.99
+  },
+  "kospi_buyhold": {
+    "cagr_pct": 11.54,
+    "sharpe": 0.59,
+    "mdd_pct": -43.9,
+    "ulcer": 16.06
+  },
+  "sector_ew_buyhold_all17": {
+    "cagr_pct": 7.96,
+    "sharpe": 0.48,
+    "mdd_pct": -51.3,
+    "ulcer": 16.22
+  },
+  "rotation_vs_kospi_bootstrap": {
+    "delta_cagr_ci90": [
+      -17.323,
+      -5.903
+    ],
+    "prob_better_pct": 0.0
+  },
+  "rotation_vs_ew_all17_bootstrap": {
+    "delta_cagr_ci90": [
+      -10.844,
+      -3.041
+    ],
+    "prob_better_pct": 0.2
+  },
+  "per_sector_trend_vs_buyhold": {
+    "건설": {
+      "cagr": 2.09,
+      "bh_cagr": 8.7,
+      "sharpe": 0.205,
+      "bh_sharpe": 0.422,
+      "mdd": -55.3,
+      "bh_mdd": -65.4,
+      "ulcer": 20.91,
+      "bh_ulcer": 24.91,
+      "off_episodes": 17,
+      "delta_cagr_ci90": [
+        -12.387,
+        5.236
+      ],
+      "prob_beats_buyhold_pct": 25.4,
+      "n_boot": 2000,
+      "block": 60
+    },
+    "철강": {
+      "cagr": 1.86,
+      "bh_cagr": 2.76,
+      "sharpe": 0.194,
+      "bh_sharpe": 0.241,
+      "mdd": -54.2,
+      "bh_mdd": -67.5,
+      "ulcer": 25.55,
+      "bh_ulcer": 26.78,
+      "off_episodes": 16,
+      "delta_cagr_ci90": [
+        -8.743,
+        7.352
+      ],
+      "prob_beats_buyhold_pct": 49.1,
+      "n_boot": 2000,
+      "block": 60
+    },
+    "반도체": {
+      "cagr": 17.61,
+      "bh_cagr": 18.59,
+      "sharpe": 0.708,
+      "bh_sharpe": 0.662,
+      "mdd": -50.2,
+      "bh_mdd": -50.2,
+      "ulcer": 17.89,
+      "bh_ulcer": 19.61,
+      "off_episodes": 12,
+      "delta_cagr_ci90": [
+        -11.137,
+        8.787
+      ],
+      "prob_beats_buyhold_pct": 43.5,
+      "n_boot": 2000,
+      "block": 60
+    },
+    "헬스케어": {
+      "cagr": 5.89,
+      "bh_cagr": 8.35,
+      "sharpe": 0.371,
+      "bh_sharpe": 0.412,
+      "mdd": -44.9,
+      "bh_mdd": -56.7,
+      "ulcer": 22.61,
+      "bh_ulcer": 31.95,
+      "off_episodes": 13,
+      "delta_cagr_ci90": [
+        -16.679,
+        8.555
+      ],
+      "prob_beats_buyhold_pct": 34.2,
+      "n_boot": 2000,
+      "block": 60
+    },
+    "은행": {
+      "cagr": 7.22,
+      "bh_cagr": 8.29,
+      "sharpe": 0.458,
+      "bh_sharpe": 0.432,
+      "mdd": -45.0,
+      "bh_mdd": -62.3,
+      "ulcer": 18.65,
+      "bh_ulcer": 25.24,
+      "off_episodes": 12,
+      "delta_cagr_ci90": [
+        -10.544,
+        6.715
+      ],
+      "prob_beats_buyhold_pct": 39.9,
+      "n_boot": 2000,
+      "block": 60
+    },
+    "보험": {
+      "cagr": 8.12,
+      "bh_cagr": 8.72,
+      "sharpe": 0.485,
+      "bh_sharpe": 0.452,
+      "mdd": -26.9,
+      "bh_mdd": -69.7,
+      "ulcer": 13.71,
+      "bh_ulcer": 26.48,
+      "off_episodes": 11,
+      "delta_cagr_ci90": [
+        -8.526,
+        6.675
+      ],
+      "prob_beats_buyhold_pct": 42.5,
+      "n_boot": 2000,
+      "block": 60
+    },
+    "증권": {
+      "cagr": 8.89,
+      "bh_cagr": 9.86,
+      "sharpe": 0.459,
+      "bh_sharpe": 0.446,
+      "mdd": -40.0,
+      "bh_mdd": -66.1,
+      "ulcer": 17.91,
+      "bh_ulcer": 31.1,
+      "off_episodes": 13,
+      "delta_cagr_ci90": [
+        -11.922,
+        6.303
+      ],
+      "prob_beats_buyhold_pct": 35.2,
+      "n_boot": 2000,
+      "block": 60
+    },
+    "자동차": {
+      "cagr": -1.12,
+      "bh_cagr": 3.08,
+      "sharpe": 0.055,
+      "bh_sharpe": 0.249,
+      "mdd": -47.2,
+      "bh_mdd": -58.9,
+      "ulcer": 30.37,
+      "bh_ulcer": 24.05,
+      "off_episodes": 18,
+      "delta_cagr_ci90": [
+        -12.136,
+        3.942
+      ],
+      "prob_beats_buyhold_pct": 21.6,
+      "n_boot": 2000,
+      "block": 60
+    },
+    "에너지화학": {
+      "cagr": 8.73,
+      "bh_cagr": 6.02,
+      "sharpe": 0.534,
+      "bh_sharpe": 0.345,
+      "mdd": -31.4,
+      "bh_mdd": -61.6,
+      "ulcer": 13.92,
+      "bh_ulcer": 26.07,
+      "off_episodes": 7,
+      "delta_cagr_ci90": [
+        -6.32,
+        11.227
+      ],
+      "prob_beats_buyhold_pct": 70.2,
+      "n_boot": 2000,
+      "block": 60
+    },
+    "운송": {
+      "cagr": 0.31,
+      "bh_cagr": 2.71,
+      "sharpe": 0.11,
+      "bh_sharpe": 0.234,
+      "mdd": -43.5,
+      "bh_mdd": -63.5,
+      "ulcer": 23.2,
+      "bh_ulcer": 33.71,
+      "off_episodes": 16,
+      "delta_cagr_ci90": [
+        -11.591,
+        7.007
+      ],
+      "prob_beats_buyhold_pct": 37.8,
+      "n_boot": 2000,
+      "block": 60
+    },
+    "유틸리티": {
+      "cagr": -8.56,
+      "bh_cagr": -3.16,
+      "sharpe": -0.348,
+      "bh_sharpe": 0.016,
+      "mdd": -69.0,
+      "bh_mdd": -67.3,
+      "ulcer": 37.01,
+      "bh_ulcer": 38.43,
+      "off_episodes": 18,
+      "delta_cagr_ci90": [
+        -11.813,
+        4.427
+      ],
+      "prob_beats_buyhold_pct": 25.2,
+      "n_boot": 2000,
+      "block": 60
+    },
+    "방송통신": {
+      "cagr": 0.14,
+      "bh_cagr": -0.54,
+      "sharpe": 0.074,
+      "bh_sharpe": 0.062,
+      "mdd": -31.3,
+      "bh_mdd": -52.2,
+      "ulcer": 17.49,
+      "bh_ulcer": 26.76,
+      "off_episodes": 8,
+      "delta_cagr_ci90": [
+        -2.794,
+        7.133
+      ],
+      "prob_beats_buyhold_pct": 75.9,
+      "n_boot": 2000,
+      "block": 60
+    },
+    "정보기술": {
+      "cagr": 12.34,
+      "bh_cagr": 19.92,
+      "sharpe": 0.573,
+      "bh_sharpe": 0.733,
+      "mdd": -50.6,
+      "bh_mdd": -50.6,
+      "ulcer": 23.62,
+      "bh_ulcer": 18.2,
+      "off_episodes": 18,
+      "delta_cagr_ci90": [
+        -16.809,
+        1.435
+      ],
+      "prob_beats_buyhold_pct": 8.1,
+      "n_boot": 2000,
+      "block": 60
+    },
+    "필수소비재": {
+      "cagr": -3.37,
+      "bh_cagr": 0.83,
+      "sharpe": -0.183,
+      "bh_sharpe": 0.141,
+      "mdd": -50.7,
+      "bh_mdd": -56.7,
+      "ulcer": 33.19,
+      "bh_ulcer": 35.26,
+      "off_episodes": 13,
+      "delta_cagr_ci90": [
+        -11.933,
+        3.127
+      ],
+      "prob_beats_buyhold_pct": 17.4,
+      "n_boot": 2000,
+      "block": 60
+    },
+    "경기소비재": {
+      "cagr": 2.94,
+      "bh_cagr": 2.68,
+      "sharpe": 0.257,
+      "bh_sharpe": 0.23,
+      "mdd": -40.1,
+      "bh_mdd": -52.6,
+      "ulcer": 18.14,
+      "bh_ulcer": 25.27,
+      "off_episodes": 12,
+      "delta_cagr_ci90": [
+        -7.03,
+        6.894
+      ],
+      "prob_beats_buyhold_pct": 52.3,
+      "n_boot": 2000,
+      "block": 60
+    },
+    "기계장비": {
+      "cagr": 2.19,
+      "bh_cagr": 4.86,
+      "sharpe": 0.209,
+      "bh_sharpe": 0.309,
+      "mdd": -44.5,
+      "bh_mdd": -77.4,
+      "ulcer": 22.84,
+      "bh_ulcer": 40.29,
+      "off_episodes": 19,
+      "delta_cagr_ci90": [
+        -13.184,
+        5.247
+      ],
+      "prob_beats_buyhold_pct": 23.5,
+      "n_boot": 2000,
+      "block": 60
+    },
+    "K콘텐츠": {
+      "cagr": 1.7,
+      "bh_cagr": -0.86,
+      "sharpe": 0.185,
+      "bh_sharpe": 0.095,
+      "mdd": -46.5,
+      "bh_mdd": -66.3,
+      "ulcer": 23.2,
+      "bh_ulcer": 36.46,
+      "off_episodes": 14,
+      "delta_cagr_ci90": [
+        -6.465,
+        10.787
+      ],
+      "prob_beats_buyhold_pct": 65.7,
+      "n_boot": 2000,
+      "block": 60
+    }
+  }
+}

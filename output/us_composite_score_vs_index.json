@@ -1,0 +1,461 @@
+{
+  "n_snaps": 34,
+  "n_pooled_obs": 5779,
+  "score_range": [
+    -12.49,
+    17.05
+  ],
+  "bin_width": 1.0,
+  "method": "종합점수(라이브 1:2:2, shareholder_yield만 ±5클립)를 6개월 forward return - SPY forward return(초과수익)에 대해 (1)고정폭 1.0구간별 평균, (2)누적임계값(score>=T)별 평균으로 집계. 모든 스냅샷·종목을 풀링(스냅샷 반복관측 문제 있음 — 참고용, 엄밀한 유의성 검정 아님).",
+  "by_bin": [
+    {
+      "bin_mid": -3.5,
+      "bin_lo": -4.0,
+      "bin_hi": -3.0,
+      "n": 47,
+      "mean_excess_pct": -0.164,
+      "mean_raw_ret_pct": 5.381
+    },
+    {
+      "bin_mid": -2.5,
+      "bin_lo": -3.0,
+      "bin_hi": -2.0,
+      "n": 210,
+      "mean_excess_pct": 0.266,
+      "mean_raw_ret_pct": 6.896
+    },
+    {
+      "bin_mid": -1.5,
+      "bin_lo": -2.0,
+      "bin_hi": -1.0,
+      "n": 1315,
+      "mean_excess_pct": -1.813,
+      "mean_raw_ret_pct": 5.149
+    },
+    {
+      "bin_mid": -0.5,
+      "bin_lo": -1.0,
+      "bin_hi": 0.0,
+      "n": 2348,
+      "mean_excess_pct": -2.681,
+      "mean_raw_ret_pct": 5.737
+    },
+    {
+      "bin_mid": 0.5,
+      "bin_lo": 0.0,
+      "bin_hi": 1.0,
+      "n": 860,
+      "mean_excess_pct": -1.749,
+      "mean_raw_ret_pct": 5.365
+    },
+    {
+      "bin_mid": 1.5,
+      "bin_lo": 1.0,
+      "bin_hi": 2.0,
+      "n": 466,
+      "mean_excess_pct": -1.457,
+      "mean_raw_ret_pct": 6.458
+    },
+    {
+      "bin_mid": 2.5,
+      "bin_lo": 2.0,
+      "bin_hi": 3.0,
+      "n": 201,
+      "mean_excess_pct": 1.873,
+      "mean_raw_ret_pct": 8.515
+    },
+    {
+      "bin_mid": 3.5,
+      "bin_lo": 3.0,
+      "bin_hi": 4.0,
+      "n": 96,
+      "mean_excess_pct": 0.666,
+      "mean_raw_ret_pct": 6.372
+    },
+    {
+      "bin_mid": 4.5,
+      "bin_lo": 4.0,
+      "bin_hi": 5.0,
+      "n": 56,
+      "mean_excess_pct": 2.686,
+      "mean_raw_ret_pct": 9.972
+    },
+    {
+      "bin_mid": 5.5,
+      "bin_lo": 5.0,
+      "bin_hi": 6.0,
+      "n": 38,
+      "mean_excess_pct": -0.691,
+      "mean_raw_ret_pct": 8.047
+    },
+    {
+      "bin_mid": 6.5,
+      "bin_lo": 6.0,
+      "bin_hi": 7.0,
+      "n": 40,
+      "mean_excess_pct": 6.377,
+      "mean_raw_ret_pct": 14.667
+    },
+    {
+      "bin_mid": 7.5,
+      "bin_lo": 7.0,
+      "bin_hi": 8.0,
+      "n": 17,
+      "mean_excess_pct": 0.9,
+      "mean_raw_ret_pct": 4.51
+    },
+    {
+      "bin_mid": 10.5,
+      "bin_lo": 10.0,
+      "bin_hi": 11.0,
+      "n": 23,
+      "mean_excess_pct": -2.8,
+      "mean_raw_ret_pct": 6.278
+    }
+  ],
+  "by_threshold": [
+    {
+      "threshold": -13.0,
+      "n": 5779,
+      "pct_of_universe": 100.0,
+      "mean_excess_pct": -1.796,
+      "mean_raw_ret_pct": 5.784
+    },
+    {
+      "threshold": -12.5,
+      "n": 5779,
+      "pct_of_universe": 100.0,
+      "mean_excess_pct": -1.796,
+      "mean_raw_ret_pct": 5.784
+    },
+    {
+      "threshold": -12.0,
+      "n": 5776,
+      "pct_of_universe": 99.9,
+      "mean_excess_pct": -1.791,
+      "mean_raw_ret_pct": 5.794
+    },
+    {
+      "threshold": -11.5,
+      "n": 5776,
+      "pct_of_universe": 99.9,
+      "mean_excess_pct": -1.791,
+      "mean_raw_ret_pct": 5.794
+    },
+    {
+      "threshold": -11.0,
+      "n": 5776,
+      "pct_of_universe": 99.9,
+      "mean_excess_pct": -1.791,
+      "mean_raw_ret_pct": 5.794
+    },
+    {
+      "threshold": -10.5,
+      "n": 5776,
+      "pct_of_universe": 99.9,
+      "mean_excess_pct": -1.791,
+      "mean_raw_ret_pct": 5.794
+    },
+    {
+      "threshold": -10.0,
+      "n": 5776,
+      "pct_of_universe": 99.9,
+      "mean_excess_pct": -1.791,
+      "mean_raw_ret_pct": 5.794
+    },
+    {
+      "threshold": -9.5,
+      "n": 5774,
+      "pct_of_universe": 99.9,
+      "mean_excess_pct": -1.795,
+      "mean_raw_ret_pct": 5.794
+    },
+    {
+      "threshold": -9.0,
+      "n": 5771,
+      "pct_of_universe": 99.9,
+      "mean_excess_pct": -1.793,
+      "mean_raw_ret_pct": 5.798
+    },
+    {
+      "threshold": -8.5,
+      "n": 5768,
+      "pct_of_universe": 99.8,
+      "mean_excess_pct": -1.783,
+      "mean_raw_ret_pct": 5.813
+    },
+    {
+      "threshold": -8.0,
+      "n": 5766,
+      "pct_of_universe": 99.8,
+      "mean_excess_pct": -1.776,
+      "mean_raw_ret_pct": 5.822
+    },
+    {
+      "threshold": -7.5,
+      "n": 5766,
+      "pct_of_universe": 99.8,
+      "mean_excess_pct": -1.776,
+      "mean_raw_ret_pct": 5.822
+    },
+    {
+      "threshold": -7.0,
+      "n": 5763,
+      "pct_of_universe": 99.7,
+      "mean_excess_pct": -1.765,
+      "mean_raw_ret_pct": 5.836
+    },
+    {
+      "threshold": -6.5,
+      "n": 5760,
+      "pct_of_universe": 99.7,
+      "mean_excess_pct": -1.746,
+      "mean_raw_ret_pct": 5.861
+    },
+    {
+      "threshold": -6.0,
+      "n": 5753,
+      "pct_of_universe": 99.6,
+      "mean_excess_pct": -1.711,
+      "mean_raw_ret_pct": 5.888
+    },
+    {
+      "threshold": -5.5,
+      "n": 5752,
+      "pct_of_universe": 99.5,
+      "mean_excess_pct": -1.71,
+      "mean_raw_ret_pct": 5.889
+    },
+    {
+      "threshold": -5.0,
+      "n": 5750,
+      "pct_of_universe": 99.5,
+      "mean_excess_pct": -1.714,
+      "mean_raw_ret_pct": 5.886
+    },
+    {
+      "threshold": -4.5,
+      "n": 5744,
+      "pct_of_universe": 99.4,
+      "mean_excess_pct": -1.712,
+      "mean_raw_ret_pct": 5.895
+    },
+    {
+      "threshold": -4.0,
+      "n": 5738,
+      "pct_of_universe": 99.3,
+      "mean_excess_pct": -1.711,
+      "mean_raw_ret_pct": 5.906
+    },
+    {
+      "threshold": -3.5,
+      "n": 5727,
+      "pct_of_universe": 99.1,
+      "mean_excess_pct": -1.706,
+      "mean_raw_ret_pct": 5.911
+    },
+    {
+      "threshold": -3.0,
+      "n": 5691,
+      "pct_of_universe": 98.5,
+      "mean_excess_pct": -1.724,
+      "mean_raw_ret_pct": 5.91
+    },
+    {
+      "threshold": -2.5,
+      "n": 5636,
+      "pct_of_universe": 97.5,
+      "mean_excess_pct": -1.767,
+      "mean_raw_ret_pct": 5.882
+    },
+    {
+      "threshold": -2.0,
+      "n": 5481,
+      "pct_of_universe": 94.8,
+      "mean_excess_pct": -1.8,
+      "mean_raw_ret_pct": 5.873
+    },
+    {
+      "threshold": -1.5,
+      "n": 5008,
+      "pct_of_universe": 86.7,
+      "mean_excess_pct": -1.775,
+      "mean_raw_ret_pct": 5.985
+    },
+    {
+      "threshold": -1.0,
+      "n": 4166,
+      "pct_of_universe": 72.1,
+      "mean_excess_pct": -1.796,
+      "mean_raw_ret_pct": 6.101
+    },
+    {
+      "threshold": -0.5,
+      "n": 2667,
+      "pct_of_universe": 46.1,
+      "mean_excess_pct": -1.292,
+      "mean_raw_ret_pct": 5.881
+    },
+    {
+      "threshold": 0.0,
+      "n": 2067,
+      "pct_of_universe": 35.8,
+      "mean_excess_pct": -0.963,
+      "mean_raw_ret_pct": 6.276
+    },
+    {
+      "threshold": 0.5,
+      "n": 1265,
+      "pct_of_universe": 21.9,
+      "mean_excess_pct": -0.235,
+      "mean_raw_ret_pct": 6.938
+    },
+    {
+      "threshold": 1.0,
+      "n": 958,
+      "pct_of_universe": 16.6,
+      "mean_excess_pct": 0.33,
+      "mean_raw_ret_pct": 7.654
+    },
+    {
+      "threshold": 1.5,
+      "n": 682,
+      "pct_of_universe": 11.8,
+      "mean_excess_pct": 1.358,
+      "mean_raw_ret_pct": 8.44
+    },
+    {
+      "threshold": 2.0,
+      "n": 492,
+      "pct_of_universe": 8.5,
+      "mean_excess_pct": 2.022,
+      "mean_raw_ret_pct": 8.786
+    },
+    {
+      "threshold": 2.5,
+      "n": 363,
+      "pct_of_universe": 6.3,
+      "mean_excess_pct": 2.066,
+      "mean_raw_ret_pct": 8.9
+    },
+    {
+      "threshold": 3.0,
+      "n": 291,
+      "pct_of_universe": 5.0,
+      "mean_excess_pct": 2.126,
+      "mean_raw_ret_pct": 8.974
+    },
+    {
+      "threshold": 3.5,
+      "n": 242,
+      "pct_of_universe": 4.2,
+      "mean_excess_pct": 1.884,
+      "mean_raw_ret_pct": 8.987
+    },
+    {
+      "threshold": 4.0,
+      "n": 195,
+      "pct_of_universe": 3.4,
+      "mean_excess_pct": 2.844,
+      "mean_raw_ret_pct": 10.255
+    },
+    {
+      "threshold": 4.5,
+      "n": 163,
+      "pct_of_universe": 2.8,
+      "mean_excess_pct": 3.748,
+      "mean_raw_ret_pct": 10.759
+    },
+    {
+      "threshold": 5.0,
+      "n": 139,
+      "pct_of_universe": 2.4,
+      "mean_excess_pct": 2.909,
+      "mean_raw_ret_pct": 10.369
+    },
+    {
+      "threshold": 5.5,
+      "n": 115,
+      "pct_of_universe": 2.0,
+      "mean_excess_pct": 3.295,
+      "mean_raw_ret_pct": 10.426
+    },
+    {
+      "threshold": 6.0,
+      "n": 101,
+      "pct_of_universe": 1.7,
+      "mean_excess_pct": 4.263,
+      "mean_raw_ret_pct": 11.243
+    },
+    {
+      "threshold": 6.5,
+      "n": 81,
+      "pct_of_universe": 1.4,
+      "mean_excess_pct": 6.665,
+      "mean_raw_ret_pct": 13.834
+    },
+    {
+      "threshold": 7.0,
+      "n": 61,
+      "pct_of_universe": 1.1,
+      "mean_excess_pct": 2.876,
+      "mean_raw_ret_pct": 8.997
+    },
+    {
+      "threshold": 7.5,
+      "n": 45,
+      "pct_of_universe": 0.8,
+      "mean_excess_pct": 3.566,
+      "mean_raw_ret_pct": 10.713
+    },
+    {
+      "threshold": 8.0,
+      "n": 44,
+      "pct_of_universe": 0.8,
+      "mean_excess_pct": 3.64,
+      "mean_raw_ret_pct": 10.731
+    },
+    {
+      "threshold": 8.5,
+      "n": 44,
+      "pct_of_universe": 0.8,
+      "mean_excess_pct": 3.64,
+      "mean_raw_ret_pct": 10.731
+    },
+    {
+      "threshold": 9.0,
+      "n": 42,
+      "pct_of_universe": 0.7,
+      "mean_excess_pct": 3.5,
+      "mean_raw_ret_pct": 10.027
+    },
+    {
+      "threshold": 9.5,
+      "n": 42,
+      "pct_of_universe": 0.7,
+      "mean_excess_pct": 3.5,
+      "mean_raw_ret_pct": 10.027
+    },
+    {
+      "threshold": 10.0,
+      "n": 40,
+      "pct_of_universe": 0.7,
+      "mean_excess_pct": 3.164,
+      "mean_raw_ret_pct": 9.816
+    },
+    {
+      "threshold": 10.5,
+      "n": 20,
+      "pct_of_universe": 0.3,
+      "mean_excess_pct": 9.811,
+      "mean_raw_ret_pct": 16.553
+    },
+    {
+      "threshold": 11.0,
+      "n": 17,
+      "pct_of_universe": 0.3,
+      "mean_excess_pct": 11.232,
+      "mean_raw_ret_pct": 14.602
+    }
+  ]
+}

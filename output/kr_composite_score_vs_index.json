@@ -1,0 +1,292 @@
+{
+  "n_snaps": 39,
+  "n_pooled_obs": 7445,
+  "score_range": [
+    -4.33,
+    9.0
+  ],
+  "bin_width": 1.0,
+  "method": "종합점수(라이브 valuediv 동일가중)를 6개월 forward return - 코스피200(B1) forward return(초과수익)에 대해 고정폭1.0구간·누적임계값(score>=T)별로 집계. 전체 풀링(참고용, 엄밀한 유의성 검정 아님).",
+  "by_bin": [
+    {
+      "bin_mid": -3.5,
+      "bin_lo": -4.0,
+      "bin_hi": -3.0,
+      "n": 172,
+      "mean_excess_pct": -5.468,
+      "mean_raw_ret_pct": 0.648
+    },
+    {
+      "bin_mid": -2.5,
+      "bin_lo": -3.0,
+      "bin_hi": -2.0,
+      "n": 1135,
+      "mean_excess_pct": -0.593,
+      "mean_raw_ret_pct": 6.862
+    },
+    {
+      "bin_mid": -1.5,
+      "bin_lo": -2.0,
+      "bin_hi": -1.0,
+      "n": 1530,
+      "mean_excess_pct": -5.247,
+      "mean_raw_ret_pct": 1.095
+    },
+    {
+      "bin_mid": -0.5,
+      "bin_lo": -1.0,
+      "bin_hi": 0.0,
+      "n": 1368,
+      "mean_excess_pct": -2.695,
+      "mean_raw_ret_pct": 3.464
+    },
+    {
+      "bin_mid": 0.5,
+      "bin_lo": 0.0,
+      "bin_hi": 1.0,
+      "n": 1113,
+      "mean_excess_pct": -2.151,
+      "mean_raw_ret_pct": 4.771
+    },
+    {
+      "bin_mid": 1.5,
+      "bin_lo": 1.0,
+      "bin_hi": 2.0,
+      "n": 931,
+      "mean_excess_pct": -2.418,
+      "mean_raw_ret_pct": 5.167
+    },
+    {
+      "bin_mid": 2.5,
+      "bin_lo": 2.0,
+      "bin_hi": 3.0,
+      "n": 567,
+      "mean_excess_pct": -0.863,
+      "mean_raw_ret_pct": 5.762
+    },
+    {
+      "bin_mid": 3.5,
+      "bin_lo": 3.0,
+      "bin_hi": 4.0,
+      "n": 294,
+      "mean_excess_pct": -0.336,
+      "mean_raw_ret_pct": 6.244
+    },
+    {
+      "bin_mid": 4.5,
+      "bin_lo": 4.0,
+      "bin_hi": 5.0,
+      "n": 172,
+      "mean_excess_pct": 2.394,
+      "mean_raw_ret_pct": 8.244
+    },
+    {
+      "bin_mid": 5.5,
+      "bin_lo": 5.0,
+      "bin_hi": 6.0,
+      "n": 83,
+      "mean_excess_pct": 6.145,
+      "mean_raw_ret_pct": 10.097
+    },
+    {
+      "bin_mid": 6.5,
+      "bin_lo": 6.0,
+      "bin_hi": 7.0,
+      "n": 47,
+      "mean_excess_pct": 3.581,
+      "mean_raw_ret_pct": 8.855
+    },
+    {
+      "bin_mid": 7.5,
+      "bin_lo": 7.0,
+      "bin_hi": 8.0,
+      "n": 15,
+      "mean_excess_pct": -10.509,
+      "mean_raw_ret_pct": 12.418
+    }
+  ],
+  "by_threshold": [
+    {
+      "threshold": -5.0,
+      "n": 7445,
+      "pct_of_universe": 100.0,
+      "mean_excess_pct": -2.342,
+      "mean_raw_ret_pct": 4.386
+    },
+    {
+      "threshold": -4.5,
+      "n": 7445,
+      "pct_of_universe": 100.0,
+      "mean_excess_pct": -2.342,
+      "mean_raw_ret_pct": 4.386
+    },
+    {
+      "threshold": -4.0,
+      "n": 7437,
+      "pct_of_universe": 99.9,
+      "mean_excess_pct": -2.376,
+      "mean_raw_ret_pct": 4.36
+    },
+    {
+      "threshold": -3.5,
+      "n": 7430,
+      "pct_of_universe": 99.8,
+      "mean_excess_pct": -2.39,
+      "mean_raw_ret_pct": 4.353
+    },
+    {
+      "threshold": -3.0,
+      "n": 7265,
+      "pct_of_universe": 97.6,
+      "mean_excess_pct": -2.303,
+      "mean_raw_ret_pct": 4.448
+    },
+    {
+      "threshold": -2.5,
+      "n": 6746,
+      "pct_of_universe": 90.6,
+      "mean_excess_pct": -2.38,
+      "mean_raw_ret_pct": 4.203
+    },
+    {
+      "threshold": -2.0,
+      "n": 6130,
+      "pct_of_universe": 82.3,
+      "mean_excess_pct": -2.62,
+      "mean_raw_ret_pct": 4.0
+    },
+    {
+      "threshold": -1.5,
+      "n": 5348,
+      "pct_of_universe": 71.8,
+      "mean_excess_pct": -1.977,
+      "mean_raw_ret_pct": 4.695
+    },
+    {
+      "threshold": -1.0,
+      "n": 4600,
+      "pct_of_universe": 61.8,
+      "mean_excess_pct": -1.746,
+      "mean_raw_ret_pct": 4.967
+    },
+    {
+      "threshold": -0.5,
+      "n": 3889,
+      "pct_of_universe": 52.2,
+      "mean_excess_pct": -1.489,
+      "mean_raw_ret_pct": 5.268
+    },
+    {
+      "threshold": 0.0,
+      "n": 3232,
+      "pct_of_universe": 43.4,
+      "mean_excess_pct": -1.344,
+      "mean_raw_ret_pct": 5.603
+    },
+    {
+      "threshold": 0.5,
+      "n": 2643,
+      "pct_of_universe": 35.5,
+      "mean_excess_pct": -1.298,
+      "mean_raw_ret_pct": 5.4
+    },
+    {
+      "threshold": 1.0,
+      "n": 2119,
+      "pct_of_universe": 28.5,
+      "mean_excess_pct": -0.92,
+      "mean_raw_ret_pct": 6.04
+    },
+    {
+      "threshold": 1.5,
+      "n": 1614,
+      "pct_of_universe": 21.7,
+      "mean_excess_pct": 0.196,
+      "mean_raw_ret_pct": 7.031
+    },
+    {
+      "threshold": 2.0,
+      "n": 1188,
+      "pct_of_universe": 16.0,
+      "mean_excess_pct": 0.255,
+      "mean_raw_ret_pct": 6.725
+    },
+    {
+      "threshold": 2.5,
+      "n": 876,
+      "pct_of_universe": 11.8,
+      "mean_excess_pct": 0.737,
+      "mean_raw_ret_pct": 7.141
+    },
+    {
+      "threshold": 3.0,
+      "n": 621,
+      "pct_of_universe": 8.3,
+      "mean_excess_pct": 1.276,
+      "mean_raw_ret_pct": 7.603
+    },
+    {
+      "threshold": 3.5,
+      "n": 453,
+      "pct_of_universe": 6.1,
+      "mean_excess_pct": 1.305,
+      "mean_raw_ret_pct": 7.753
+    },
+    {
+      "threshold": 4.0,
+      "n": 327,
+      "pct_of_universe": 4.4,
+      "mean_excess_pct": 2.725,
+      "mean_raw_ret_pct": 8.825
+    },
+    {
+      "threshold": 4.5,
+      "n": 234,
+      "pct_of_universe": 3.1,
+      "mean_excess_pct": 3.914,
+      "mean_raw_ret_pct": 10.192
+    },
+    {
+      "threshold": 5.0,
+      "n": 155,
+      "pct_of_universe": 2.1,
+      "mean_excess_pct": 3.092,
+      "mean_raw_ret_pct": 9.469
+    },
+    {
+      "threshold": 5.5,
+      "n": 104,
+      "pct_of_universe": 1.4,
+      "mean_excess_pct": 2.25,
+      "mean_raw_ret_pct": 8.899
+    },
+    {
+      "threshold": 6.0,
+      "n": 72,
+      "pct_of_universe": 1.0,
+      "mean_excess_pct": -0.427,
+      "mean_raw_ret_pct": 8.746
+    },
+    {
+      "threshold": 6.5,
+      "n": 48,
+      "pct_of_universe": 0.6,
+      "mean_excess_pct": -3.378,
+      "mean_raw_ret_pct": 6.551
+    },
+    {
+      "threshold": 7.0,
+      "n": 25,
+      "pct_of_universe": 0.3,
+      "mean_excess_pct": -7.963,
+      "mean_raw_ret_pct": 8.539
+    },
+    {
+      "threshold": 7.5,
+      "n": 15,
+      "pct_of_universe": 0.2,
+      "mean_excess_pct": -1.901,
+      "mean_raw_ret_pct": 9.59
+    }
+  ]
+}

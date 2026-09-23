@@ -1,0 +1,129 @@
+{
+  "as_of": "2025-12-31",
+  "n_snaps_used_for_curve": 34,
+  "method": "점수구간별 평활초과수익 곡선(us_smoothed_floor.build_bucket_curve)을 선형보간해 종합점수 -> 기대초과수익 -> (역사적 기대초과수익 분포 내 백분위)*10 으로 환산. 전체표본 기반(워크포워드 아님, 프로토타입).",
+  "top20_recommendations": [
+    {
+      "symbol": "BKNG",
+      "composite_score": 9.88,
+      "expected_excess_pct": 5.34,
+      "recommendation_0_10": 9.5
+    },
+    {
+      "symbol": "MTCH",
+      "composite_score": 8.3,
+      "expected_excess_pct": 5.34,
+      "recommendation_0_10": 9.5
+    },
+    {
+      "symbol": "MRNA",
+      "composite_score": 6.17,
+      "expected_excess_pct": 4.97,
+      "recommendation_0_10": 9.5
+    },
+    {
+      "symbol": "BMY",
+      "composite_score": 5.01,
+      "expected_excess_pct": 2.49,
+      "recommendation_0_10": 8.5
+    },
+    {
+      "symbol": "GM",
+      "composite_score": 4.15,
+      "expected_excess_pct": 1.21,
+      "recommendation_0_10": 6.0
+    },
+    {
+      "symbol": "QCOM",
+      "composite_score": 3.29,
+      "expected_excess_pct": 1.89,
+      "recommendation_0_10": 8.0
+    },
+    {
+      "symbol": "HPQ",
+      "composite_score": 3.06,
+      "expected_excess_pct": 1.86,
+      "recommendation_0_10": 8.0
+    },
+    {
+      "symbol": "VRSN",
+      "composite_score": 2.83,
+      "expected_excess_pct": 1.67,
+      "recommendation_0_10": 7.5
+    },
+    {
+      "symbol": "SOLV",
+      "composite_score": 2.3,
+      "expected_excess_pct": 1.46,
+      "recommendation_0_10": 7.0
+    },
+    {
+      "symbol": "REGN",
+      "composite_score": 2.13,
+      "expected_excess_pct": 1.29,
+      "recommendation_0_10": 6.0
+    },
+    {
+      "symbol": "META",
+      "composite_score": 1.94,
+      "expected_excess_pct": 1.02,
+      "recommendation_0_10": 6.0
+    },
+    {
+      "symbol": "GILD",
+      "composite_score": 1.81,
+      "expected_excess_pct": 0.85,
+      "recommendation_0_10": 6.0
+    },
+    {
+      "symbol": "DDOG",
+      "composite_score": 1.71,
+      "expected_excess_pct": 0.75,
+      "recommendation_0_10": 5.5
+    },
+    {
+      "symbol": "NFLX",
+      "composite_score": 1.64,
+      "expected_excess_pct": 0.71,
+      "recommendation_0_10": 5.5
+    },
+    {
+      "symbol": "EBAY",
+      "composite_score": 1.58,
+      "expected_excess_pct": 0.67,
+      "recommendation_0_10": 5.5
+    },
+    {
+      "symbol": "IDXX",
+      "composite_score": 1.57,
+      "expected_excess_pct": 0.67,
+      "recommendation_0_10": 5.5
+    },
+    {
+      "symbol": "ALGN",
+      "composite_score": 1.56,
+      "expected_excess_pct": 0.66,
+      "recommendation_0_10": 5.5
+    },
+    {
+      "symbol": "YUM",
+      "composite_score": 1.55,
+      "expected_excess_pct": 0.66,
+      "recommendation_0_10": 5.5
+    },
+    {
+      "symbol": "NXPI",
+      "composite_score": 1.55,
+      "expected_excess_pct": 0.66,
+      "recommendation_0_10": 5.5
+    },
+    {
+      "symbol": "WDAY",
+      "composite_score": 1.5,
+      "expected_excess_pct": 0.63,
+      "recommendation_0_10": 5.5
+    }
+  ],
+  "n_top20_diverge_ge_2pt_from_naive_percentile": 5,
+  "note": "naive_percentile은 '점수 단순 백분위*10'(기존 score_calibration.py 방식)과 비교용."
+}

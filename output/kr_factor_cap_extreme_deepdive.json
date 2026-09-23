@@ -1,0 +1,193 @@
+{
+  "n_snaps": 39,
+  "topn": 5,
+  "fine_grid": [
+    {
+      "cap": null,
+      "n_events": 39,
+      "mean_excess_pct": -0.011,
+      "win_rate_pct": 48.7
+    },
+    {
+      "cap": 8,
+      "n_events": 39,
+      "mean_excess_pct": 0.503,
+      "win_rate_pct": 53.8
+    },
+    {
+      "cap": 7.5,
+      "n_events": 39,
+      "mean_excess_pct": 0.826,
+      "win_rate_pct": 53.8
+    },
+    {
+      "cap": 7,
+      "n_events": 39,
+      "mean_excess_pct": 1.912,
+      "win_rate_pct": 53.8
+    },
+    {
+      "cap": 6.5,
+      "n_events": 39,
+      "mean_excess_pct": 2.521,
+      "win_rate_pct": 56.4
+    },
+    {
+      "cap": 6,
+      "n_events": 39,
+      "mean_excess_pct": 2.035,
+      "win_rate_pct": 61.5
+    },
+    {
+      "cap": 5.5,
+      "n_events": 39,
+      "mean_excess_pct": 2.511,
+      "win_rate_pct": 61.5
+    },
+    {
+      "cap": 5,
+      "n_events": 39,
+      "mean_excess_pct": 1.141,
+      "win_rate_pct": 61.5
+    },
+    {
+      "cap": 4.5,
+      "n_events": 39,
+      "mean_excess_pct": -2.386,
+      "win_rate_pct": 51.3
+    },
+    {
+      "cap": 4,
+      "n_events": 39,
+      "mean_excess_pct": 0.49,
+      "win_rate_pct": 51.3
+    },
+    {
+      "cap": 3.5,
+      "n_events": 39,
+      "mean_excess_pct": 1.049,
+      "win_rate_pct": 59.0
+    },
+    {
+      "cap": 3,
+      "n_events": 39,
+      "mean_excess_pct": -0.374,
+      "win_rate_pct": 48.7
+    }
+  ],
+  "best": {
+    "cap": 6.5,
+    "n_events": 39,
+    "mean_excess_pct": 2.521,
+    "win_rate_pct": 56.4
+  },
+  "baseline": {
+    "cap": null,
+    "n_events": 39,
+    "mean_excess_pct": -0.011,
+    "win_rate_pct": 48.7
+  },
+  "bootstrap_best_vs_baseline": {
+    "best_cap": 6.5,
+    "n_events": 39,
+    "delta_excess_ci90": [
+      1.052,
+      4.048
+    ],
+    "delta_excess_ci95": [
+      0.707,
+      4.32
+    ],
+    "ci90_excludes_zero": true,
+    "ci95_excludes_zero": true,
+    "prob_cap_beats_baseline_pct": 99.7
+  },
+  "half_period_split": {
+    "split_date": "2020-08-24",
+    "halves": {
+      "전반기": {
+        "None": {
+          "n": 19,
+          "mean_excess_pct": -5.24
+        },
+        "6.5": {
+          "n": 19,
+          "mean_excess_pct": -2.325
+        }
+      },
+      "후반기": {
+        "None": {
+          "n": 20,
+          "mean_excess_pct": 4.957
+        },
+        "6.5": {
+          "n": 20,
+          "mean_excess_pct": 7.126
+        }
+      }
+    }
+  },
+  "most_frequently_excluded_at_best_cap": [
+    {
+      "sym": "015760",
+      "n_snaps_excluded": 9
+    },
+    {
+      "sym": "138930",
+      "n_snaps_excluded": 8
+    },
+    {
+      "sym": "024110",
+      "n_snaps_excluded": 5
+    },
+    {
+      "sym": "316140",
+      "n_snaps_excluded": 4
+    },
+    {
+      "sym": "375500",
+      "n_snaps_excluded": 4
+    },
+    {
+      "sym": "088350",
+      "n_snaps_excluded": 4
+    },
+    {
+      "sym": "137310",
+      "n_snaps_excluded": 2
+    },
+    {
+      "sym": "001520",
+      "n_snaps_excluded": 1
+    },
+    {
+      "sym": "000270",
+      "n_snaps_excluded": 1
+    },
+    {
+      "sym": "027410",
+      "n_snaps_excluded": 1
+    },
+    {
+      "sym": "003300",
+      "n_snaps_excluded": 1
+    },
+    {
+      "sym": "000150",
+      "n_snaps_excluded": 1
+    },
+    {
+      "sym": "071050",
+      "n_snaps_excluded": 1
+    },
+    {
+      "sym": "036460",
+      "n_snaps_excluded": 1
+    },
+    {
+      "sym": "011200",
+      "n_snaps_excluded": 1
+    }
+  ],
+  "note": "39개 스냅샷(6개월 forward, 분기 리밸런싱 시점)으로 이 프로젝트 다른 분석과 같은 표본 한계가 그대로 적용됨 — 부트스트랩·기간분할로 정직하게 강건성만 확인, 확정적 채택 근거는 아님."
+}
