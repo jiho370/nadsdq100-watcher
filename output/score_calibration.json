@@ -1,201 +1,201 @@
 {
-  "horizon": "3m",
-  "n_samples": 35196,
+  "horizon": "6m",
+  "n_samples": 40388,
   "method": "workforward IR-weighted quality/shareholder cluster (v2)",
   "deciles": [
     {
       "decile": 1,
       "score_range": "0~1",
-      "n": 3473,
-      "mean_ret_pct": 3.64,
-      "win_rate_pct": 56.8,
-      "worst_pct": -67.4,
-      "payoff": 1.35
+      "n": 3989,
+      "mean_ret_pct": 7.24,
+      "win_rate_pct": 57.6,
+      "worst_pct": -98.2,
+      "payoff": 1.47
     },
     {
       "decile": 2,
       "score_range": "1~2",
-      "n": 3515,
-      "mean_ret_pct": 3.64,
-      "win_rate_pct": 59.1,
-      "worst_pct": -64.4,
-      "payoff": 1.32
+      "n": 4035,
+      "mean_ret_pct": 6.89,
+      "win_rate_pct": 60.8,
+      "worst_pct": -70.8,
+      "payoff": 1.4
     },
     {
       "decile": 3,
       "score_range": "2~3",
-      "n": 3517,
-      "mean_ret_pct": 3.57,
-      "win_rate_pct": 61.5,
-      "worst_pct": -74.8,
-      "payoff": 1.23
+      "n": 4043,
+      "mean_ret_pct": 5.79,
+      "win_rate_pct": 61.7,
+      "worst_pct": -73.9,
+      "payoff": 1.28
     },
     {
       "decile": 4,
       "score_range": "3~4",
-      "n": 3523,
-      "mean_ret_pct": 3.58,
-      "win_rate_pct": 63.0,
-      "worst_pct": -64.8,
-      "payoff": 1.17
+      "n": 4040,
+      "mean_ret_pct": 7.07,
+      "win_rate_pct": 64.1,
+      "worst_pct": -79.7,
+      "payoff": 1.36
     },
     {
       "decile": 5,
       "score_range": "4~5",
-      "n": 3496,
-      "mean_ret_pct": 3.22,
-      "win_rate_pct": 61.7,
-      "worst_pct": -67.7,
-      "payoff": 1.14
+      "n": 4020,
+      "mean_ret_pct": 6.82,
+      "win_rate_pct": 64.7,
+      "worst_pct": -73.3,
+      "payoff": 1.28
     },
     {
       "decile": 6,
       "score_range": "5~6",
-      "n": 3535,
-      "mean_ret_pct": 3.53,
-      "win_rate_pct": 61.5,
-      "worst_pct": -71.3,
-      "payoff": 1.23
+      "n": 4047,
+      "mean_ret_pct": 6.31,
+      "win_rate_pct": 62.4,
+      "worst_pct": -74.1,
+      "payoff": 1.32
     },
     {
       "decile": 7,
       "score_range": "6~7",
-      "n": 3527,
-      "mean_ret_pct": 3.49,
-      "win_rate_pct": 58.9,
-      "worst_pct": -81.0,
-      "payoff": 1.31
+      "n": 4050,
+      "mean_ret_pct": 6.57,
+      "win_rate_pct": 61.8,
+      "worst_pct": -76.6,
+      "payoff": 1.41
     },
     {
       "decile": 8,
       "score_range": "7~8",
-      "n": 3513,
-      "mean_ret_pct": 2.97,
-      "win_rate_pct": 58.8,
-      "worst_pct": -58.9,
-      "payoff": 1.21
+      "n": 4032,
+      "mean_ret_pct": 5.62,
+      "win_rate_pct": 59.3,
+      "worst_pct": -67.6,
+      "payoff": 1.41
     },
     {
       "decile": 9,
       "score_range": "8~9",
-      "n": 3519,
-      "mean_ret_pct": 3.9,
-      "win_rate_pct": 59.4,
-      "worst_pct": -53.2,
-      "payoff": 1.37
+      "n": 4046,
+      "mean_ret_pct": 7.07,
+      "win_rate_pct": 62.2,
+      "worst_pct": -66.4,
+      "payoff": 1.43
     },
     {
       "decile": 10,
       "score_range": "9~10",
-      "n": 3578,
-      "mean_ret_pct": 4.39,
-      "win_rate_pct": 60.8,
-      "worst_pct": -51.2,
-      "payoff": 1.35
+      "n": 4086,
+      "mean_ret_pct": 8.84,
+      "win_rate_pct": 62.9,
+      "worst_pct": -73.6,
+      "payoff": 1.61
     }
   ],
   "recent_5y_deciles": [
     {
       "decile": 1,
       "score_range": "0~1",
-      "n": 2219,
-      "mean_ret_pct": 3.03,
-      "win_rate_pct": 53.2,
-      "worst_pct": -60.3,
-      "payoff": 1.41
+      "n": 2753,
+      "mean_ret_pct": 5.37,
+      "win_rate_pct": 53.1,
+      "worst_pct": -98.2,
+      "payoff": 1.49
     },
     {
       "decile": 2,
       "score_range": "1~2",
-      "n": 2233,
-      "mean_ret_pct": 2.98,
-      "win_rate_pct": 55.9,
-      "worst_pct": -54.8,
-      "payoff": 1.37
+      "n": 2788,
+      "mean_ret_pct": 3.94,
+      "win_rate_pct": 56.4,
+      "worst_pct": -63.5,
+      "payoff": 1.26
     },
     {
       "decile": 3,
       "score_range": "2~3",
-      "n": 2242,
-      "mean_ret_pct": 2.93,
-      "win_rate_pct": 58.5,
-      "worst_pct": -48.6,
-      "payoff": 1.28
+      "n": 2792,
+      "mean_ret_pct": 4.82,
+      "win_rate_pct": 59.1,
+      "worst_pct": -59.1,
+      "payoff": 1.32
     },
     {
       "decile": 4,
       "score_range": "3~4",
-      "n": 2246,
-      "mean_ret_pct": 3.36,
-      "win_rate_pct": 60.9,
-      "worst_pct": -37.5,
-      "payoff": 1.28
+      "n": 2789,
+      "mean_ret_pct": 5.23,
+      "win_rate_pct": 60.6,
+      "worst_pct": -66.0,
+      "payoff": 1.36
     },
     {
       "decile": 5,
       "score_range": "4~5",
-      "n": 2223,
-      "mean_ret_pct": 2.78,
-      "win_rate_pct": 60.1,
-      "worst_pct": -44.8,
-      "payoff": 1.16
+      "n": 2774,
+      "mean_ret_pct": 5.08,
+      "win_rate_pct": 61.5,
+      "worst_pct": -69.7,
+      "payoff": 1.26
     },
     {
       "decile": 6,
       "score_range": "5~6",
-      "n": 2253,
-      "mean_ret_pct": 2.93,
-      "win_rate_pct": 59.2,
-      "worst_pct": -50.6,
-      "payoff": 1.23
+      "n": 2795,
+      "mean_ret_pct": 4.79,
+      "win_rate_pct": 59.4,
+      "worst_pct": -56.6,
+      "payoff": 1.3
     },
     {
       "decile": 7,
       "score_range": "6~7",
-      "n": 2248,
-      "mean_ret_pct": 2.58,
-      "win_rate_pct": 55.1,
-      "worst_pct": -54.9,
-      "payoff": 1.36
+      "n": 2798,
+      "mean_ret_pct": 4.64,
+      "win_rate_pct": 58.5,
+      "worst_pct": -55.1,
+      "payoff": 1.32
     },
     {
       "decile": 8,
       "score_range": "7~8",
-      "n": 2240,
-      "mean_ret_pct": 2.29,
-      "win_rate_pct": 55.2,
-      "worst_pct": -44.8,
-      "payoff": 1.24
+      "n": 2783,
+      "mean_ret_pct": 3.27,
+      "win_rate_pct": 54.4,
+      "worst_pct": -67.6,
+      "payoff": 1.29
     },
     {
       "decile": 9,
       "score_range": "8~9",
-      "n": 2235,
-      "mean_ret_pct": 2.69,
-      "win_rate_pct": 56.3,
-      "worst_pct": -38.7,
-      "payoff": 1.27
+      "n": 2797,
+      "mean_ret_pct": 3.8,
+      "win_rate_pct": 56.7,
+      "worst_pct": -66.4,
+      "payoff": 1.23
     },
     {
       "decile": 10,
       "score_range": "9~10",
-      "n": 2280,
-      "mean_ret_pct": 3.48,
-      "win_rate_pct": 57.2,
-      "worst_pct": -51.2,
-      "payoff": 1.33
+      "n": 2817,
+      "mean_ret_pct": 6.77,
+      "win_rate_pct": 58.7,
+      "worst_pct": -73.6,
+      "payoff": 1.49
     }
   ],
-  "recent_5y_cutoff": "2021-03-19",
+  "recent_5y_cutoff": "2021-03-04",
   "spearman_by_snapshot": {
-    "rho_mean": 0.0151,
-    "t_stat": 0.71,
-    "n_snapshots": 95,
-    "n_eff": 32,
+    "rho_mean": 0.0273,
+    "t_stat": 0.77,
+    "n_snapshots": 89,
+    "n_eff": 15,
     "alpha": 0.05,
     "note": "t는 중첩 보정 유효표본(n_eff) 기준"
   },
-  "d10_d1_spread_pct": 0.75,
+  "d10_d1_spread_pct": 1.6,
   "min_spread_required_pct": 0.11,
   "checks": {
     "rho_positive": true,
@@ -204,23 +204,21 @@
   },
   "display_allowed": false,
   "note": "검증 실패 — 점수를 리포트에 노출하지 말 것(SCORE_MODEL_DESIGN.md §2.5)",
-  "as_of": "2026-07-12",
+  "as_of": "2026-09-22",
   "latest_weights": {
-    "gp_assets": 0.094,
+    "gp_assets": 0.081,
     "gross_margin": 0.051,
-    "op_margin": 0.017,
-    "roa": 0.04,
-    "roe": 0.067,
-    "cop": 0.061,
-    "accruals": 0.015,
-    "shareholder_yield": 0.133,
-    "fcf_ev": 0.089,
-    "fcf_yield": 0.094,
-    "asset_growth": 0.011,
-    "droe": 0.055,
-    "rd_mktcap": 0.146,
-    "int_gp_assets": 0.113,
-    "int_value": 0.014
+    "op_margin": 0.078,
+    "roa": 0.047,
+    "roe": 0.078,
+    "cop": 0.076,
+    "shareholder_yield": 0.1,
+    "fcf_ev": 0.102,
+    "fcf_yield": 0.087,
+    "droe": 0.082,
+    "debt_issuance": 0.0,
+    "rd_mktcap": 0.106,
+    "int_gp_assets": 0.112
   },
   "attempted_horizons": [
     "12m",

@@ -1,0 +1,22 @@
+=== BTC: pure breakout MA120 (band=0, confirm=1) ===
+{'ma': 120, 'p': 0.582, 'l_on': 47.4, 'l_off': 34.1, 'real_sharpe': 1.117, 'real_mdd': -61.2, 'real_ulcer': 25.87, 'rand_sharpe_mean': 0.577, 'rand_mdd_mean': -75.9, 'rand_ulcer_mean': 40.45, 'pctile_sharpe': 100.0, 'pctile_mdd_better': 95.1, 'pctile_ulcer_better': 96.3}
+
+=== BTC: regime grid, trend_ma=120 only (band x confirm) ===
+band=0.01 confirm=1: sharpe_real=1.133 vs rand=0.597 sharpe_pct=100.0 | mdd_real=-59.7 vs rand=-75.4 mdd_pct=96.2 | CAGR=46.73% off_episodes=33 | p=0.582 l_on=74.7 l_off=53.8
+band=0.01 confirm=3: sharpe_real=1.07 vs rand=0.599 sharpe_pct=99.5 | mdd_real=-65.0 vs rand=-75.9 mdd_pct=87.7 | CAGR=42.98% off_episodes=22 | p=0.58 l_on=111.8 l_off=80.8
+band=0.01 confirm=5: sharpe_real=0.946 vs rand=0.604 sharpe_pct=97.2 | mdd_real=-65.4 vs rand=-76.2 mdd_pct=88.2 | CAGR=36.42% off_episodes=18 | p=0.583 l_on=145.2 l_off=98.1
+band=0.03 confirm=1: sharpe_real=1.112 vs rand=0.598 sharpe_pct=99.7 | mdd_real=-60.8 vs rand=-76.0 mdd_pct=94.7 | CAGR=45.46% off_episodes=20 | p=0.581 l_on=123.2 l_off=88.8
+band=0.03 confirm=3: sharpe_real=1.093 vs rand=0.603 sharpe_pct=99.4 | mdd_real=-60.0 vs rand=-76.0 mdd_pct=94.8 | CAGR=44.51% off_episodes=15 | p=0.587 l_on=165.9 l_off=116.6
+band=0.03 confirm=5: sharpe_real=0.952 vs rand=0.613 sharpe_pct=96.9 | mdd_real=-66.4 vs rand=-76.4 mdd_pct=86.5 | CAGR=36.77% off_episodes=14 | p=0.579 l_on=188.6 l_off=127.4
+band=0.05 confirm=1: sharpe_real=1.093 vs rand=0.6 sharpe_pct=99.7 | mdd_real=-62.0 vs rand=-76.0 mdd_pct=92.1 | CAGR=44.47% off_episodes=16 | p=0.584 l_on=154.7 l_off=110.2
+band=0.05 confirm=3: sharpe_real=1.075 vs rand=0.604 sharpe_pct=99.4 | mdd_real=-61.3 vs rand=-76.0 mdd_pct=93.5 | CAGR=43.4% off_episodes=14 | p=0.583 l_on=176.4 l_off=126.2
+band=0.05 confirm=5: sharpe_real=0.919 vs rand=0.619 sharpe_pct=94.7 | mdd_real=-65.6 vs rand=-76.7 mdd_pct=88.3 | CAGR=35.08% off_episodes=13 | p=0.583 l_on=205.7 l_off=135.9
+band=0.08 confirm=1: sharpe_real=0.958 vs rand=0.604 sharpe_pct=97.2 | mdd_real=-64.1 vs rand=-76.0 mdd_pct=89.4 | CAGR=37.05% off_episodes=14 | p=0.584 l_on=176.7 l_off=126.1
+band=0.08 confirm=3: sharpe_real=0.969 vs rand=0.616 sharpe_pct=97.4 | mdd_real=-66.9 vs rand=-76.4 mdd_pct=83.9 | CAGR=37.88% off_episodes=12 | p=0.575 l_on=221.4 l_off=150.2
+band=0.08 confirm=5: sharpe_real=0.93 vs rand=0.616 sharpe_pct=95.5 | mdd_real=-69.3 vs rand=-76.5 mdd_pct=79.7 | CAGR=35.7% off_episodes=11 | p=0.567 l_on=240.2 l_off=166.6
+
+=== BTC: live_trend_only (120,0.03,3, no momentum) ===
+{'p': 0.587, 'l_on': 165.9, 'l_off': 116.6, 'real_sharpe': 1.093, 'real_mdd': -60.0, 'real_ulcer': 27.13, 'rand_sharpe_mean': 0.603, 'rand_mdd_mean': -76.0, 'rand_ulcer_mean': 40.07, 'pctile_sharpe': 99.4, 'pctile_mdd_better': 94.8, 'pctile_ulcer_better': 90.7}
+
+=== BTC: live_with_momentum (120,0.03,3 AND 3m momentum>0) ===
+{'p': 0.516, 'l_on': 52.1, 'l_off': 48.8, 'real_sharpe': 1.053, 'real_mdd': -57.2, 'real_ulcer': 26.04, 'rand_sharpe_mean': 0.541, 'rand_mdd_mean': -74.1, 'rand_ulcer_mean': 39.73, 'pctile_sharpe': 99.8, 'pctile_mdd_better': 96.2, 'pctile_ulcer_better': 92.8}

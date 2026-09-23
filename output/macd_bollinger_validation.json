@@ -1,0 +1,690 @@
+{
+  "assets": {
+    "KOSPI": {
+      "ticker": "^KS11",
+      "n_days": 7324,
+      "cost_bps": 5.0,
+      "live_params": {
+        "trend_ma": 200,
+        "band": 0.01,
+        "confirm": 3,
+        "mom": "12_1",
+        "dip_ma": 20,
+        "vol_target": 0.15
+      },
+      "buy_hold": {
+        "cagr": 8.17,
+        "sharpe": 0.424,
+        "mdd": -64.7
+      },
+      "live": {
+        "cagr": 8.81,
+        "sharpe": 0.549,
+        "mdd": -42.1
+      },
+      "macd": {
+        "cagr": 4.21,
+        "sharpe": 0.32,
+        "mdd": -62.2
+      },
+      "bollinger": {
+        "cagr": 9.38,
+        "sharpe": 0.739,
+        "mdd": -22.9
+      },
+      "macd_vs_buyhold": {
+        "a_cagr": 4.21,
+        "b_cagr": 8.17,
+        "a_sharpe": 0.32,
+        "b_sharpe": 0.424,
+        "a_mdd": -62.2,
+        "b_mdd": -64.7,
+        "delta_cagr_ci90": [
+          -9.884,
+          1.088
+        ],
+        "prob_a_beats_b_pct": 9.7
+      },
+      "macd_vs_live": {
+        "a_cagr": 4.21,
+        "b_cagr": 8.81,
+        "a_sharpe": 0.32,
+        "b_sharpe": 0.549,
+        "a_mdd": -62.2,
+        "b_mdd": -42.1,
+        "delta_cagr_ci90": [
+          -10.594,
+          1.356
+        ],
+        "prob_a_beats_b_pct": 9.2
+      },
+      "bollinger_vs_buyhold": {
+        "a_cagr": 9.38,
+        "b_cagr": 8.17,
+        "a_sharpe": 0.739,
+        "b_sharpe": 0.424,
+        "a_mdd": -22.9,
+        "b_mdd": -64.7,
+        "delta_cagr_ci90": [
+          -6.748,
+          8.509
+        ],
+        "prob_a_beats_b_pct": 57.4
+      },
+      "bollinger_vs_live": {
+        "a_cagr": 9.38,
+        "b_cagr": 8.81,
+        "a_sharpe": 0.739,
+        "b_sharpe": 0.549,
+        "a_mdd": -22.9,
+        "b_mdd": -42.1,
+        "delta_cagr_ci90": [
+          -3.926,
+          4.708
+        ],
+        "prob_a_beats_b_pct": 57.9
+      }
+    },
+    "KOSDAQ": {
+      "ticker": "^KQ11",
+      "n_days": 6385,
+      "cost_bps": 5.0,
+      "live_params": {
+        "trend_ma": 200,
+        "band": 0.01,
+        "confirm": 3,
+        "mom": "12_1",
+        "dip_ma": 20,
+        "vol_target": 0.15
+      },
+      "buy_hold": {
+        "cagr": -0.22,
+        "sharpe": 0.126,
+        "mdd": -72.3
+      },
+      "live": {
+        "cagr": -0.05,
+        "sharpe": 0.078,
+        "mdd": -55.8
+      },
+      "macd": {
+        "cagr": 8.13,
+        "sharpe": 0.581,
+        "mdd": -40.8
+      },
+      "bollinger": {
+        "cagr": 5.28,
+        "sharpe": 0.586,
+        "mdd": -19.3
+      },
+      "macd_vs_buyhold": {
+        "a_cagr": 8.13,
+        "b_cagr": -0.22,
+        "a_sharpe": 0.581,
+        "b_sharpe": 0.126,
+        "a_mdd": -40.8,
+        "b_mdd": -72.3,
+        "delta_cagr_ci90": [
+          1.696,
+          14.825
+        ],
+        "prob_a_beats_b_pct": 97.9
+      },
+      "macd_vs_live": {
+        "a_cagr": 8.13,
+        "b_cagr": -0.05,
+        "a_sharpe": 0.581,
+        "b_sharpe": 0.078,
+        "a_mdd": -40.8,
+        "b_mdd": -55.8,
+        "delta_cagr_ci90": [
+          2.836,
+          13.614
+        ],
+        "prob_a_beats_b_pct": 99.6
+      },
+      "bollinger_vs_buyhold": {
+        "a_cagr": 5.28,
+        "b_cagr": -0.22,
+        "a_sharpe": 0.586,
+        "b_sharpe": 0.126,
+        "a_mdd": -19.3,
+        "b_mdd": -72.3,
+        "delta_cagr_ci90": [
+          -4.052,
+          14.482
+        ],
+        "prob_a_beats_b_pct": 84.8
+      },
+      "bollinger_vs_live": {
+        "a_cagr": 5.28,
+        "b_cagr": -0.05,
+        "a_sharpe": 0.586,
+        "b_sharpe": 0.078,
+        "a_mdd": -19.3,
+        "b_mdd": -55.8,
+        "delta_cagr_ci90": [
+          0.178,
+          10.543
+        ],
+        "prob_a_beats_b_pct": 95.5
+      }
+    },
+    "GOLD": {
+      "ticker": "GLD",
+      "n_days": 5487,
+      "cost_bps": 5.0,
+      "live_params": {
+        "trend_ma": 200,
+        "band": 0.01,
+        "confirm": 3,
+        "mom": "12_1",
+        "dip_ma": 20,
+        "vol_target": 0.15
+      },
+      "buy_hold": {
+        "cagr": 10.61,
+        "sharpe": 0.644,
+        "mdd": -45.6
+      },
+      "live": {
+        "cagr": 8.2,
+        "sharpe": 0.603,
+        "mdd": -36.9
+      },
+      "macd": {
+        "cagr": 7.11,
+        "sharpe": 0.589,
+        "mdd": -22.4
+      },
+      "bollinger": {
+        "cagr": 3.61,
+        "sharpe": 0.385,
+        "mdd": -23.7
+      },
+      "macd_vs_buyhold": {
+        "a_cagr": 7.11,
+        "b_cagr": 10.61,
+        "a_sharpe": 0.589,
+        "b_sharpe": 0.644,
+        "a_mdd": -22.4,
+        "b_mdd": -45.6,
+        "delta_cagr_ci90": [
+          -8.237,
+          0.702
+        ],
+        "prob_a_beats_b_pct": 8.2
+      },
+      "macd_vs_live": {
+        "a_cagr": 7.11,
+        "b_cagr": 8.2,
+        "a_sharpe": 0.589,
+        "b_sharpe": 0.603,
+        "a_mdd": -22.4,
+        "b_mdd": -36.9,
+        "delta_cagr_ci90": [
+          -6.148,
+          2.687
+        ],
+        "prob_a_beats_b_pct": 26.7
+      },
+      "bollinger_vs_buyhold": {
+        "a_cagr": 3.61,
+        "b_cagr": 10.61,
+        "a_sharpe": 0.385,
+        "b_sharpe": 0.644,
+        "a_mdd": -23.7,
+        "b_mdd": -45.6,
+        "delta_cagr_ci90": [
+          -12.415,
+          -2.105
+        ],
+        "prob_a_beats_b_pct": 1.1
+      },
+      "bollinger_vs_live": {
+        "a_cagr": 3.61,
+        "b_cagr": 8.2,
+        "a_sharpe": 0.385,
+        "b_sharpe": 0.603,
+        "a_mdd": -23.7,
+        "b_mdd": -36.9,
+        "delta_cagr_ci90": [
+          -9.28,
+          -1.225
+        ],
+        "prob_a_beats_b_pct": 1.5
+      }
+    },
+    "BOND": {
+      "ticker": "IEF",
+      "n_days": 6069,
+      "cost_bps": 5.0,
+      "live_params": {
+        "trend_ma": 150,
+        "band": 0.0,
+        "confirm": 3,
+        "mom": "12_1",
+        "dip_ma": 20,
+        "vol_target": 0.15
+      },
+      "buy_hold": {
+        "cagr": 3.46,
+        "sharpe": 0.535,
+        "mdd": -23.9
+      },
+      "live": {
+        "cagr": 2.35,
+        "sharpe": 0.464,
+        "mdd": -10.0
+      },
+      "macd": {
+        "cagr": 1.41,
+        "sharpe": 0.312,
+        "mdd": -14.3
+      },
+      "bollinger": {
+        "cagr": 0.25,
+        "sharpe": 0.084,
+        "mdd": -18.6
+      },
+      "macd_vs_buyhold": {
+        "a_cagr": 1.41,
+        "b_cagr": 3.46,
+        "a_sharpe": 0.312,
+        "b_sharpe": 0.535,
+        "a_mdd": -14.3,
+        "b_mdd": -23.9,
+        "delta_cagr_ci90": [
+          -3.746,
+          -0.573
+        ],
+        "prob_a_beats_b_pct": 1.3
+      },
+      "macd_vs_live": {
+        "a_cagr": 1.41,
+        "b_cagr": 2.35,
+        "a_sharpe": 0.312,
+        "b_sharpe": 0.464,
+        "a_mdd": -14.3,
+        "b_mdd": -10.0,
+        "delta_cagr_ci90": [
+          -2.416,
+          0.521
+        ],
+        "prob_a_beats_b_pct": 13.4
+      },
+      "bollinger_vs_buyhold": {
+        "a_cagr": 0.25,
+        "b_cagr": 3.46,
+        "a_sharpe": 0.084,
+        "b_sharpe": 0.535,
+        "a_mdd": -18.6,
+        "b_mdd": -23.9,
+        "delta_cagr_ci90": [
+          -5.194,
+          -1.304
+        ],
+        "prob_a_beats_b_pct": 0.4
+      },
+      "bollinger_vs_live": {
+        "a_cagr": 0.25,
+        "b_cagr": 2.35,
+        "a_sharpe": 0.084,
+        "b_sharpe": 0.464,
+        "a_mdd": -18.6,
+        "b_mdd": -10.0,
+        "delta_cagr_ci90": [
+          -3.566,
+          -0.758
+        ],
+        "prob_a_beats_b_pct": 0.7
+      }
+    },
+    "NDX": {
+      "ticker": "^NDX",
+      "n_days": 10316,
+      "cost_bps": 5.0,
+      "live_params": {
+        "trend_ma": 200,
+        "band": 0.01,
+        "confirm": 3,
+        "mom": "12_1",
+        "dip_ma": 20,
+        "vol_target": 0.15
+      },
+      "buy_hold": {
+        "cagr": 14.57,
+        "sharpe": 0.656,
+        "mdd": -82.9
+      },
+      "live": {
+        "cagr": 10.27,
+        "sharpe": 0.622,
+        "mdd": -52.2
+      },
+      "macd": {
+        "cagr": 4.82,
+        "sharpe": 0.375,
+        "mdd": -70.7
+      },
+      "bollinger": {
+        "cagr": 3.87,
+        "sharpe": 0.392,
+        "mdd": -57.1
+      },
+      "macd_vs_buyhold": {
+        "a_cagr": 4.82,
+        "b_cagr": 14.57,
+        "a_sharpe": 0.375,
+        "b_sharpe": 0.656,
+        "a_mdd": -70.7,
+        "b_mdd": -82.9,
+        "delta_cagr_ci90": [
+          -14.624,
+          -4.485
+        ],
+        "prob_a_beats_b_pct": 0.1
+      },
+      "macd_vs_live": {
+        "a_cagr": 4.82,
+        "b_cagr": 10.27,
+        "a_sharpe": 0.375,
+        "b_sharpe": 0.622,
+        "a_mdd": -70.7,
+        "b_mdd": -52.2,
+        "delta_cagr_ci90": [
+          -10.383,
+          -0.569
+        ],
+        "prob_a_beats_b_pct": 3.4
+      },
+      "bollinger_vs_buyhold": {
+        "a_cagr": 3.87,
+        "b_cagr": 14.57,
+        "a_sharpe": 0.392,
+        "b_sharpe": 0.656,
+        "a_mdd": -57.1,
+        "b_mdd": -82.9,
+        "delta_cagr_ci90": [
+          -16.913,
+          -4.642
+        ],
+        "prob_a_beats_b_pct": 0.4
+      },
+      "bollinger_vs_live": {
+        "a_cagr": 3.87,
+        "b_cagr": 10.27,
+        "a_sharpe": 0.392,
+        "b_sharpe": 0.622,
+        "a_mdd": -57.1,
+        "b_mdd": -52.2,
+        "delta_cagr_ci90": [
+          -11.444,
+          -1.358
+        ],
+        "prob_a_beats_b_pct": 1.7
+      }
+    },
+    "SPX": {
+      "ticker": "^GSPC",
+      "n_days": 24791,
+      "cost_bps": 5.0,
+      "live_params": {
+        "trend_ma": 200,
+        "band": 0.01,
+        "confirm": 3,
+        "mom": "12_1",
+        "dip_ma": 20,
+        "vol_target": 0.15
+      },
+      "buy_hold": {
+        "cagr": 6.37,
+        "sharpe": 0.421,
+        "mdd": -86.2
+      },
+      "live": {
+        "cagr": 6.75,
+        "sharpe": 0.587,
+        "mdd": -41.0
+      },
+      "macd": {
+        "cagr": 4.45,
+        "sharpe": 0.424,
+        "mdd": -48.2
+      },
+      "bollinger": {
+        "cagr": 1.62,
+        "sharpe": 0.238,
+        "mdd": -55.1
+      },
+      "macd_vs_buyhold": {
+        "a_cagr": 4.45,
+        "b_cagr": 6.37,
+        "a_sharpe": 0.424,
+        "b_sharpe": 0.421,
+        "a_mdd": -48.2,
+        "b_mdd": -86.2,
+        "delta_cagr_ci90": [
+          -4.259,
+          0.619
+        ],
+        "prob_a_beats_b_pct": 11.6
+      },
+      "macd_vs_live": {
+        "a_cagr": 4.45,
+        "b_cagr": 6.75,
+        "a_sharpe": 0.424,
+        "b_sharpe": 0.587,
+        "a_mdd": -48.2,
+        "b_mdd": -41.0,
+        "delta_cagr_ci90": [
+          -4.504,
+          0.009
+        ],
+        "prob_a_beats_b_pct": 5.1
+      },
+      "bollinger_vs_buyhold": {
+        "a_cagr": 1.62,
+        "b_cagr": 6.37,
+        "a_sharpe": 0.238,
+        "b_sharpe": 0.421,
+        "a_mdd": -55.1,
+        "b_mdd": -86.2,
+        "delta_cagr_ci90": [
+          -7.437,
+          -1.821
+        ],
+        "prob_a_beats_b_pct": 0.4
+      },
+      "bollinger_vs_live": {
+        "a_cagr": 1.62,
+        "b_cagr": 6.75,
+        "a_sharpe": 0.238,
+        "b_sharpe": 0.587,
+        "a_mdd": -55.1,
+        "b_mdd": -41.0,
+        "delta_cagr_ci90": [
+          -7.156,
+          -2.933
+        ],
+        "prob_a_beats_b_pct": 0.0
+      }
+    },
+    "BTC": {
+      "ticker": "BTC-USD",
+      "n_days": 4379,
+      "cost_bps": 30.0,
+      "live_params": {
+        "trend_ma": 120,
+        "band": 0.03,
+        "confirm": 3,
+        "mom": "3m",
+        "dip_ma": 50,
+        "vol_target": 0.4
+      },
+      "buy_hold": {
+        "cagr": 34.34,
+        "sharpe": 0.814,
+        "mdd": -83.4
+      },
+      "live": {
+        "cagr": 44.26,
+        "sharpe": 1.09,
+        "mdd": -60.0
+      },
+      "macd": {
+        "cagr": 34.84,
+        "sharpe": 0.981,
+        "mdd": -56.5
+      },
+      "bollinger": {
+        "cagr": 25.27,
+        "sharpe": 0.88,
+        "mdd": -58.7
+      },
+      "macd_vs_buyhold": {
+        "a_cagr": 34.84,
+        "b_cagr": 34.34,
+        "a_sharpe": 0.981,
+        "b_sharpe": 0.814,
+        "a_mdd": -56.5,
+        "b_mdd": -83.4,
+        "delta_cagr_ci90": [
+          -17.225,
+          16.274
+        ],
+        "prob_a_beats_b_pct": 52.6
+      },
+      "macd_vs_live": {
+        "a_cagr": 34.84,
+        "b_cagr": 44.26,
+        "a_sharpe": 0.981,
+        "b_sharpe": 1.09,
+        "a_mdd": -56.5,
+        "b_mdd": -60.0,
+        "delta_cagr_ci90": [
+          -28.649,
+          6.564
+        ],
+        "prob_a_beats_b_pct": 14.2
+      },
+      "bollinger_vs_buyhold": {
+        "a_cagr": 25.27,
+        "b_cagr": 34.34,
+        "a_sharpe": 0.88,
+        "b_sharpe": 0.814,
+        "a_mdd": -58.7,
+        "b_mdd": -83.4,
+        "delta_cagr_ci90": [
+          -30.61,
+          11.487
+        ],
+        "prob_a_beats_b_pct": 24.9
+      },
+      "bollinger_vs_live": {
+        "a_cagr": 25.27,
+        "b_cagr": 44.26,
+        "a_sharpe": 0.88,
+        "b_sharpe": 1.09,
+        "a_mdd": -58.7,
+        "b_mdd": -60.0,
+        "delta_cagr_ci90": [
+          -39.028,
+          -2.782
+        ],
+        "prob_a_beats_b_pct": 2.5
+      }
+    },
+    "ETH": {
+      "ticker": "ETH-USD",
+      "n_days": 3230,
+      "cost_bps": 30.0,
+      "live_params": {
+        "trend_ma": 30,
+        "band": 0.0,
+        "confirm": 1,
+        "mom": "3m",
+        "dip_ma": 20,
+        "vol_target": 0.4
+      },
+      "buy_hold": {
+        "cagr": 17.47,
+        "sharpe": 0.584,
+        "mdd": -94.0
+      },
+      "live": {
+        "cagr": 36.18,
+        "sharpe": 0.871,
+        "mdd": -61.2
+      },
+      "macd": {
+        "cagr": 13.43,
+        "sharpe": 0.501,
+        "mdd": -72.8
+      },
+      "bollinger": {
+        "cagr": 21.34,
+        "sharpe": 0.681,
+        "mdd": -42.1
+      },
+      "macd_vs_buyhold": {
+        "a_cagr": 13.43,
+        "b_cagr": 17.47,
+        "a_sharpe": 0.501,
+        "b_sharpe": 0.584,
+        "a_mdd": -72.8,
+        "b_mdd": -94.0,
+        "delta_cagr_ci90": [
+          -46.795,
+          25.219
+        ],
+        "prob_a_beats_b_pct": 45.8
+      },
+      "macd_vs_live": {
+        "a_cagr": 13.43,
+        "b_cagr": 36.18,
+        "a_sharpe": 0.501,
+        "b_sharpe": 0.871,
+        "a_mdd": -72.8,
+        "b_mdd": -61.2,
+        "delta_cagr_ci90": [
+          -51.722,
+          1.847
+        ],
+        "prob_a_beats_b_pct": 6.5
+      },
+      "bollinger_vs_buyhold": {
+        "a_cagr": 21.34,
+        "b_cagr": 17.47,
+        "a_sharpe": 0.681,
+        "b_sharpe": 0.584,
+        "a_mdd": -42.1,
+        "b_mdd": -94.0,
+        "delta_cagr_ci90": [
+          -36.065,
+          32.896
+        ],
+        "prob_a_beats_b_pct": 58.8
+      },
+      "bollinger_vs_live": {
+        "a_cagr": 21.34,
+        "b_cagr": 36.18,
+        "a_sharpe": 0.681,
+        "b_sharpe": 0.871,
+        "a_mdd": -42.1,
+        "b_mdd": -61.2,
+        "delta_cagr_ci90": [
+          -36.829,
+          3.443
+        ],
+        "prob_a_beats_b_pct": 10.1
+      }
+    }
+  },
+  "pooled_pbo_dsr": {
+    "pbo": 0.039,
+    "dsr": 0.002,
+    "passed": false,
+    "n_periods_per_trial": 3232
+  }
+}

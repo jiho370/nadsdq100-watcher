@@ -1,0 +1,509 @@
+{
+  "asset": "btc",
+  "ticker": "BTC-USD",
+  "n_days": 4372,
+  "cost_bps": 5.0,
+  "baseline": {
+    "sharpe": 1.106,
+    "cagr": 45.27,
+    "ulcer": 26.83,
+    "mdd": -59.6,
+    "score": 0.36936216004559685
+  },
+  "grid": [
+    {
+      "threshold": -0.05,
+      "floor": 0.0,
+      "cooldown": 3,
+      "sharpe": 1.106,
+      "cagr": 39.75,
+      "ulcer": 25.3,
+      "mdd": -47.9,
+      "turnover_month_pct": 95.5,
+      "score": 0.4051939299945927
+    },
+    {
+      "threshold": -0.05,
+      "floor": 0.0,
+      "cooldown": 5,
+      "sharpe": 1.19,
+      "cagr": 40.52,
+      "ulcer": 23.14,
+      "mdd": -52.6,
+      "turnover_month_pct": 79.2,
+      "score": 0.45602002660810365
+    },
+    {
+      "threshold": -0.05,
+      "floor": 0.0,
+      "cooldown": 10,
+      "sharpe": 1.251,
+      "cagr": 38.99,
+      "ulcer": 15.86,
+      "mdd": -40.1,
+      "turnover_month_pct": 59.0,
+      "score": 0.6270951186672109
+    },
+    {
+      "threshold": -0.05,
+      "floor": 0.25,
+      "cooldown": 3,
+      "sharpe": 1.136,
+      "cagr": 41.68,
+      "ulcer": 25.06,
+      "mdd": -49.3,
+      "turnover_month_pct": 75.2,
+      "score": 0.4108665261499111
+    },
+    {
+      "threshold": -0.05,
+      "floor": 0.25,
+      "cooldown": 5,
+      "sharpe": 1.218,
+      "cagr": 42.53,
+      "ulcer": 23.05,
+      "mdd": -49.2,
+      "turnover_month_pct": 63.0,
+      "score": 0.4581122642092439
+    },
+    {
+      "threshold": -0.05,
+      "floor": 0.25,
+      "cooldown": 10,
+      "sharpe": 1.287,
+      "cagr": 41.65,
+      "ulcer": 17.16,
+      "mdd": -37.2,
+      "turnover_month_pct": 47.9,
+      "score": 0.5966810501559948
+    },
+    {
+      "threshold": -0.05,
+      "floor": 0.5,
+      "cooldown": 3,
+      "sharpe": 1.144,
+      "cagr": 43.25,
+      "ulcer": 25.08,
+      "mdd": -51.2,
+      "turnover_month_pct": 54.8,
+      "score": 0.4104237023936016
+    },
+    {
+      "threshold": -0.05,
+      "floor": 0.5,
+      "cooldown": 5,
+      "sharpe": 1.205,
+      "cagr": 44.0,
+      "ulcer": 23.62,
+      "mdd": -46.1,
+      "turnover_month_pct": 46.6,
+      "score": 0.44472215494568373
+    },
+    {
+      "threshold": -0.05,
+      "floor": 0.5,
+      "cooldown": 10,
+      "sharpe": 1.257,
+      "cagr": 43.6,
+      "ulcer": 19.54,
+      "mdd": -39.0,
+      "turnover_month_pct": 36.5,
+      "score": 0.5405195291901659
+    },
+    {
+      "threshold": -0.07,
+      "floor": 0.0,
+      "cooldown": 3,
+      "sharpe": 1.024,
+      "cagr": 37.96,
+      "ulcer": 26.82,
+      "mdd": -52.6,
+      "turnover_month_pct": 51.5,
+      "score": 0.3695864823686499
+    },
+    {
+      "threshold": -0.07,
+      "floor": 0.0,
+      "cooldown": 5,
+      "sharpe": 1.065,
+      "cagr": 38.18,
+      "ulcer": 26.34,
+      "mdd": -50.7,
+      "turnover_month_pct": 46.6,
+      "score": 0.38070563863934054
+    },
+    {
+      "threshold": -0.07,
+      "floor": 0.0,
+      "cooldown": 10,
+      "sharpe": 1.11,
+      "cagr": 38.09,
+      "ulcer": 24.12,
+      "mdd": -47.3,
+      "turnover_month_pct": 39.9,
+      "score": 0.4329906143674894
+    },
+    {
+      "threshold": -0.07,
+      "floor": 0.25,
+      "cooldown": 3,
+      "sharpe": 1.06,
+      "cagr": 40.05,
+      "ulcer": 26.61,
+      "mdd": -54.1,
+      "turnover_month_pct": 42.0,
+      "score": 0.37445119295720725
+    },
+    {
+      "threshold": -0.07,
+      "floor": 0.25,
+      "cooldown": 5,
+      "sharpe": 1.103,
+      "cagr": 40.42,
+      "ulcer": 26.09,
+      "mdd": -52.4,
+      "turnover_month_pct": 38.4,
+      "score": 0.38675658810208247
+    },
+    {
+      "threshold": -0.07,
+      "floor": 0.25,
+      "cooldown": 10,
+      "sharpe": 1.151,
+      "cagr": 40.57,
+      "ulcer": 24.0,
+      "mdd": -45.4,
+      "turnover_month_pct": 33.4,
+      "score": 0.4358167685739796
+    },
+    {
+      "threshold": -0.07,
+      "floor": 0.5,
+      "cooldown": 3,
+      "sharpe": 1.086,
+      "cagr": 41.97,
+      "ulcer": 26.54,
+      "mdd": -55.8,
+      "turnover_month_pct": 32.8,
+      "score": 0.37611012884621764
+    },
+    {
+      "threshold": -0.07,
+      "floor": 0.5,
+      "cooldown": 5,
+      "sharpe": 1.121,
+      "cagr": 42.35,
+      "ulcer": 26.09,
+      "mdd": -54.5,
+      "turnover_month_pct": 30.2,
+      "score": 0.3866360703860912
+    },
+    {
+      "threshold": -0.07,
+      "floor": 0.5,
+      "cooldown": 10,
+      "sharpe": 1.159,
+      "cagr": 42.6,
+      "ulcer": 24.36,
+      "mdd": -46.7,
+      "turnover_month_pct": 26.9,
+      "score": 0.427367544409108
+    },
+    {
+      "threshold": -0.1,
+      "floor": 0.0,
+      "cooldown": 3,
+      "sharpe": 1.035,
+      "cagr": 39.78,
+      "ulcer": 28.61,
+      "mdd": -62.8,
+      "turnover_month_pct": 33.2,
+      "score": 0.3273860719809282
+    },
+    {
+      "threshold": -0.1,
+      "floor": 0.0,
+      "cooldown": 5,
+      "sharpe": 1.048,
+      "cagr": 39.13,
+      "ulcer": 28.32,
+      "mdd": -61.4,
+      "turnover_month_pct": 29.4,
+      "score": 0.33418892138011524
+    },
+    {
+      "threshold": -0.1,
+      "floor": 0.0,
+      "cooldown": 10,
+      "sharpe": 1.122,
+      "cagr": 41.87,
+      "ulcer": 24.42,
+      "mdd": -45.6,
+      "turnover_month_pct": 27.3,
+      "score": 0.4259931272287641
+    },
+    {
+      "threshold": -0.1,
+      "floor": 0.25,
+      "cooldown": 3,
+      "sharpe": 1.06,
+      "cagr": 41.28,
+      "ulcer": 28.06,
+      "mdd": -61.9,
+      "turnover_month_pct": 28.3,
+      "score": 0.34024464076935607
+    },
+    {
+      "threshold": -0.1,
+      "floor": 0.25,
+      "cooldown": 5,
+      "sharpe": 1.078,
+      "cagr": 40.94,
+      "ulcer": 27.73,
+      "mdd": -60.5,
+      "turnover_month_pct": 25.4,
+      "score": 0.34805462177287727
+    },
+    {
+      "threshold": -0.1,
+      "floor": 0.25,
+      "cooldown": 10,
+      "sharpe": 1.141,
+      "cagr": 43.14,
+      "ulcer": 24.69,
+      "mdd": -47.5,
+      "turnover_month_pct": 23.9,
+      "score": 0.4195228998140034
+    },
+    {
+      "threshold": -0.1,
+      "floor": 0.5,
+      "cooldown": 3,
+      "sharpe": 1.081,
+      "cagr": 42.7,
+      "ulcer": 27.58,
+      "mdd": -61.0,
+      "turnover_month_pct": 23.5,
+      "score": 0.3516652828990517
+    },
+    {
+      "threshold": -0.1,
+      "floor": 0.5,
+      "cooldown": 5,
+      "sharpe": 1.098,
+      "cagr": 42.57,
+      "ulcer": 27.28,
+      "mdd": -59.9,
+      "turnover_month_pct": 21.6,
+      "score": 0.35875333736436515
+    },
+    {
+      "threshold": -0.1,
+      "floor": 0.5,
+      "cooldown": 10,
+      "sharpe": 1.143,
+      "cagr": 44.14,
+      "ulcer": 25.19,
+      "mdd": -51.4,
+      "turnover_month_pct": 20.6,
+      "score": 0.4078426058233093
+    },
+    {
+      "threshold": -0.15,
+      "floor": 0.0,
+      "cooldown": 3,
+      "sharpe": 1.067,
+      "cagr": 42.69,
+      "ulcer": 27.19,
+      "mdd": -60.0,
+      "turnover_month_pct": 16.8,
+      "score": 0.3607028676394388
+    },
+    {
+      "threshold": -0.15,
+      "floor": 0.0,
+      "cooldown": 5,
+      "sharpe": 1.049,
+      "cagr": 41.28,
+      "ulcer": 27.36,
+      "mdd": -60.0,
+      "turnover_month_pct": 16.8,
+      "score": 0.35688571652598594
+    },
+    {
+      "threshold": -0.15,
+      "floor": 0.0,
+      "cooldown": 10,
+      "sharpe": 1.075,
+      "cagr": 42.69,
+      "ulcer": 26.83,
+      "mdd": -58.5,
+      "turnover_month_pct": 16.8,
+      "score": 0.3691923732371757
+    },
+    {
+      "threshold": -0.15,
+      "floor": 0.25,
+      "cooldown": 3,
+      "sharpe": 1.078,
+      "cagr": 43.36,
+      "ulcer": 27.09,
+      "mdd": -59.9,
+      "turnover_month_pct": 16.2,
+      "score": 0.3630968919620705
+    },
+    {
+      "threshold": -0.15,
+      "floor": 0.25,
+      "cooldown": 5,
+      "sharpe": 1.066,
+      "cagr": 42.33,
+      "ulcer": 27.18,
+      "mdd": -59.8,
+      "turnover_month_pct": 16.2,
+      "score": 0.36108560098415643
+    },
+    {
+      "threshold": -0.15,
+      "floor": 0.25,
+      "cooldown": 10,
+      "sharpe": 1.087,
+      "cagr": 43.41,
+      "ulcer": 26.79,
+      "mdd": -58.7,
+      "turnover_month_pct": 16.2,
+      "score": 0.3702387915721649
+    },
+    {
+      "threshold": -0.15,
+      "floor": 0.5,
+      "cooldown": 3,
+      "sharpe": 1.088,
+      "cagr": 44.01,
+      "ulcer": 27.0,
+      "mdd": -59.8,
+      "turnover_month_pct": 15.3,
+      "score": 0.3653399679868205
+    },
+    {
+      "threshold": -0.15,
+      "floor": 0.5,
+      "cooldown": 5,
+      "sharpe": 1.082,
+      "cagr": 43.35,
+      "ulcer": 27.03,
+      "mdd": -59.7,
+      "turnover_month_pct": 15.3,
+      "score": 0.3645630775958795
+    },
+    {
+      "threshold": -0.15,
+      "floor": 0.5,
+      "cooldown": 10,
+      "sharpe": 1.096,
+      "cagr": 44.08,
+      "ulcer": 26.77,
+      "mdd": -58.9,
+      "turnover_month_pct": 15.3,
+      "score": 0.37060889790053736
+    }
+  ],
+  "best": {
+    "threshold": -0.05,
+    "floor": 0.0,
+    "cooldown": 10,
+    "sharpe": 1.251,
+    "cagr": 38.99,
+    "ulcer": 15.86,
+    "mdd": -40.1,
+    "turnover_month_pct": 59.0,
+    "score": 0.6270951186672109
+  },
+  "bootstrap_best_vs_baseline": {
+    "delta_ulcer_ci90": [
+      0.645,
+      18.441
+    ],
+    "delta_cagr_ci90": [
+      -21.106,
+      6.393
+    ],
+    "delta_sharpe_ci90": [
+      -0.1,
+      0.389
+    ],
+    "delta_ulcer_excludes_zero": true,
+    "delta_sharpe_excludes_zero": false
+  },
+  "cost_sensitivity_best": [
+    {
+      "cost_bps": 5.0,
+      "sharpe": 1.251,
+      "cagr": 38.99,
+      "ulcer": 15.86,
+      "mdd": -40.1
+    },
+    {
+      "cost_bps": 13.9,
+      "sharpe": 1.227,
+      "cagr": 38.08,
+      "ulcer": 16.18,
+      "mdd": -40.9
+    },
+    {
+      "cost_bps": 30.0,
+      "sharpe": 1.183,
+      "cagr": 36.45,
+      "ulcer": 16.81,
+      "mdd": -42.2
+    },
+    {
+      "cost_bps": 50.0,
+      "sharpe": 1.129,
+      "cagr": 34.45,
+      "ulcer": 17.67,
+      "mdd": -43.9
+    }
+  ],
+  "pbo_gate": {
+    "input": {
+      "horizon": "circuit_breaker_grid",
+      "universe": "asset",
+      "cost": "5.0bp"
+    },
+    "n_trials": 36,
+    "n_events": 208,
+    "pbo": {
+      "pbo": 0.2879,
+      "embargo": 0,
+      "purged_events_total": 0,
+      "n_combos": 924,
+      "n_blocks": 12,
+      "lambda_mean": 1.0201,
+      "is_sharpe_mean": -0.0011,
+      "oos_sharpe_mean": -0.0294,
+      "degradation_slope": -1.1083,
+      "prob_oos_loss": 0.6212
+    },
+    "pbo_verdict": "중간(주의)",
+    "dsr": {
+      "sr": -0.0005,
+      "sr0": 0.0312,
+      "dsr": 0.324,
+      "dsr_uncorrected": 0.324,
+      "skew": 0.13,
+      "kurtosis": 8.011,
+      "T": 208,
+      "T_eff": 208,
+      "N": 36,
+      "best_trial": "th-0.15_f0.5_c3"
+    },
+    "dsr_verdict": "통과 실패(다중검정 감안 시 샤프가 유의하지 않음)",
+    "passed": false,
+    "references": [
+      "Bailey et al. 2017 (PBO/CSCV)",
+      "Bailey & López de Prado 2014 (DSR)"
+    ],
+    "note": "조합 간 상관으로 N이 과대계상될 수 있어 DSR은 보수적(실제보다 낮게) 추정됨."
+  }
+}

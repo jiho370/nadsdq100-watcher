@@ -1,0 +1,766 @@
+{
+  "btc": {
+    "asset": "btc",
+    "ticker": "BTC-USD",
+    "n_days": 4372,
+    "regime_params": {
+      "trend_ma": 120,
+      "band": 0.03,
+      "confirm": 3
+    },
+    "cost_bps": 30,
+    "grid": [
+      {
+        "target": null,
+        "cagr": 44.66,
+        "bh_cagr": 34.69,
+        "ulcer": 27.14,
+        "bh_ulcer": 42.54,
+        "mdd": -60.0,
+        "sharpe": 1.096,
+        "avg_turnover": 0.0066,
+        "score": 0.3619908881518865
+      },
+      {
+        "target": 0.15,
+        "cagr": 15.71,
+        "bh_cagr": 34.69,
+        "ulcer": 7.76,
+        "bh_ulcer": 42.54,
+        "mdd": -17.7,
+        "sharpe": 1.154,
+        "avg_turnover": 0.0041,
+        "score": -Infinity
+      },
+      {
+        "target": 0.2,
+        "cagr": 20.61,
+        "bh_cagr": 34.69,
+        "ulcer": 10.27,
+        "bh_ulcer": 42.54,
+        "mdd": -22.9,
+        "sharpe": 1.144,
+        "avg_turnover": 0.0054,
+        "score": -Infinity
+      },
+      {
+        "target": 0.25,
+        "cagr": 25.05,
+        "bh_cagr": 34.69,
+        "ulcer": 12.72,
+        "bh_ulcer": 42.54,
+        "mdd": -27.9,
+        "sharpe": 1.131,
+        "avg_turnover": 0.0064,
+        "score": -Infinity
+      },
+      {
+        "target": 0.3,
+        "cagr": 29.07,
+        "bh_cagr": 34.69,
+        "ulcer": 14.87,
+        "bh_ulcer": 42.54,
+        "mdd": -30.8,
+        "sharpe": 1.123,
+        "avg_turnover": 0.0071,
+        "score": 0.650477417944716
+      },
+      {
+        "target": 0.35,
+        "cagr": 32.36,
+        "bh_cagr": 34.69,
+        "ulcer": 16.7,
+        "bh_ulcer": 42.54,
+        "mdd": -32.6,
+        "sharpe": 1.115,
+        "avg_turnover": 0.0075,
+        "score": 0.60738454163539
+      },
+      {
+        "target": 0.4,
+        "cagr": 35.39,
+        "bh_cagr": 34.69,
+        "ulcer": 18.28,
+        "bh_ulcer": 42.54,
+        "mdd": -33.6,
+        "sharpe": 1.122,
+        "avg_turnover": 0.0076,
+        "score": 0.5701572493479552
+      },
+      {
+        "target": 0.45,
+        "cagr": 37.65,
+        "bh_cagr": 34.69,
+        "ulcer": 19.79,
+        "bh_ulcer": 42.54,
+        "mdd": -36.7,
+        "sharpe": 1.122,
+        "avg_turnover": 0.0075,
+        "score": 0.5347504839810805
+      },
+      {
+        "target": 0.5,
+        "cagr": 39.67,
+        "bh_cagr": 34.69,
+        "ulcer": 21.12,
+        "bh_ulcer": 42.54,
+        "mdd": -39.9,
+        "sharpe": 1.124,
+        "avg_turnover": 0.0075,
+        "score": 0.5035250498352286
+      },
+      {
+        "target": 0.6,
+        "cagr": 43.29,
+        "bh_cagr": 34.69,
+        "ulcer": 23.33,
+        "bh_ulcer": 42.54,
+        "mdd": -45.2,
+        "sharpe": 1.135,
+        "avg_turnover": 0.0071,
+        "score": 0.45147493452537746
+      },
+      {
+        "target": 0.7,
+        "cagr": 44.79,
+        "bh_cagr": 34.69,
+        "ulcer": 24.72,
+        "bh_ulcer": 42.54,
+        "mdd": -49.5,
+        "sharpe": 1.129,
+        "avg_turnover": 0.0069,
+        "score": 0.41890654336278116
+      },
+      {
+        "target": 0.8,
+        "cagr": 45.56,
+        "bh_cagr": 34.69,
+        "ulcer": 25.45,
+        "bh_ulcer": 42.54,
+        "mdd": -52.8,
+        "sharpe": 1.126,
+        "avg_turnover": 0.0067,
+        "score": 0.40164040994202704
+      },
+      {
+        "target": 1.0,
+        "cagr": 45.13,
+        "bh_cagr": 34.69,
+        "ulcer": 26.56,
+        "bh_ulcer": 42.54,
+        "mdd": -57.7,
+        "sharpe": 1.107,
+        "avg_turnover": 0.0066,
+        "score": 0.37567199015742087
+      }
+    ],
+    "best": {
+      "target": 0.3,
+      "cagr": 29.07,
+      "bh_cagr": 34.69,
+      "ulcer": 14.87,
+      "bh_ulcer": 42.54,
+      "mdd": -30.8,
+      "sharpe": 1.123,
+      "avg_turnover": 0.0071,
+      "score": 0.650477417944716
+    },
+    "off": {
+      "target": null,
+      "cagr": 44.66,
+      "bh_cagr": 34.69,
+      "ulcer": 27.14,
+      "bh_ulcer": 42.54,
+      "mdd": -60.0,
+      "sharpe": 1.096,
+      "avg_turnover": 0.0066,
+      "score": 0.3619908881518865
+    },
+    "current_default": {
+      "target": 0.4,
+      "cagr": 35.39,
+      "bh_cagr": 34.69,
+      "ulcer": 18.28,
+      "bh_ulcer": 42.54,
+      "mdd": -33.6,
+      "sharpe": 1.122,
+      "avg_turnover": 0.0076,
+      "score": 0.5701572493479552
+    },
+    "bootstrap_best_vs_off": {
+      "delta_ulcer_ci90": [
+        2.969,
+        16.291
+      ],
+      "delta_cagr_ci90": [
+        -31.504,
+        -3.862
+      ],
+      "delta_sharpe_ci90": [
+        -0.119,
+        0.182
+      ],
+      "delta_ulcer_excludes_zero": true,
+      "delta_sharpe_excludes_zero": false
+    },
+    "bootstrap_best_vs_current": {
+      "delta_ulcer_ci90": [
+        1.421,
+        5.155
+      ],
+      "delta_cagr_ci90": [
+        -11.88,
+        -1.838
+      ],
+      "delta_sharpe_ci90": [
+        -0.049,
+        0.054
+      ],
+      "delta_ulcer_excludes_zero": true,
+      "delta_sharpe_excludes_zero": false
+    },
+    "pbo_gate": {
+      "input": {
+        "horizon": "vol_target_grid",
+        "universe": "asset",
+        "cost": "30bp"
+      },
+      "n_trials": 13,
+      "n_events": 208,
+      "pbo": {
+        "pbo": 0.0032,
+        "embargo": 0,
+        "purged_events_total": 0,
+        "n_combos": 924,
+        "n_blocks": 12,
+        "lambda_mean": 1.1691,
+        "is_sharpe_mean": 0.0037,
+        "oos_sharpe_mean": -0.003,
+        "degradation_slope": -0.964,
+        "prob_oos_loss": 0.4924
+      },
+      "pbo_verdict": "낮음(과최적화 가능성 작음)",
+      "dsr": {
+        "sr": 0.006,
+        "sr0": 0.1111,
+        "dsr": 0.0653,
+        "dsr_uncorrected": 0.0653,
+        "skew": 0.111,
+        "kurtosis": 7.913,
+        "T": 208,
+        "T_eff": 208,
+        "N": 13,
+        "best_trial": "vt_0.8"
+      },
+      "dsr_verdict": "통과 실패(다중검정 감안 시 샤프가 유의하지 않음)",
+      "passed": false,
+      "references": [
+        "Bailey et al. 2017 (PBO/CSCV)",
+        "Bailey & López de Prado 2014 (DSR)"
+      ],
+      "note": "조합 간 상관으로 N이 과대계상될 수 있어 DSR은 보수적(실제보다 낮게) 추정됨."
+    }
+  },
+  "eth": {
+    "asset": "eth",
+    "ticker": "ETH-USD",
+    "n_days": 3223,
+    "regime_params": {
+      "trend_ma": 30,
+      "band": 0.0,
+      "confirm": 1
+    },
+    "cost_bps": 30,
+    "grid": [
+      {
+        "target": null,
+        "cagr": 36.04,
+        "bh_cagr": 17.34,
+        "ulcer": 34.04,
+        "bh_ulcer": 60.21,
+        "mdd": -61.2,
+        "sharpe": 0.869,
+        "avg_turnover": 0.0742,
+        "score": 0.4347239519899925
+      },
+      {
+        "target": 0.15,
+        "cagr": 17.31,
+        "bh_cagr": 17.34,
+        "ulcer": 8.84,
+        "bh_ulcer": 60.21,
+        "mdd": -20.6,
+        "sharpe": 0.973,
+        "avg_turnover": 0.0195,
+        "score": 0.8531302592961711
+      },
+      {
+        "target": 0.2,
+        "cagr": 20.43,
+        "bh_cagr": 17.34,
+        "ulcer": 10.92,
+        "bh_ulcer": 60.21,
+        "mdd": -24.7,
+        "sharpe": 1.0,
+        "avg_turnover": 0.0257,
+        "score": 0.8186890476243852
+      },
+      {
+        "target": 0.25,
+        "cagr": 23.46,
+        "bh_cagr": 17.34,
+        "ulcer": 13.08,
+        "bh_ulcer": 60.21,
+        "mdd": -30.4,
+        "sharpe": 1.007,
+        "avg_turnover": 0.032,
+        "score": 0.7827100500966578
+      },
+      {
+        "target": 0.3,
+        "cagr": 26.44,
+        "bh_cagr": 17.34,
+        "ulcer": 15.3,
+        "bh_ulcer": 60.21,
+        "mdd": -34.9,
+        "sharpe": 1.009,
+        "avg_turnover": 0.038,
+        "score": 0.7458704895014766
+      },
+      {
+        "target": 0.35,
+        "cagr": 29.08,
+        "bh_cagr": 17.34,
+        "ulcer": 17.75,
+        "bh_ulcer": 60.21,
+        "mdd": -39.2,
+        "sharpe": 1.002,
+        "avg_turnover": 0.0438,
+        "score": 0.7051438385135451
+      },
+      {
+        "target": 0.4,
+        "cagr": 31.34,
+        "bh_cagr": 17.34,
+        "ulcer": 20.27,
+        "bh_ulcer": 60.21,
+        "mdd": -43.4,
+        "sharpe": 0.99,
+        "avg_turnover": 0.0494,
+        "score": 0.6633762550105289
+      },
+      {
+        "target": 0.45,
+        "cagr": 33.55,
+        "bh_cagr": 17.34,
+        "ulcer": 22.54,
+        "bh_ulcer": 60.21,
+        "mdd": -46.1,
+        "sharpe": 0.983,
+        "avg_turnover": 0.0543,
+        "score": 0.6256060877284074
+      },
+      {
+        "target": 0.5,
+        "cagr": 34.99,
+        "bh_cagr": 17.34,
+        "ulcer": 24.45,
+        "bh_ulcer": 60.21,
+        "mdd": -48.4,
+        "sharpe": 0.968,
+        "avg_turnover": 0.0585,
+        "score": 0.593848782431435
+      },
+      {
+        "target": 0.6,
+        "cagr": 35.93,
+        "bh_cagr": 17.34,
+        "ulcer": 27.97,
+        "bh_ulcer": 60.21,
+        "mdd": -53.2,
+        "sharpe": 0.931,
+        "avg_turnover": 0.0653,
+        "score": 0.5355146960284562
+      },
+      {
+        "target": 0.7,
+        "cagr": 36.88,
+        "bh_cagr": 17.34,
+        "ulcer": 31.06,
+        "bh_ulcer": 60.21,
+        "mdd": -56.9,
+        "sharpe": 0.915,
+        "avg_turnover": 0.0694,
+        "score": 0.4841186040922804
+      },
+      {
+        "target": 0.8,
+        "cagr": 36.51,
+        "bh_cagr": 17.34,
+        "ulcer": 33.48,
+        "bh_ulcer": 60.21,
+        "mdd": -59.9,
+        "sharpe": 0.892,
+        "avg_turnover": 0.0714,
+        "score": 0.4439787325685689
+      },
+      {
+        "target": 1.0,
+        "cagr": 36.48,
+        "bh_cagr": 17.34,
+        "ulcer": 33.49,
+        "bh_ulcer": 60.21,
+        "mdd": -61.2,
+        "sharpe": 0.88,
+        "avg_turnover": 0.073,
+        "score": 0.4437288098519705
+      }
+    ],
+    "best": {
+      "target": 0.15,
+      "cagr": 17.31,
+      "bh_cagr": 17.34,
+      "ulcer": 8.84,
+      "bh_ulcer": 60.21,
+      "mdd": -20.6,
+      "sharpe": 0.973,
+      "avg_turnover": 0.0195,
+      "score": 0.8531302592961711
+    },
+    "off": {
+      "target": null,
+      "cagr": 36.04,
+      "bh_cagr": 17.34,
+      "ulcer": 34.04,
+      "bh_ulcer": 60.21,
+      "mdd": -61.2,
+      "sharpe": 0.869,
+      "avg_turnover": 0.0742,
+      "score": 0.4347239519899925
+    },
+    "current_default": {
+      "target": 0.4,
+      "cagr": 31.34,
+      "bh_cagr": 17.34,
+      "ulcer": 20.27,
+      "bh_ulcer": 60.21,
+      "mdd": -43.4,
+      "sharpe": 0.99,
+      "avg_turnover": 0.0494,
+      "score": 0.6633762550105289
+    },
+    "bootstrap_best_vs_off": {
+      "delta_ulcer_ci90": [
+        16.611,
+        40.253
+      ],
+      "delta_cagr_ci90": [
+        -51.229,
+        3.358
+      ],
+      "delta_sharpe_ci90": [
+        -0.098,
+        0.306
+      ],
+      "delta_ulcer_excludes_zero": true,
+      "delta_sharpe_excludes_zero": false
+    },
+    "bootstrap_best_vs_current": {
+      "delta_ulcer_ci90": [
+        8.18,
+        20.274
+      ],
+      "delta_cagr_ci90": [
+        -28.77,
+        -1.21
+      ],
+      "delta_sharpe_ci90": [
+        -0.124,
+        0.128
+      ],
+      "delta_ulcer_excludes_zero": true,
+      "delta_sharpe_excludes_zero": false
+    },
+    "pbo_gate": {
+      "input": {
+        "horizon": "vol_target_grid",
+        "universe": "asset",
+        "cost": "30bp"
+      },
+      "n_trials": 13,
+      "n_events": 153,
+      "pbo": {
+        "pbo": 0.0682,
+        "embargo": 0,
+        "purged_events_total": 0,
+        "n_combos": 924,
+        "n_blocks": 12,
+        "lambda_mean": 1.3865,
+        "is_sharpe_mean": 0.0098,
+        "oos_sharpe_mean": 0.0001,
+        "degradation_slope": -1.0407,
+        "prob_oos_loss": 0.46
+      },
+      "pbo_verdict": "낮음(과최적화 가능성 작음)",
+      "dsr": {
+        "sr": 0.0122,
+        "sr0": 0.0742,
+        "dsr": 0.2214,
+        "dsr_uncorrected": 0.2214,
+        "skew": 0.832,
+        "kurtosis": 4.539,
+        "T": 153,
+        "T_eff": 153,
+        "N": 13,
+        "best_trial": "vt_1.0"
+      },
+      "dsr_verdict": "통과 실패(다중검정 감안 시 샤프가 유의하지 않음)",
+      "passed": false,
+      "references": [
+        "Bailey et al. 2017 (PBO/CSCV)",
+        "Bailey & López de Prado 2014 (DSR)"
+      ],
+      "note": "조합 간 상관으로 N이 과대계상될 수 있어 DSR은 보수적(실제보다 낮게) 추정됨."
+    }
+  },
+  "spx": {
+    "asset": "spx",
+    "ticker": "^GSPC",
+    "n_days": 24787,
+    "regime_params": {
+      "trend_ma": 200,
+      "band": 0.01,
+      "confirm": 3
+    },
+    "cost_bps": 5,
+    "grid": [
+      {
+        "target": null,
+        "cagr": 6.76,
+        "bh_cagr": 6.38,
+        "ulcer": 11.09,
+        "bh_ulcer": 30.61,
+        "mdd": -41.0,
+        "sharpe": 0.587,
+        "avg_turnover": 0.0063,
+        "score": 0.6378119111943163
+      },
+      {
+        "target": 0.05,
+        "cagr": 2.56,
+        "bh_cagr": 6.38,
+        "ulcer": 4.82,
+        "bh_ulcer": 30.61,
+        "mdd": -13.8,
+        "sharpe": 0.589,
+        "avg_turnover": 0.0041,
+        "score": -Infinity
+      },
+      {
+        "target": 0.08,
+        "cagr": 3.95,
+        "bh_cagr": 6.38,
+        "ulcer": 7.33,
+        "bh_ulcer": 30.61,
+        "mdd": -21.5,
+        "sharpe": 0.594,
+        "avg_turnover": 0.0061,
+        "score": -Infinity
+      },
+      {
+        "target": 0.1,
+        "cagr": 4.68,
+        "bh_cagr": 6.38,
+        "ulcer": 8.73,
+        "bh_ulcer": 30.61,
+        "mdd": -26.3,
+        "sharpe": 0.594,
+        "avg_turnover": 0.0067,
+        "score": -Infinity
+      },
+      {
+        "target": 0.12,
+        "cagr": 5.29,
+        "bh_cagr": 6.38,
+        "ulcer": 9.68,
+        "bh_ulcer": 30.61,
+        "mdd": -30.4,
+        "sharpe": 0.602,
+        "avg_turnover": 0.0067,
+        "score": 0.6838305287393469
+      },
+      {
+        "target": 0.15,
+        "cagr": 5.81,
+        "bh_cagr": 6.38,
+        "ulcer": 10.62,
+        "bh_ulcer": 30.61,
+        "mdd": -33.2,
+        "sharpe": 0.605,
+        "avg_turnover": 0.0065,
+        "score": 0.6531115423056493
+      },
+      {
+        "target": 0.18,
+        "cagr": 6.17,
+        "bh_cagr": 6.38,
+        "ulcer": 10.85,
+        "bh_ulcer": 30.61,
+        "mdd": -33.4,
+        "sharpe": 0.614,
+        "avg_turnover": 0.0065,
+        "score": 0.6456266045345346
+      },
+      {
+        "target": 0.2,
+        "cagr": 6.34,
+        "bh_cagr": 6.38,
+        "ulcer": 10.92,
+        "bh_ulcer": 30.61,
+        "mdd": -33.4,
+        "sharpe": 0.619,
+        "avg_turnover": 0.0064,
+        "score": 0.6433258496347267
+      },
+      {
+        "target": 0.25,
+        "cagr": 6.53,
+        "bh_cagr": 6.38,
+        "ulcer": 11.0,
+        "bh_ulcer": 30.61,
+        "mdd": -33.5,
+        "sharpe": 0.618,
+        "avg_turnover": 0.0064,
+        "score": 0.6407213629136665
+      },
+      {
+        "target": 0.3,
+        "cagr": 6.61,
+        "bh_cagr": 6.38,
+        "ulcer": 11.13,
+        "bh_ulcer": 30.61,
+        "mdd": -35.9,
+        "sharpe": 0.613,
+        "avg_turnover": 0.0064,
+        "score": 0.6362734484111969
+      },
+      {
+        "target": 0.4,
+        "cagr": 6.69,
+        "bh_cagr": 6.38,
+        "ulcer": 11.23,
+        "bh_ulcer": 30.61,
+        "mdd": -39.1,
+        "sharpe": 0.603,
+        "avg_turnover": 0.0063,
+        "score": 0.6332834542076268
+      }
+    ],
+    "best": {
+      "target": 0.12,
+      "cagr": 5.29,
+      "bh_cagr": 6.38,
+      "ulcer": 9.68,
+      "bh_ulcer": 30.61,
+      "mdd": -30.4,
+      "sharpe": 0.602,
+      "avg_turnover": 0.0067,
+      "score": 0.6838305287393469
+    },
+    "off": {
+      "target": null,
+      "cagr": 6.76,
+      "bh_cagr": 6.38,
+      "ulcer": 11.09,
+      "bh_ulcer": 30.61,
+      "mdd": -41.0,
+      "sharpe": 0.587,
+      "avg_turnover": 0.0063,
+      "score": 0.6378119111943163
+    },
+    "current_default": {
+      "target": 0.15,
+      "cagr": 5.81,
+      "bh_cagr": 6.38,
+      "ulcer": 10.62,
+      "bh_ulcer": 30.61,
+      "mdd": -33.2,
+      "sharpe": 0.605,
+      "avg_turnover": 0.0065,
+      "score": 0.6531115423056493
+    },
+    "bootstrap_best_vs_off": {
+      "delta_ulcer_ci90": [
+        0.551,
+        5.165
+      ],
+      "delta_cagr_ci90": [
+        -2.447,
+        -0.594
+      ],
+      "delta_sharpe_ci90": [
+        -0.056,
+        0.083
+      ],
+      "delta_ulcer_excludes_zero": true,
+      "delta_sharpe_excludes_zero": false
+    },
+    "bootstrap_best_vs_current": {
+      "delta_ulcer_ci90": [
+        0.254,
+        1.652
+      ],
+      "delta_cagr_ci90": [
+        -0.74,
+        -0.284
+      ],
+      "delta_sharpe_ci90": [
+        -0.021,
+        0.013
+      ],
+      "delta_ulcer_excludes_zero": true,
+      "delta_sharpe_excludes_zero": false
+    },
+    "pbo_gate": {
+      "input": {
+        "horizon": "vol_target_grid",
+        "universe": "asset",
+        "cost": "5bp"
+      },
+      "n_trials": 11,
+      "n_events": 1180,
+      "pbo": {
+        "pbo": 0.0,
+        "embargo": 0,
+        "purged_events_total": 0,
+        "n_combos": 924,
+        "n_blocks": 12,
+        "lambda_mean": 2.2598,
+        "is_sharpe_mean": -0.0179,
+        "oos_sharpe_mean": -0.0184,
+        "degradation_slope": -0.906,
+        "prob_oos_loss": 0.7522
+      },
+      "pbo_verdict": "낮음(과최적화 가능성 작음)",
+      "dsr": {
+        "sr": -0.0134,
+        "sr0": 0.0423,
+        "dsr": 0.0274,
+        "dsr_uncorrected": 0.0274,
+        "skew": -0.709,
+        "kurtosis": 36.342,
+        "T": 1180,
+        "T_eff": 1180,
+        "N": 11,
+        "best_trial": "vt_None"
+      },
+      "dsr_verdict": "통과 실패(다중검정 감안 시 샤프가 유의하지 않음)",
+      "passed": false,
+      "references": [
+        "Bailey et al. 2017 (PBO/CSCV)",
+        "Bailey & López de Prado 2014 (DSR)"
+      ],
+      "note": "조합 간 상관으로 N이 과대계상될 수 있어 DSR은 보수적(실제보다 낮게) 추정됨."
+    }
+  }
+}

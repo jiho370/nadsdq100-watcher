@@ -1,0 +1,20 @@
+buy_hold: {'cagr': 17.22, 'sharpe': 0.581, 'mdd': -94.0, 'ulcer': 60.25}
+
+--- top5 ma_breakout by pctile_sharpe ---
+MA30: sharpe_real=0.868 vs rand=0.298 | sharpe_pct=99.8 mdd_pct=99.1 | mdd_real=-61.2 vs rand=-85.2 | CAGR=36.02% (excess 18.8pp)
+MA40: sharpe_real=0.859 vs rand=0.321 | sharpe_pct=99.6 mdd_pct=99.0 | mdd_real=-63.4 vs rand=-85.1 | CAGR=34.69% (excess 17.47pp)
+MA20: sharpe_real=0.722 vs rand=0.26 | sharpe_pct=98.7 mdd_pct=99.1 | mdd_real=-64.2 vs rand=-86.2 | CAGR=26.64% (excess 9.42pp)
+MA50: sharpe_real=0.77 vs rand=0.325 | sharpe_pct=98.2 mdd_pct=99.4 | mdd_real=-61.4 vs rand=-85.3 | CAGR=28.74% (excess 11.52pp)
+MA10: sharpe_real=0.504 vs rand=0.149 | sharpe_pct=95.7 mdd_pct=96.7 | mdd_real=-76.0 vs rand=-89.8 | CAGR=13.65% (excess -3.57pp)
+
+--- top5 regime_grid by pctile_sharpe ---
+tm50_b0.01_c1: sharpe_real=0.826 vs rand=0.355 | sharpe_pct=98.6 mdd_pct=99.8 | CAGR=32.15% (bh=17.22%)
+tm50_b0.03_c1: sharpe_real=0.761 vs rand=0.367 | sharpe_pct=96.5 mdd_pct=99.8 | CAGR=28.27% (bh=17.22%)
+tm50_b0.03_c3: sharpe_real=0.742 vs rand=0.376 | sharpe_pct=95.0 mdd_pct=98.5 | CAGR=27.32% (bh=17.22%)
+tm50_b0.05_c1: sharpe_real=0.743 vs rand=0.373 | sharpe_pct=94.7 mdd_pct=99.9 | CAGR=26.88% (bh=17.22%)
+tm50_b0.01_c3: sharpe_real=0.725 vs rand=0.37 | sharpe_pct=94.5 mdd_pct=99.2 | CAGR=26.27% (bh=17.22%)
+
+golden_cross: {'p': 0.504, 'l_on': 189.5, 'l_off': 166.0, 'real_sharpe': 0.559, 'real_mdd': -78.1, 'real_ulcer': 39.18, 'rand_sharpe_mean': 0.415, 'rand_mdd_mean': -84.5, 'rand_ulcer_mean': 54.28, 'pctile_sharpe': 72.5, 'pctile_mdd_better': 77.6, 'pctile_ulcer_better': 83.4}
+live_trend_only: {'p': 0.506, 'l_on': 97.6, 'l_off': 95.4, 'real_sharpe': 0.628, 'real_mdd': -72.5, 'real_ulcer': 44.62, 'rand_sharpe_mean': 0.395, 'rand_mdd_mean': -84.0, 'rand_ulcer_mean': 53.81, 'pctile_sharpe': 84.2, 'pctile_mdd_better': 88.5, 'pctile_ulcer_better': 72.5}
+live_with_momentum: {'p': 0.445, 'l_on': 38.2, 'l_off': 47.6, 'real_sharpe': 0.627, 'real_mdd': -61.5, 'real_ulcer': 37.33, 'rand_sharpe_mean': 0.345, 'rand_mdd_mean': -82.7, 'rand_ulcer_mean': 53.28, 'pctile_sharpe': 88.5, 'pctile_mdd_better': 98.2, 'pctile_ulcer_better': 86.4}
+summary: {'n_strategies_tested': 77, 'pct_sharpe_beats_random_95': 10.4, 'pct_mdd_beats_random_95': 31.2, 'pct_both_beat_random_95': 10.4, 'median_pctile_sharpe': 85.8, 'median_pctile_mdd_better': 92.3}
