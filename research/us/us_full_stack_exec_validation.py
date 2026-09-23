@@ -69,20 +69,20 @@ def _select_basket_livestack(panel, p, funds, cross, pit, weights, topn):
     return list(score.sort_values(ascending=False).index[:topn])
 
 
-def run(years: float = 10) -> dict:
+def run(years: float = 10, topn: int = 10) -> dict:
     pit = BC.load_pit()
     panel, spy, _ = BC.build_panel_pit(years, pit)
     funds = BW.load_funds()
     cost = BC.CostModel("us", commission_bps=0.0, slippage_bps=5.0)
     weights = BE._load_exec_weights()
-    _log(f"라이브 가중치 사용: {weights}")
+    _log(f"라이브 가중치 사용: {weights} · topn={topn}")
 
     import tech_factors as T
     cross = T.build_panels(panel)
-    select_fn = lambda p: _select_basket_livestack(panel, p, funds, cross, pit, weights, 10)
+    select_fn = lambda p: _select_basket_livestack(panel, p, funds, cross, pit, weights, topn)
 
-    payload, report = BE.run_exec(panel, spy, funds, pit, rebal_days=63, topn=10, cost=cost,
-                                  select_fn=select_fn, out_suffix="_us_livestack")
+    payload, report = BE.run_exec(panel, spy, funds, pit, rebal_days=63, topn=topn, cost=cost,
+                                  select_fn=select_fn, out_suffix=f"_us_livestack_top{topn}")
     _log(f"[결과] baseline={payload['baseline']}")
     for row in payload["rows"]:
         _log(f"{row['entry']}__{row['exit']}: net {row['net_pct']:+.2f}% MDD {row['mdd_pct']:.1f}% "
@@ -96,8 +96,9 @@ def run(years: float = 10) -> dict:
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--years", type=float, default=10)
+    ap.add_argument("--topn", type=int, default=10)
     args = ap.parse_args()
-    run(years=args.years)
+    run(years=args.years, topn=args.topn)
 
 
 if __name__ == "__main__":

@@ -1,0 +1,210 @@
+{
+  "as_of": "2026-09-23",
+  "weights_used": {
+    "int_gp_assets": 1,
+    "rd_mktcap": 2,
+    "shareholder_yield": 2
+  },
+  "topn": 6,
+  "rebal_days": 63,
+  "turnover_pct": 44.2,
+  "n_combos": 21,
+  "rows": [
+    {
+      "entry": "entry1_full",
+      "exit": "exit_trail15",
+      "net_pct": 9.42,
+      "stop_rate_pct": 90.3,
+      "mdd_pct": -5.5,
+      "unfilled_pct": 0.0,
+      "n_events": 24
+    },
+    {
+      "entry": "entry1_full",
+      "exit": "exit_trail20",
+      "net_pct": 13.98,
+      "stop_rate_pct": 82.6,
+      "mdd_pct": -6.4,
+      "unfilled_pct": 0.0,
+      "n_events": 24
+    },
+    {
+      "entry": "entry1_full",
+      "exit": "exit_trail25",
+      "net_pct": 16.05,
+      "stop_rate_pct": 79.9,
+      "mdd_pct": -6.7,
+      "unfilled_pct": 0.0,
+      "n_events": 24
+    },
+    {
+      "entry": "entry1_full",
+      "exit": "exit_ma200only",
+      "net_pct": 19.29,
+      "stop_rate_pct": 75.7,
+      "mdd_pct": -6.8,
+      "unfilled_pct": 0.0,
+      "n_events": 24
+    },
+    {
+      "entry": "entry1_full",
+      "exit": "exit_time6m",
+      "net_pct": 12.68,
+      "stop_rate_pct": 0.0,
+      "mdd_pct": -12.3,
+      "unfilled_pct": 0.0,
+      "n_events": 24
+    },
+    {
+      "entry": "entry1_full",
+      "exit": "exit_atr2stage",
+      "net_pct": 1.4,
+      "stop_rate_pct": 100.0,
+      "mdd_pct": -2.0,
+      "unfilled_pct": 0.0,
+      "n_events": 24
+    },
+    {
+      "entry": "entry1_full",
+      "exit": "exit_support2stage",
+      "net_pct": 20.44,
+      "stop_rate_pct": 53.5,
+      "mdd_pct": -10.3,
+      "unfilled_pct": 0.0,
+      "n_events": 24
+    },
+    {
+      "entry": "entry2_pullback2",
+      "exit": "exit_trail15",
+      "net_pct": 9.97,
+      "stop_rate_pct": 90.3,
+      "mdd_pct": -5.0,
+      "unfilled_pct": 37.2,
+      "n_events": 24
+    },
+    {
+      "entry": "entry2_pullback2",
+      "exit": "exit_trail20",
+      "net_pct": 14.51,
+      "stop_rate_pct": 82.6,
+      "mdd_pct": -5.9,
+      "unfilled_pct": 37.2,
+      "n_events": 24
+    },
+    {
+      "entry": "entry2_pullback2",
+      "exit": "exit_trail25",
+      "net_pct": 16.57,
+      "stop_rate_pct": 79.9,
+      "mdd_pct": -6.2,
+      "unfilled_pct": 37.2,
+      "n_events": 24
+    },
+    {
+      "entry": "entry2_pullback2",
+      "exit": "exit_ma200only",
+      "net_pct": 19.81,
+      "stop_rate_pct": 75.7,
+      "mdd_pct": -6.3,
+      "unfilled_pct": 37.2,
+      "n_events": 24
+    },
+    {
+      "entry": "entry2_pullback2",
+      "exit": "exit_time6m",
+      "net_pct": 13.18,
+      "stop_rate_pct": 0.0,
+      "mdd_pct": -11.9,
+      "unfilled_pct": 37.2,
+      "n_events": 24
+    },
+    {
+      "entry": "entry2_pullback2",
+      "exit": "exit_atr2stage",
+      "net_pct": 1.94,
+      "stop_rate_pct": 100.0,
+      "mdd_pct": -1.5,
+      "unfilled_pct": 37.2,
+      "n_events": 24
+    },
+    {
+      "entry": "entry2_pullback2",
+      "exit": "exit_support2stage",
+      "net_pct": 20.68,
+      "stop_rate_pct": 52.8,
+      "mdd_pct": -10.2,
+      "unfilled_pct": 37.2,
+      "n_events": 24
+    },
+    {
+      "entry": "entry3_pullback3",
+      "exit": "exit_trail15",
+      "net_pct": 10.4,
+      "stop_rate_pct": 90.3,
+      "mdd_pct": -4.6,
+      "unfilled_pct": 57.6,
+      "n_events": 24
+    },
+    {
+      "entry": "entry3_pullback3",
+      "exit": "exit_trail20",
+      "net_pct": 14.94,
+      "stop_rate_pct": 82.6,
+      "mdd_pct": -5.5,
+      "unfilled_pct": 57.6,
+      "n_events": 24
+    },
+    {
+      "entry": "entry3_pullback3",
+      "exit": "exit_trail25",
+      "net_pct": 17.0,
+      "stop_rate_pct": 79.9,
+      "mdd_pct": -5.8,
+      "unfilled_pct": 57.6,
+      "n_events": 24
+    },
+    {
+      "entry": "entry3_pullback3",
+      "exit": "exit_ma200only",
+      "net_pct": 20.24,
+      "stop_rate_pct": 75.7,
+      "mdd_pct": -5.9,
+      "unfilled_pct": 57.6,
+      "n_events": 24
+    },
+    {
+      "entry": "entry3_pullback3",
+      "exit": "exit_time6m",
+      "net_pct": 13.64,
+      "stop_rate_pct": 0.0,
+      "mdd_pct": -11.5,
+      "unfilled_pct": 57.6,
+      "n_events": 24
+    },
+    {
+      "entry": "entry3_pullback3",
+      "exit": "exit_atr2stage",
+      "net_pct": 2.4,
+      "stop_rate_pct": 100.0,
+      "mdd_pct": -1.1,
+      "unfilled_pct": 57.6,
+      "n_events": 24
+    },
+    {
+      "entry": "entry3_pullback3",
+      "exit": "exit_support2stage",
+      "net_pct": 22.04,
+      "stop_rate_pct": 50.7,
+      "mdd_pct": -9.8,
+      "unfilled_pct": 57.6,
+      "n_events": 24
+    }
+  ],
+  "baseline": "entry1_full__exit_trail20 (현행 시스템과 동일 규칙)",
+  "adoption_criteria": "청산 규칙은 baseline 대비 net 개선 & 손절빈도 감소가 T_eff 보정 후에도 유지될 때만 채택 제안(SCORE_MODEL_DESIGN.md 부록 A3)",
+  "limitations": [
+    "ATR은 종가 기반 근사(고가/저가 데이터 미사용)",
+    "지지선은 진입 시점 1회 계산 후 보유기간 동안 고정(매일 재계산 아님)",
+    "vol_poc_dist(A1)는 실제 거래량 히스토그램 최빈가 대신 252일 거래량가중평균가(VWAP)로 근사"
+  ]
+}
