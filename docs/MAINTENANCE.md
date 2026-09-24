@@ -66,6 +66,10 @@ GitHub Actions(주 3~4회+워치독), 로컬 PC 작업 스케줄러(pregen), 그
   시각에 코드가 main으로 바뀐다 — **실제 사례(2026-09-24)**: 16:01 pregen이 `claude/*` 브랜치를 main으로
   전환해, 실행 중이던 연구 스크립트가 main에 없는 함수(`_live_ranked`)를 import하다 실패했다. 긴
   브랜치 작업은 `.worktrees/`에서 하거나, 끝난 뒤 `git branch --show-current`로 브랜치를 확인할 것.
+  **같은 날 두 번째 사고**: 그때 메인 체크아웃에 남아 있던 미커밋 변경(연구 결과 JSON) 때문에 pregen의
+  `git pull --rebase`가 막혀, 로컬 main에 커밋된 `pregen_kr.json`이 push되지 않았다(`output/pregen.log`
+  "rebase 실패 - push 생략"). 발견 후 수동으로 fast-forward push. **작업을 끝낼 땐 메인 체크아웃을 깨끗한
+  상태(main, 미커밋 변경 없음)로 둘 것.**
 - **실제 사례**: KOSPI200 캐시 merge driver 작업과 리포 정리가 같은 파일을 건드려 리베이스
   10개 커밋이 자동 충돌 해소됐다(merge driver를 로컬에 등록해뒀기 때문) — driver를 등록 안
   했으면 전부 수동 충돌이었을 것.
