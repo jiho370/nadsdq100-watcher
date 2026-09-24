@@ -10,66 +10,67 @@
       "exit": "exit_time6m",
       "net_pct": 6.05,
       "stop_rate_pct": 0.0,
-      "mdd_pct": -13.3,
+      "basket_mdd_pct": -13.5,
       "unfilled_pct": 0.0,
       "n_events": 44
     },
     {
       "entry": "entry2_5050",
       "exit": "exit_time6m",
-      "net_pct": 6.73,
+      "net_pct": 4.31,
       "stop_rate_pct": 0.0,
-      "mdd_pct": -12.7,
+      "basket_mdd_pct": -10.3,
       "unfilled_pct": 27.3,
       "n_events": 44
     },
     {
       "entry": "entry2_3070",
       "exit": "exit_time6m",
-      "net_pct": 7.01,
+      "net_pct": 3.63,
       "stop_rate_pct": 0.0,
-      "mdd_pct": -12.5,
+      "basket_mdd_pct": -8.9,
       "unfilled_pct": 38.3,
       "n_events": 44
     },
     {
       "entry": "entry2_7030",
       "exit": "exit_time6m",
-      "net_pct": 6.45,
+      "net_pct": 5.0,
       "stop_rate_pct": 0.0,
-      "mdd_pct": -12.9,
+      "basket_mdd_pct": -11.6,
       "unfilled_pct": 16.4,
       "n_events": 44
     },
     {
       "entry": "entry3_303040",
       "exit": "exit_time6m",
-      "net_pct": 7.22,
+      "net_pct": 3.14,
       "stop_rate_pct": 0.0,
-      "mdd_pct": -12.3,
+      "basket_mdd_pct": -8.1,
       "unfilled_pct": 44.7,
       "n_events": 44
     },
     {
       "entry": "entry3_502525",
       "exit": "exit_time6m",
-      "net_pct": 6.82,
+      "net_pct": 4.0,
       "stop_rate_pct": 0.0,
-      "mdd_pct": -12.6,
+      "basket_mdd_pct": -9.7,
       "unfilled_pct": 31.3,
       "n_events": 44
     },
     {
       "entry": "entry3_204040",
       "exit": "exit_time6m",
-      "net_pct": 7.42,
+      "net_pct": 2.8,
       "stop_rate_pct": 0.0,
-      "mdd_pct": -12.1,
+      "basket_mdd_pct": -7.4,
       "unfilled_pct": 50.1,
       "n_events": 44
     }
   ],
   "baseline": "entry2_5050(현행 평시 50/50) · entry3_303040(현행 과열 30/30/40)",
+  "accounting": "2026-09-24 이후 산식: net·excess는 배정자금 기준(미체결·빈 슬롯은 현금 수익 0), 추가매수는 청산 이전 체결분만 반영, basket_mdd_pct는 이벤트 바스켓 가치경로의 고점대비 최대낙폭 평균(계좌 NAV MDD 아님 — research/us/backtest_portfolio.py 참고)",
   "note": "청산 exit_time6m 고정 — 진입 '비율'만 순수 비교(진입×청산 교차 스윕 아님)",
   "adoption_criteria": "현행 비율(entry2_5050/entry3_303040) 대비 net 개선이 T_eff 보정 후에도 유지될 때만 비율 변경 제안"
 }

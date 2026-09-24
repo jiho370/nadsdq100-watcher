@@ -10,7 +10,7 @@
       "exit": "exit_time6m",
       "net_pct": 6.05,
       "stop_rate_pct": 0.0,
-      "mdd_pct": -13.3,
+      "basket_mdd_pct": -13.5,
       "unfilled_pct": 0.0,
       "n_events": 44
     },
@@ -19,7 +19,7 @@
       "exit": "exit_time6m_5050w10",
       "net_pct": 6.27,
       "stop_rate_pct": 16.8,
-      "mdd_pct": -13.5,
+      "basket_mdd_pct": -13.8,
       "unfilled_pct": 0.0,
       "n_events": 44
     },
@@ -28,7 +28,7 @@
       "exit": "exit_time6m_3070w10",
       "net_pct": 6.31,
       "stop_rate_pct": 16.8,
-      "mdd_pct": -13.5,
+      "basket_mdd_pct": -13.8,
       "unfilled_pct": 0.0,
       "n_events": 44
     },
@@ -37,7 +37,7 @@
       "exit": "exit_time6m_7030w10",
       "net_pct": 6.23,
       "stop_rate_pct": 16.8,
-      "mdd_pct": -13.5,
+      "basket_mdd_pct": -13.8,
       "unfilled_pct": 0.0,
       "n_events": 44
     },
@@ -46,7 +46,7 @@
       "exit": "exit_time6m_5050w5",
       "net_pct": 6.31,
       "stop_rate_pct": 16.8,
-      "mdd_pct": -13.3,
+      "basket_mdd_pct": -13.7,
       "unfilled_pct": 0.0,
       "n_events": 44
     },
@@ -55,12 +55,13 @@
       "exit": "exit_time6m_5050w20",
       "net_pct": 6.38,
       "stop_rate_pct": 16.8,
-      "mdd_pct": -13.6,
+      "basket_mdd_pct": -14.0,
       "unfilled_pct": 0.0,
       "n_events": 44
     }
   ],
-  "baseline": "exit_time6m(트리거 즉시 전량) · exit_time6m_5050w10(현행 라이브 처분)",
+  "baseline": "exit_time6m(트리거 즉시 전량) · exit_time6m_5050w10(옛 라이브 처분)",
+  "accounting": "2026-09-24 이후 산식: net·excess는 배정자금 기준(미체결·빈 슬롯은 현금 수익 0), 추가매수는 청산 이전 체결분만 반영, basket_mdd_pct는 이벤트 바스켓 가치경로의 고점대비 최대낙폭 평균(계좌 NAV MDD 아님 — research/us/backtest_portfolio.py 참고)",
   "note": "진입 entry1_full 고정 — 트리거(6개월) 이후 '처분 방식'만 순수 비교",
   "adoption_criteria": "현행 처분(exit_time6m_5050w10) 대비 net 개선이 T_eff 보정 후에도 유지될 때만 처분 방식 변경 제안"
 }
