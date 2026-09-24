@@ -1163,9 +1163,11 @@ def render_report_html(report, as_of="", metrics_by_sym=None, market_html="", si
              "최신 뉴스·리스크 확인은 이번엔 생략됐습니다(아래 고지 참고)."
     us_note = (
         '<div style="font-size:12px;color:#374151;background:#f8fafc;border-radius:6px;'
-        'padding:6px 9px;margin:2px 0 8px;line-height:1.5">퀄리티·주주환원 팩터(자산 대비 '
-        '수익성·연구개발 집약도·자사주매입 등 계량 지표) 점수 상위 종목입니다. 과최적화 '
-        f'위험(PBO)과 통계적 유의성(DSR) 검증을 통과한 가중치로 순위를 매기고, {ai_note}</div>')
+        'padding:6px 9px;margin:2px 0 8px;line-height:1.5">수익성·연구개발 집약도·주주환원 점수 '
+        '상위 종목 — 핵심자산(코어)을 보완하는 위성자산(새틀라이트) 후보입니다. 권장 편성은 코어 50% '
+        'SPMO(S&amp;P500 모멘텀 ETF) + 이 추천 종목 50%: 개별종목만으로는 해마다 지수와 차이가 커서, '
+        '모멘텀 코어와 섞었을 때 위험 대비 수익(샤프지수)이 가장 좋았습니다(2018~2026 백테스트, '
+        f'통계적 확정은 아님 — 근거는 주간 배분 리포트 참고). {ai_note}</div>')
     us_sec = ""
     if buy_cards or watch_cards:
         us_sec = (

@@ -171,7 +171,7 @@ def _holdings_compare_chart_png(series: dict, index_name: str, extra_line: dict 
     """포트폴리오(각 종목 진입일에 동일 금액 투입 가정) 누적수익률 vs 같은 날짜에 같은 금액을
     지수에 넣었을 때의 누적수익률. extra_line={"values","label"}(series['dates']와 길이 동일)을
     주면 지수 비교선 추가(2026-07-17, 지호 님 요청 — 미장은 나스닥100). blend_line도 같은
-    형식으로, 지수·알고리즘 블렌드 참고선(미장: 알고리즘70+SPMO30, 국장: 코스피70+알고리즘30 —
+    형식으로, 지수·알고리즘 블렌드 참고선(미장: SPMO50+알고리즘50, 국장: 코스피65+알고리즘35 —
     둘 다 라이브 배분 아닌 시각적 참고선일 뿐).
     2026-07-23(지호 님 색상 배열 검토 — 5안 중 "클래식 블루" 채택): 지수·나스닥·포트폴리오는
     기존 색 그대로 유지(다른 리포트 섹션과 색상 언어 일관성), 블렌드선만 연한 회색 점선으로
@@ -299,9 +299,12 @@ def _holdings_section(hstate, ind_map, price_map, bench_dates, bench_closes, ind
             if series3:
                 by_date3 = dict(zip(series3["dates"], series3["bench"]))
                 ratio = blend_index.get("ratio", 0.7)
-                vals = []
+                vals, last_sv = [], None
                 for d, p in zip(series["dates"], series["portfolio"]):
+                    # 블렌드 소스 ETF의 하루치 시세 누락(예: 야후 SPMO 2026-09-22)이 선을 끊지 않게 직전 값 유지
                     sv = by_date3.get(d)
+                    sv = last_sv if sv is None else sv
+                    last_sv = sv
                     vals.append(ratio * p + (1 - ratio) * sv if (p is not None and sv is not None) else None)
                 if any(v is not None for v in vals):
                     blend_line = {"label": blend_index["label"], "values": vals}
@@ -755,12 +758,20 @@ def run_us(no_email: bool = False, force: bool = False):
         ndx_dates = [d.date().isoformat() for d in qs.index]
         ndx_closes = [float(v) for v in qs.tolist()]
     ndx_label = "나스닥100(QQQ)" if _KFONT else "NASDAQ100(QQQ)"
-    # 2026-07-19 추가했던 "알고리즘70+SPMO30" 참고선은 2026-07-28 제거(지호 님 결정) — §6-C의
-    # 원 근거(t=1.95)가 이후 §6-H 사전등록 재검증에서 기각됨(CAGR차이 95%CI가 완전히 음수,
-    # 위기 동시발생 시 순수 알고리즘보다 오히려 더 나쁨 — HISTORY.md §6-H·§6-K 참고).
+    # 2026-07-19 추가했던 "알고리즘70+SPMO30" 참고선은 2026-07-28 제거(§6-H 기각 — 분할 미보정·
+    # PIT 결함 데이터 기준). 2026-09-24 결함을 고친 계좌 NAV 재검증(HISTORY.md §13·§17)에서
+    # SPMO50:알고리즘50이 권장 편성이 되어 그 비율의 참고선을 다시 그린다(국장 코스피65+알고리즘35와 같은 방식).
+    spmo_dates, spmo_closes = [], []
+    spmo_series = R.download_histories(["SPMO"]).get("SPMO")
+    if spmo_series is not None and not spmo_series.empty:
+        ss = spmo_series.dropna()
+        spmo_dates = [d.date().isoformat() for d in ss.index]
+        spmo_closes = [float(v) for v in ss.tolist()]
+    us_blend_label = "SPMO50+알고리즘50" if _KFONT else "SPMO50+Algo50"
     holdings_html, holdings_images = _holdings_section(
         hstate, data["ind_map"], price_map, bench_dates, bench_closes, "S&P500",
-        extra_index={"label": ndx_label, "dates": ndx_dates, "closes": ndx_closes})
+        extra_index={"label": ndx_label, "dates": ndx_dates, "closes": ndx_closes},
+        blend_index={"label": us_blend_label, "dates": spmo_dates, "closes": spmo_closes, "ratio": 0.5})
 
     # 차트: SPY(큰 차트) + 종목 + 신호
     images, metrics = list(holdings_images), {}

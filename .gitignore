@@ -38,6 +38,10 @@ output/*.jsonl
 # 네트워크/연산 캐시 (재생성 가능, 용량 큼)
 output/price_cache/
 output/ff_cache/
+# 원자료 캐시·대용량 원시 행렬(2026-09-24 정리 — 재생성 가능, 요약 결과는 추적 유지)
+output/kr_disclosures.json
+output/us_insider_form4_raw.json
+output/trial_returns_sector_neutral.json
 output/kr_bt_cache.json
 output/kr_sector_cache.json
 output/kr_regime_cache.json

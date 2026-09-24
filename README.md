@@ -58,8 +58,8 @@ python -m research.us.us_factor_formula_sweep
 ```
 .
 ├─ daily_ai_report.py     ← 유일한 실행 진입점 (GitHub Actions가 이것만 호출)
-├─ *.py                   ← 운영 모듈 25개 (아래 "운영 코드" 참고)
-├─ research/              ← 일회성 검증·백테스트 스크립트 79개 (주제별)
+├─ *.py                   ← 운영 모듈 (아래 "운영 코드" 참고)
+├─ research/              ← 일회성 검증·백테스트 스크립트 (주제별)
 │   ├─ us/ kr/ crypto/ fx/ bonds/ gold/ regime/ common/
 ├─ scripts/               ← Windows 작업 스케줄러용 .ps1
 ├─ state/                 ← CI가 commit-back 하는 상태파일 (추적됨)
@@ -79,13 +79,13 @@ python -m research.us.us_factor_formula_sweep
 | 묶음 | 파일 |
 |---|---|
 | 파이프라인 | `daily_ai_report` `weekly_report` `pregen` `export_data` |
-| 데이터 수집 | `sp500_daily_report` `kr_stocks` `fundamentals_edgar` `market_signals` |
+| 데이터 수집 | `sp500_daily_report` `market_data`(시세 캐시) `kr_stocks` `fundamentals_edgar` `market_signals` |
 | 신호·점수 | `tech_factors` `score_calibration` `kr_factor_ic` `entry_plan` `expectancy_report` |
 | 보유 추적 | `holdings` |
 | 백테스트 코어 | `backtest_costs` `backtest_weights` `backtest_exec` `backtest_kr` `overfit_stats` |
 | 리포트 생성 | `ai_report` `ai_commentary` `ai_verdict_log` |
 | 상시 운영 | `upbit_crash_check` `realtime_circuit_breaker_paper` |
-| 유지보수 | `gen_profiles` (분기 1회 — 종목 프로필 캐시 재생성, claude CLI 필요) |
+| 유지보수 | `gen_profiles` (분기 1회 — 종목 프로필 캐시 재생성, claude CLI 필요) · `merge_kospi200_cache` `merge_verdict_log`(git merge driver) |
 
 ### 리서치 코드 (`research/`)
 
