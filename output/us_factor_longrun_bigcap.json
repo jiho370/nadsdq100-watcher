@@ -1,0 +1,910 @@
+{
+  "source": "Kenneth R. French Data Library (CRSP), value-weighted, BIG size group only",
+  "last_month": "2026-07",
+  "start": "1963-07",
+  "split": "1995-01",
+  "summary": {
+    "n_factors": 14,
+    "last30_direction_kept": 11,
+    "last30_direction_adjusted_mean_ann_pct": 0.93,
+    "first30_abs_mean_ann_pct": 2.95
+  },
+  "factors": {
+    "value_BM": {
+      "full": {
+        "ann_pct": 2.32,
+        "t": 1.58,
+        "months": 757
+      },
+      "first30": {
+        "ann_pct": 3.92,
+        "t": 2.19,
+        "months": 378
+      },
+      "last30": {
+        "ann_pct": 0.71,
+        "t": 0.31,
+        "months": 379
+      },
+      "decades": {
+        "1960s": {
+          "ann_pct": 2.08,
+          "t": 0.65,
+          "months": 78
+        },
+        "1970s": {
+          "ann_pct": 8.23,
+          "t": 2.32,
+          "months": 120
+        },
+        "1980s": {
+          "ann_pct": 3.39,
+          "t": 1.05,
+          "months": 120
+        },
+        "1990s": {
+          "ann_pct": -2.95,
+          "t": -1.02,
+          "months": 120
+        },
+        "2000s": {
+          "ann_pct": 5.71,
+          "t": 1.31,
+          "months": 120
+        },
+        "2010s": {
+          "ann_pct": -3.11,
+          "t": -1.05,
+          "months": 120
+        },
+        "2020s": {
+          "ann_pct": 3.03,
+          "t": 0.43,
+          "months": 79
+        }
+      },
+      "rolling10y_same_sign_as_full_pct": 67.1,
+      "rolling10y_sig_same_sign_pct": 12.1,
+      "rolling10y_sig_opposite_pct": 0.0,
+      "first30_direction": "Hi",
+      "last30_direction_adjusted": {
+        "ann_pct": 0.71,
+        "t": 0.31,
+        "months": 379
+      },
+      "columns": "BIG HiBM − BIG LoBM"
+    },
+    "value_EP": {
+      "full": {
+        "ann_pct": 2.37,
+        "t": 1.69,
+        "months": 757
+      },
+      "first30": {
+        "ann_pct": 3.32,
+        "t": 1.8,
+        "months": 378
+      },
+      "last30": {
+        "ann_pct": 1.42,
+        "t": 0.67,
+        "months": 379
+      },
+      "decades": {
+        "1960s": {
+          "ann_pct": 2.93,
+          "t": 0.84,
+          "months": 78
+        },
+        "1970s": {
+          "ann_pct": 6.82,
+          "t": 1.72,
+          "months": 120
+        },
+        "1980s": {
+          "ann_pct": 1.99,
+          "t": 0.62,
+          "months": 120
+        },
+        "1990s": {
+          "ann_pct": -0.9,
+          "t": -0.34,
+          "months": 120
+        },
+        "2000s": {
+          "ann_pct": 8.31,
+          "t": 2.19,
+          "months": 120
+        },
+        "2010s": {
+          "ann_pct": -0.94,
+          "t": -0.39,
+          "months": 120
+        },
+        "2020s": {
+          "ann_pct": -3.39,
+          "t": -0.5,
+          "months": 79
+        }
+      },
+      "rolling10y_same_sign_as_full_pct": 72.7,
+      "rolling10y_sig_same_sign_pct": 5.5,
+      "rolling10y_sig_opposite_pct": 0.0,
+      "first30_direction": "Hi",
+      "last30_direction_adjusted": {
+        "ann_pct": 1.42,
+        "t": 0.67,
+        "months": 379
+      },
+      "columns": "BIG HiEP − BIG LoEP"
+    },
+    "value_CFP": {
+      "full": {
+        "ann_pct": 1.68,
+        "t": 1.18,
+        "months": 757
+      },
+      "first30": {
+        "ann_pct": 3.59,
+        "t": 1.91,
+        "months": 378
+      },
+      "last30": {
+        "ann_pct": -0.24,
+        "t": -0.11,
+        "months": 379
+      },
+      "decades": {
+        "1960s": {
+          "ann_pct": 1.72,
+          "t": 0.52,
+          "months": 78
+        },
+        "1970s": {
+          "ann_pct": 8.61,
+          "t": 2.18,
+          "months": 120
+        },
+        "1980s": {
+          "ann_pct": 2.44,
+          "t": 0.74,
+          "months": 120
+        },
+        "1990s": {
+          "ann_pct": -3.08,
+          "t": -1.03,
+          "months": 120
+        },
+        "2000s": {
+          "ann_pct": 7.1,
+          "t": 1.88,
+          "months": 120
+        },
+        "2010s": {
+          "ann_pct": -3.48,
+          "t": -1.52,
+          "months": 120
+        },
+        "2020s": {
+          "ann_pct": -3.26,
+          "t": -0.48,
+          "months": 79
+        }
+      },
+      "rolling10y_same_sign_as_full_pct": 68.2,
+      "rolling10y_sig_same_sign_pct": 8.9,
+      "rolling10y_sig_opposite_pct": 2.2,
+      "first30_direction": "Hi",
+      "last30_direction_adjusted": {
+        "ann_pct": -0.24,
+        "t": -0.11,
+        "months": 379
+      },
+      "columns": "BIG HiCFP − BIG LoCFP"
+    },
+    "dividend_yield": {
+      "full": {
+        "ann_pct": 0.42,
+        "t": 0.26,
+        "months": 757
+      },
+      "first30": {
+        "ann_pct": 1.28,
+        "t": 0.59,
+        "months": 378
+      },
+      "last30": {
+        "ann_pct": -0.44,
+        "t": -0.19,
+        "months": 379
+      },
+      "decades": {
+        "1960s": {
+          "ann_pct": -4.76,
+          "t": -1.21,
+          "months": 78
+        },
+        "1970s": {
+          "ann_pct": 4.38,
+          "t": 1.03,
+          "months": 120
+        },
+        "1980s": {
+          "ann_pct": 3.56,
+          "t": 0.85,
+          "months": 120
+        },
+        "1990s": {
+          "ann_pct": -5.11,
+          "t": -1.45,
+          "months": 120
+        },
+        "2000s": {
+          "ann_pct": 6.22,
+          "t": 1.51,
+          "months": 120
+        },
+        "2010s": {
+          "ann_pct": 0.15,
+          "t": 0.05,
+          "months": 120
+        },
+        "2020s": {
+          "ann_pct": -5.23,
+          "t": -0.77,
+          "months": 79
+        }
+      },
+      "rolling10y_same_sign_as_full_pct": 70.8,
+      "rolling10y_sig_same_sign_pct": 0.0,
+      "rolling10y_sig_opposite_pct": 0.0,
+      "first30_direction": "Hi",
+      "last30_direction_adjusted": {
+        "ann_pct": -0.44,
+        "t": -0.19,
+        "months": 379
+      },
+      "columns": "BIG HiDP − BIG LoDP"
+    },
+    "profitability_OP": {
+      "full": {
+        "ann_pct": 2.76,
+        "t": 2.41,
+        "months": 757
+      },
+      "first30": {
+        "ann_pct": 1.28,
+        "t": 0.94,
+        "months": 378
+      },
+      "last30": {
+        "ann_pct": 4.23,
+        "t": 2.3,
+        "months": 379
+      },
+      "decades": {
+        "1960s": {
+          "ann_pct": 3.22,
+          "t": 1.02,
+          "months": 78
+        },
+        "1970s": {
+          "ann_pct": -0.27,
+          "t": -0.11,
+          "months": 120
+        },
+        "1980s": {
+          "ann_pct": 1.35,
+          "t": 0.58,
+          "months": 120
+        },
+        "1990s": {
+          "ann_pct": 1.44,
+          "t": 0.61,
+          "months": 120
+        },
+        "2000s": {
+          "ann_pct": 7.78,
+          "t": 1.99,
+          "months": 120
+        },
+        "2010s": {
+          "ann_pct": 2.84,
+          "t": 1.32,
+          "months": 120
+        },
+        "2020s": {
+          "ann_pct": 3.26,
+          "t": 0.66,
+          "months": 79
+        }
+      },
+      "rolling10y_same_sign_as_full_pct": 92.0,
+      "rolling10y_sig_same_sign_pct": 6.7,
+      "rolling10y_sig_opposite_pct": 0.0,
+      "first30_direction": "Hi",
+      "last30_direction_adjusted": {
+        "ann_pct": 4.23,
+        "t": 2.3,
+        "months": 379
+      },
+      "columns": "BIG HiOP − BIG LoOP"
+    },
+    "investment": {
+      "full": {
+        "ann_pct": -1.82,
+        "t": -1.48,
+        "months": 757
+      },
+      "first30": {
+        "ann_pct": -3.01,
+        "t": -2.03,
+        "months": 378
+      },
+      "last30": {
+        "ann_pct": -0.62,
+        "t": -0.32,
+        "months": 379
+      },
+      "decades": {
+        "1960s": {
+          "ann_pct": 4.73,
+          "t": 1.3,
+          "months": 78
+        },
+        "1970s": {
+          "ann_pct": -5.46,
+          "t": -2.15,
+          "months": 120
+        },
+        "1980s": {
+          "ann_pct": -7.42,
+          "t": -2.87,
+          "months": 120
+        },
+        "1990s": {
+          "ann_pct": 4.3,
+          "t": 1.42,
+          "months": 120
+        },
+        "2000s": {
+          "ann_pct": -6.57,
+          "t": -1.79,
+          "months": 120
+        },
+        "2010s": {
+          "ann_pct": 0.35,
+          "t": 0.16,
+          "months": 120
+        },
+        "2020s": {
+          "ann_pct": 0.39,
+          "t": 0.07,
+          "months": 79
+        }
+      },
+      "rolling10y_same_sign_as_full_pct": 70.2,
+      "rolling10y_sig_same_sign_pct": 20.1,
+      "rolling10y_sig_opposite_pct": 0.0,
+      "first30_direction": "Lo",
+      "last30_direction_adjusted": {
+        "ann_pct": 0.62,
+        "t": 0.32,
+        "months": 379
+      },
+      "columns": "BIG HiINV − BIG LoINV"
+    },
+    "momentum_12_2": {
+      "full": {
+        "ann_pct": 4.54,
+        "t": 2.18,
+        "months": 757
+      },
+      "first30": {
+        "ann_pct": 6.2,
+        "t": 2.48,
+        "months": 378
+      },
+      "last30": {
+        "ann_pct": 2.88,
+        "t": 0.86,
+        "months": 379
+      },
+      "decades": {
+        "1960s": {
+          "ann_pct": 8.22,
+          "t": 1.88,
+          "months": 78
+        },
+        "1970s": {
+          "ann_pct": 8.97,
+          "t": 1.94,
+          "months": 120
+        },
+        "1980s": {
+          "ann_pct": 2.22,
+          "t": 0.46,
+          "months": 120
+        },
+        "1990s": {
+          "ann_pct": 8.98,
+          "t": 1.95,
+          "months": 120
+        },
+        "2000s": {
+          "ann_pct": 1.16,
+          "t": 0.15,
+          "months": 120
+        },
+        "2010s": {
+          "ann_pct": 1.87,
+          "t": 0.46,
+          "months": 120
+        },
+        "2020s": {
+          "ann_pct": 0.12,
+          "t": 0.02,
+          "months": 79
+        }
+      },
+      "rolling10y_same_sign_as_full_pct": 89.5,
+      "rolling10y_sig_same_sign_pct": 7.7,
+      "rolling10y_sig_opposite_pct": 0.0,
+      "first30_direction": "Hi",
+      "last30_direction_adjusted": {
+        "ann_pct": 2.88,
+        "t": 0.86,
+        "months": 379
+      },
+      "columns": "BIG HiPRIOR − BIG LoPRIOR"
+    },
+    "reversal_1m": {
+      "full": {
+        "ann_pct": -2.71,
+        "t": -1.67,
+        "months": 757
+      },
+      "first30": {
+        "ann_pct": -3.46,
+        "t": -1.85,
+        "months": 378
+      },
+      "last30": {
+        "ann_pct": -1.96,
+        "t": -0.74,
+        "months": 379
+      },
+      "decades": {
+        "1960s": {
+          "ann_pct": -6.01,
+          "t": -1.82,
+          "months": 78
+        },
+        "1970s": {
+          "ann_pct": -5.63,
+          "t": -1.74,
+          "months": 120
+        },
+        "1980s": {
+          "ann_pct": -4.56,
+          "t": -1.17,
+          "months": 120
+        },
+        "1990s": {
+          "ann_pct": 0.25,
+          "t": 0.07,
+          "months": 120
+        },
+        "2000s": {
+          "ann_pct": -5.11,
+          "t": -0.91,
+          "months": 120
+        },
+        "2010s": {
+          "ann_pct": -3.2,
+          "t": -0.97,
+          "months": 120
+        },
+        "2020s": {
+          "ann_pct": 7.72,
+          "t": 1.15,
+          "months": 79
+        }
+      },
+      "rolling10y_same_sign_as_full_pct": 81.5,
+      "rolling10y_sig_same_sign_pct": 9.4,
+      "rolling10y_sig_opposite_pct": 0.0,
+      "first30_direction": "Lo",
+      "last30_direction_adjusted": {
+        "ann_pct": 1.96,
+        "t": 0.74,
+        "months": 379
+      },
+      "columns": "BIG HiPRIOR − BIG LoPRIOR"
+    },
+    "long_reversal_60_13": {
+      "full": {
+        "ann_pct": -2.11,
+        "t": -1.43,
+        "months": 757
+      },
+      "first30": {
+        "ann_pct": -3.89,
+        "t": -1.99,
+        "months": 378
+      },
+      "last30": {
+        "ann_pct": -0.34,
+        "t": -0.15,
+        "months": 379
+      },
+      "decades": {
+        "1960s": {
+          "ann_pct": -1.55,
+          "t": -0.47,
+          "months": 78
+        },
+        "1970s": {
+          "ann_pct": -6.82,
+          "t": -1.86,
+          "months": 120
+        },
+        "1980s": {
+          "ann_pct": -0.2,
+          "t": -0.05,
+          "months": 120
+        },
+        "1990s": {
+          "ann_pct": -4.46,
+          "t": -1.35,
+          "months": 120
+        },
+        "2000s": {
+          "ann_pct": -5.0,
+          "t": -1.29,
+          "months": 120
+        },
+        "2010s": {
+          "ann_pct": 6.28,
+          "t": 2.01,
+          "months": 120
+        },
+        "2020s": {
+          "ann_pct": -3.24,
+          "t": -0.49,
+          "months": 79
+        }
+      },
+      "rolling10y_same_sign_as_full_pct": 66.1,
+      "rolling10y_sig_same_sign_pct": 9.6,
+      "rolling10y_sig_opposite_pct": 3.4,
+      "first30_direction": "Lo",
+      "last30_direction_adjusted": {
+        "ann_pct": 0.34,
+        "t": 0.15,
+        "months": 379
+      },
+      "columns": "BIG HiPRIOR − BIG LoPRIOR"
+    },
+    "accruals": {
+      "full": {
+        "ann_pct": -3.98,
+        "t": -2.96,
+        "months": 757
+      },
+      "first30": {
+        "ann_pct": -5.39,
+        "t": -2.93,
+        "months": 378
+      },
+      "last30": {
+        "ann_pct": -2.57,
+        "t": -1.31,
+        "months": 379
+      },
+      "decades": {
+        "1960s": {
+          "ann_pct": -9.76,
+          "t": -2.35,
+          "months": 78
+        },
+        "1970s": {
+          "ann_pct": -3.32,
+          "t": -1.06,
+          "months": 120
+        },
+        "1980s": {
+          "ann_pct": -5.03,
+          "t": -1.43,
+          "months": 120
+        },
+        "1990s": {
+          "ann_pct": -6.89,
+          "t": -2.05,
+          "months": 120
+        },
+        "2000s": {
+          "ann_pct": 0.98,
+          "t": 0.24,
+          "months": 120
+        },
+        "2010s": {
+          "ann_pct": -5.33,
+          "t": -2.18,
+          "months": 120
+        },
+        "2020s": {
+          "ann_pct": 1.26,
+          "t": 0.3,
+          "months": 79
+        }
+      },
+      "rolling10y_same_sign_as_full_pct": 92.0,
+      "rolling10y_sig_same_sign_pct": 10.2,
+      "rolling10y_sig_opposite_pct": 0.0,
+      "first30_direction": "Lo",
+      "last30_direction_adjusted": {
+        "ann_pct": 2.57,
+        "t": 1.31,
+        "months": 379
+      },
+      "columns": "BIG HiAC − BIG LoAC"
+    },
+    "net_share_issues": {
+      "full": {
+        "ann_pct": -2.84,
+        "t": -1.91,
+        "months": 757
+      },
+      "first30": {
+        "ann_pct": -2.77,
+        "t": -1.76,
+        "months": 378
+      },
+      "last30": {
+        "ann_pct": -2.92,
+        "t": -1.15,
+        "months": 379
+      },
+      "decades": {
+        "1960s": {
+          "ann_pct": -3.11,
+          "t": -1.11,
+          "months": 78
+        },
+        "1970s": {
+          "ann_pct": -3.34,
+          "t": -1.05,
+          "months": 120
+        },
+        "1980s": {
+          "ann_pct": -3.06,
+          "t": -1.11,
+          "months": 120
+        },
+        "1990s": {
+          "ann_pct": -0.88,
+          "t": -0.28,
+          "months": 120
+        },
+        "2000s": {
+          "ann_pct": -9.26,
+          "t": -2.21,
+          "months": 120
+        },
+        "2010s": {
+          "ann_pct": -1.34,
+          "t": -0.38,
+          "months": 120
+        },
+        "2020s": {
+          "ann_pct": 2.97,
+          "t": 0.37,
+          "months": 79
+        }
+      },
+      "rolling10y_same_sign_as_full_pct": 85.6,
+      "rolling10y_sig_same_sign_pct": 17.6,
+      "rolling10y_sig_opposite_pct": 0.0,
+      "first30_direction": "Lo",
+      "last30_direction_adjusted": {
+        "ann_pct": 2.92,
+        "t": 1.15,
+        "months": 379
+      },
+      "columns": "BIG HiNI − BIG LoNI"
+    },
+    "beta": {
+      "full": {
+        "ann_pct": 2.46,
+        "t": 0.87,
+        "months": 757
+      },
+      "first30": {
+        "ann_pct": -2.59,
+        "t": -0.82,
+        "months": 378
+      },
+      "last30": {
+        "ann_pct": 7.49,
+        "t": 1.61,
+        "months": 379
+      },
+      "decades": {
+        "1960s": {
+          "ann_pct": 11.24,
+          "t": 1.72,
+          "months": 78
+        },
+        "1970s": {
+          "ann_pct": -12.22,
+          "t": -1.97,
+          "months": 120
+        },
+        "1980s": {
+          "ann_pct": -7.8,
+          "t": -1.53,
+          "months": 120
+        },
+        "1990s": {
+          "ann_pct": 14.06,
+          "t": 2.6,
+          "months": 120
+        },
+        "2000s": {
+          "ann_pct": -4.97,
+          "t": -0.59,
+          "months": 120
+        },
+        "2010s": {
+          "ann_pct": 1.11,
+          "t": 0.2,
+          "months": 120
+        },
+        "2020s": {
+          "ann_pct": 27.35,
+          "t": 1.87,
+          "months": 79
+        }
+      },
+      "rolling10y_same_sign_as_full_pct": 50.5,
+      "rolling10y_sig_same_sign_pct": 4.5,
+      "rolling10y_sig_opposite_pct": 1.7,
+      "first30_direction": "Lo",
+      "last30_direction_adjusted": {
+        "ann_pct": -7.49,
+        "t": -1.61,
+        "months": 379
+      },
+      "columns": "BIG HiBETA − BIG LoBETA"
+    },
+    "variance": {
+      "full": {
+        "ann_pct": 1.71,
+        "t": 0.7,
+        "months": 757
+      },
+      "first30": {
+        "ann_pct": 0.0,
+        "t": 0.0,
+        "months": 378
+      },
+      "last30": {
+        "ann_pct": 3.41,
+        "t": 0.83,
+        "months": 379
+      },
+      "decades": {
+        "1960s": {
+          "ann_pct": 5.2,
+          "t": 0.92,
+          "months": 78
+        },
+        "1970s": {
+          "ann_pct": -0.27,
+          "t": -0.07,
+          "months": 120
+        },
+        "1980s": {
+          "ann_pct": -3.37,
+          "t": -0.63,
+          "months": 120
+        },
+        "1990s": {
+          "ann_pct": 7.96,
+          "t": 1.57,
+          "months": 120
+        },
+        "2000s": {
+          "ann_pct": -7.48,
+          "t": -0.83,
+          "months": 120
+        },
+        "2010s": {
+          "ann_pct": 1.08,
+          "t": 0.23,
+          "months": 120
+        },
+        "2020s": {
+          "ann_pct": 14.41,
+          "t": 1.41,
+          "months": 79
+        }
+      },
+      "rolling10y_same_sign_as_full_pct": 49.7,
+      "rolling10y_sig_same_sign_pct": 0.0,
+      "rolling10y_sig_opposite_pct": 0.0,
+      "first30_direction": "Hi",
+      "last30_direction_adjusted": {
+        "ann_pct": 3.41,
+        "t": 0.83,
+        "months": 379
+      },
+      "columns": "BIG HiVAR − BIG LoVAR"
+    },
+    "residual_variance": {
+      "full": {
+        "ann_pct": 0.38,
+        "t": 0.19,
+        "months": 757
+      },
+      "first30": {
+        "ann_pct": 0.62,
+        "t": 0.27,
+        "months": 378
+      },
+      "last30": {
+        "ann_pct": 0.15,
+        "t": 0.05,
+        "months": 379
+      },
+      "decades": {
+        "1960s": {
+          "ann_pct": 3.52,
+          "t": 0.73,
+          "months": 78
+        },
+        "1970s": {
+          "ann_pct": 1.62,
+          "t": 0.44,
+          "months": 120
+        },
+        "1980s": {
+          "ann_pct": -1.83,
+          "t": -0.39,
+          "months": 120
+        },
+        "1990s": {
+          "ann_pct": 2.75,
+          "t": 0.65,
+          "months": 120
+        },
+        "2000s": {
+          "ann_pct": -5.68,
+          "t": -0.71,
+          "months": 120
+        },
+        "2010s": {
+          "ann_pct": -1.1,
+          "t": -0.32,
+          "months": 120
+        },
+        "2020s": {
+          "ann_pct": 6.65,
+          "t": 0.91,
+          "months": 79
+        }
+      },
+      "rolling10y_same_sign_as_full_pct": 35.9,
+      "rolling10y_sig_same_sign_pct": 0.0,
+      "rolling10y_sig_opposite_pct": 0.0,
+      "first30_direction": "Hi",
+      "last30_direction_adjusted": {
+        "ann_pct": 0.15,
+        "t": 0.05,
+        "months": 379
+      },
+      "columns": "BIG HiVAR − BIG LoVAR"
+    }
+  }
+}

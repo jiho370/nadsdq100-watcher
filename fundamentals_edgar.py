@@ -282,6 +282,60 @@ def asof(points: list, date_iso: str):
     return v
 
 
+def asof_filed(points: list, date_iso: str):
+    """date_iso 시점의 최근값 + 그 값의 공시일(filed) — 주당값의 주식분할 기준 판정용."""
+    v, f = None, None
+    for p in points or []:
+        if p["filed"] <= date_iso:
+            v, f = p["val"], p["filed"]
+        else:
+            break
+    return v, f
+
+
+def split_factor_after(rec: dict, date_iso: str) -> float:
+    """date_iso '이후'에 일어난 주식분할의 누적 배수(rec["splits"]=[[날짜, 배수], ...],
+    4:1 분할이면 4.0, 역분할은 1 미만). 공시 당시 기준의 주당값(EPS)·주식수를 수정주가와
+    같은 '현재' 분할 기준으로 옮기는 데 쓴다 — 기업은 공시일 이전의 분할은 재무제표에
+    소급 반영해 발표하므로 기준 시점은 회계기간 종료일이 아니라 공시일(filed)이다."""
+    f = 1.0
+    for d, r in rec.get("splits") or []:
+        if d > date_iso and r and r > 0:
+            f *= float(r)
+    return f
+
+
+def add_splits(cache: dict, tickers: list | None = None) -> tuple[int, list]:
+    """야후 주식분할 이력을 cache[티커]["splits"]에 기록(2026-09-24 전략 검토 D).
+    반환 (성공 수, 실패 티커 목록) — 부분 실패를 조용히 성공으로 보고하지 않도록(MAINTENANCE §7).
+    분할 이력이 없는 종목은 빈 리스트로 기록(= 조회 성공, 분할 없음)."""
+    import datetime as _dt
+    import yfinance as yf
+    today = _dt.date.today().isoformat()
+    ok, failed = 0, []
+    for t in tickers or list(cache):
+        rec = cache.setdefault(t.upper(), {})
+        try:
+            sp = yf.Ticker(t.upper().replace(".", "-")).splits
+            rec["splits"] = [[d.date().isoformat(), float(r)] for d, r in sp.items() if r and r > 0]
+            rec["splits_asof"] = today
+            ok += 1
+        except Exception:
+            failed.append(t)
+    return ok, failed
+
+
+def warn_split_coverage(funds: dict | None, where: str):
+    """분할이력 미수집 종목이 있으면 경고(조용히 옛 동작으로 돌지 않게)."""
+    if not funds:
+        return
+    missing = sum(1 for r in funds.values() if isinstance(r, dict) and "splits" not in r)
+    if missing:
+        print(f"[{where}] 경고: 펀더멘탈 {len(funds)}종목 중 {missing}종목 주식분할 이력 없음 — "
+              f"시총 기반 팩터(rd_mktcap·shareholder_yield 등)가 분할배수만큼 틀릴 수 있음. "
+              f"`python fundamentals_edgar.py --splits-only`로 수집", file=sys.stderr)
+
+
 def asof_pair(points: list, date_iso: str):
     """date_iso 시점 기준 (최근값, 직전연도값). 성장률 계산용."""
     seen = [p["val"] for p in (points or []) if p["filed"] <= date_iso]
@@ -336,6 +390,15 @@ def factor_values(rec: dict, date_iso: str, price: float) -> dict:
     rec = rec or {}
     g = lambda k: asof(rec.get(k), date_iso)
     eps, ni, eq = g("eps"), g("ni"), g("equity")
+    # 2026-09-24(전략 검토 D): price는 분할이 소급 반영된 '현재 기준' 수정주가인데 EPS는 공시
+    # 당시 기준이라, 공시 후 분할이 있었던 종목은 주식수(NI/EPS)가 분할배수만큼 작게 잡혀
+    # 시총이 1/배수로, rd_mktcap·shareholder_yield·value 등은 배수만큼 부풀려졌다(실측: NVDA
+    # FY2024 EPS 11.93은 10:1 분할 전 기준). EPS를 현재 분할 기준으로 옮긴다. 분할이력
+    # (rec["splits"], add_splits로 수집)이 없으면 배수 1(예전 동작). 남는 한계: price가
+    # 배당까지 소급 조정된 값이면 과거 시총이 누적 배당만큼 약간 작게 잡힌다(분할보다 훨씬 작음).
+    if eps is not None:
+        _, eps_filed = asof_filed(rec.get("eps"), date_iso)
+        eps = eps / split_factor_after(rec, eps_filed)
     assets, debt, cash = g("assets"), g("debt"), g("cash")
     rev, opinc, gross = g("revenue"), g("opinc"), g("gross")
     if gross is None and rev is not None:
@@ -439,7 +502,14 @@ def main():
     ap = argparse.ArgumentParser(description="SEC EDGAR 과거 펀더멘탈 수집")
     ap.add_argument("--tickers", default=None, help="쉼표구분(미지정 시 현재 S&P500 전체)")
     ap.add_argument("--refresh", action="store_true", help="캐시 무시하고 재수집")
+    ap.add_argument("--splits-only", action="store_true",
+                    help="EDGAR 수집 없이 캐시 전 종목의 주식분할 이력만 야후에서 갱신")
     args = ap.parse_args()
+    if args.splits_only:
+        with open(CACHE, encoding="utf-8") as f:
+            cache = json.load(f)
+        _update_splits(cache)
+        return
     if args.tickers:
         tickers = [t.strip().upper() for t in args.tickers.split(",") if t.strip()]
     else:
@@ -447,7 +517,17 @@ def main():
         tickers, _ = R.get_sp500()
         bad = ("-W", "-WI", "-WS", "-U", "-RT", "-R", ".W", ".U")
         tickers = [s for s in tickers if not any(s.upper().endswith(x) for x in bad)]
-    build(tickers, refresh=args.refresh)
+    cache = build(tickers, refresh=args.refresh)
+    _update_splits(cache)
+
+
+def _update_splits(cache: dict):
+    ok, failed = add_splits(cache)
+    with open(CACHE, "w", encoding="utf-8") as f:
+        json.dump(cache, f, ensure_ascii=False)
+    print(f"[분할이력] {ok}종목 갱신 · 실패 {len(failed)}: {failed[:15]}", file=sys.stderr)
+    if ok == 0:
+        sys.exit(1)   # 전부 실패 = 네트워크/야후 장애 — 성공처럼 끝내지 않는다
 
 
 if __name__ == "__main__":

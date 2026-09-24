@@ -2,24 +2,24 @@
   "cost_sensitivity": [
     {
       "cost_bps": 30.0,
-      "ma30_cagr": 36.02,
-      "live_cagr": 19.6,
-      "bh_cagr": 17.22,
-      "ma30_excess_over_live": 16.43
+      "ma30_cagr": 55.62,
+      "live_cagr": 30.73,
+      "bh_cagr": 27.02,
+      "ma30_excess_over_live": 24.9
     },
     {
       "cost_bps": 50.0,
-      "ma30_cagr": 30.88,
-      "live_cagr": 18.24,
-      "bh_cagr": 17.22,
-      "ma30_excess_over_live": 12.64
+      "ma30_cagr": 47.18,
+      "live_cagr": 28.6,
+      "bh_cagr": 27.02,
+      "ma30_excess_over_live": 18.59
     },
     {
       "cost_bps": 100.0,
-      "ma30_cagr": 18.81,
-      "live_cagr": 14.89,
-      "bh_cagr": 17.22,
-      "ma30_excess_over_live": 3.92
+      "ma30_cagr": 27.97,
+      "live_cagr": 23.41,
+      "bh_cagr": 27.02,
+      "ma30_excess_over_live": 4.56
     }
   ],
   "pbo_dsr_full_ma_grid": {
@@ -29,29 +29,29 @@
       "cost": "30.0bp"
     },
     "n_trials": 16,
-    "n_events": 152,
+    "n_events": 154,
     "pbo": {
-      "pbo": 0.408,
+      "pbo": 0.3669,
       "embargo": 0,
       "purged_events_total": 0,
       "n_combos": 924,
       "n_blocks": 12,
-      "lambda_mean": 0.3339,
-      "is_sharpe_mean": 0.0322,
-      "oos_sharpe_mean": -0.0417,
-      "degradation_slope": -0.9111,
-      "prob_oos_loss": 0.7165
+      "lambda_mean": 0.4487,
+      "is_sharpe_mean": 0.0283,
+      "oos_sharpe_mean": -0.0422,
+      "degradation_slope": -0.8253,
+      "prob_oos_loss": 0.7121
     },
     "pbo_verdict": "중간(주의)",
     "dsr": {
-      "sr": 0.0137,
-      "sr0": 0.0542,
-      "dsr": 0.3084,
-      "dsr_uncorrected": 0.3084,
-      "skew": 0.823,
-      "kurtosis": 4.528,
-      "T": 152,
-      "T_eff": 152,
+      "sr": 0.0112,
+      "sr0": 0.0554,
+      "dsr": 0.2915,
+      "dsr_uncorrected": 0.2915,
+      "skew": 0.836,
+      "kurtosis": 4.593,
+      "T": 154,
+      "T_eff": 154,
       "N": 16,
       "best_trial": "tm30_b0.0_c1"
     },

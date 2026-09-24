@@ -80,16 +80,29 @@ def run(save: bool = True) -> dict:
     # 사전계산: 모든 (스냅샷, 캡) 조합의 초과수익
     excess_by_cap = {cap: [_excess_for_cap(s, cap) for s in snaps] for cap in CAP_SEARCH_GRID}
 
-    wf_excess, wf_chosen_cap, baseline_oos = [], [], []
+    # 2026-09-24(전략 검토 F): 스냅샷 i의 6개월 수익은 진입일(i+1거래일)부터 126거래일 뒤에야
+    # 확정된다. 예전엔 t 이전 스냅샷을 전부(range(t)) 학습에 썼는데, 직전 1~2개 스냅샷의
+    # 수익은 t 시점에 아직 끝나지 않은 미래 정보였다 — 확정일이 t 이하인 스냅샷만 쓴다.
+    import backtest_weights as BW
+    pos = {d.date().isoformat(): k for k, d in enumerate(panel.index)}
+    hd = BW.TD[HORIZON]
+    known_at = [panel.index[min(pos[s["date"]] + 1 + hd, len(panel) - 1)] for s in snaps]
+    snap_dt = [pd.Timestamp(s["date"]) for s in snaps]
+
+    wf_excess, wf_chosen_cap, baseline_oos, eval_ts = [], [], [], []
     for t in range(MIN_HISTORY, n):
+        done = [i for i in range(t) if known_at[i] <= snap_dt[t]]
         best_cap, best_mean = None, -np.inf
         for cap in CAP_SEARCH_GRID:
-            hist = [excess_by_cap[cap][i] for i in range(t) if excess_by_cap[cap][i] is not None]
+            hist = [excess_by_cap[cap][i] for i in done if excess_by_cap[cap][i] is not None]
             if len(hist) < MIN_HISTORY // 2:
                 continue
             m = float(np.mean(hist))
             if m > best_mean:
                 best_mean, best_cap = m, cap
+        if best_mean == -np.inf:          # 확정된 과거 표본 부족 — 이 시점은 평가 안 함
+            continue
+        eval_ts.append(t)
         ex_t = excess_by_cap[best_cap][t]
         if ex_t is not None:
             wf_excess.append(ex_t); wf_chosen_cap.append(best_cap)
@@ -97,7 +110,7 @@ def run(save: bool = True) -> dict:
         if base_t is not None:
             baseline_oos.append(base_t)
 
-    fixed65_oos = [excess_by_cap[6.5][t] for t in range(MIN_HISTORY, n) if excess_by_cap[6.5][t] is not None]
+    fixed65_oos = [excess_by_cap[6.5][t] for t in eval_ts if excess_by_cap[6.5][t] is not None]
 
     wf_result = {
         "n_oos_events": len(wf_excess),

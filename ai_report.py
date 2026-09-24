@@ -4,7 +4,7 @@ ai_report.py — 2단계(검증→서술) AI 리포트 생성기. 비용 최소�
 
 역할 분담 (HISTORY.md §5 + 2026-07 비용 개편):
   · 규칙(코드)      = 후보 발굴 + '실행 계획' 확정.
-                      매수 분할 가격·비율, 손절선, 관찰→매수 전환 조건, 매도 처분 계획은
+                      매수 가격·비율, 손절선, 관찰→매수 전환 조건, 매도 처분 계획은
                       전부 entry_plan.py 가 지표로 계산한다. AI는 이 숫자를 바꿀 수 없다.
   · 프로필 캐시     = 종목 사업 설명(②펀더멘털 축)은 sp500_profiles.json /
                       kospi200_profiles.json 에서 재사용(분기 1회 gen_profiles.py 로 생성).
@@ -149,7 +149,7 @@ def attach_plans(groups: dict):
     for key, krw in (("watch", False), ("kr_watch", True)):
         for c in groups.get(key) or []:
             c["trigger"] = EP.watch_trigger(c, krw=krw)
-            c["plan"] = EP.buy_plan(c, krw=krw)          # 전환 시 쓸 분할 계획(표시용)
+            c["plan"] = EP.buy_plan(c, krw=krw)          # 전환 시 쓸 매수 계획(표시용)
             c["plan_text"] = EP.plan_text(c["plan"])
     for s in groups.get("sells") or []:
         s["plan"] = EP.sell_plan(s)
@@ -885,7 +885,7 @@ def _metric_chips(m):
 
 
 def _plan_table(plan: dict, comment: str = ""):
-    """entry_plan.buy_plan 결과를 분할매수 표로. 코드 확정값 — 리포트의 '실행' 핵심."""
+    """entry_plan.buy_plan 결과를 매수 계획 표로. 코드 확정값 — 리포트의 '실행' 핵심."""
     if not plan or not plan.get("tranches"):
         return ""
     krw = plan.get("krw", False)
@@ -925,7 +925,7 @@ def _card(i, r, metrics_by_sym, kind, is_kr=False):
     fl = r.get("flag")
     flag_chip = _chip(fl, flag_color.get(fl, "#6b7280"), True) if fl else ""
     cat_chip = _chip(_esc(r.get("category")), "#7c3aed") if r.get("category") else ""
-    hot_chip = _chip("과열·분할", "#c2410c", True) if (kind == "buy" and r.get("hot")) else ""
+    hot_chip = _chip("과열", "#c2410c", True) if (kind == "buy" and r.get("hot")) else ""
     # 2026-07-17(지호 님 요청): 보유중/신규를 둘 다 명시적으로 표기해 구별되게 — 국장은
     # already_held를 이미 쓰고 있었는데 미장엔 안 켜져 있었음(daily_ai_report.run_us에서 신규 배선).
     held_chip = (_chip("보유중", "#0369a1", True) if r.get("already_held")
@@ -1163,9 +1163,11 @@ def render_report_html(report, as_of="", metrics_by_sym=None, market_html="", si
              "최신 뉴스·리스크 확인은 이번엔 생략됐습니다(아래 고지 참고)."
     us_note = (
         '<div style="font-size:12px;color:#374151;background:#f8fafc;border-radius:6px;'
-        'padding:6px 9px;margin:2px 0 8px;line-height:1.5">퀄리티·주주환원 팩터(자산 대비 '
-        '수익성·연구개발 집약도·자사주매입 등 계량 지표) 점수 상위 종목입니다. 과최적화 '
-        f'위험(PBO)과 통계적 유의성(DSR) 검증을 통과한 가중치로 순위를 매기고, {ai_note}</div>')
+        'padding:6px 9px;margin:2px 0 8px;line-height:1.5">수익성·연구개발 집약도·주주환원 점수 '
+        '상위 종목 — 핵심자산(코어)을 보완하는 위성자산(새틀라이트) 후보입니다. 권장 편성은 코어 50% '
+        'SPMO(S&amp;P500 모멘텀 ETF) + 이 추천 종목 50%: 개별종목만으로는 해마다 지수와 차이가 커서, '
+        '모멘텀 코어와 섞었을 때 위험 대비 수익(샤프지수)이 가장 좋았습니다(2018~2026 백테스트, '
+        f'통계적 확정은 아님 — 근거는 주간 배분 리포트 참고). {ai_note}</div>')
     us_sec = ""
     if buy_cards or watch_cards:
         us_sec = (

@@ -40,6 +40,7 @@ BAD_TICKER_PATH = "state/known_bad_tickers.json"
 BAD_RECHECK_DAYS = 90
 TAIL_REFRESH_DAYS = 10
 MIN_CALL_INTERVAL = 0.5
+BASIS_TOL = 0.001   # 겹치는 날짜 가격차 0.1% 초과 = 소급조정(분할·배당) → 전체 재수집
 
 _last_call: dict[str, float] = {}
 
@@ -118,6 +119,18 @@ def _save_cache(symbol: str, series: pd.Series):
         pass
 
 
+def _basis_changed(cached: pd.Series, new: pd.Series, tol: float = BASIS_TOL) -> bool:
+    """캐시와 새로 받은 꼬리가 겹치는 날짜의 가격이 tol 넘게 다르면 수정주가 기준이 바뀐 것.
+    캐시의 마지막 날짜는 비교에서 뺀다 — 장중 실행(미장 메일은 개장 30~90분 후)이면 그 봉은
+    확정 종가가 아닌 장중 가격이라, 넣으면 매 실행마다 '기준 변경'으로 오판해 전체 재수집한다."""
+    common = cached.index.intersection(new.index)
+    common = common[common < cached.index.max()]
+    if not len(common):
+        return False
+    ratio = (new.reindex(common) / cached.reindex(common)).dropna()
+    return bool(len(ratio)) and float((ratio - 1).abs().max()) > tol
+
+
 def fetch_batch(symbols: list[str], period: str, yf_batch_fn) -> dict[str, pd.Series]:
     """symbols를 캐시 상태로 나눠 최소한만 야후에 요청 — 캐시가 이미 요청 기간만큼
     깊고 최근이면 최근 며칠만 다시 받아 이어붙이고, 없거나 얕으면 전체를 새로 받는다.
@@ -155,16 +168,36 @@ def fetch_batch(symbols: list[str], period: str, yf_batch_fn) -> dict[str, pd.Se
     if need_tail:
         _throttle("yahoo")
         fetched = yf_batch_fn(need_tail, f"{TAIL_REFRESH_DAYS + 5}d") or {}
+        rebase = []
         for s in need_tail:
             new = fetched.get(s)
             cached = tail_cache[s]
             if new is not None and len(new):
+                if _basis_changed(cached, new):
+                    rebase.append(s)
+                    continue
                 merged = pd.concat([cached, new])
                 merged = merged[~merged.index.duplicated(keep="last")].sort_index()
                 out[s] = merged
                 _save_cache(s, merged)
             else:
                 out[s] = cached   # 최근 갱신 실패해도 캐시는 반환(완전 누락보다 낫다)
+        if rebase:
+            # 수정주가는 분할·배당 때마다 과거 구간 전체가 소급 조정된다 — 옛 기준 캐시에 새
+            # 기준 꼬리를 이어붙이면 분할일에 가짜 폭락/폭등이 생긴다(2026-09-24 전략 검토 D).
+            _log(f"수정주가 기준 변경(분할·배당 소급조정) 감지 {len(rebase)}종목 → 전체 재수집: {rebase[:10]}")
+            _throttle("yahoo")
+            fetched = yf_batch_fn(rebase, period) or {}
+            for s in rebase:
+                ser = fetched.get(s)
+                if ser is not None and len(ser):
+                    out[s] = ser
+                    _save_cache(s, ser)
+                else:
+                    # 재수집 실패는 일시 장애일 수 있다 — 영구실패 목록에 올리지 말고 옛 캐시를
+                    # 반환(기준은 한 번 어긋나 있지만 완전 누락보다 낫고, 다음 실행에 재시도된다).
+                    _log(f"{s}: 기준 변경 후 재수집 실패 → 옛 캐시 사용(다음 실행 때 재시도)")
+                    out[s] = tail_cache[s]
 
     recovered = [s for s in todo if s in out and s in bad]
     if recovered:

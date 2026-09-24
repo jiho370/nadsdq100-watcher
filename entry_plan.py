@@ -8,14 +8,12 @@ entry_plan.py — 매수/매도 '실행 계획'을 규칙으로 확정하는 모
   AI는 이 계획을 '바꿀 수 없고', 뉴스 기반 한 줄 코멘트만 덧붙인다(ai_report.py).
 
 규칙 요약 (HISTORY.md 매도 규칙과 정합):
-  · 매수(과열 아님): 2분할 — 1차 50% 현재가 / 2차 50% 20일선 부근(현재가보다 위면 -3% 지점).
-  · 매수(과열 hot): 3분할 — 30% 현재가 / 30% 20일선 부근 / 40% 50일선 부근.
-                    과열 판정은 export_data.split_by_entry(RSI≥72 또는 50일선 +15% 이상)가 확정.
-  · 하한선: 분할 가격이 200일선 아래로 내려가면 200일선까지로 올림(추세 이탈 구간 매수 금지) —
-            단 200일선이 현재가보다 '아래'에 있을 때만(진짜 하방 지지선일 때만) 적용한다.
-            진입 필터 폐기(2026-07, HISTORY.md §2) 이후 이미 200일선 아래에서 편입되는
-            종목이 흔해졌는데, 그럴 땐 200일선이 현재가보다 '위'에 있어 이 하한선을 무조건
-            적용하면 2차 매수가가 1차보다 높아지는 역전이 생겼다(2026-07-15 발견·수정).
+  · 매수(2026-09-24 변경, HISTORY.md §17): **현재가 전량 1회**. 예전 2분할(50/50)·과열 3분할
+    (30/30/40, 20일선·50일선 부근 대기)은 미체결분을 현금으로 남겨(미국 42.9%·한국 27~50%)
+    배정자금 기준 수익을 깎았다 — 자본 회계를 고친 스윕에서 미국(이벤트당 6.54% vs 3.97%)·
+    한국(6.05% vs 4.31%) 모두 전량 진입이 1위였고 낙폭 대비 수익도 더 좋았다. 예전 스윕이
+    분할을 고른 건 미체결 현금을 수익 계산에서 뺀 회계 결함 때문이었다.
+    과열 판정(is_hot: RSI≥72 또는 50일선 +15% 이상)은 카드 표시용으로만 남긴다.
   · 손절선(2026-07-13 정정): 기본은 200일선 × (1-SELL_MA_BUFFER)만 표시 — 실제 매도 규칙이
             "6개월 정기 재평가 + 200일선 백업"으로 바뀐 뒤에도(holdings.py) 여기 SELL_TRAIL
             기본값이 옛 -20%로 남아 있어 손절선이 실제 규칙과 안 맞는 문제가 있었다. 트레일링은
@@ -60,53 +58,44 @@ def _valid(x):
     return x is not None and isinstance(x, (int, float)) and x == x and x > 0
 
 
+HOT_RSI = 72        # 과열 판정: RSI(14) 이상
+HOT_GAP50 = 15      # 과열 판정: 50일선 대비 +% 이상
+
+
+def is_hot(rsi, price, ma50) -> bool:
+    """과열(3분할 대상) 판정 — 미국(export_data.split_by_entry)·한국(kr_stocks)·백테스트
+    (backtest_exec entry_live)가 공유하는 단일 정의(2026-09-24 전략 검토 E: 연구와 라이브의
+    분할 조건이 달랐던 문제 제거)."""
+    gap50 = ((price / ma50 - 1) * 100) if (_valid(price) and _valid(ma50)) else 0
+    return (rsi is not None and rsi == rsi and rsi >= HOT_RSI) or gap50 >= HOT_GAP50
+
+
+def tranche_targets(price) -> list:
+    """매수 트랜치 [(비중%, 목표가, 근거)] — 현재가 전량 1회. buy_plan(라이브 표시)과
+    backtest_exec의 entry_live가 같은 함수를 쓴다(연구·라이브 동일 규칙)."""
+    return [(100, price, "현재가 전량")]
+
+
 def buy_plan(c: dict, krw: bool = False) -> dict:
-    """매수 후보 c(export_data.build_candidates / kr_stocks 형식)의 분할매수 계획.
+    """매수 후보 c(export_data.build_candidates / kr_stocks 형식)의 매수 계획(현재가 전량 1회).
     반환: {"tranches":[{"label","price","pct","basis"}...], "stop":{"price","basis"}, "note"}"""
-    price, ma20, ma50, ma200 = (c.get("price"), c.get("ma20"), c.get("ma50"), c.get("ma200"))
+    price, ma200 = c.get("price"), c.get("ma200")
     if not _valid(price):
         return {}
-    hot = bool(c.get("hot"))
-
-    def below(base, fallback_ratio, basis):
-        """현재가 아래의 매수 지점: 기준선(base)이 유효하고 현재가 아래면 그 값,
-        아니면 현재가 대비 고정 비율 지점. 200일선이 현재가보다 아래에 있을 때만(=진짜
-        하방 지지선일 때만) 그 아래로는 안 내리는 floor로 쓴다. 진입 필터 폐기(2026-07,
-        HISTORY.md) 이후 200일선 '위'에서 편입되지 않는 종목이 흔해졌는데, 그럴 땐
-        200일선이 현재가보다 위에 있어 floor가 오히려 2차 가격을 현재가보다 높게
-        밀어올려 분할매수 순서가 뒤집히는 버그가 있었다(2026-07-15 발견)."""
-        if _valid(base) and base < price:
-            p, b = base, basis
-        else:
-            p, b = price * fallback_ratio, f"현재가 {int((1-fallback_ratio)*100)}% 조정 시"
-        if _valid(ma200) and ma200 < price and p < ma200:
-            p, b = ma200, "200일선(추세 하한)"
-        return round(p, 0 if krw else 2), b
-
-    p2, b2 = below(ma20, 0.97, "20일선 부근")
-    already_held = bool(c.get("already_held"))
-    if hot:
-        p3, b3 = below(ma50, 0.92, "50일선 부근")
-        tranches = [
-            {"label": "1차", "price": round(price, 0 if krw else 2), "pct": 30, "basis": "현재가(소량 시작)"},
-            {"label": "2차", "price": p2, "pct": 30, "basis": b2},
-            {"label": "3차", "price": p3, "pct": 40, "basis": b3},
-        ]
-        note = ("이미 보유 중 — 아래는 추가 매수 참고 가격대(과열 구간, 조정 기다리며)"
-                if already_held else "과열 구간 — 반드시 나눠서, 조정을 기다리며 채운다")
+    tranches = [{"label": "매수", "price": round(px, 0 if krw else 2), "pct": pct, "basis": basis}
+                for pct, px, basis in tranche_targets(price)]
+    if c.get("already_held"):
+        note = "이미 보유 중 — 신규 매수 아님"
+    elif c.get("hot"):
+        note = "과열 구간(참고) — 그래도 전량 1회 매수(조정 대기 시 미체결 현금이 수익을 깎음)"
     else:
-        tranches = [
-            {"label": "1차", "price": round(price, 0 if krw else 2), "pct": 50, "basis": "현재가"},
-            {"label": "2차", "price": p2, "pct": 50, "basis": b2},
-        ]
-        note = ("이미 보유 중 — 신규 매수 아님, 아래는 추가 매수 시 참고 가격대"
-                if already_held else "2분할 — 1차 후 조정 오면 2차, 안 오면 1차분만 보유")
+        note = "전량 1회 매수"
     # 손절선(진입 직후 참고): 2026-07-15부터 200일선 백업 기본 비활성(holdings.py와 동일 —
     # 21조합 검증 하위권 확인, 실제 매도 트리거로 안 씀). TRAIL>0이거나 MA200_BACKUP=1일 때만
     # 해당 후보를 넣는다 — 둘 중 높은(더 가까운) 쪽을 표시.
     candidates = []
     if TRAIL > 0:
-        candidates.append((price * (1 - TRAIL), f"1차 매수가 -{int(TRAIL*100)}%"))
+        candidates.append((price * (1 - TRAIL), f"매수가 -{int(TRAIL*100)}%"))
     if MA200_BACKUP and _valid(ma200) and ma200 < price:   # 200일선이 현재가 위면(이미 이탈 상태) 손절 기준으로 못 씀
         candidates.append((ma200 * (1 - MA_BUFFER), f"200일선 -{int(MA_BUFFER*100)}%"))
     if candidates:
@@ -131,7 +120,7 @@ def watch_trigger(c: dict, krw: bool = False) -> str:
         conds.append(f"또는 RSI {rsi:.0f} 과매도권 — 소량(계획의 30%) 선취매 가능")
     if _valid(ma50) and _valid(price) and price < ma50:
         conds.append(f"50일선({_fmt(ma50, krw)}) 회복 시 나머지 추가")
-    return " · ".join(conds) if conds else "20일선 회복 확인 후 2분할 매수"
+    return " · ".join(conds) if conds else "20일선 회복 확인 후 매수"
 
 
 def _support_note(s: dict, krw: bool = False) -> str:

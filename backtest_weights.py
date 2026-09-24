@@ -262,9 +262,12 @@ def load_funds():
         return None
     try:
         with open(p, encoding="utf-8") as f:
-            return json.load(f)
+            funds = json.load(f)
     except Exception:
         return None
+    import fundamentals_edgar as F
+    F.warn_split_coverage(funds, "펀더멘탈")
+    return funds
 
 
 def _synthetic(n_days=2100, n_syms=90, seed=11):

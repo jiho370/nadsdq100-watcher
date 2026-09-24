@@ -30,7 +30,7 @@ import os, sys, json, argparse
 import numpy as np
 import pandas as pd
 
-from research.regime.backtest_regime_assets import fetch, regime_series, simulate, pbo_gate, _cagr, _mdd, _ulcer
+from research.regime.backtest_regime_assets import fetch, regime_series, simulate, pbo_gate, _cagr, _mdd, _ulcer, periods_per_year
 
 MA_GRID = [10, 20, 30, 40, 50, 60, 75, 90, 100, 120, 150, 180, 200, 220, 250, 300]
 GOLDEN_PAIRS = [(50, 200)]     # 표준 골든/데드크로스 정의
@@ -43,9 +43,9 @@ SEED = 7
 def _log(m): print(f"[MA추세전략] {m}", file=sys.stderr)
 
 
-def _sharpe(r: np.ndarray) -> float:
+def _sharpe(r: np.ndarray, ppy: int = 252) -> float:
     sd = r.std(ddof=1)
-    return round(float(r.mean() / sd * np.sqrt(252)), 3) if sd > 0 else 0.0
+    return round(float(r.mean() / sd * np.sqrt(ppy)), 3) if sd > 0 else 0.0
 
 
 def golden_cross_series(closes: np.ndarray, fast: int, slow: int) -> np.ndarray:
@@ -58,10 +58,10 @@ def golden_cross_series(closes: np.ndarray, fast: int, slow: int) -> np.ndarray:
 
 
 def bootstrap_vs_bh(closes: np.ndarray, exposure: np.ndarray, cost_bps: float,
-                    block=BLOCK, n_boot=N_BOOT, seed=SEED) -> dict:
+                    block=BLOCK, n_boot=N_BOOT, seed=SEED, ppy: int = 252) -> dict:
     """전략 vs 매수후보유 쌍대 블록부트스트랩 — "이 전략이 매수후보유보다 나을 확률"을
     직접 계산(PBO/DSR의 "다중검정 중 1등일 확률"과는 다른 질문, 지호 님이 명시 요청한 정의)."""
-    m = simulate(closes, exposure, cost_bps)
+    m = simulate(closes, exposure, cost_bps, ppy)
     bh_ret = np.diff(closes) / closes[:-1]
     ra, rb = m["strat_ret"], bh_ret
     n = min(len(ra), len(rb))
@@ -75,10 +75,10 @@ def bootstrap_vs_bh(closes: np.ndarray, exposure: np.ndarray, cost_bps: float,
         idx = rng.integers(0, n_blocks, n_blocks)
         sel = np.concatenate([np.arange(j * block, (j + 1) * block) for j in idx])
         nav_a = np.cumprod(1 + ra[sel]); nav_b = np.cumprod(1 + rb[sel])
-        d_cagr[i] = _cagr(nav_a, n) - _cagr(nav_b, n)
+        d_cagr[i] = _cagr(nav_a, n, ppy) - _cagr(nav_b, n, ppy)
     ci = (round(float(np.percentile(d_cagr, 5)), 3), round(float(np.percentile(d_cagr, 95)), 3))
     return {"cagr": round(m["cagr"], 2), "bh_cagr": round(m["bh_cagr"], 2),
-            "sharpe": _sharpe(ra), "bh_sharpe": _sharpe(rb),
+            "sharpe": _sharpe(ra, ppy), "bh_sharpe": _sharpe(rb, ppy),
             "mdd": round(m["mdd"], 1), "bh_mdd": round(m["bh_mdd"], 1),
             "ulcer": round(m["ulcer"], 2), "bh_ulcer": round(m["bh_ulcer"], 2),
             "off_episodes": m["off_episodes"],
@@ -86,15 +86,15 @@ def bootstrap_vs_bh(closes: np.ndarray, exposure: np.ndarray, cost_bps: float,
             "n_boot": n_boot, "block": block}
 
 
-def ma_breakout_sweep(closes: np.ndarray, cost_bps: float, grid=MA_GRID) -> dict:
+def ma_breakout_sweep(closes: np.ndarray, cost_bps: float, grid=MA_GRID, ppy: int = 252) -> dict:
     """N일선 돌파(위)=매수·이탈(아래)=매도, band=0·confirm=1(지연 없는 순수 돌파)."""
     rows = []
     for n in grid:
         exp = regime_series(closes, n, band=0.0, confirm=1)
-        m = simulate(closes, exp, cost_bps)
+        m = simulate(closes, exp, cost_bps, ppy)
         rows.append({"ma": n, "cagr": round(m["cagr"], 2), "bh_cagr": round(m["bh_cagr"], 2),
                     "excess_cagr": round(m["cagr"] - m["bh_cagr"], 2),
-                    "sharpe": _sharpe(m["strat_ret"]), "mdd": round(m["mdd"], 1),
+                    "sharpe": _sharpe(m["strat_ret"], ppy), "mdd": round(m["mdd"], 1),
                     "ulcer": round(m["ulcer"], 2), "off_episodes": m["off_episodes"],
                     "rankable": m["off_episodes"] >= MIN_OFF_EPISODES})
     rankable = [r for r in rows if r["rankable"]]
@@ -103,11 +103,11 @@ def ma_breakout_sweep(closes: np.ndarray, cost_bps: float, grid=MA_GRID) -> dict
     return {"rows": rows, "best_by_return": best_by_return, "best_by_risk_adj": best_by_risk_adj}
 
 
-def golden_cross_stats(closes: np.ndarray, cost_bps: float, pairs=GOLDEN_PAIRS) -> list:
+def golden_cross_stats(closes: np.ndarray, cost_bps: float, pairs=GOLDEN_PAIRS, ppy: int = 252) -> list:
     rows = []
     for fast, slow in pairs:
         exp = golden_cross_series(closes, fast, slow)
-        boot = bootstrap_vs_bh(closes, exp, cost_bps)
+        boot = bootstrap_vs_bh(closes, exp, cost_bps, ppy=ppy)
         rows.append({"fast": fast, "slow": slow, **boot})
     return rows
 
@@ -116,10 +116,11 @@ def run(name: str, ticker: str, cost_bps: float, cache_path: str | None = None, 
     cache_path = cache_path or f"output/regime_price_cache_{name}.pkl"
     s = fetch(ticker, cache_path)
     closes = s.to_numpy()
+    ppy = periods_per_year(ticker)   # 코인 365·그 외 252(2026-09-24)
     _log(f"[{name}] 데이터 {s.index.min().date()}~{s.index.max().date()} ({len(s)}일)")
 
-    always_on = simulate(closes, np.ones(len(closes)), cost_bps)
-    sweep = ma_breakout_sweep(closes, cost_bps)
+    always_on = simulate(closes, np.ones(len(closes)), cost_bps, ppy)
+    sweep = ma_breakout_sweep(closes, cost_bps, ppy=ppy)
     try:
         pbo = pbo_gate(closes, {"trend_ma": MA_GRID, "band": [0.0], "confirm": [1]}, cost_bps)
     except Exception as e:
@@ -130,16 +131,16 @@ def run(name: str, ticker: str, cost_bps: float, cache_path: str | None = None, 
     best_boot = None
     if best:
         exp_best = regime_series(closes, best["ma"], 0.0, 1)
-        best_boot = bootstrap_vs_bh(closes, exp_best, cost_bps)
+        best_boot = bootstrap_vs_bh(closes, exp_best, cost_bps, ppy=ppy)
 
-    gold_rows = golden_cross_stats(closes, cost_bps)
+    gold_rows = golden_cross_stats(closes, cost_bps, ppy=ppy)
 
     payload = {
         "asset": name, "ticker": ticker, "n_days": len(closes),
         "date_range": [s.index.min().date().isoformat(), s.index.max().date().isoformat()],
         "cost_bps": cost_bps,
         "buy_hold": {"cagr": round(always_on["cagr"], 2),
-                    "sharpe": _sharpe(np.diff(closes) / closes[:-1]),
+                    "sharpe": _sharpe(np.diff(closes) / closes[:-1], ppy),
                     "mdd": round(always_on["mdd"], 1), "ulcer": round(always_on["ulcer"], 2)},
         "ma_sweep": sweep,
         "ma_sweep_pbo_dsr": pbo,

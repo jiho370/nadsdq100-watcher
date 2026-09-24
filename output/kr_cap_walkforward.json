@@ -3,14 +3,15 @@
   "min_history": 12,
   "walkforward_adaptive_cap": {
     "n_oos_events": 27,
-    "mean_excess_pct": 1.942,
-    "win_rate_pct": 63.0,
+    "mean_excess_pct": 1.477,
+    "win_rate_pct": 59.3,
     "chosen_cap_distribution": {
-      "4": 1,
-      "5.5": 12,
+      "4.5": 1,
       "5": 5,
+      "4": 2,
       "6": 4,
-      "6.5": 5
+      "6.5": 3,
+      "5.5": 12
     }
   },
   "same_window_baseline_no_cap": {

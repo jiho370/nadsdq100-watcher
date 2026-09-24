@@ -84,3 +84,17 @@
 - **v2 변경(2026-07 재검증)**: 점수 캘리브레이션 기본 호라이즌 1m→6m(D1), 임의 고정가중 폐지 →
   워크포워드 IR-가중 팩터 군집(D2·D4), PBO에 purged/embargo 추가·DSR에 T_eff 병기(D3),
   전체기간·최근5년 분위표 분리(D5). 근거: `SCORE_MODEL_DESIGN.md`.
+- **2026-09-24 추가 규칙(전략 검토 반영)**:
+  - *시행 수 N은 스크립트 안의 조합 수만 센다.* 그 전의 가중치·필터·종목 수 탐색 부담은 DSR에
+    안 들어가므로, 이미 본 기간에서 조합을 새로 골라 다시 검증한 결과는 독립 표본외 검증이 아니다.
+    판단에 쓸 땐 누적 탐색 이력을 같이 적는다.
+  - *워크포워드 학습 표본은 결과 확정일 기준.* 시점 t에서 쓸 수 있는 건 "진입일+보유기간"이 t
+    이전에 끝난 스냅샷뿐이다(`research/kr/kr_cap_walkforward.py`, `score_calibration.py`).
+  - *자본 기준 통일.* 분할매수·부분체결 비교는 배정자금 기준(미체결=현금)으로, 후보가 부족한
+    시점은 삭제하지 말고 빈 슬롯을 현금으로 평가한다(`backtest_exec._eval_event`).
+  - *MDD는 가치경로의 고점대비 낙폭만 MDD라 부른다.* 이벤트 바스켓 MDD(`basket_mdd_pct`)와 계좌
+    NAV MDD(`research/us/backtest_portfolio.py`)를 같은 이름으로 비교하지 않는다.
+  - *연환산은 자산의 거래일 수로.* 주식 252, 코인 365(`backtest_regime_assets.periods_per_year`).
+  - *검증은 라이브 함수를 호출한다.* 필터·클립·분할가격·과열 판정·매도 규칙을 연구 코드에 다시
+    쓰지 말고 `export_data.live_z`·`SCORE_FLOOR`·`entry_plan.tranche_targets`·`is_hot`·
+    `backtest_exec`의 `entry_live`/`exit_live`를 쓴다.

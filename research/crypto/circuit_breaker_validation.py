@@ -23,11 +23,11 @@ from __future__ import annotations
 import os, sys, json, argparse
 import numpy as np
 
-from research.regime.backtest_regime_assets import fetch, regime_series, _ulcer, _mdd, _cagr, composite_score
+from research.regime.backtest_regime_assets import fetch, regime_series, _ulcer, _mdd, _cagr, composite_score, CRYPTO_DAYS
 from research.legacy_cost_30bp.vol_target_validation import paired_bootstrap
 import overfit_stats as OS
 
-TRADING_DAYS = 252
+TRADING_DAYS = CRYPTO_DAYS   # 2026-09-24: 코인은 연 365봉(예전 252는 CAGR·샤프 과장)
 
 # 2026-09-06(지호 님 실제 계정 수수료, 업비트 KRW마켓): 일반주문(시장가) 0.05%·예약주문 0.139%.
 # 기존 backtest_regime_assets.COST_BPS["btc"]=30bp는 Fable5의 일반적 가정치였을 뿐 실제
@@ -78,8 +78,8 @@ def simulate_weighted(closes, exposure, cost_bps) -> dict:
     bh_nav = closes[1:] / closes[0]
     sd = np.std(strat_ret, ddof=1)
     sharpe = float(np.mean(strat_ret) / sd * np.sqrt(TRADING_DAYS)) if sd > 0 else float("nan")
-    return {"nav": nav, "bh_nav": bh_nav, "cagr": _cagr(nav, len(nav)),
-            "bh_cagr": _cagr(bh_nav, len(bh_nav)), "ulcer": _ulcer(nav),
+    return {"nav": nav, "bh_nav": bh_nav, "cagr": _cagr(nav, len(nav), TRADING_DAYS),
+            "bh_cagr": _cagr(bh_nav, len(bh_nav), TRADING_DAYS), "ulcer": _ulcer(nav),
             "bh_ulcer": _ulcer(bh_nav), "mdd": _mdd(nav), "bh_mdd": _mdd(bh_nav),
             "sharpe": round(sharpe, 3), "strat_ret": strat_ret,
             "avg_turnover": round(float(np.mean(turnover)), 4)}

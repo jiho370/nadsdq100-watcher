@@ -1,0 +1,38 @@
+{
+  "as_of": "2026-09-23",
+  "topn": 10,
+  "n_events": 32,
+  "n_clusters": 32,
+  "n_trades": 266,
+  "scope_note": "현금 슬롯(필터 부족분) 제외 — 종목이 실제로 뽑힌 개별 거래만. 계좌 슬롯 희석까지 포함한 수치는 backtest_exec_compare_us_livestack_top10.json의 entry_live__exit_live 행 참고.",
+  "hit_rate_pct": 36.1,
+  "naive_pooled_invalid": {
+    "mean_excess_pct": -2.739,
+    "t": -2.464,
+    "p": 0.0144,
+    "n": 266,
+    "warning": "종목 간 상관을 무시한 틀린 검정 — 과신 유발, 대조용으로만 표시"
+  },
+  "cluster_robust": {
+    "mean_excess_pct": -2.718,
+    "se_pct": 1.785,
+    "t": -1.522,
+    "p": 0.1381,
+    "df": 31,
+    "n_clusters": 32
+  },
+  "block_bootstrap": {
+    "n_boot": 20000,
+    "mean_excess_pct": -2.717,
+    "ci90_pct": [
+      -5.558,
+      0.204
+    ],
+    "ci95_pct": [
+      -6.115,
+      0.745
+    ],
+    "p_mean_le_zero": 0.9373
+  },
+  "note": "리밸런싱 날짜(클러스터) 자체는 여전히 32개뿐 — 종목 단위로 쪼개도 진짜 독립정보가 그만큼 늘어나는 건 아니다(균형패널에선 클러스터-로버스트 결과가 기존 바스켓평균 DSR과 방향이 같아야 정상). 이 스크립트의 목적은 표본을 늘리는 게 아니라 CSCV의 embargo/purge로 T_eff가 6~11까지 깎이는 것 없이, 32개 클러스터를 그대로 쓰는 더 표준적인 검정(및 정규분포 가정이 없는 부트스트랩)으로 같은 결론이 재현되는지 교차확인하는 것."
+}

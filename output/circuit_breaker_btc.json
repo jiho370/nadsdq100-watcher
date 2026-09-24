@@ -1,436 +1,436 @@
 {
   "asset": "btc",
   "ticker": "BTC-USD",
-  "n_days": 4372,
+  "n_days": 4390,
   "cost_bps": 5.0,
   "baseline": {
-    "sharpe": 1.106,
-    "cagr": 45.27,
+    "sharpe": 1.335,
+    "cagr": 72.08,
     "ulcer": 26.83,
     "mdd": -59.6,
-    "score": 0.36936216004559685
+    "score": 0.3688654363565144
   },
   "grid": [
     {
       "threshold": -0.05,
       "floor": 0.0,
       "cooldown": 3,
-      "sharpe": 1.106,
-      "cagr": 39.75,
-      "ulcer": 25.3,
+      "sharpe": 1.335,
+      "cagr": 62.72,
+      "ulcer": 25.31,
       "mdd": -47.9,
-      "turnover_month_pct": 95.5,
-      "score": 0.4051939299945927
+      "turnover_month_pct": 95.1,
+      "score": 0.40474760201830795
     },
     {
       "threshold": -0.05,
       "floor": 0.0,
       "cooldown": 5,
-      "sharpe": 1.19,
-      "cagr": 40.52,
+      "sharpe": 1.437,
+      "cagr": 64.02,
       "ulcer": 23.14,
       "mdd": -52.6,
-      "turnover_month_pct": 79.2,
-      "score": 0.45602002660810365
+      "turnover_month_pct": 79.0,
+      "score": 0.4556796724011435
     },
     {
       "threshold": -0.05,
       "floor": 0.0,
       "cooldown": 10,
-      "sharpe": 1.251,
-      "cagr": 38.99,
-      "ulcer": 15.86,
+      "sharpe": 1.51,
+      "cagr": 61.44,
+      "ulcer": 15.89,
       "mdd": -40.1,
-      "turnover_month_pct": 59.0,
-      "score": 0.6270951186672109
+      "turnover_month_pct": 58.8,
+      "score": 0.6263190904298912
     },
     {
       "threshold": -0.05,
       "floor": 0.25,
       "cooldown": 3,
-      "sharpe": 1.136,
-      "cagr": 41.68,
-      "ulcer": 25.06,
+      "sharpe": 1.372,
+      "cagr": 65.97,
+      "ulcer": 25.07,
       "mdd": -49.3,
-      "turnover_month_pct": 75.2,
-      "score": 0.4108665261499111
+      "turnover_month_pct": 75.0,
+      "score": 0.4103538864733665
     },
     {
       "threshold": -0.05,
       "floor": 0.25,
       "cooldown": 5,
-      "sharpe": 1.218,
-      "cagr": 42.53,
-      "ulcer": 23.05,
+      "sharpe": 1.47,
+      "cagr": 67.41,
+      "ulcer": 23.06,
       "mdd": -49.2,
-      "turnover_month_pct": 63.0,
-      "score": 0.4581122642092439
+      "turnover_month_pct": 62.6,
+      "score": 0.45764401246104813
     },
     {
       "threshold": -0.05,
       "floor": 0.25,
       "cooldown": 10,
-      "sharpe": 1.287,
-      "cagr": 41.65,
-      "ulcer": 17.16,
+      "sharpe": 1.553,
+      "cagr": 65.92,
+      "ulcer": 17.18,
       "mdd": -37.2,
-      "turnover_month_pct": 47.9,
-      "score": 0.5966810501559948
+      "turnover_month_pct": 47.7,
+      "score": 0.5958215499952422
     },
     {
       "threshold": -0.05,
       "floor": 0.5,
       "cooldown": 3,
-      "sharpe": 1.144,
-      "cagr": 43.25,
-      "ulcer": 25.08,
+      "sharpe": 1.381,
+      "cagr": 68.63,
+      "ulcer": 25.09,
       "mdd": -51.2,
-      "turnover_month_pct": 54.8,
-      "score": 0.4104237023936016
+      "turnover_month_pct": 54.6,
+      "score": 0.40986571407793404
     },
     {
       "threshold": -0.05,
       "floor": 0.5,
       "cooldown": 5,
-      "sharpe": 1.205,
-      "cagr": 44.0,
-      "ulcer": 23.62,
+      "sharpe": 1.455,
+      "cagr": 69.91,
+      "ulcer": 23.63,
       "mdd": -46.1,
-      "turnover_month_pct": 46.6,
-      "score": 0.44472215494568373
+      "turnover_month_pct": 46.4,
+      "score": 0.4441814449478148
     },
     {
       "threshold": -0.05,
       "floor": 0.5,
       "cooldown": 10,
-      "sharpe": 1.257,
-      "cagr": 43.6,
-      "ulcer": 19.54,
+      "sharpe": 1.517,
+      "cagr": 69.23,
+      "ulcer": 19.57,
       "mdd": -39.0,
-      "turnover_month_pct": 36.5,
-      "score": 0.5405195291901659
+      "turnover_month_pct": 36.3,
+      "score": 0.5397061280268831
     },
     {
       "threshold": -0.07,
       "floor": 0.0,
       "cooldown": 3,
-      "sharpe": 1.024,
-      "cagr": 37.96,
+      "sharpe": 1.237,
+      "cagr": 59.73,
       "ulcer": 26.82,
       "mdd": -52.6,
-      "turnover_month_pct": 51.5,
-      "score": 0.3695864823686499
+      "turnover_month_pct": 51.2,
+      "score": 0.3690889080639888
     },
     {
       "threshold": -0.07,
       "floor": 0.0,
       "cooldown": 5,
-      "sharpe": 1.065,
-      "cagr": 38.18,
-      "ulcer": 26.34,
+      "sharpe": 1.287,
+      "cagr": 60.1,
+      "ulcer": 26.35,
       "mdd": -50.7,
-      "turnover_month_pct": 46.6,
-      "score": 0.38070563863934054
+      "turnover_month_pct": 46.4,
+      "score": 0.38016543695608346
     },
     {
       "threshold": -0.07,
       "floor": 0.0,
       "cooldown": 10,
-      "sharpe": 1.11,
-      "cagr": 38.09,
-      "ulcer": 24.12,
+      "sharpe": 1.341,
+      "cagr": 59.95,
+      "ulcer": 24.14,
       "mdd": -47.3,
-      "turnover_month_pct": 39.9,
-      "score": 0.4329906143674894
+      "turnover_month_pct": 39.7,
+      "score": 0.43223640394019286
     },
     {
       "threshold": -0.07,
       "floor": 0.25,
       "cooldown": 3,
-      "sharpe": 1.06,
-      "cagr": 40.05,
-      "ulcer": 26.61,
+      "sharpe": 1.28,
+      "cagr": 63.23,
+      "ulcer": 26.62,
       "mdd": -54.1,
-      "turnover_month_pct": 42.0,
-      "score": 0.37445119295720725
+      "turnover_month_pct": 41.8,
+      "score": 0.37393508176943296
     },
     {
       "threshold": -0.07,
       "floor": 0.25,
       "cooldown": 5,
-      "sharpe": 1.103,
-      "cagr": 40.42,
-      "ulcer": 26.09,
+      "sharpe": 1.332,
+      "cagr": 63.85,
+      "ulcer": 26.1,
       "mdd": -52.4,
-      "turnover_month_pct": 38.4,
-      "score": 0.38675658810208247
+      "turnover_month_pct": 38.2,
+      "score": 0.3861927957459094
     },
     {
       "threshold": -0.07,
       "floor": 0.25,
       "cooldown": 10,
-      "sharpe": 1.151,
-      "cagr": 40.57,
-      "ulcer": 24.0,
+      "sharpe": 1.389,
+      "cagr": 64.1,
+      "ulcer": 24.02,
       "mdd": -45.4,
-      "turnover_month_pct": 33.4,
-      "score": 0.4358167685739796
+      "turnover_month_pct": 33.2,
+      "score": 0.43505027864918766
     },
     {
       "threshold": -0.07,
       "floor": 0.5,
       "cooldown": 3,
-      "sharpe": 1.086,
-      "cagr": 41.97,
-      "ulcer": 26.54,
+      "sharpe": 1.311,
+      "cagr": 66.47,
+      "ulcer": 26.55,
       "mdd": -55.8,
-      "turnover_month_pct": 32.8,
-      "score": 0.37611012884621764
+      "turnover_month_pct": 32.6,
+      "score": 0.3755876564527286
     },
     {
       "threshold": -0.07,
       "floor": 0.5,
       "cooldown": 5,
-      "sharpe": 1.121,
-      "cagr": 42.35,
-      "ulcer": 26.09,
+      "sharpe": 1.353,
+      "cagr": 67.12,
+      "ulcer": 26.1,
       "mdd": -54.5,
       "turnover_month_pct": 30.2,
-      "score": 0.3866360703860912
+      "score": 0.386072750668958
     },
     {
       "threshold": -0.07,
       "floor": 0.5,
       "cooldown": 10,
-      "sharpe": 1.159,
-      "cagr": 42.6,
-      "ulcer": 24.36,
+      "sharpe": 1.399,
+      "cagr": 67.54,
+      "ulcer": 24.38,
       "mdd": -46.7,
       "turnover_month_pct": 26.9,
-      "score": 0.427367544409108
+      "score": 0.4266375312455569
     },
     {
       "threshold": -0.1,
       "floor": 0.0,
       "cooldown": 3,
-      "sharpe": 1.035,
-      "cagr": 39.78,
+      "sharpe": 1.25,
+      "cagr": 62.77,
       "ulcer": 28.61,
       "mdd": -62.8,
-      "turnover_month_pct": 33.2,
-      "score": 0.3273860719809282
+      "turnover_month_pct": 33.0,
+      "score": 0.32704251326979095
     },
     {
       "threshold": -0.1,
       "floor": 0.0,
       "cooldown": 5,
-      "sharpe": 1.048,
-      "cagr": 39.13,
+      "sharpe": 1.266,
+      "cagr": 61.67,
       "ulcer": 28.32,
       "mdd": -61.4,
-      "turnover_month_pct": 29.4,
-      "score": 0.33418892138011524
+      "turnover_month_pct": 29.2,
+      "score": 0.33382130828413076
     },
     {
       "threshold": -0.1,
       "floor": 0.0,
       "cooldown": 10,
-      "sharpe": 1.122,
-      "cagr": 41.87,
-      "ulcer": 24.42,
+      "sharpe": 1.355,
+      "cagr": 66.29,
+      "ulcer": 24.43,
       "mdd": -45.6,
       "turnover_month_pct": 27.3,
-      "score": 0.4259931272287641
+      "score": 0.425268981774519
     },
     {
       "threshold": -0.1,
       "floor": 0.25,
       "cooldown": 3,
-      "sharpe": 1.06,
-      "cagr": 41.28,
-      "ulcer": 28.06,
+      "sharpe": 1.28,
+      "cagr": 65.3,
+      "ulcer": 28.07,
       "mdd": -61.9,
-      "turnover_month_pct": 28.3,
-      "score": 0.34024464076935607
+      "turnover_month_pct": 28.1,
+      "score": 0.3398553760550239
     },
     {
       "threshold": -0.1,
       "floor": 0.25,
       "cooldown": 5,
-      "sharpe": 1.078,
-      "cagr": 40.94,
+      "sharpe": 1.302,
+      "cagr": 64.72,
       "ulcer": 27.73,
       "mdd": -60.5,
       "turnover_month_pct": 25.4,
-      "score": 0.34805462177287727
+      "score": 0.34763709033831613
     },
     {
       "threshold": -0.1,
       "floor": 0.25,
       "cooldown": 10,
-      "sharpe": 1.141,
-      "cagr": 43.14,
-      "ulcer": 24.69,
+      "sharpe": 1.377,
+      "cagr": 68.45,
+      "ulcer": 24.71,
       "mdd": -47.5,
       "turnover_month_pct": 23.9,
-      "score": 0.4195228998140034
+      "score": 0.41882613650573897
     },
     {
       "threshold": -0.1,
       "floor": 0.5,
       "cooldown": 3,
-      "sharpe": 1.081,
-      "cagr": 42.7,
+      "sharpe": 1.305,
+      "cagr": 67.7,
       "ulcer": 27.58,
       "mdd": -61.0,
       "turnover_month_pct": 23.5,
-      "score": 0.3516652828990517
+      "score": 0.35123454928937264
     },
     {
       "threshold": -0.1,
       "floor": 0.5,
       "cooldown": 5,
-      "sharpe": 1.098,
-      "cagr": 42.57,
+      "sharpe": 1.325,
+      "cagr": 67.48,
       "ulcer": 27.28,
       "mdd": -59.9,
       "turnover_month_pct": 21.6,
-      "score": 0.35875333736436515
+      "score": 0.35829643302511177
     },
     {
       "threshold": -0.1,
       "floor": 0.5,
       "cooldown": 10,
-      "sharpe": 1.143,
-      "cagr": 44.14,
-      "ulcer": 25.19,
+      "sharpe": 1.38,
+      "cagr": 70.14,
+      "ulcer": 25.2,
       "mdd": -51.4,
       "turnover_month_pct": 20.6,
-      "score": 0.4078426058233093
+      "score": 0.40719430108934723
     },
     {
       "threshold": -0.15,
       "floor": 0.0,
       "cooldown": 3,
-      "sharpe": 1.067,
-      "cagr": 42.69,
-      "ulcer": 27.19,
+      "sharpe": 1.288,
+      "cagr": 67.69,
+      "ulcer": 27.2,
       "mdd": -60.0,
       "turnover_month_pct": 16.8,
-      "score": 0.3607028676394388
+      "score": 0.36023870508794475
     },
     {
       "threshold": -0.15,
       "floor": 0.0,
       "cooldown": 5,
-      "sharpe": 1.049,
-      "cagr": 41.28,
+      "sharpe": 1.266,
+      "cagr": 65.3,
       "ulcer": 27.36,
       "mdd": -60.0,
       "turnover_month_pct": 16.8,
-      "score": 0.35688571652598594
+      "score": 0.35643574093241537
     },
     {
       "threshold": -0.15,
       "floor": 0.0,
       "cooldown": 10,
-      "sharpe": 1.075,
-      "cagr": 42.69,
-      "ulcer": 26.83,
+      "sharpe": 1.298,
+      "cagr": 67.68,
+      "ulcer": 26.84,
       "mdd": -58.5,
       "turnover_month_pct": 16.8,
-      "score": 0.3691923732371757
+      "score": 0.36869629312673946
     },
     {
       "threshold": -0.15,
       "floor": 0.25,
       "cooldown": 3,
-      "sharpe": 1.078,
-      "cagr": 43.36,
-      "ulcer": 27.09,
+      "sharpe": 1.301,
+      "cagr": 68.82,
+      "ulcer": 27.1,
       "mdd": -59.9,
-      "turnover_month_pct": 16.2,
-      "score": 0.3630968919620705
+      "turnover_month_pct": 16.0,
+      "score": 0.362623780219008
     },
     {
       "threshold": -0.15,
       "floor": 0.25,
       "cooldown": 5,
-      "sharpe": 1.066,
-      "cagr": 42.33,
+      "sharpe": 1.287,
+      "cagr": 67.08,
       "ulcer": 27.18,
       "mdd": -59.8,
-      "turnover_month_pct": 16.2,
-      "score": 0.36108560098415643
+      "turnover_month_pct": 16.0,
+      "score": 0.36062001040520797
     },
     {
       "threshold": -0.15,
       "floor": 0.25,
       "cooldown": 10,
-      "sharpe": 1.087,
-      "cagr": 43.41,
+      "sharpe": 1.312,
+      "cagr": 68.91,
       "ulcer": 26.79,
       "mdd": -58.7,
-      "turnover_month_pct": 16.2,
-      "score": 0.3702387915721649
+      "turnover_month_pct": 16.0,
+      "score": 0.3697387416836484
     },
     {
       "threshold": -0.15,
       "floor": 0.5,
       "cooldown": 3,
-      "sharpe": 1.088,
-      "cagr": 44.01,
+      "sharpe": 1.314,
+      "cagr": 69.93,
       "ulcer": 27.0,
       "mdd": -59.8,
       "turnover_month_pct": 15.3,
-      "score": 0.3653399679868205
+      "score": 0.3648584348321791
     },
     {
       "threshold": -0.15,
       "floor": 0.5,
       "cooldown": 5,
-      "sharpe": 1.082,
-      "cagr": 43.35,
-      "ulcer": 27.03,
+      "sharpe": 1.306,
+      "cagr": 68.8,
+      "ulcer": 27.04,
       "mdd": -59.7,
       "turnover_month_pct": 15.3,
-      "score": 0.3645630775958795
+      "score": 0.3640844652206577
     },
     {
       "threshold": -0.15,
       "floor": 0.5,
       "cooldown": 10,
-      "sharpe": 1.096,
-      "cagr": 44.08,
-      "ulcer": 26.77,
+      "sharpe": 1.323,
+      "cagr": 70.05,
+      "ulcer": 26.78,
       "mdd": -58.9,
       "turnover_month_pct": 15.3,
-      "score": 0.37060889790053736
+      "score": 0.3701074420460449
     }
   ],
   "best": {
     "threshold": -0.05,
     "floor": 0.0,
     "cooldown": 10,
-    "sharpe": 1.251,
-    "cagr": 38.99,
-    "ulcer": 15.86,
+    "sharpe": 1.51,
+    "cagr": 61.44,
+    "ulcer": 15.89,
     "mdd": -40.1,
-    "turnover_month_pct": 59.0,
-    "score": 0.6270951186672109
+    "turnover_month_pct": 58.8,
+    "score": 0.6263190904298912
   },
   "bootstrap_best_vs_baseline": {
     "delta_ulcer_ci90": [
-      0.645,
-      18.441
+      0.675,
+      18.682
     ],
     "delta_cagr_ci90": [
-      -21.106,
-      6.393
+      -21.02,
+      6.525
     ],
     "delta_sharpe_ci90": [
-      -0.1,
-      0.389
+      -0.097,
+      0.394
     ],
     "delta_ulcer_excludes_zero": true,
     "delta_sharpe_excludes_zero": false
@@ -438,30 +438,30 @@
   "cost_sensitivity_best": [
     {
       "cost_bps": 5.0,
-      "sharpe": 1.251,
-      "cagr": 38.99,
-      "ulcer": 15.86,
+      "sharpe": 1.51,
+      "cagr": 61.44,
+      "ulcer": 15.89,
       "mdd": -40.1
     },
     {
       "cost_bps": 13.9,
-      "sharpe": 1.227,
-      "cagr": 38.08,
-      "ulcer": 16.18,
+      "sharpe": 1.481,
+      "cagr": 59.92,
+      "ulcer": 16.2,
       "mdd": -40.9
     },
     {
       "cost_bps": 30.0,
-      "sharpe": 1.183,
-      "cagr": 36.45,
-      "ulcer": 16.81,
+      "sharpe": 1.428,
+      "cagr": 57.2,
+      "ulcer": 16.84,
       "mdd": -42.2
     },
     {
       "cost_bps": 50.0,
-      "sharpe": 1.129,
-      "cagr": 34.45,
-      "ulcer": 17.67,
+      "sharpe": 1.363,
+      "cagr": 53.89,
+      "ulcer": 17.7,
       "mdd": -43.9
     }
   ],

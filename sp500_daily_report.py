@@ -699,11 +699,15 @@ def _yf_batch_fetch(symbols: list[str], period: str) -> dict[str, pd.Series]:
 
 
 def download_histories(symbols: list[str], period: str = HISTORY_PERIOD,
-                       with_volume: bool = False):
+                       with_volume: bool = False, drop_stale: bool = True):
     """종가 시계열 수집(공용 캐시·재시도·폴백은 market_data.py — 2026-09-23).
     with_volume=True 이면 (종가맵, 거래량맵) 튜플 반환 — 유일한 호출부(라이브 미국
     유니버스 수집, gather_universe_data)라 이 경로만 캐시를 거치지 않고 기존 방식대로
-    직접 받는다(볼륨은 아직 캐시 계층이 다루지 않음)."""
+    직접 받는다(볼륨은 아직 캐시 계층이 다루지 않음).
+    drop_stale=False(2026-09-24 전략 검토 C): 마지막 시세가 오래된(=과거에 거래가 끝난)
+    종목도 그대로 반환 — 과거 시점 백테스트(PIT)용. 기본값(True)은 라이브 리포트용 신선도
+    필터라, 백테스트가 이걸 그대로 쓰면 인수·상장폐지로 사라진 종목의 '전체' 시계열이
+    지워져 미래의 생존 여부로 과거 유니버스를 고르는 편향이 생겼다."""
     _require_yf()
     if with_volume:
         out, vol_out = {}, {}
@@ -741,7 +745,7 @@ def download_histories(symbols: list[str], period: str = HISTORY_PERIOD,
 
     import market_data as MD
     out = MD.fetch_batch(symbols, period, _yf_batch_fetch)
-    return _filter_stale(out, MAX_STALE_DAYS)
+    return _filter_stale(out, MAX_STALE_DAYS) if drop_stale else out
 
 def _clean_volume(vol: pd.Series) -> pd.Series:
     s = pd.to_numeric(vol, errors="coerce")

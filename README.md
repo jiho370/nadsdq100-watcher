@@ -13,19 +13,23 @@
 
 **미국 개별주(S&P500)**
 1. 팩터 점수 = `int_gp_assets×1 + rd_mktcap×2 + shareholder_yield×2`(z-score 가중합 — 자산대비수익성·연구개발집약도·주주환원 3팩터, `output/best_weights.json`)
-2. 필터: 점수하한 3.25 미달 제외, 100일 이동평균 아래 제외 (둘 다 백테스트로 채택 — `research/us/`)
+2. 필터: 점수하한(`export_data.SCORE_FLOOR`) 미달 제외, 100일 이동평균 아래(또는 값 없음) 제외. 통과 0종목이면 신규 매수 없이 현금 대기
 3. 최종 매수 상위 10종목, 섹터캡 없음
-4. 매수 집행: 평시 2분할(현재가 50%+20일선 부근 50%), 과열(RSI≥72 등)이면 3분할(30/30/40) — `entry_plan.py`
-5. 매도: 가격 개입 없이 6개월 정기 재평가만(그때 팩터 후보풀 밖이면 정리). 손절선·트레일링스톱·목표가 익절은 전부 백테스트 후 폐기 — 공통 이유는 "승자를 일찍 잘라내서 기대값을 깎는다"
+4. 매수 집행: 현재가 전량 1회(2026-09-24부터 — 분할매수는 미체결 현금이 수익을 깎아 폐지) — `entry_plan.py`
+5. 매도: 가격 개입 없이, 보유 180달력일 경과 **그리고** 그날 팩터 후보풀(60) 밖이면 정리(기간이 지나도 풀 안이면 계속 보유). 손절선·트레일링스톱·목표가 익절은 기본 비활성
 6. AI(sonnet)는 이미 뽑힌 후보의 최신 뉴스·리스크만 검토(카드에 유의사항으로 표시) — 종목 추가·순위 변경 불가, 최종 결정은 항상 코드
 
-**한국 개별주(코스피200)**: EPS>0·ROE>0 필터 → `z(1/PER)+z(1/PBR)+z(배당수익률)` 1:1:1 → 상위 5종목. 매도는 3개월 정기 재평가(미국과 동일 철학).
+**한국 개별주(코스피200)**: EPS>0·ROE>0 필터 → `z(1/PER)+z(1/PBR)+z(배당수익률)` 1:1:1(점수상한 `kr_stocks.SCORE_CAP` 초과 제외) → 상위 5종목. 매도는 보유 90달력일 경과 **그리고** 팩터 순위 상위 5 밖이면 정리.
 
 **검증 방법론**: 모든 채택 결정에 PBO(과최적화 확률, CSCV)·DSR(다중검정 보정 샤프비율)을 게이트로 씀 — `overfit_stats.py`, 기준은 [docs/VALIDATION_PIPELINE.md](docs/VALIDATION_PIPELINE.md). 시행착오·기각된 대안은 전부 [docs/strategy/HISTORY.md](docs/strategy/HISTORY.md)에 날짜별로 기록.
 
-**알려진 한계(정직하게 공개)**
-- 팩터 가중치(1:2:2)의 과거 백테스트 성과 자체는 좋다(9년 백테스트 CAGR 29.43%·샤프 1.02, HISTORY.md §7) — 이건 실측 사실. 다만 이 좋은 성과가 665개 가중치 조합을 탐색하는 과정에서 생긴 과최적화가 아니라고 통계적으로 완전히 배제하진 못한다(PBO 22%·DSR 0.88, 다중검정 보정 기준 0.95 미달).
-- floor+100일선 필터까지 포함한 최종 선정+분할매수+청산규칙 전체를 21조합으로 검증하면 표본이 부족하다. 같은 21조합 검증을 floor·100일선 도입 전(2026-07, PIT버그 수정 후)에 돌렸을 땐 PBO 12.3%·DSR 0.9236(0.95 기준 근소 미달)이었는데, 필터를 넣은 지금(2026-09)은 리밸런싱 이벤트가 18~24건으로 줄면서 DSR이 0.7657~0.8704로 더 멀어졌다(topn 10/8/6 전부 미통과, PBO도 20.6~66.3%로 악화). 방향(분할매수+6개월재평가가 최고시행)은 그때나 지금이나 일관되나, 필터 도입이 통계적 안정성 자체는 깎았다(`research/us/us_full_stack_exec_validation.py`, 2026-09-24).
+**결론(2026-09-24, [HISTORY.md §13~§17](docs/strategy/HISTORY.md))**: 미국 주식은 코어 50% SPMO(S&P500 모멘텀) + 위성 50% 개별종목 추천을 권장한다(2018~2026 계좌 백테스트 CAGR 19.6%·샤프 0.85 vs S&P500 14.4%·0.67, 나스닥100 19.9%·0.77 — S&P500 대비 우위는 방향이 일관되나 통계적으로 확정되지 않았고 나스닥100 대비 우위 근거는 없다). 매수는 분할 대신 현재가 전량 1회. 1:2:2의 두 팩터(rd_mktcap·shareholder_yield)는 결함을 고친 데이터에서 예측력 근거가 없어 가중치 재튜닝은 중단했다.
+
+**알려진 한계(정직하게 공개)** — 상세는 [LIVE.md '검증 상태'](docs/strategy/LIVE.md)
+- **현재 저장된 성과로는 시장을 이기는 전략이라고 입증되지 않았다.** 현행 조합(top10·floor·100일선·섹터무제한)의 집행 검증은 PBO 60%·DSR 0.77(top8 66%·0.84, top6 21%·0.87)로 자체 게이트(PBO<50%·DSR≥0.95) 미통과. DSR의 시행 수는 그 스크립트의 조합 수만 세고, 그 전의 가중치(665)·필터·종목 수 탐색 부담은 빠져 있어 실제보다 관대하다.
+- 과거에 인용하던 **9년 CAGR 29.43%·샤프 1.02는 옛 top8·섹터캡2 설정**의 결과(같은 실험 MDD −37.4%)로, 현행 전략의 기대수익이 아니다.
+- 2026-09-24 전략 검토에서 확인된 계산·데이터 결함(분할매수 자본 기준, 청산 이후 체결, 이름만 MDD인 지표, PIT 백테스트의 과거 종료 종목 삭제, 공시 후 주식분할로 부풀려진 시총 팩터, 연구와 라이브 규칙 불일치, 한국 워크포워드 미래참조, 코인 252일 연환산)은 코드에서 고쳤지만, **`output/`의 결과 파일은 재실행 전까지 옛 산식**이다. 재실행 전까지 주력 자금 운용의 근거로 쓰지 말 것.
+- 집행 검증은 이벤트별 독립 평가다. 미국 전략의 계좌 NAV 검증은 2026-09-24에 추가됐다([HISTORY.md §13](docs/strategy/HISTORY.md)): 2018-02~2026-09 CAGR 18.99%·샤프 0.75(SPY 14.39%·0.67, QQQ 19.87%·0.77)지만 2025-09까지로 자르면 SPY에 지는, 소수 연도 의존 결과다. 환율·세금을 포함한 원화 세후 성과, 주식·코인·자산배분을 합친 최종 포트폴리오 검증은 아직 없다.
 
 ---
 
@@ -54,8 +58,8 @@ python -m research.us.us_factor_formula_sweep
 ```
 .
 ├─ daily_ai_report.py     ← 유일한 실행 진입점 (GitHub Actions가 이것만 호출)
-├─ *.py                   ← 운영 모듈 25개 (아래 "운영 코드" 참고)
-├─ research/              ← 일회성 검증·백테스트 스크립트 79개 (주제별)
+├─ *.py                   ← 운영 모듈 (아래 "운영 코드" 참고)
+├─ research/              ← 일회성 검증·백테스트 스크립트 (주제별)
 │   ├─ us/ kr/ crypto/ fx/ bonds/ gold/ regime/ common/
 ├─ scripts/               ← Windows 작업 스케줄러용 .ps1
 ├─ state/                 ← CI가 commit-back 하는 상태파일 (추적됨)
@@ -75,13 +79,13 @@ python -m research.us.us_factor_formula_sweep
 | 묶음 | 파일 |
 |---|---|
 | 파이프라인 | `daily_ai_report` `weekly_report` `pregen` `export_data` |
-| 데이터 수집 | `sp500_daily_report` `kr_stocks` `fundamentals_edgar` `market_signals` |
+| 데이터 수집 | `sp500_daily_report` `market_data`(시세 캐시) `kr_stocks` `fundamentals_edgar` `market_signals` |
 | 신호·점수 | `tech_factors` `score_calibration` `kr_factor_ic` `entry_plan` `expectancy_report` |
 | 보유 추적 | `holdings` |
 | 백테스트 코어 | `backtest_costs` `backtest_weights` `backtest_exec` `backtest_kr` `overfit_stats` |
 | 리포트 생성 | `ai_report` `ai_commentary` `ai_verdict_log` |
 | 상시 운영 | `upbit_crash_check` `realtime_circuit_breaker_paper` |
-| 유지보수 | `gen_profiles` (분기 1회 — 종목 프로필 캐시 재생성, claude CLI 필요) |
+| 유지보수 | `gen_profiles` (분기 1회 — 종목 프로필 캐시 재생성, claude CLI 필요) · `merge_kospi200_cache` `merge_verdict_log`(git merge driver) |
 
 ### 리서치 코드 (`research/`)
 
