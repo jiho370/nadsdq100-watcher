@@ -73,7 +73,7 @@ def _make_select_fn(panel: pd.DataFrame, snaps: list, topn=TOPN):
     decisions = KS.build_decisions(panel, snaps, "valuediv")
     by_p = {p: ranked[:topn] for p, ranked in decisions}
     _log(f"valuediv 결정 시점 {len(by_p)}개 (풀 30 → topn {topn})")
-    return lambda p: by_p.get(p, [])
+    return lambda p: by_p.get(p)   # 결정 시점 아님 → None(이벤트 제외, 빈 리스트=현금 이벤트와 구분)
 
 
 def run_entry_ratio_sweep_kr(save=True):
@@ -136,24 +136,15 @@ def run_hot_split_sweep(save=True):
             if not syms:
                 continue
             for e in CORE_ENTRIES:
-                evs = []
-                for sym in syms:
-                    r = BE._simulate_trade(panel, ma20, ma50, ma200, atr, sym, entry_day, e, exit_rule)
-                    if r is None:
-                        continue
-                    net = cost.net(r["exit_price"] / r["entry_price"] - 1)
-                    b_ret = 0.0
-                    if np.isfinite(bench_r.iloc[r["exit_day"]]) and np.isfinite(bench_r.iloc[entry_day]):
-                        b_ret = float(bench_r.iloc[r["exit_day"]] / bench_r.iloc[entry_day] - 1)
-                    evs.append({"net": net, "excess": net - b_ret, "mdd": r["mdd"]})
-                if not evs:
-                    continue
+                # 2026-09-24: 배정자금 기준 수익·바스켓 MDD(backtest_exec._eval_event와 같은 회계)
+                ev = BE._eval_event(panel, (ma20, ma50, ma200, atr), syms, entry_day, e, exit_rule,
+                                    cost, bench_r, len(syms))
                 key = (group, e)
-                per_combo[key]["excess"].append(round(float(np.mean([x["excess"] for x in evs])), 6))
+                per_combo[key]["excess"].append(round(float(ev["excess"]), 6))
                 per_combo[key]["dates"].append(date)
-                stats[key]["net"].append(float(np.mean([x["net"] for x in evs])))
-                stats[key]["mdd"].append(float(np.mean([x["mdd"] for x in evs])))
-                stats[key]["n_syms"].append(len(evs))
+                stats[key]["net"].append(float(ev["net"]))
+                stats[key]["mdd"].append(float(ev["basket_mdd"]))
+                stats[key]["n_syms"].append(len(syms))
 
     _log(f"결정 시점 {len(decisions)}개 · 종목-이벤트 누적 hot {n_hot_events}건 · normal {n_normal_events}건")
 
@@ -165,7 +156,7 @@ def run_hot_split_sweep(save=True):
         matrix = [per_combo[(group, e)]["excess"][:n_ev] for e in CORE_ENTRIES]
         dates0 = per_combo[(group, CORE_ENTRIES[0])]["dates"][:n_ev]
         rows = [{"entry": e, "net_pct": round(100 * float(np.mean(stats[(group, e)]["net"])), 2),
-                "mdd_pct": round(100 * float(np.mean(stats[(group, e)]["mdd"])), 1),
+                "basket_mdd_pct": round(100 * float(np.mean(stats[(group, e)]["mdd"])), 1),
                 "avg_n_syms": round(float(np.mean(stats[(group, e)]["n_syms"])), 1),
                 "n_events": n_ev} for e in CORE_ENTRIES]
         trial_data = {"horizon": f"hotsplit_{group}", "universe": "pit", "cost": cost.describe(),
@@ -173,7 +164,7 @@ def run_hot_split_sweep(save=True):
                      "dates": dates0, "trials": CORE_ENTRIES, "excess_returns": matrix}
         report = OS.analyze(trial_data, save=False)
         results[group] = {"rows": rows, "n_events": n_ev, "report": report}
-        _log(f"[{group}] " + " · ".join(f"{r['entry']}={r['net_pct']}%p(MDD{r['mdd_pct']}%,평균{r['avg_n_syms']}종목)"
+        _log(f"[{group}] " + " · ".join(f"{r['entry']}={r['net_pct']}%p(바스켓MDD{r['basket_mdd_pct']}%,평균{r['avg_n_syms']}종목)"
                                         for r in rows))
 
     payload = {"as_of": panel.index[-1].date().isoformat(), "market": "kr",
@@ -217,7 +208,7 @@ def self_test():
     ps = list(range(260, n - 300, REBAL_DAYS))
     assert len(ps) >= 4, "합성 데이터 결정 시점 부족 — self-test 설계 확인 필요"
     by_p = {p: list(rng.permutation(cols))[:10] for p in ps}
-    select_fn = lambda p: by_p.get(p, [])
+    select_fn = lambda p: by_p.get(p)
 
     payload, report = BE.run_entry_ratio_sweep(panel, bench, None, None, rebal_days=REBAL_DAYS,
                                                topn=10, cost=cost, select_fn=select_fn,

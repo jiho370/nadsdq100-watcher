@@ -53,6 +53,10 @@ SR_CANDIDATES = ["sr_support_dist", "sr_resist_dist", "hi52_prox", "lo52_prox",
 #   exit_time6m      = 검증된 백테스트의 원형(고정 6개월) — 현행 트레일링과의 핵심 대조군
 #   exit_trail15/25  = 현행 -20%의 파라미터 민감도 스윕
 ENTRY_RULES = ["entry1_full", "entry2_pullback2", "entry3_pullback3"]
+# 2026-09-24(전략 검토 E): 라이브 규칙 그대로의 진입·청산 — entry_live(과열이면 3분할·아니면
+# 2분할, entry_plan.tranche_targets 가격) / exit_live(180달력일 경과 AND 후보풀 이탈 시 매도,
+# pool_fn 필요). 기본 21조합에는 안 넣고 research/us/us_full_stack_exec_validation.py가 추가한다.
+LIVE_ENTRY, LIVE_EXIT = "entry_live", "exit_live"
 EXIT_RULES = ["exit_trail15", "exit_trail20", "exit_trail25", "exit_ma200only",
               "exit_time6m", "exit_atr2stage", "exit_support2stage"]
 BASELINE = "entry1_full__exit_trail20"
@@ -90,6 +94,7 @@ DISPOSAL_LOSS_OVERRIDE = -0.15   # entry_plan.sell_plan()과 동일 — 초과 �
 TOPN_SWEEP = [5, 8, 10, 12, 15, 20]
 
 PULLBACK_WINDOW = 10     # 2차 트랜치 눌림 대기 거래일
+POOL_CHECK_DAYS = 5      # exit_live: 재평가 기간 경과 후 후보풀 재확인 간격(거래일, 라이브는 매 영업일)
 ATR_WINDOW = 60
 MAX_HOLD = 252           # 강제청산 상한(12m) — HISTORY.md 장기보유 취지상 이 이상은 안 봄
 TRAIL = 0.20             # holdings.py와 동일(env SELL_TRAIL로 조정 가능하나 여기선 고정 비교)
@@ -250,27 +255,41 @@ def _load_exec_weights():
 def _select_basket(panel, p, funds, cross, pit, weights, topn):
     raw = BW._raw_frame(panel, p, funds, bool(funds), cross)
     if raw is None or raw.empty:
-        return []
+        return None                      # 데이터 없음 → 이벤트 제외(현금 이벤트와 구분)
     date = panel.index[p].date().isoformat()
     idx = raw.index.intersection(BC.membership_asof(pit, date))
     if len(idx) < topn:
-        return []
+        return None
     raw = raw.loc[idx]
     w = {k: v for k, v in weights.items() if k in raw.columns}
     if not w:
-        return []
+        return None
     z = raw[list(w)].apply(BW._z).fillna(0.0)
     score = (z * pd.Series(w)).sum(axis=1)
     return list(score.sort_values(ascending=False).index[:topn])
 
 
-def _simulate_trade(panel, ma20, ma50, ma200, atr, sym, entry_day, entry_rule, exit_rule):
-    """단일 종목·단일 이벤트의 진입~청산 시뮬레이션(일별 경로). 반환: dict 또는 None(가격 결측)."""
-    vals = panel[sym].to_numpy(dtype=float)
-    n = len(vals)
-    cap = min(entry_day + MAX_HOLD, n - 1)
-    if entry_day >= n or not np.isfinite(vals[entry_day]):
+def _last_valid(vals, day, lo):
+    """day 이하에서 가장 최근 유효가격의 인덱스 — 거래가 끝난 종목(인수·상장폐지)은 마지막
+    거래가로 청산된 것으로 간주한다(인수 현금지급 근사. 파산은 과대평가될 수 있음)."""
+    while day > lo and not np.isfinite(vals[day]):
+        day -= 1
+    return day
+
+
+def _rsi_at(vals, t):
+    """t일 종가까지의 RSI(14) — 라이브 미국 지표 함수(sp500_daily_report._rsi)를 그대로 호출."""
+    import sp500_daily_report as R
+    s = pd.Series(vals[:t + 1]).dropna()
+    if len(s) < 15:
         return None
+    v = R._rsi(s).iloc[-1]
+    return float(v) if np.isfinite(v) else None
+
+
+def _planned_fills(vals, ma20, ma50, ma200, sym, entry_day, entry_rule, n):
+    """진입 규칙별 '체결 후보' [(비중, 체결가, 체결일)] — 날짜순 정리(청산 이후 체결 제거)는
+    _simulate_trade가 청산일을 정한 뒤에 한다. 1차 트랜치는 항상 entry_day 종가."""
     p1 = vals[entry_day]
 
     def _wait_fill(target, window):
@@ -279,47 +298,40 @@ def _simulate_trade(panel, ma20, ma50, ma200, atr, sym, entry_day, entry_rule, e
                 return vals[d], d
         return None, None
 
-    # ---- 진입 ----
+    def _col(df, t):
+        v = df[sym].to_numpy(dtype=float)[t]
+        return v if np.isfinite(v) else None
+
     if entry_rule == "entry1_full":
-        entry_price, filled_frac, entry_ref_day = p1, 1.0, entry_day
-    elif entry_rule == "entry2_pullback2":
-        ma20v = ma20[sym].to_numpy(dtype=float)
-        base = ma20v[entry_day] * 0.97 if np.isfinite(ma20v[entry_day]) else p1 * 0.97
-        fill2, day2 = _wait_fill(min(base, p1), PULLBACK_WINDOW)
-        if fill2 is not None:
-            entry_price, filled_frac, entry_ref_day = 0.5 * p1 + 0.5 * fill2, 1.0, day2
-        else:
-            entry_price, filled_frac, entry_ref_day = p1, 0.5, entry_day
-    elif entry_rule == "entry3_pullback3":  # 라이브 과열 규칙: 30% 즉시 / 30% 20일선-3% / 40% 50일선-8%
-        ma20v = ma20[sym].to_numpy(dtype=float)
-        ma50v = ma50[sym].to_numpy(dtype=float)
-        t2 = min(ma20v[entry_day] * 0.97 if np.isfinite(ma20v[entry_day]) else p1 * 0.97, p1)
-        t3 = min(ma50v[entry_day] * 0.92 if np.isfinite(ma50v[entry_day]) else p1 * 0.92, p1)
-        f2, d2 = _wait_fill(t2, PULLBACK_WINDOW)
-        f3, d3 = _wait_fill(t3, PULLBACK_WINDOW * 2)
-        fills = [(0.3, p1, entry_day)]
-        if f2 is not None:
-            fills.append((0.3, f2, d2))
-        if f3 is not None:
-            fills.append((0.4, f3, d3))
-        filled_frac = sum(w for w, _, _ in fills)
-        entry_price = sum(w * px for w, px, _ in fills) / filled_frac
-        entry_ref_day = max(d for _, _, d in fills)
-    elif entry_rule in ENTRY_RATIO_2:   # 2분할 비율 스윕 — 트리거는 entry2_pullback2와 동일(20일선-3%)
-        w1, w2 = ENTRY_RATIO_2[entry_rule]
-        ma20v = ma20[sym].to_numpy(dtype=float)
-        base = ma20v[entry_day] * 0.97 if np.isfinite(ma20v[entry_day]) else p1 * 0.97
-        fill2, day2 = _wait_fill(min(base, p1), PULLBACK_WINDOW)
-        if fill2 is not None:
-            entry_price, filled_frac, entry_ref_day = w1 * p1 + w2 * fill2, 1.0, day2
-        else:
-            entry_price, filled_frac, entry_ref_day = p1, w1, entry_day
-    elif entry_rule in ENTRY_RATIO_3:   # 3분할 비율 스윕 — 트리거는 entry3_pullback3와 동일
-        w1, w2, w3 = ENTRY_RATIO_3[entry_rule]
-        ma20v = ma20[sym].to_numpy(dtype=float)
-        ma50v = ma50[sym].to_numpy(dtype=float)
-        t2 = min(ma20v[entry_day] * 0.97 if np.isfinite(ma20v[entry_day]) else p1 * 0.97, p1)
-        t3 = min(ma50v[entry_day] * 0.92 if np.isfinite(ma50v[entry_day]) else p1 * 0.92, p1)
+        return [(1.0, p1, entry_day)]
+    if entry_rule == "entry_live":
+        # 라이브 규칙 그대로(2026-09-24 전략 검토 E): 신호일(entry_day-1) 지표로 과열 판정
+        # (entry_plan.is_hot) → 2분할 50/50 또는 3분할 30/30/40, 가격은 entry_plan.tranche_targets
+        # (20일선/50일선 부근·200일선 하한). 대기기간은 라이브에 명시가 없어 기존 스윕과 같은
+        # 가정(2차 10거래일·3차 20거래일)을 쓴다.
+        import entry_plan as EP
+        sd = entry_day - 1
+        ps = vals[sd] if np.isfinite(vals[sd]) else p1
+        ma20s, ma50s, ma200s = _col(ma20, sd), _col(ma50, sd), _col(ma200, sd)
+        hot = EP.is_hot(_rsi_at(vals, sd), ps, ma50s)
+        plan = EP.tranche_targets(ps, ma20s, ma50s, ma200s, hot)
+        fills = [(plan[0][0] / 100.0, p1, entry_day)]
+        for k, (pct, target, _) in enumerate(plan[1:], start=1):
+            f, d = _wait_fill(target, PULLBACK_WINDOW * k)
+            if f is not None:
+                fills.append((pct / 100.0, f, d))
+        return fills
+    if entry_rule == "entry2_pullback2" or entry_rule in ENTRY_RATIO_2:
+        w1, w2 = ENTRY_RATIO_2.get(entry_rule, (0.5, 0.5))
+        m20 = _col(ma20, entry_day)
+        base = m20 * 0.97 if m20 is not None else p1 * 0.97
+        f2, d2 = _wait_fill(min(base, p1), PULLBACK_WINDOW)
+        return [(w1, p1, entry_day)] + ([(w2, f2, d2)] if f2 is not None else [])
+    if entry_rule == "entry3_pullback3" or entry_rule in ENTRY_RATIO_3:
+        w1, w2, w3 = ENTRY_RATIO_3.get(entry_rule, (0.3, 0.3, 0.4))
+        m20, m50 = _col(ma20, entry_day), _col(ma50, entry_day)
+        t2 = min(m20 * 0.97 if m20 is not None else p1 * 0.97, p1)
+        t3 = min(m50 * 0.92 if m50 is not None else p1 * 0.92, p1)
         f2, d2 = _wait_fill(t2, PULLBACK_WINDOW)
         f3, d3 = _wait_fill(t3, PULLBACK_WINDOW * 2)
         fills = [(w1, p1, entry_day)]
@@ -327,16 +339,44 @@ def _simulate_trade(panel, ma20, ma50, ma200, atr, sym, entry_day, entry_rule, e
             fills.append((w2, f2, d2))
         if f3 is not None:
             fills.append((w3, f3, d3))
-        filled_frac = sum(w for w, _, _ in fills)
-        entry_price = sum(w * px for w, px, _ in fills) / filled_frac
-        entry_ref_day = max(d for _, _, d in fills)
-    else:
-        raise ValueError(f"알 수 없는 entry_rule: {entry_rule}")
+        return fills
+    raise ValueError(f"알 수 없는 entry_rule: {entry_rule}")
 
-    # ---- 청산 ----
-    peak = entry_price
+
+def _avg_entry(fills):
+    frac = sum(w for w, _, _ in fills)
+    return sum(w * px for w, px, _ in fills) / frac, frac
+
+
+def _simulate_trade(panel, ma20, ma50, ma200, atr, sym, entry_day, entry_rule, exit_rule,
+                    pool_fn=None):
+    """단일 종목·단일 이벤트의 진입~청산 시뮬레이션(일별 경로). 반환: dict 또는 None(가격 결측).
+
+    2026-09-24 전략 검토 A·B 반영:
+      · 날짜순 처리 — 추가 매수 트랜치는 청산일 '이전'에 체결된 것만 포지션에 넣는다(예전엔
+        미래 구간의 추가 매수를 전부 먼저 계산해 청산 이후의 저가 매수가 평균단가에 섞였다).
+        트레일링 고점은 1차 체결가에서 시작하고(평균단가에 미래 체결이 섞이지 않게), 지지선은
+        진입 결정 시점(entry_day)에 계산한다.
+      · 배정자금 기준 수익 — alloc_ret = filled_frac × 순수익(미체결분은 현금, 수익 0 가정).
+        예전엔 체결분 수익률만 써서 부분체결 전략과 전량매수 전략의 자본 기준이 달랐다.
+      · path = 배정자금 1의 일별 가치(현금+보유분, 비용 제외) — 이벤트 바스켓 MDD 계산용.
+        예전 'mdd'(최저가/평균단가-1)는 고점대비 낙폭이 아니었다."""
+    vals = panel[sym].to_numpy(dtype=float)
+    n = len(vals)
+    cap = min(entry_day + MAX_HOLD, n - 1)
+    if entry_day >= n or not np.isfinite(vals[entry_day]):
+        return None
+    p1 = vals[entry_day]
+    fills_all = _planned_fills(vals, ma20, ma50, ma200, sym, entry_day, entry_rule, n)
+
+    # ---- 청산(청산 판정은 평균단가가 아니라 가격경로·1차 체결가만 쓴다 → 미래 체결과 무관) ----
+    peak = p1
     exit_price, exit_day, stop_triggered = None, cap, False
     ma200v = ma200[sym].to_numpy(dtype=float)
+
+    def _at_cap():
+        d = _last_valid(vals, cap, entry_day)
+        return vals[d], d
 
     if exit_rule.startswith("exit_trail"):        # 트레일링 스윕(15/20/25%) + 200일선 백업(현행 구조)
         trail = int(exit_rule[-2:]) / 100.0
@@ -349,7 +389,7 @@ def _simulate_trade(panel, ma20, ma50, ma200, atr, sym, entry_day, entry_rule, e
                 exit_price, exit_day, stop_triggered = vals[d], d, True
                 break
         if exit_price is None:
-            exit_price, exit_day = vals[cap], cap
+            exit_price, exit_day = _at_cap()
 
     elif exit_rule == "exit_ma200only":           # 200일선 이탈만(트레일링 없음)
         for d in range(entry_day + 1, cap + 1):
@@ -357,22 +397,40 @@ def _simulate_trade(panel, ma20, ma50, ma200, atr, sym, entry_day, entry_rule, e
                 exit_price, exit_day, stop_triggered = vals[d], d, True
                 break
         if exit_price is None:
-            exit_price, exit_day = vals[cap], cap
+            exit_price, exit_day = _at_cap()
 
     elif exit_rule == "exit_time6m":              # 고정 6개월 — 검증된 백테스트의 원형(대조군)
-        exit_day = min(entry_day + 126, cap)
-        while exit_day > entry_day and not np.isfinite(vals[exit_day]):
-            exit_day -= 1
+        exit_day = _last_valid(vals, min(entry_day + 126, cap), entry_day)
         exit_price = vals[exit_day]
+
+    elif exit_rule == "exit_live":
+        # 라이브 매도 규칙 그대로(holdings.update): 보유 REEVAL_DAYS(달력일) 경과 후 그날의
+        # 팩터 후보풀(pool_fn) 밖이면 매도. 라이브는 매 영업일 확인하지만 후보풀 재계산 비용
+        # 때문에 POOL_CHECK_DAYS 거래일 간격으로 확인(근사). 후보풀에 계속 남으면 MAX_HOLD
+        # 에서 평가 종료(시가평가 — 라이브엔 상한이 없으므로 매도 신호가 아님).
+        import holdings as H
+        if pool_fn is None:
+            raise ValueError("exit_live에는 pool_fn(day)->후보풀 set 이 필요")
+        t0 = panel.index[entry_day]
+        d = entry_day + 1
+        while d <= cap and (panel.index[d] - t0).days < H.REEVAL_DAYS:
+            d += 1
+        while d <= cap:
+            pool = pool_fn(d)
+            if pool is not None and np.isfinite(vals[d]) and sym not in pool:
+                exit_price, exit_day, stop_triggered = vals[d], d, False
+                break
+            d += POOL_CHECK_DAYS
+        if exit_price is None:
+            exit_price, exit_day = _at_cap()
 
     elif exit_rule in DISPOSAL_SWEEP and DISPOSAL_SWEEP[exit_rule] is not None:
         # 6개월 트리거는 exit_time6m과 동일하게 확정하되, 그 이후 '처분'만 라이브 sell_plan()
         # 방식(분할+반등대기, 손실 -15% 초과 시 즉시 전량)으로 시뮬레이션.
         (w1, w2), window = DISPOSAL_SWEEP[exit_rule]
-        trig_day = min(entry_day + 126, cap)
-        while trig_day > entry_day and not np.isfinite(vals[trig_day]):
-            trig_day -= 1
-        trig_ret = vals[trig_day] / entry_price - 1
+        trig_day = _last_valid(vals, min(entry_day + 126, cap), entry_day)
+        entry_at_trig, _ = _avg_entry([f for f in fills_all if f[2] <= trig_day])
+        trig_ret = vals[trig_day] / entry_at_trig - 1
         if trig_ret <= DISPOSAL_LOSS_OVERRIDE:
             exit_price, exit_day, stop_triggered = vals[trig_day], trig_day, True
         else:
@@ -411,13 +469,14 @@ def _simulate_trade(panel, ma20, ma50, ma200, atr, sym, entry_day, entry_rule, e
                 exit_price, exit_day, stop_triggered = 0.5 * half_price + 0.5 * vals[d], d, True
                 break
         if exit_price is None:
+            last_px, exit_day = _at_cap()
             if half_done:
-                exit_price, exit_day, stop_triggered = 0.5 * half_price + 0.5 * vals[cap], cap, True
+                exit_price, stop_triggered = 0.5 * half_price + 0.5 * last_px, True
             else:
-                exit_price, exit_day = vals[cap], cap
+                exit_price = last_px
 
-    else:  # exit_support2stage
-        sup = support_level_asof(vals, entry_ref_day)
+    elif exit_rule == "exit_support2stage":
+        sup = support_level_asof(vals, entry_day)
         half_done, half_price = False, None
         if sup is None:                       # 지지선 미발견 — 200일선 이탈만 백업으로 사용
             for d in range(entry_day + 1, cap + 1):
@@ -435,111 +494,190 @@ def _simulate_trade(panel, ma20, ma50, ma200, atr, sym, entry_day, entry_rule, e
                     exit_price, exit_day, stop_triggered = 0.5 * half_price + 0.5 * vals[d], d, True
                     break
             if exit_price is None and half_done:
-                exit_price, exit_day, stop_triggered = 0.5 * half_price + 0.5 * vals[cap], cap, True
+                last_px, exit_day = _at_cap()
+                exit_price, stop_triggered = 0.5 * half_price + 0.5 * last_px, True
         if exit_price is None:
-            exit_price, exit_day = vals[cap], cap
+            exit_price, exit_day = _at_cap()
+    else:
+        raise ValueError(f"알 수 없는 exit_rule: {exit_rule}")
 
-    span = vals[entry_day:exit_day + 1]
-    span = span[np.isfinite(span)]
-    mdd = float(span.min() / entry_price - 1) if len(span) else 0.0
+    # ---- 날짜순 정리: 청산일 이후(당일 포함)의 추가 매수는 체결되지 않은 것으로 본다 ----
+    fills = [f for f in fills_all if f[2] == entry_day or f[2] < exit_day]
+    entry_price, filled_frac = _avg_entry(fills)
+
+    # ---- 배정자금 1의 일별 가치(현금 + 보유분) — 청산 후엔 현금으로 고정 ----
+    seg = pd.Series(vals[entry_day:cap + 1]).ffill().to_numpy()
+    path = np.empty(len(seg))
+    cash, shares = 1.0, 0.0
+    by_day = {}
+    for w, px, d in fills:
+        by_day.setdefault(d, []).append((w, px))
+    for i, d in enumerate(range(entry_day, cap + 1)):
+        for w, px in by_day.get(d, []):
+            cash -= w
+            shares += w / px
+        if d >= exit_day:
+            path[i] = cash + shares * exit_price
+        else:
+            path[i] = cash + shares * seg[i]
     return {"entry_price": entry_price, "exit_price": exit_price, "entry_day": entry_day,
-            "exit_day": exit_day, "filled_frac": filled_frac, "stop": stop_triggered, "mdd": mdd}
+            "exit_day": exit_day, "filled_frac": filled_frac, "stop": stop_triggered,
+            "path": path}
 
 
-def run_exec(panel, spy, funds, pit, rebal_days=63, topn=15, cost=None,
-             select_fn=None, out_suffix="", lookback=None):
-    """select_fn(p)->basket 지정 시 자체 선정(미장 가중치) 대신 사용 — KR 모드가 라이브
-    규칙 선정을 주입한다. out_suffix로 결과 파일 분리(예: "_kr")."""
-    cost = cost or BC.CostModel("us", commission_bps=0.0, slippage_bps=5.0)
-    weights = _load_exec_weights()
-    if select_fn is None:
-        import tech_factors as T
-        cross = T.build_panels(panel)
-        select_fn = lambda p: _select_basket(panel, p, funds, cross, pit, weights, topn)
-    ma20, ma50, ma200, atr = _ma(panel, 20), _ma(panel, 50), _ma(panel, 200), _atr_close(panel)
-    spy = spy.reindex(panel.index).ffill() if spy is not None else None
+def _eval_event(panel, ind, basket, entry_day, entry_rule, exit_rule, cost, spy, slots, pool_fn=None):
+    """리밸런싱 이벤트 1회 = 배정자금 1을 slots(목표 종목수)개 슬롯에 균등 배분해 평가.
+
+    2026-09-24 전략 검토 A·B·E 반영: 후보가 목표보다 적거나(필터 탈락) 0개여도 이벤트를
+    버리지 않고 빈 슬롯은 현금(수익 0)으로 둔다 — 예전엔 후보 부족 시점을 통째로 삭제해 그
+    기간의 현금·손익이 결과에서 사라졌다. 초과수익은 같은 자금을 SPY(벤치마크)에 전액 투자한
+    경우와 비교(종목 슬롯은 그 종목 보유기간, 빈 슬롯은 표준 6개월=126거래일 동안).
+    basket_mdd = 슬롯 평균 가치경로의 고점대비 최대낙폭(이 이벤트 바스켓 기준 — 겹치는 여러
+    이벤트를 합친 계좌 MDD는 아님, 계좌 NAV MDD는 research/us/backtest_portfolio.py)."""
+    ma20, ma50, ma200, atr = ind
     n = len(panel)
-    ps = list(range(lookback or BW.LOOKBACK, n - MAX_HOLD - 1, rebal_days))
-    if not ps:
-        raise RuntimeError("기간이 짧아 리밸런싱 시점 없음.")
 
-    combos = [(e, x) for e in ENTRY_RULES for x in EXIT_RULES]
-    per_combo = {c: {"excess": [], "dates": []} for c in combos}
-    stats = {c: {"stop": [], "mdd": [], "unfilled": [], "net": []} for c in combos}
-    turns, prev_basket = [], None
+    def _bench(d0, d1):
+        if spy is None or not (np.isfinite(spy.iloc[d1]) and np.isfinite(spy.iloc[d0])):
+            return 0.0
+        return float(spy.iloc[d1] / spy.iloc[d0] - 1)
 
+    slots = max(slots, len(basket), 1)
+    trades = [_simulate_trade(panel, ma20, ma50, ma200, atr, s, entry_day, entry_rule, exit_rule,
+                              pool_fn=pool_fn) for s in basket]
+    trades = [t for t in trades if t is not None]
+    n_cash = slots - len(trades)
+    cash_bench = _bench(entry_day, min(entry_day + 126, n - 1)) if n_cash else 0.0
+    nets = [t["filled_frac"] * cost.net(t["exit_price"] / t["entry_price"] - 1) for t in trades]
+    excess = [nt - _bench(entry_day, t["exit_day"]) for nt, t in zip(nets, trades)]
+    horizon = MAX_HOLD + 1
+    paths = [np.pad(t["path"], (0, horizon - len(t["path"])), mode="edge")[:horizon] for t in trades]
+    paths += [np.ones(horizon)] * n_cash
+    basket_path = np.mean(paths, axis=0)
+    mdd = float((basket_path / np.maximum.accumulate(basket_path) - 1).min())
+    return {"net": (sum(nets)) / slots,
+            "excess": (sum(excess) - n_cash * cash_bench) / slots,
+            "stop": (sum(t["stop"] for t in trades)) / slots,
+            "unfilled": (sum(1 - t["filled_frac"] for t in trades) + n_cash) / slots,
+            "basket_mdd": mdd}
+
+
+def _run_grid(panel, spy, ps, select_fn, trials, cost, slots, pool_fn=None):
+    """trials=[(entry, exit, key)] 전부를 같은 이벤트들에서 평가. select_fn(p)가 None이면
+    (데이터 없음) 그 이벤트는 건너뛰고, 빈 리스트면(후보 0) 전액 현금 이벤트로 평가한다.
+    slots는 정수 또는 key->정수 함수(topn 스윕)."""
+    ind = (_ma(panel, 20), _ma(panel, 50), _ma(panel, 200), _atr_close(panel))
+    spy = spy.reindex(panel.index).ffill() if spy is not None else None
+    per = {k: {"excess": [], "dates": []} for _, _, k in trials}
+    stats = {k: {"stop": [], "mdd": [], "unfilled": [], "net": []} for _, _, k in trials}
     for p in ps:
-        basket = select_fn(p)
-        if not basket:
-            continue
         date = panel.index[p].date().isoformat()
-        if prev_basket is not None:
-            turns.append(1 - len(set(basket) & prev_basket) / max(len(basket), 1))
-        prev_basket = set(basket)
-        entry_day = p + 1
-        for combo in combos:
-            entry_rule, exit_rule = combo
-            evs = []
-            for sym in basket:
-                r = _simulate_trade(panel, ma20, ma50, ma200, atr, sym, entry_day, entry_rule, exit_rule)
-                if r is None:
-                    continue
-                net = cost.net(r["exit_price"] / r["entry_price"] - 1)
-                spy_ret = 0.0
-                if spy is not None and np.isfinite(spy.iloc[r["exit_day"]]) and np.isfinite(spy.iloc[entry_day]):
-                    spy_ret = float(spy.iloc[r["exit_day"]] / spy.iloc[entry_day] - 1)
-                evs.append({"net": net, "excess": net - spy_ret, "stop": r["stop"],
-                           "mdd": r["mdd"], "unfilled": 1 - r["filled_frac"]})
-            if not evs:
+        for e, x, k in trials:
+            basket = select_fn(p, k)
+            if basket is None:
                 continue
-            per_combo[combo]["excess"].append(round(float(np.mean([e["excess"] for e in evs])), 6))
-            per_combo[combo]["dates"].append(date)
-            stats[combo]["stop"].append(float(np.mean([e["stop"] for e in evs])))
-            stats[combo]["mdd"].append(float(np.mean([e["mdd"] for e in evs])))
-            stats[combo]["unfilled"].append(float(np.mean([e["unfilled"] for e in evs])))
-            stats[combo]["net"].append(float(np.mean([e["net"] for e in evs])))
+            ns = slots(k) if callable(slots) else slots
+            ev = _eval_event(panel, ind, basket, p + 1, e, x, cost, spy, ns, pool_fn=pool_fn)
+            per[k]["excess"].append(round(float(ev["excess"]), 6))
+            per[k]["dates"].append(date)
+            for f, src in (("stop", "stop"), ("mdd", "basket_mdd"), ("unfilled", "unfilled"), ("net", "net")):
+                stats[k][f].append(float(ev[src]))
+    return per, stats
 
-    n_ev = min((len(v["excess"]) for v in per_combo.values()), default=0)
-    if n_ev < 4:
-        raise RuntimeError(f"이벤트 수 부족(n_ev={n_ev}) — 기간을 늘리세요.")
-    trials = [f"{e}__{x}" for e, x in combos]
-    matrix = [per_combo[c]["excess"][:n_ev] for c in combos]
-    dates0 = per_combo[combos[0]]["dates"][:n_ev]
-    turnover = round(100 * float(np.mean(turns)), 1) if turns else None
 
-    rows = [{"entry": e, "exit": x,
-            "net_pct": round(100 * float(np.mean(stats[(e, x)]["net"])), 2),
-            "stop_rate_pct": round(100 * float(np.mean(stats[(e, x)]["stop"])), 1),
-            "mdd_pct": round(100 * float(np.mean(stats[(e, x)]["mdd"])), 1),
-            "unfilled_pct": round(100 * float(np.mean(stats[(e, x)]["unfilled"])), 1),
-            "n_events": len(stats[(e, x)]["net"])}
-            for e, x in combos]
+def _row(st):
+    return {"net_pct": round(100 * float(np.mean(st["net"])), 2),
+            "stop_rate_pct": round(100 * float(np.mean(st["stop"])), 1),
+            "basket_mdd_pct": round(100 * float(np.mean(st["mdd"])), 1),
+            "unfilled_pct": round(100 * float(np.mean(st["unfilled"])), 1),
+            "n_events": len(st["net"])}
 
-    payload = {"as_of": panel.index[-1].date().isoformat(), "weights_used": weights,
-              "topn": topn, "rebal_days": rebal_days, "turnover_pct": turnover,
-              "n_combos": len(combos), "rows": rows,
-              "baseline": BASELINE + " (현행 시스템과 동일 규칙)",
-              "adoption_criteria": "청산 규칙은 baseline 대비 net 개선 & 손절빈도 감소가 "
-                                   "T_eff 보정 후에도 유지될 때만 채택 제안(SCORE_MODEL_DESIGN.md 부록 A3)",
-              "limitations": ["ATR은 종가 기반 근사(고가/저가 데이터 미사용)",
-                              "지지선은 진입 시점 1회 계산 후 보유기간 동안 고정(매일 재계산 아님)",
-                              "vol_poc_dist(A1)는 실제 거래량 히스토그램 최빈가 대신 "
-                              "252일 거래량가중평균가(VWAP)로 근사"]}
 
+ACCOUNTING_NOTE = ("2026-09-24 이후 산식: net·excess는 배정자금 기준(미체결·빈 슬롯은 현금 수익 0), "
+                   "추가매수는 청산 이전 체결분만 반영, basket_mdd_pct는 이벤트 바스켓 가치경로의 "
+                   "고점대비 최대낙폭 평균(계좌 NAV MDD 아님 — research/us/backtest_portfolio.py 참고)")
+
+
+def _save(payload, trial_data, compare_path, trial_path, report_path):
     os.makedirs("output", exist_ok=True)
-    compare_path = COMPARE_PATH.replace(".json", f"{out_suffix}.json")
-    trial_path = TRIAL_PATH.replace(".json", f"{out_suffix}.json")
-    report_path = REPORT_PATH.replace(".json", f"{out_suffix}.json")
     with open(compare_path, "w", encoding="utf-8") as f:
         json.dump(payload, f, ensure_ascii=False, indent=2)
-    trial_data = {"horizon": "exec", "universe": "pit", "cost": cost.describe(),
-                 "rebal_days": rebal_days, "hold_days": MAX_HOLD,
-                 "dates": dates0, "trials": trials, "excess_returns": matrix}
     with open(trial_path, "w", encoding="utf-8") as f:
         json.dump(trial_data, f, ensure_ascii=False)
     report = OS.analyze(trial_data, save=False)
     with open(report_path, "w", encoding="utf-8") as f:
         json.dump(report, f, ensure_ascii=False, indent=2)
+    return report
+
+
+def _matrix(per, keys):
+    n_ev = min((len(per[k]["excess"]) for k in keys), default=0)
+    if n_ev < 4:
+        raise RuntimeError(f"이벤트 수 부족(n_ev={n_ev}) — 기간을 늘리세요.")
+    return n_ev, [per[k]["excess"][:n_ev] for k in keys], per[keys[0]]["dates"][:n_ev]
+
+
+def _default_select(panel, funds, pit, topn):
+    weights = _load_exec_weights()
+    import tech_factors as T
+    cross = T.build_panels(panel)
+    return weights, (lambda p: _select_basket(panel, p, funds, cross, pit, weights, topn))
+
+
+def _rebal_points(panel, rebal_days, lookback):
+    ps = list(range(lookback or BW.LOOKBACK, len(panel) - MAX_HOLD - 1, rebal_days))
+    if not ps:
+        raise RuntimeError("기간이 짧아 리밸런싱 시점 없음.")
+    return ps
+
+
+def run_exec(panel, spy, funds, pit, rebal_days=63, topn=15, cost=None,
+             select_fn=None, out_suffix="", lookback=None, entries=None, exits=None, pool_fn=None):
+    """select_fn(p)->basket 지정 시 자체 선정(미장 가중치) 대신 사용 — KR 모드가 라이브
+    규칙 선정을 주입한다. out_suffix로 결과 파일 분리(예: "_kr"). entries/exits로 규칙
+    목록을 바꿀 수 있고(예: entry_live·exit_live 추가), exit_live는 pool_fn(day)->set 필요."""
+    cost = cost or BC.CostModel("us", commission_bps=0.0, slippage_bps=5.0)
+    weights = _load_exec_weights()
+    if select_fn is None:
+        weights, select_fn = _default_select(panel, funds, pit, topn)
+    ps = _rebal_points(panel, rebal_days, lookback)
+    combos = [(e, x) for e in (entries or ENTRY_RULES) for x in (exits or EXIT_RULES)]
+    trials = [f"{e}__{x}" for e, x in combos]
+    cache = {}
+
+    def sel(p, _k):
+        if p not in cache:
+            cache[p] = select_fn(p)
+        return cache[p]
+
+    per, stats = _run_grid(panel, spy, ps, sel, [(e, x, f"{e}__{x}") for e, x in combos],
+                           cost, topn, pool_fn=pool_fn)
+    n_ev, matrix, dates0 = _matrix(per, trials)
+    baskets = [cache[p] for p in ps if cache.get(p) is not None]
+    turns = [1 - len(set(b) & set(a)) / max(len(b), 1) for a, b in zip(baskets, baskets[1:]) if b]
+    turnover = round(100 * float(np.mean(turns)), 1) if turns else None
+
+    rows = [{"entry": e, "exit": x, **_row(stats[f"{e}__{x}"])} for e, x in combos]
+    payload = {"as_of": panel.index[-1].date().isoformat(), "weights_used": weights,
+              "topn": topn, "rebal_days": rebal_days, "turnover_pct": turnover,
+              "n_combos": len(combos), "rows": rows,
+              "baseline": BASELINE + " (옛 트레일링 규칙 — 라이브 규칙은 entry_live__exit_live)",
+              "accounting": ACCOUNTING_NOTE,
+              "adoption_criteria": "청산 규칙은 baseline 대비 net 개선 & 손절빈도 감소가 "
+                                   "T_eff 보정 후에도 유지될 때만 채택 제안(SCORE_MODEL_DESIGN.md 부록 A3)",
+              "limitations": ["ATR은 종가 기반 근사(고가/저가 데이터 미사용)",
+                              "지지선은 진입 시점 1회 계산 후 보유기간 동안 고정(매일 재계산 아님)",
+                              "vol_poc_dist(A1)는 실제 거래량 히스토그램 최빈가 대신 "
+                              "252일 거래량가중평균가(VWAP)로 근사",
+                              "이벤트별 독립 평가 — 보유상한·'팔아야 산다'·이벤트 간 자금 재투자는 "
+                              "반영 안 됨(계좌 단위 검증은 backtest_portfolio.py)"]}
+    trial_data = {"horizon": "exec", "universe": "pit", "cost": cost.describe(),
+                 "rebal_days": rebal_days, "hold_days": MAX_HOLD,
+                 "dates": dates0, "trials": trials, "excess_returns": matrix}
+    compare_path = COMPARE_PATH.replace(".json", f"{out_suffix}.json")
+    trial_path = TRIAL_PATH.replace(".json", f"{out_suffix}.json")
+    report_path = REPORT_PATH.replace(".json", f"{out_suffix}.json")
+    report = _save(payload, trial_data, compare_path, trial_path, report_path)
     _log(f"저장: {compare_path} · {trial_path} · {report_path} "
          f"(조합 {len(combos)}개 × 이벤트 {n_ev}회 · 회전율 {turnover}%)")
     return payload, report
@@ -561,86 +699,30 @@ def run_entry_ratio_sweep(panel, spy, funds, pit, rebal_days=63, topn=15, cost=N
     cost = cost or BC.CostModel("us", commission_bps=0.0, slippage_bps=5.0)
     weights = None
     if select_fn is None:
-        weights = _load_exec_weights()
-        import tech_factors as T
-        cross = T.build_panels(panel)
-        select_fn = lambda p: _select_basket(panel, p, funds, cross, pit, weights, topn)
-    ma20, ma50, ma200, atr = _ma(panel, 20), _ma(panel, 50), _ma(panel, 200), _atr_close(panel)
-    spy = spy.reindex(panel.index).ffill() if spy is not None else None
-    n = len(panel)
-    ps = list(range(lookback or BW.LOOKBACK, n - MAX_HOLD - 1, rebal_days))
-    if not ps:
-        raise RuntimeError("기간이 짧아 리밸런싱 시점 없음.")
-
+        weights, select_fn = _default_select(panel, funds, pit, topn)
+    ps = _rebal_points(panel, rebal_days, lookback)
     exit_rule = "exit_time6m"
-    entries = entries or ENTRY_RATIO_SWEEP
-    per_combo = {e: {"excess": [], "dates": []} for e in entries}
-    stats = {e: {"stop": [], "mdd": [], "unfilled": [], "net": []} for e in entries}
-
-    for p in ps:
-        basket = select_fn(p)
-        if not basket:
-            continue
-        date = panel.index[p].date().isoformat()
-        entry_day = p + 1
-        for e in entries:
-            evs = []
-            for sym in basket:
-                r = _simulate_trade(panel, ma20, ma50, ma200, atr, sym, entry_day, e, exit_rule)
-                if r is None:
-                    continue
-                net = cost.net(r["exit_price"] / r["entry_price"] - 1)
-                spy_ret = 0.0
-                if spy is not None and np.isfinite(spy.iloc[r["exit_day"]]) and np.isfinite(spy.iloc[entry_day]):
-                    spy_ret = float(spy.iloc[r["exit_day"]] / spy.iloc[entry_day] - 1)
-                evs.append({"net": net, "excess": net - spy_ret, "stop": r["stop"],
-                           "mdd": r["mdd"], "unfilled": 1 - r["filled_frac"]})
-            if not evs:
-                continue
-            per_combo[e]["excess"].append(round(float(np.mean([x["excess"] for x in evs])), 6))
-            per_combo[e]["dates"].append(date)
-            stats[e]["stop"].append(float(np.mean([x["stop"] for x in evs])))
-            stats[e]["mdd"].append(float(np.mean([x["mdd"] for x in evs])))
-            stats[e]["unfilled"].append(float(np.mean([x["unfilled"] for x in evs])))
-            stats[e]["net"].append(float(np.mean([x["net"] for x in evs])))
-
-    n_ev = min((len(v["excess"]) for v in per_combo.values()), default=0)
-    if n_ev < 4:
-        raise RuntimeError(f"이벤트 수 부족(n_ev={n_ev}) — 기간을 늘리세요.")
-    trials = list(entries)
-    matrix = [per_combo[e]["excess"][:n_ev] for e in entries]
-    dates0 = per_combo[entries[0]]["dates"][:n_ev]
-
-    rows = [{"entry": e, "exit": exit_rule,
-            "net_pct": round(100 * float(np.mean(stats[e]["net"])), 2),
-            "stop_rate_pct": round(100 * float(np.mean(stats[e]["stop"])), 1),
-            "mdd_pct": round(100 * float(np.mean(stats[e]["mdd"])), 1),
-            "unfilled_pct": round(100 * float(np.mean(stats[e]["unfilled"])), 1),
-            "n_events": len(stats[e]["net"])}
-            for e in entries]
-
+    entries = list(entries or ENTRY_RATIO_SWEEP)
+    cache = {}
+    sel = lambda p, _k: cache[p] if p in cache else cache.setdefault(p, select_fn(p))
+    per, stats = _run_grid(panel, spy, ps, sel, [(e, exit_rule, e) for e in entries], cost, topn)
+    n_ev, matrix, dates0 = _matrix(per, entries)
+    rows = [{"entry": e, "exit": exit_rule, **_row(stats[e])} for e in entries]
     payload = {"as_of": panel.index[-1].date().isoformat(), "weights_used": weights,
               "topn": topn, "rebal_days": rebal_days, "n_combos": len(entries), "rows": rows,
               "baseline": "entry2_5050(현행 평시 50/50) · entry3_303040(현행 과열 30/30/40)",
+              "accounting": ACCOUNTING_NOTE,
               "note": "청산 exit_time6m 고정 — 진입 '비율'만 순수 비교(진입×청산 교차 스윕 아님)",
               "adoption_criteria": "현행 비율(entry2_5050/entry3_303040) 대비 net 개선이 "
                                    "T_eff 보정 후에도 유지될 때만 비율 변경 제안"}
-
-    os.makedirs("output", exist_ok=True)
-    compare_path = f"output/backtest_entry_ratio_compare{out_suffix}.json"
-    trial_path = f"output/trial_returns_entry_ratio{out_suffix}.json"
-    report_path = f"output/pbo_report_entry_ratio{out_suffix}.json"
-    with open(compare_path, "w", encoding="utf-8") as f:
-        json.dump(payload, f, ensure_ascii=False, indent=2)
     trial_data = {"horizon": "entry_ratio", "universe": "pit", "cost": cost.describe(),
                  "rebal_days": rebal_days, "hold_days": MAX_HOLD,
-                 "dates": dates0, "trials": trials, "excess_returns": matrix}
-    with open(trial_path, "w", encoding="utf-8") as f:
-        json.dump(trial_data, f, ensure_ascii=False)
-    report = OS.analyze(trial_data, save=False)
-    with open(report_path, "w", encoding="utf-8") as f:
-        json.dump(report, f, ensure_ascii=False, indent=2)
-    _log(f"저장: {compare_path} · {trial_path} · {report_path} (진입비율 {len(entries)}종 × 이벤트 {n_ev}회)")
+                 "dates": dates0, "trials": list(entries), "excess_returns": matrix}
+    paths = (f"output/backtest_entry_ratio_compare{out_suffix}.json",
+             f"output/trial_returns_entry_ratio{out_suffix}.json",
+             f"output/pbo_report_entry_ratio{out_suffix}.json")
+    report = _save(payload, trial_data, *paths)
+    _log(f"저장: {' · '.join(paths)} (진입비율 {len(entries)}종 × 이벤트 {n_ev}회)")
     return payload, report
 
 
@@ -654,86 +736,30 @@ def run_disposal_sweep(panel, spy, funds, pit, rebal_days=63, topn=15, cost=None
     cost = cost or BC.CostModel("us", commission_bps=0.0, slippage_bps=5.0)
     weights = None
     if select_fn is None:
-        weights = _load_exec_weights()
-        import tech_factors as T
-        cross = T.build_panels(panel)
-        select_fn = lambda p: _select_basket(panel, p, funds, cross, pit, weights, topn)
-    ma20, ma50, ma200, atr = _ma(panel, 20), _ma(panel, 50), _ma(panel, 200), _atr_close(panel)
-    spy = spy.reindex(panel.index).ffill() if spy is not None else None
-    n = len(panel)
-    ps = list(range(lookback or BW.LOOKBACK, n - MAX_HOLD - 1, rebal_days))
-    if not ps:
-        raise RuntimeError("기간이 짧아 리밸런싱 시점 없음.")
-
+        weights, select_fn = _default_select(panel, funds, pit, topn)
+    ps = _rebal_points(panel, rebal_days, lookback)
     entry_rule = "entry1_full"
     exits = list(DISPOSAL_SWEEP)
-    per_combo = {e: {"excess": [], "dates": []} for e in exits}
-    stats = {e: {"stop": [], "mdd": [], "unfilled": [], "net": []} for e in exits}
-
-    for p in ps:
-        basket = select_fn(p)
-        if not basket:
-            continue
-        date = panel.index[p].date().isoformat()
-        entry_day = p + 1
-        for e in exits:
-            evs = []
-            for sym in basket:
-                r = _simulate_trade(panel, ma20, ma50, ma200, atr, sym, entry_day, entry_rule, e)
-                if r is None:
-                    continue
-                net = cost.net(r["exit_price"] / r["entry_price"] - 1)
-                spy_ret = 0.0
-                if spy is not None and np.isfinite(spy.iloc[r["exit_day"]]) and np.isfinite(spy.iloc[entry_day]):
-                    spy_ret = float(spy.iloc[r["exit_day"]] / spy.iloc[entry_day] - 1)
-                evs.append({"net": net, "excess": net - spy_ret, "stop": r["stop"],
-                           "mdd": r["mdd"], "unfilled": 1 - r["filled_frac"]})
-            if not evs:
-                continue
-            per_combo[e]["excess"].append(round(float(np.mean([x["excess"] for x in evs])), 6))
-            per_combo[e]["dates"].append(date)
-            stats[e]["stop"].append(float(np.mean([x["stop"] for x in evs])))
-            stats[e]["mdd"].append(float(np.mean([x["mdd"] for x in evs])))
-            stats[e]["unfilled"].append(float(np.mean([x["unfilled"] for x in evs])))
-            stats[e]["net"].append(float(np.mean([x["net"] for x in evs])))
-
-    n_ev = min((len(v["excess"]) for v in per_combo.values()), default=0)
-    if n_ev < 4:
-        raise RuntimeError(f"이벤트 수 부족(n_ev={n_ev}) — 기간을 늘리세요.")
-    trials = list(exits)
-    matrix = [per_combo[e]["excess"][:n_ev] for e in exits]
-    dates0 = per_combo[exits[0]]["dates"][:n_ev]
-
-    rows = [{"entry": entry_rule, "exit": e,
-            "net_pct": round(100 * float(np.mean(stats[e]["net"])), 2),
-            "stop_rate_pct": round(100 * float(np.mean(stats[e]["stop"])), 1),
-            "mdd_pct": round(100 * float(np.mean(stats[e]["mdd"])), 1),
-            "unfilled_pct": round(100 * float(np.mean(stats[e]["unfilled"])), 1),
-            "n_events": len(stats[e]["net"])}
-            for e in exits]
-
+    cache = {}
+    sel = lambda p, _k: cache[p] if p in cache else cache.setdefault(p, select_fn(p))
+    per, stats = _run_grid(panel, spy, ps, sel, [(entry_rule, x, x) for x in exits], cost, topn)
+    n_ev, matrix, dates0 = _matrix(per, exits)
+    rows = [{"entry": entry_rule, "exit": x, **_row(stats[x])} for x in exits]
     payload = {"as_of": panel.index[-1].date().isoformat(), "weights_used": weights,
               "topn": topn, "rebal_days": rebal_days, "n_combos": len(exits), "rows": rows,
-              "baseline": "exit_time6m(트리거 즉시 전량) · exit_time6m_5050w10(현행 라이브 처분)",
+              "baseline": "exit_time6m(트리거 즉시 전량) · exit_time6m_5050w10(옛 라이브 처분)",
+              "accounting": ACCOUNTING_NOTE,
               "note": "진입 entry1_full 고정 — 트리거(6개월) 이후 '처분 방식'만 순수 비교",
               "adoption_criteria": "현행 처분(exit_time6m_5050w10) 대비 net 개선이 "
                                    "T_eff 보정 후에도 유지될 때만 처분 방식 변경 제안"}
-
-    os.makedirs("output", exist_ok=True)
-    compare_path = f"output/backtest_disposal_compare{out_suffix}.json"
-    trial_path = f"output/trial_returns_disposal{out_suffix}.json"
-    report_path = f"output/pbo_report_disposal{out_suffix}.json"
-    with open(compare_path, "w", encoding="utf-8") as f:
-        json.dump(payload, f, ensure_ascii=False, indent=2)
     trial_data = {"horizon": "disposal", "universe": "pit", "cost": cost.describe(),
                  "rebal_days": rebal_days, "hold_days": MAX_HOLD,
-                 "dates": dates0, "trials": trials, "excess_returns": matrix}
-    with open(trial_path, "w", encoding="utf-8") as f:
-        json.dump(trial_data, f, ensure_ascii=False)
-    report = OS.analyze(trial_data, save=False)
-    with open(report_path, "w", encoding="utf-8") as f:
-        json.dump(report, f, ensure_ascii=False, indent=2)
-    _log(f"저장: {compare_path} · {trial_path} · {report_path} (처분방식 {len(exits)}종 × 이벤트 {n_ev}회)")
+                 "dates": dates0, "trials": exits, "excess_returns": matrix}
+    paths = (f"output/backtest_disposal_compare{out_suffix}.json",
+             f"output/trial_returns_disposal{out_suffix}.json",
+             f"output/pbo_report_disposal{out_suffix}.json")
+    report = _save(payload, trial_data, *paths)
+    _log(f"저장: {' · '.join(paths)} (처분방식 {len(exits)}종 × 이벤트 {n_ev}회)")
     return payload, report
 
 
@@ -745,90 +771,40 @@ def run_topn_sweep(panel, spy, funds, pit, rebal_days=63, topn_list=None, cost=N
     topn_list = topn_list or TOPN_SWEEP
     import tech_factors as T
     cross = T.build_panels(panel)
-    ma20, ma50, ma200, atr = _ma(panel, 20), _ma(panel, 50), _ma(panel, 200), _atr_close(panel)
-    spy = spy.reindex(panel.index).ffill() if spy is not None else None
-    n = len(panel)
-    ps = list(range(lookback or BW.LOOKBACK, n - MAX_HOLD - 1, rebal_days))
-    if not ps:
-        raise RuntimeError("기간이 짧아 리밸런싱 시점 없음.")
-
+    ps = _rebal_points(panel, rebal_days, lookback)
     entry_rule, exit_rule = "entry1_full", "exit_time6m"
-    per_combo = {tn: {"excess": [], "dates": []} for tn in topn_list}
-    stats = {tn: {"stop": [], "mdd": [], "unfilled": [], "net": []} for tn in topn_list}
-    turns = {tn: [] for tn in topn_list}
-    prev_basket = {tn: None for tn in topn_list}
+    keys = [f"topn{tn}" for tn in topn_list]
+    cache = {}
 
-    for p in ps:
-        date = panel.index[p].date().isoformat()
-        entry_day = p + 1
-        for tn in topn_list:
-            basket = _select_basket(panel, p, funds, cross, pit, weights, tn)
-            if not basket:
-                continue
-            if prev_basket[tn] is not None:
-                turns[tn].append(1 - len(set(basket) & prev_basket[tn]) / max(len(basket), 1))
-            prev_basket[tn] = set(basket)
-            evs = []
-            for sym in basket:
-                r = _simulate_trade(panel, ma20, ma50, ma200, atr, sym, entry_day, entry_rule, exit_rule)
-                if r is None:
-                    continue
-                net = cost.net(r["exit_price"] / r["entry_price"] - 1)
-                spy_ret = 0.0
-                if spy is not None and np.isfinite(spy.iloc[r["exit_day"]]) and np.isfinite(spy.iloc[entry_day]):
-                    spy_ret = float(spy.iloc[r["exit_day"]] / spy.iloc[entry_day] - 1)
-                evs.append({"net": net, "excess": net - spy_ret, "stop": r["stop"],
-                           "mdd": r["mdd"], "unfilled": 1 - r["filled_frac"]})
-            if not evs:
-                continue
-            per_combo[tn]["excess"].append(round(float(np.mean([x["excess"] for x in evs])), 6))
-            per_combo[tn]["dates"].append(date)
-            stats[tn]["stop"].append(float(np.mean([x["stop"] for x in evs])))
-            stats[tn]["mdd"].append(float(np.mean([x["mdd"] for x in evs])))
-            stats[tn]["unfilled"].append(float(np.mean([x["unfilled"] for x in evs])))
-            stats[tn]["net"].append(float(np.mean([x["net"] for x in evs])))
+    def sel(p, k):
+        if (p, k) not in cache:
+            cache[(p, k)] = _select_basket(panel, p, funds, cross, pit, weights, int(k[4:]))
+        return cache[(p, k)]
 
-    n_ev = min((len(v["excess"]) for v in per_combo.values()), default=0)
-    if n_ev < 4:
-        raise RuntimeError(f"이벤트 수 부족(n_ev={n_ev}) — 기간을 늘리세요.")
-    trials = [f"topn{tn}" for tn in topn_list]
-    matrix = [per_combo[tn]["excess"][:n_ev] for tn in topn_list]
-    dates0 = per_combo[topn_list[0]]["dates"][:n_ev]
-
-    rows = [{"topn": tn,
-            "net_pct": round(100 * float(np.mean(stats[tn]["net"])), 2),
-            "stop_rate_pct": round(100 * float(np.mean(stats[tn]["stop"])), 1),
-            "mdd_pct": round(100 * float(np.mean(stats[tn]["mdd"])), 1),
-            "turnover_pct": round(100 * float(np.mean(turns[tn])), 1) if turns[tn] else None,
-            "n_events": len(stats[tn]["net"])}
-            for tn in topn_list]
-
+    per, stats = _run_grid(panel, spy, ps, sel, [(entry_rule, exit_rule, k) for k in keys], cost,
+                           slots=lambda k: int(k[4:]))
+    n_ev, matrix, dates0 = _matrix(per, keys)
+    rows = []
+    for tn, k in zip(topn_list, keys):
+        bs = [cache[(p, k)] for p in ps if cache.get((p, k)) is not None]
+        turns = [1 - len(set(b) & set(a)) / max(len(b), 1) for a, b in zip(bs, bs[1:]) if b]
+        rows.append({"topn": tn, **_row(stats[k]),
+                     "turnover_pct": round(100 * float(np.mean(turns)), 1) if turns else None})
     payload = {"as_of": panel.index[-1].date().isoformat(), "weights_used": weights,
               "entry": entry_rule, "exit": exit_rule, "rebal_days": rebal_days,
               "n_combos": len(topn_list), "rows": rows,
               "baseline": "topn10(현행 미국 보유 상한)",
+              "accounting": ACCOUNTING_NOTE,
               "note": "진입 entry1_full·청산 exit_time6m 고정 — 보유종목 수(topn)만 순수 비교",
               "adoption_criteria": "현행(topn=10) 대비 net 개선 & MDD 축소가 T_eff 보정 후에도 "
-                                   "유지될 때만 보유상한 변경 제안",
-              "limitations": ["MDD·net은 트레이드별 평균(포트폴리오 전체를 하나의 자산으로 본 "
-                              "일별 equity curve 낙폭이 아님) — 분산투자 효과(topn이 커질수록 "
-                              "개별 종목 리스크가 상쇄되는 정도)는 이 지표로 완전히 포착 안 됨"]}
-
-    os.makedirs("output", exist_ok=True)
-    compare_path = "output/backtest_topn_compare.json"
-    trial_path = "output/trial_returns_topn.json"
-    report_path = "output/pbo_report_topn.json"
-    with open(compare_path, "w", encoding="utf-8") as f:
-        json.dump(payload, f, ensure_ascii=False, indent=2)
+                                   "유지될 때만 보유상한 변경 제안"}
     trial_data = {"horizon": "topn", "universe": "pit", "cost": cost.describe(),
                  "rebal_days": rebal_days, "hold_days": MAX_HOLD,
-                 "dates": dates0, "trials": trials, "excess_returns": matrix}
-    with open(trial_path, "w", encoding="utf-8") as f:
-        json.dump(trial_data, f, ensure_ascii=False)
-    report = OS.analyze(trial_data, save=False)
-    with open(report_path, "w", encoding="utf-8") as f:
-        json.dump(report, f, ensure_ascii=False, indent=2)
-    _log(f"저장: {compare_path} · {trial_path} · {report_path} (topn {len(topn_list)}종 × 이벤트 {n_ev}회)")
+                 "dates": dates0, "trials": keys, "excess_returns": matrix}
+    paths = ("output/backtest_topn_compare.json", "output/trial_returns_topn.json",
+             "output/pbo_report_topn.json")
+    report = _save(payload, trial_data, *paths)
+    _log(f"저장: {' · '.join(paths)} (topn {len(topn_list)}종 × 이벤트 {n_ev}회)")
     return payload, report
 
 
@@ -893,6 +869,34 @@ def self_test():
     assert dreb["exit_day"] < 347, f"반등했는데 강제청산 시점까지 대기: {dreb}"
     assert abs(dreb["exit_price"] - 95.0) < 1e-6, f"반등 처분가 블렌딩 오류: {dreb}"
 
+    # 2026-09-24 전략 검토 재현 사례 — ①부분체결 자본기준 ②날짜순 체결 ③바스켓 MDD
+    m = 300
+    ix = pd.bdate_range("2020-01-01", periods=m)
+    up = np.full(m, 100.0); up[211:] = 110.0                         # 100→110, 20일선-3% 눌림 없음
+    dip = np.full(m, 100.0); dip[:150] = 60.0; dip[211] = 96.0; dip[212:] = 50.0   # 100→96→50(200일선은 아래)
+    hump = np.full(m, 100.0); hump[211:250] = 200.0; hump[250:] = 150.0  # 100→200→150
+    p3 = pd.DataFrame({"UP": up, "DIP": dip, "HUMP": hump}, index=ix)
+    ind3 = (_ma(p3, 20), _ma(p3, 50), _ma(p3, 200), _atr_close(p3))
+    ev = _eval_event(p3, ind3, ["UP"], 210, "entry2_pullback2", "exit_time6m", cost, None, 1)
+    assert abs(ev["net"] - 0.5 * cost.net(0.10)) < 1e-9 and abs(ev["net"] - 0.04943) < 5e-5, \
+        f"부분체결인데 배정자금 기준 수익이 아님: {ev}"
+    tr = _simulate_trade(p3, *ind3[:3], ind3[3], "DIP", 210, "entry3_pullback3", "exit_trail20")
+    assert tr["exit_day"] == 212 and abs(tr["filled_frac"] - 0.6) < 1e-9 and \
+        abs(tr["entry_price"] - 98.0) < 1e-9, f"청산 이후 체결이 평균단가에 섞임: {tr}"
+    ev = _eval_event(p3, ind3, ["HUMP"], 210, "entry1_full", "exit_time6m", cost, None, 1)
+    assert abs(ev["basket_mdd"] + 0.25) < 1e-9, f"고점대비 낙폭이 아님: {ev}"
+    ev = _eval_event(p3, ind3, [], 210, "entry1_full", "exit_time6m", cost, None, 10)
+    assert ev["net"] == 0.0 and ev["unfilled"] == 1.0, f"후보 0개 이벤트는 전액 현금이어야: {ev}"
+    # 라이브 규칙: 횡보(과열 아님)면 2분할 1차 50%만 / exit_live는 180일 경과 후 후보풀 이탈 시
+    lv = _simulate_trade(p2, ma20, ma50, ma200, atr, "FLAT", 210, "entry_live", "exit_live",
+                         pool_fn=lambda d: set())
+    assert abs(lv["filled_frac"] - 0.5) < 1e-9, lv
+    held = (p2.index[lv["exit_day"]] - p2.index[210]).days
+    assert 180 <= held < 190 and not lv["stop"], f"exit_live 재평가 시점 오류: {held}일 {lv}"
+    lv2 = _simulate_trade(p2, ma20, ma50, ma200, atr, "FLAT", 210, "entry_live", "exit_live",
+                          pool_fn=lambda d: {"FLAT"})
+    assert lv2["exit_day"] == min(210 + MAX_HOLD, n - 1), f"후보풀 잔류인데 청산: {lv2}"
+
     small = panel.iloc[:400, :6]
     sig = sr_signal_panels(small)
     assert set(sig) == set(SR_CANDIDATES), set(sig)
@@ -901,7 +905,8 @@ def self_test():
     assert sig["hi52_prox"].to_numpy()[np.isfinite(sig["hi52_prox"].to_numpy())].max() <= 1e-9, \
         "hi52_prox는 정의상 0 이하여야 함(현재가 ≤ 52주 고점)"
 
-    _log("[self-test] 통과: 규칙비교 엔진 · 트레일링 스톱 발동 · 미체결 추적 · A1 신호 shape/부호 OK")
+    _log("[self-test] 통과: 규칙비교 엔진 · 트레일링 스톱 발동 · 미체결 추적 · 배정자금/날짜순/MDD · "
+         "라이브 규칙 · A1 신호 shape/부호 OK")
 
 
 def main():
@@ -951,12 +956,13 @@ def main():
         cost = BC.CostModel("us", args.commission_bps, args.slippage_bps)
         run_exec(panel, spy, funds, pit, rebal_days=args.rebal_days, topn=args.topn, cost=cost)
         return
-    # KR 모드: 선정은 라이브 규칙(펀더멘탈 필터 + z(mom12_1)0.6+z(hi52)0.4) 주입 — 규칙만 비교
+    # KR 모드(레거시): 2026-07-14 이전 한국 규칙(펀더멘탈 필터 + z(mom12_1)0.6+z(hi52)0.4) 주입 —
+    # 현행 valuediv 선정의 집행 검증은 research/kr/kr_entry_exit_sweep.py
     import backtest_kr as BK
     panel, membership, fundamentals, flows, mktcaps, bench = BK.prepare_kr_data(
         int(args.years), args.rebal_days)
     snaps, _, _ = BK.build_kr_snaps(panel, bench, membership, fundamentals, args.rebal_days)
-    by_date = {}
+    by_date = {}   # 스냅샷 없는 날짜는 None(데이터 없음 → 이벤트 제외)
     for s in snaps:
         pool = s["live_ok"][s["live_ok"]].index
         if len(pool) < 5:
@@ -964,7 +970,7 @@ def main():
         z = s["z"].loc[pool]
         score = z["mom12_1"] * 0.6 + z["hi52_prox"] * 0.4
         by_date[s["date"]] = list(score.sort_values(ascending=False).index[:args.topn])
-    select_fn = lambda p: by_date.get(panel.index[p].date().isoformat(), [])
+    select_fn = lambda p: by_date.get(panel.index[p].date().isoformat())
     cost = BC.CostModel("kospi", max(args.commission_bps, 1.5), args.slippage_bps)
     run_exec(panel, bench, None, None, rebal_days=args.rebal_days, topn=args.topn,
              cost=cost, select_fn=select_fn, out_suffix="_kr", lookback=BK.LOOKBACK)

@@ -171,8 +171,15 @@ def build_panel_pit(years, pit):
                 and not _SUFFIXED.search(s)]
     _log(f"[PIT] 구간 내 편입 이력 합집합 {len(universe)}종목 시세 다운로드 "
          f"(재사용-접미사 티커 {n_suf}개 제외 — 야후에 없음)…")
-    hist = R.download_histories(universe, period=f"{int(years)}y")
+    # drop_stale=False(2026-09-24 전략 검토 C): 라이브용 신선도 필터가 과거에 거래가 끝난
+    # 종목(인수·상장폐지)의 시계열을 통째로 지워 PIT 유니버스에 생존편향을 되살리고 있었다.
+    hist = R.download_histories(universe, period=f"{int(years)}y", drop_stale=False)
     panel = pd.DataFrame({s: c for s, c in hist.items() if c is not None and len(c)}).sort_index()
+    # 거래 종료 이후 구간은 마지막 거래가로 고정 = 그 가격에 현금화된 것으로 간주(인수 현금지급
+    # 근사, 파산은 과대평가될 수 있음). 이게 없으면 보유 중 상장폐지된 종목의 수익이 NaN으로
+    # 빠져 다시 생존편향이 된다. 편입 여부는 membership_asof(PIT)가 따로 거른다.
+    last_idx = {c: panel[c].last_valid_index() for c in panel.columns}
+    panel = panel.ffill()
     spy = R.download_histories(["SPY"], period=f"{int(years)}y").get("SPY")
     opens = None
     try:
@@ -182,8 +189,9 @@ def build_panel_pit(years, pit):
         opens = od["Open"].reindex(panel.index) if "Open" in od else None
     except Exception:
         opens = None
-    _log(f"[PIT] 시세 확보 {panel.shape[1]}/{len(universe)}종목 "
-         f"(누락 {len(universe)-panel.shape[1]} = 대부분 상장폐지 → 잔존편향 잔여분)")
+    n_ended = sum(1 for li in last_idx.values() if li is not None and li < panel.index[-1] - pd.Timedelta(days=10))
+    _log(f"[PIT] 시세 확보 {panel.shape[1]}/{len(universe)}종목 — 그중 구간 중 거래 종료 {n_ended}종목 포함 "
+         f"(누락 {len(universe)-panel.shape[1]} = 무료 데이터에 시세 자체가 없는 상장폐지 → 잔존편향 잔여분)")
     return panel, spy, opens
 
 

@@ -15,7 +15,7 @@ from __future__ import annotations
 import os, sys, json
 import numpy as np
 
-from research.regime.backtest_regime_assets import fetch, regime_series, simulate, momentum_ok, pbo_gate
+from research.regime.backtest_regime_assets import fetch, regime_series, simulate, momentum_ok, pbo_gate, CRYPTO_DAYS
 from research.regime.ma_trend_strategies import MA_GRID
 
 MA_CANDIDATE = 30
@@ -33,12 +33,12 @@ def main():
     mok = momentum_ok(closes, "3m")
     exp_live = np.where((live_trend == 1.0) & (mok == 1.0), 1.0,
                         np.where(np.isnan(live_trend) | np.isnan(mok), np.nan, 0.0))
-    bh_cagr = simulate(closes, np.ones(len(closes)), 0.0)["cagr"]
+    bh_cagr = simulate(closes, np.ones(len(closes)), 0.0, CRYPTO_DAYS)["cagr"]
 
     cost_rows = []
     for cb in COST_LEVELS:
-        m30 = simulate(closes, exp_ma30, cb)
-        mlive = simulate(closes, exp_live, cb)
+        m30 = simulate(closes, exp_ma30, cb, CRYPTO_DAYS)
+        mlive = simulate(closes, exp_live, cb, CRYPTO_DAYS)
         row = {"cost_bps": cb, "ma30_cagr": round(m30["cagr"], 2), "live_cagr": round(mlive["cagr"], 2),
               "bh_cagr": round(bh_cagr, 2), "ma30_excess_over_live": round(m30["cagr"] - mlive["cagr"], 2)}
         cost_rows.append(row)

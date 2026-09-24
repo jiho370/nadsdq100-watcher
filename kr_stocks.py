@@ -11,7 +11,8 @@ kr_stocks.py — 코스피200 개별 종목 선별 (HISTORY.md §3, 2026-07-14 v
     — "밸류×주주환원" 계열. 코어-새틀라이트 구조(§2-F, HISTORY.md §3)의 새틀라이트 역할.
   · 매수 후보 풀 5(순위순, 2026-07-16 6→5 변경 — topn 정밀검증 Stage 3.1·3.2 결과 반영,
     HISTORY.md §3 참고). 보유 상한 5
-  · 매도: 3개월 정기 재평가(후보풀 이탈)만 활성(2026-09-23, 6개월→3개월 변경 —
+  · 매도: 3개월 정기 재평가(팩터 순위 상위 MAX_HOLD 밖이면 정리 — 2026-09-24부터, 그 전엔
+    필터 통과 전체가 풀이라 사실상 매도가 없었음)만 활성(2026-09-23, 6개월→3개월 변경 —
     kr_rebal_freq_with_cap.py 백테스트, cap=6 반영 후 재검증에서 3개월이 연환산 순초과
     수익 뚜렷이 우위·holdings.KR_REEVAL_DAYS) — 200일선 백업은 2026-07-15부로 기본
     비활성(holdings.py SELL_MA200_BACKUP, 근거는 HISTORY.md §3 Stage 6)
@@ -145,9 +146,8 @@ def _z(values: dict) -> dict:
 
 
 def _hot(c) -> bool:
-    rsi = c.get("rsi"); price, ma50 = c.get("price"), c.get("ma50")
-    gap50 = ((price / ma50 - 1) * 100) if (price and ma50) else 0
-    return (rsi is not None and rsi >= 72) or gap50 >= 15
+    import entry_plan as EP   # 미국·백테스트와 같은 과열 판정식
+    return EP.is_hot(c.get("rsi"), c.get("price"), c.get("ma50"))
 
 
 def select(yf) -> dict:
@@ -167,9 +167,20 @@ def select(yf) -> dict:
     _log(f"펀더멘탈 통과 {len(passed)}/{len(funda)}종목 (EPS>0·ROE>0)")
     if not passed:
         return {}
-    raw = MS.fetch_closes(yf, [f"{t}.KS" for t in passed])
+    # 2026-09-24(전략 검토 F): 보유종목 시세는 신규 후보 필터와 따로 조회한다 — 예전엔 EPS·ROE
+    # 통과 종목만 받아서, 적자 전환·코스피200 제외로 필터에서 빠진 보유종목은 가격이 없어
+    # holdings.update()가 건너뛰었고, 바로 그 종목들에 걸려야 할 후보풀 이탈 매도가 영영 안 났다.
+    import holdings as H
+    held = set((H.load(KR_HOLDINGS).get("holdings") or {}).keys())
+    raw = MS.fetch_closes(yf, [f"{t}.KS" for t in sorted(set(passed) | held)])
     cands, value_v, pbrinv_v, div_v, ind_map = {}, {}, {}, {}, {}
     as_of = None
+    for t in held - set(passed):
+        d = raw.get(f"{t}.KS")
+        if d and d["closes"]:
+            c = d["closes"]
+            ind_map[t] = {"price": c[-1], "ma200": MS._sma(c, 200),
+                          "closes": c[-452:], "dates": d["dates"][-452:]}
     for t, f in passed.items():
         d = raw.get(f"{t}.KS")
         if not d or len(d["closes"]) < 260:
@@ -220,8 +231,11 @@ def select(yf) -> dict:
     watch = ranked[N_BUY:N_BUY + N_WATCH]
     _log(f"AI 검증 풀 {len(buy)}(최종 채택은 AI 검증 후 상위 {MAX_HOLD}명) · "
          f"관찰 {len(watch)} (후보 {len(ranked)})")
+    # 재평가 매도 기준 후보풀 = 팩터 순위 상위 MAX_HOLD(2026-09-24, 전략 검토 F). 예전엔 필터
+    # 통과 전체(~150종목)라 흑자·점수상한만 유지하면 사실상 영구 보유였다 — 근거 연구
+    # (kr_rebal_freq_with_cap.py, "3개월마다 상위 5를 다시 고른다")와 다른 전략이었다.
     return {"as_of": as_of, "buy": buy, "watch": watch, "ind_map": ind_map,
-            "pool": [c["symbol"] for c in ranked]}   # 6개월 재평가용 후보풀(필터+추세 통과 전체)
+            "pool": [c["symbol"] for c in ranked[:MAX_HOLD]]}
 
 
 # ------------------------- 보유 추적(매도 시그널) -------------------------
@@ -231,8 +245,10 @@ def update_holdings(buy_syms: list, ind_map: dict, today: str, pool_syms=None) -
     않고 있었다(HISTORY.md '미국과 동일' 명시와 불일치) — select()의 pool을 받도록 확장."""
     import holdings as H
     state = H.load(KR_HOLDINGS)
+    # pool_syms=None(시세 장애 등으로 후보풀 자체를 못 만든 날)만 재평가를 건너뛴다 — 빈
+    # 리스트(후보 0)는 '전부 풀 밖'이라는 정상 결과다(예전엔 둘 다 None 취급).
     sells = H.update(state, buy_syms, ind_map, today,
-                     pool_syms=set(pool_syms) if pool_syms else None, market="KR")
+                     pool_syms=set(pool_syms) if pool_syms is not None else None, market="KR")
     H.save(state, KR_HOLDINGS)
     return sells
 

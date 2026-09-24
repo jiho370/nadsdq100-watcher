@@ -14,19 +14,24 @@
 
 ## 미국 개별주 (S&P500)
 
+(2026-09-24 코드 재확인 — 이전 판의 "섹터캡 2·진입필터·보유상한 8"은 전부 낡은 값이었다)
+
 - **팩터 가중치**: `int_gp_assets×1 + rd_mktcap×2 + shareholder_yield×2` — `output/best_weights.json`
-- z-score 클립: `shareholder_yield`만 ±5, 나머지 ±3 (`export_data.select_by_weights`)
-- 섹터캡: 최종 매수 단계에만 2종목 상한(`export_data.split_by_entry`) — 후보풀(60) 자체는 무제한
-- 진입 필터: 종가>200일선, 52주고점 대비 -25% 이내, 과열(RSI≥72 또는 50일선+15%↑)이면 분할매수 강제
-- **후보풀 10 → AI 검증 → 최종 매수 10 · 관찰 0**(`REPORT_POOL`/`REPORT_FINAL_BUY`/`REPORT_FINAL_WATCH`,
-  `daily_ai_report.py` · `ai_report.py`) — 보유 상한은 별도로 **8**(`US_MAX_HOLD`)
-- **매도**: 6개월 정기 재평가(팩터 후보풀 이탈 시)만 활성. 트레일링 스톱·200일선 백업은
-  **기본 비활성**(`holdings.py` `SELL_TRAIL=0`, `SELL_MA200_BACKUP=0`)
+- z-score 클립: `shareholder_yield`만 ±5, 나머지 ±3 — `export_data.live_z`(백테스트도 같은 함수)
+- **필터**: 종합점수 < `export_data.SCORE_FLOOR`(3.25) 제외, 100일선 아래(또는 값 없음) 제외
+  (`export_data.select_by_weights`). 필터 통과 0종목이면 **신규 매수 없이 현금 대기**
+  (2026-09-24부터 — 그 전엔 하이브리드 점수 전략으로 자동 전환됐다). 데이터 자체가 없을 때만
+  하이브리드 폴백.
+- 섹터캡: **없음**(`daily_ai_report.py` `split_by_entry(..., sector_cap=None)`)
+- 진입 게이트(200일선·52주고점): 폐지 — 과열 판정은 분할 방식에만 씀(아래 실행 계획)
+- **후보풀 60 → 매수 후보 상위 10 → AI 검증 → 최종 매수 10**(`REPORT_MAX_CANDIDATES`/`REPORT_POOL`/
+  `REPORT_FINAL_BUY`) — 보유 상한 **10**(`US_MAX_HOLD`, "팔아야 산다")
+- **매도**: 보유 `holdings.REEVAL_DAYS`(180달력일) 경과 **그리고** 그날 후보풀(60) 밖이면 정리.
+  기간이 지나도 후보풀 안이면 계속 보유(고정 6개월 청산과 다른 규칙 — 검증은 아래 '검증 상태').
+  트레일링 스톱·200일선 백업은 **기본 비활성**(`SELL_TRAIL=0`, `SELL_MA200_BACKUP=0`)
 
 **왜**: 665개 대안 조합 중 1:2:2를 통계적으로 유의하게 이긴 게 없어서 유지 중(HISTORY.md §6-A,
-PBO 22%·DSR 0.88로 여전히 미달). 매도규칙은 개입형(트레일링·MA200)이 승자를 조기에 잘라내는
-것으로 확인돼(트레일링 -20%가 트레이드 88%를 중도 손절, 순수익 절반) 가격 무개입 재평가만
-남겼다(`holdings.py` 상단 docstring, kr_sell_algo_sweep.py와 같은 결론).
+PBO 22%·DSR 0.88로 미달 — 즉 "더 나은 게 입증 안 됨"이지 "이게 입증됨"이 아니다).
 
 ---
 
@@ -34,18 +39,47 @@ PBO 22%·DSR 0.88로 여전히 미달). 매도규칙은 개입형(트레일링·
 
 - **유니버스**: 코스피200만(전체 유니버스는 모멘텀 무의미 — universe-shrinkage 연구)
 - **펀더멘탈 필터**: EPS>0(흑자) ∧ ROE(EPS/BPS)>0 — `kr_stocks.py`
-- **점수** = `z(1/PER) + z(1/PBR) + z(배당수익률)` 1:1:1, 전부 ±3 클립 — "밸류×주주환원" 계열
-  (2026-07-14 valuediv로 전면 교체, 옛 모멘텀 공식 폐기)
-- **후보풀 8 → AI 검증 → 최종 매수 5 · 관찰 0**(`KR_POOL_BUY`/`KR_FINAL_BUY`/`KR_FINAL_WATCH`) —
-  보유 상한도 5(`KR_MAX_HOLD`, 최종 채택 수와 동일)
-- **매도**: 미국과 동일 메커니즘 — 6개월 재평가만 활성, 트레일링·200일선 백업 기본 비활성
-- 참고선(실거래 아님): 보유현황 차트에 "코스피65+알고리즘35" 블렌드 표시 — 주간 자산배분과
-  같은 공식 비율(`daily_ai_report.py` run_kr)
+- **점수** = `z(1/PER) + z(1/PBR) + z(배당수익률)` 1:1:1, 전부 ±3 클립 — "밸류×주주환원" 계열.
+  z-score 모집단은 흑자 필터 통과 종목(연구 `research/kr/`는 코스피200 전체 — 알려진 차이)
+- **점수상한**: `kr_stocks.SCORE_CAP`(6.0) 초과 제외(밸류트랩 구간)
+- **후보풀 8 → AI 검증 → 최종 매수 5**(`KR_POOL_BUY`/`KR_FINAL_BUY`) — 보유 상한 5(`KR_MAX_HOLD`)
+- **매도**: 보유 `holdings.KR_REEVAL_DAYS`(90달력일) 경과 **그리고** 팩터 순위 상위
+  `KR_MAX_HOLD`(5) 밖이면 정리(2026-09-24부터 — 그 전엔 흑자·점수상한 통과 전체(~150종목)가
+  풀이라 사실상 매도가 없었고, "3개월마다 상위 5 재선정"을 검증한 연구와 다른 전략이었다).
+  보유종목 시세는 신규 후보 필터와 별도로 조회(적자 전환·지수 제외 종목도 매도 판정 가능).
+- 참고선(실거래 아님): 보유현황 차트에 "코스피65+알고리즘35" 블렌드 표시
 
 **왜**: 옛 ROE≥8%·PER≤40·200일선 위 필터는 저평가 구간을 스스로 걸러내는 모순이라 완화·폐기
-(HISTORY.md §3). 모멘텀 이식은 국내 문헌과 정합하게 실패(한국은 모멘텀 미작동 시장 계열).
-데이터 의존성: 2025-12-27부터 KRX 로그인 필수 — `KRX_ID`/`KRX_PW` 없으면 이 섹션이
-에러 없이 빈 채로 발송된다.
+(HISTORY.md §3). 데이터 의존성: 2025-12-27부터 KRX 로그인 필수 — `KRX_ID`/`KRX_PW` 없으면
+이 섹션이 에러 없이 빈 채로 발송된다.
+
+---
+
+## 검증 상태 (2026-09-24 전략 검토 반영 — 저장된 결과를 읽을 때 반드시 볼 것)
+
+2026-09-24 이전에 만들어진 `output/` 백테스트 결과에는 아래 결함이 들어 있다. 코드는 고쳤지만
+**결과 파일은 재실행 전까지 옛 산식 그대로**다(이 컨테이너에선 시세 수집이 막혀 재실행 못 함).
+
+| 결함 | 영향받는 결과 | 수정 위치 |
+|---|---|---|
+| 분할매수 수익을 체결분 기준으로 계산(미체결 현금 무시) · 청산 이후 추가매수가 평균단가에 섞임 | `backtest_exec_compare*`, `pbo_report_exec*`, `backtest_entry_ratio_compare*`, `backtest_disposal_compare*`, `backtest_topn_compare`, `kr_hot_split_sweep` | `backtest_exec._simulate_trade`/`_eval_event` |
+| 위 결과들의 `mdd_pct`는 "최저가/평균단가-1" 평균 — 고점대비 낙폭도, 계좌 MDD도 아님 | 동일 | 새 결과는 `basket_mdd_pct`(이벤트 바스켓 가치경로 MDD) |
+| PIT 백테스트가 라이브용 신선도 필터로 과거 종료 종목(인수·상장폐지) 시세를 통째로 삭제 | `build_panel_pit` 쓰는 모든 미국 연구 | `backtest_costs.build_panel_pit` |
+| 과거 시총 = 수정주가 × 공시 당시 주식수 → 공시 후 분할 종목의 rd_mktcap·shareholder_yield가 분할배수만큼 부풀려짐 | 미국 팩터 가중치·필터 연구 전부(1:2:2 포함) | `fundamentals_edgar.factor_values` + `--splits-only` 수집 |
+| 풀스택 검증이 라이브와 다름(클립 ±3·후보 부족 이벤트 삭제·고정 분할·고정 126일 청산) | `*_us_livestack*` | `research/us/us_full_stack_exec_validation.py` |
+| 워크포워드 컷 학습에 아직 확정 안 된 6개월 수익 사용 | `kr_cap_walkforward.json` | `research/kr/kr_cap_walkforward.py` |
+| 코인 CAGR·샤프를 연 252봉으로 연환산(코인은 365) | `regime_backtest_btc`, `ma_trend_btc/eth`, `circuit_breaker_*`, `eth_ma30_cost_and_wide_grid` | `backtest_regime_assets.periods_per_year` |
+
+- **README의 CAGR 29.43%·샤프 1.02는 옛 top8·섹터캡2 설정의 결과**(같은 실험 MDD −37.4%)이며
+  현행 top10·floor·100일선·섹터무제한 전략의 기대수익이 아니다. 위 데이터 결함도 들어 있다.
+- 현행 조합의 저장된 PBO/DSR(topn10: PBO 60%·DSR 0.77, topn8: 66%·0.84, topn6: 21%·0.87)은
+  전부 자체 게이트(PBO<50% ∧ DSR≥0.95) 미통과 — "우월성이 입증 안 됨"이지 "나쁨"의 증거는 아니다.
+- DSR의 시행 수 N은 그 스크립트 안의 조합 수만 센다 — 그 전에 가중치(665)·점수하한·이동평균·
+  종목 수를 반복 탐색한 부담은 빠져 있어 실제보다 관대하다. 이미 본 기간에서 새 조합을 골라
+  다시 검증해도 독립 표본외 검증이 되지 않는다.
+- **재실행 순서**(PC, 네트워크 필요): `python fundamentals_edgar.py --splits-only` →
+  `python -m research.us.us_full_stack_exec_validation --topn 10` → 나머지 연구. 재실행 전까지
+  주력 자금 운용의 근거로 쓰지 말 것.
 
 ---
 
@@ -104,14 +138,16 @@ PBO/DSR 게이트 불통과 또는 매수후유지 대비 이길 확률 50% 미�
 
 ## 실행 계획(분할매수) — `entry_plan.py`, 100% 하드코딩
 
-AI가 못 건드리는 값. 미·한 공통.
+AI가 못 건드리는 값. 미·한 공통. 가격 규칙은 `entry_plan.tranche_targets`, 과열 판정은
+`entry_plan.is_hot` 한 곳에만 있고 백테스트(`backtest_exec` `entry_live`)도 같은 함수를 쓴다.
 
-- 평시: 2분할(1차 50% 현재가 / 2차 50% 20일선 부근)
-- 과열(RSI≥72 또는 50일선+15%↑): 3분할(30%/30%/40%, 현재가·20일선·50일선)
-- 하한선: 200일선 아래로 못 내려감(추세이탈 구간 매수 금지)
+- 평시: 2분할(1차 50% 현재가 / 2차 50% 20일선 부근 — 20일선이 현재가 위면 현재가 -3%)
+- 과열(`is_hot`: RSI≥72 또는 50일선+15%↑): 3분할(30/30/40, 현재가·20일선·50일선 부근)
+- 하한선: 200일선이 현재가 아래일 때만, 분할 가격이 200일선 밑으로 못 내려감
+- 한계: 라이브는 RSI 계산식이 미국(Wilder)·한국(단순평균)으로 다르고, 추가 매수 주문의 유효기간이
+  명시돼 있지 않다(백테스트는 2차 10거래일·3차 20거래일 가정).
 
-**왜**: "일관 패턴은 하드코딩, 변하는 것만 AI" 원칙 — 분할매수 로직은 매번 AI에게 다시
-계산시킬 이유가 없는 결정론적 규칙.
+**왜**: "일관 패턴은 하드코딩, 변하는 것만 AI" 원칙.
 
 ---
 

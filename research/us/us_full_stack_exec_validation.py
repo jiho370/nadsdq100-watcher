@@ -15,58 +15,60 @@ us_full_stack_exec_validation.py — 지호 님 요청(2026-09-24, ChatGPT 리�
 (entry1_full/entry2_pullback2/entry3_pullback3 × 7 exit)을 그대로 돌려 PBO/DSR까지
 동일 파이프라인(overfit_stats.OS.analyze)으로 낸다.
 
-한계(정직히 명시): entry_plan.py의 실제 라이브 규칙은 "과열(RSI≥72 등)이면 3분할, 아니면
-2분할"인 종목별 조건분기인데, backtest_exec.py의 entry2/3은 전체 바스켓에 하나의 규칙을
-고정 적용하는 전역 스윕이라 이 조건분기 자체는 여기서도 재현 못 한다(HISTORY.md §7.1에서
-이미 별도 검증 시도됐고 결론 보류 상태 — 동일 한계 승계).
+2026-09-24 개정(전략 검토 E — 이 검증이 라이브와 달랐던 5가지를 라이브 함수로 통일):
+  · 주주환원 z 클립 ±3 → 라이브와 같은 export_data.live_z(±5)
+  · 후보가 topn보다 적으면 이벤트를 통째로 버리던 것 → 있는 만큼만 사고 빈 슬롯은 현금
+    (후보 0이면 전액 현금 이벤트 — 라이브도 필터 통과 0이면 하이브리드 폴백 없이 현금 대기)
+  · 100일선 값이 없는 종목 통과 → 제외(라이브도 동일하게 변경)
+  · 전 종목 고정 2/3분할 → entry_live(과열이면 3분할·아니면 2분할, entry_plan.tranche_targets
+    가격·200일선 하한) 추가
+  · 126거래일 고정 청산 → exit_live(180달력일 경과 AND 후보풀(상위 60) 이탈 시 매도) 추가
+  기존 21조합도 그대로 같이 돌려 4×8=32조합으로 PBO/DSR을 낸다(시행 수가 늘어난 만큼 DSR
+  보정이 더 엄격해진다 — 라이브 조합만 따로 떼어 보는 것보다 정직).
+남은 한계: 이벤트별 독립 평가라 보유상한 10·"팔아야 산다"·이벤트 간 재투자는 반영 안 됨
+  (계좌 NAV 검증은 research/us/backtest_portfolio.py 몫), 후보풀 재확인은 5거래일 간격 근사,
+  재무 스냅샷의 분할 기준은 fundamentals_cache의 splits 수집 여부에 좌우됨.
 
 실행: python -m research.us.us_full_stack_exec_validation [--years 10]
-결과: output/backtest_exec_compare_us_livestack.json,
-      output/backtest_exec_trials_us_livestack.json,
-      output/backtest_exec_pbo_us_livestack.json
+결과: output/backtest_exec_compare_us_livestack_top{N}.json,
+      output/trial_returns_exec_us_livestack_top{N}.json,
+      output/pbo_report_exec_us_livestack_top{N}.json
 """
 from __future__ import annotations
 import argparse
 import sys
 
-import pandas as pd
-
 import backtest_costs as BC
 import backtest_weights as BW
 import backtest_exec as BE
-from research.us.us_momentum_overlay import _mom_features
 
-FLOOR = 3.25
+POOL_N = 60         # 라이브 후보풀 크기(daily_ai_report.MAX_CANDIDATES 기본값) — 재평가 매도 기준
 
 
 def _log(m): print(f"[US풀스택검증]  {m}", file=sys.stderr)
 
 
-def _select_basket_livestack(panel, p, funds, cross, pit, weights, topn):
-    """라이브와 동일: 가중합성 점수 + floor(3.25) + 100일선 위 + 섹터캡 없음 + topn.
-    backtest_exec._select_basket에 floor·100일선 필터만 추가한 버전."""
+def _live_ranked(panel, p, funds, cross, pit, weights):
+    """라이브 export_data.select_by_weights와 같은 규칙으로 필터 통과 종목을 점수순으로.
+    데이터 자체가 없으면 None(이벤트 제외), 필터 통과 0이면 [](현금)."""
+    import export_data as E
     raw = BW._raw_frame(panel, p, funds, bool(funds), cross)
     if raw is None or raw.empty:
-        return []
+        return None
     date = panel.index[p].date().isoformat()
     idx = raw.index.intersection(BC.membership_asof(pit, date))
-    if len(idx) < topn:
-        return []
+    if not len(idx):
+        return None
     raw = raw.loc[idx]
     w = {k: v for k, v in weights.items() if k in raw.columns}
     if not w:
-        return []
-    z = raw[list(w)].apply(BW._z).fillna(0.0)
-    score = (z * pd.Series(w)).sum(axis=1)
-    score = score[score >= FLOOR]
-    if len(score) < topn:
-        return []
-    mom = _mom_features(panel, date, score.index)
-    above = mom["ma100_gap"] > 0 if "ma100_gap" in mom.columns else pd.Series(True, index=score.index)
-    score = score[above.reindex(score.index).fillna(False)]
-    if len(score) < topn:
-        return []
-    return list(score.sort_values(ascending=False).index[:topn])
+        return None
+    score = sum(float(v) * E.live_z(raw[k], k) for k, v in w.items())
+    score = score[score >= E.SCORE_FLOOR]
+    gap = raw["ma100_gap"].reindex(score.index) if "ma100_gap" in raw.columns else None
+    if gap is not None:
+        score = score[gap > 0]          # 값 없음(NaN)은 통과 못 함 — 라이브와 동일
+    return list(score.sort_values(ascending=False).index)
 
 
 def run(years: float = 10, topn: int = 10) -> dict:
@@ -75,21 +77,32 @@ def run(years: float = 10, topn: int = 10) -> dict:
     funds = BW.load_funds()
     cost = BC.CostModel("us", commission_bps=0.0, slippage_bps=5.0)
     weights = BE._load_exec_weights()
-    _log(f"라이브 가중치 사용: {weights} · topn={topn}")
+    _log(f"라이브 가중치 사용: {weights} · topn={topn} · 후보풀 {POOL_N}")
 
     import tech_factors as T
     cross = T.build_panels(panel)
-    select_fn = lambda p: _select_basket_livestack(panel, p, funds, cross, pit, weights, topn)
+    ranked = {}
+
+    def _rank(p):
+        if p not in ranked:
+            ranked[p] = _live_ranked(panel, p, funds, cross, pit, weights)
+        return ranked[p]
+
+    select_fn = lambda p: None if _rank(p) is None else _rank(p)[:topn]
+    pool_fn = lambda d: None if _rank(d) is None else set(_rank(d)[:POOL_N])
 
     payload, report = BE.run_exec(panel, spy, funds, pit, rebal_days=63, topn=topn, cost=cost,
-                                  select_fn=select_fn, out_suffix=f"_us_livestack_top{topn}")
-    _log(f"[결과] baseline={payload['baseline']}")
+                                  select_fn=select_fn, out_suffix=f"_us_livestack_top{topn}",
+                                  entries=BE.ENTRY_RULES + [BE.LIVE_ENTRY],
+                                  exits=BE.EXIT_RULES + [BE.LIVE_EXIT], pool_fn=pool_fn)
+    _log(f"[결과] 라이브 조합 = {BE.LIVE_ENTRY}__{BE.LIVE_EXIT}")
     for row in payload["rows"]:
-        _log(f"{row['entry']}__{row['exit']}: net {row['net_pct']:+.2f}% MDD {row['mdd_pct']:.1f}% "
+        _log(f"{row['entry']}__{row['exit']}: net {row['net_pct']:+.2f}% 바스켓MDD {row['basket_mdd_pct']:.1f}% "
             f"미체결 {row['unfilled_pct']:.1f}% n={row['n_events']}")
     if report:
-        _log(f"PBO={report.get('pbo_pct')}% DSR={report.get('dsr')} 통과={report.get('passed')} "
-            f"최고시행={report.get('best_trial')}")
+        pbo, dsr = report.get("pbo") or {}, report.get("dsr") or {}
+        _log(f"PBO={pbo.get('pbo')} DSR={dsr.get('dsr')} 통과={report.get('passed')} "
+            f"최고시행={dsr.get('best_trial')}")
     return {"exec": payload, "pbo_dsr": report}
 
 

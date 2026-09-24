@@ -60,6 +60,43 @@ def _valid(x):
     return x is not None and isinstance(x, (int, float)) and x == x and x > 0
 
 
+HOT_RSI = 72        # 과열 판정: RSI(14) 이상
+HOT_GAP50 = 15      # 과열 판정: 50일선 대비 +% 이상
+
+
+def is_hot(rsi, price, ma50) -> bool:
+    """과열(3분할 대상) 판정 — 미국(export_data.split_by_entry)·한국(kr_stocks)·백테스트
+    (backtest_exec entry_live)가 공유하는 단일 정의(2026-09-24 전략 검토 E: 연구와 라이브의
+    분할 조건이 달랐던 문제 제거)."""
+    gap50 = ((price / ma50 - 1) * 100) if (_valid(price) and _valid(ma50)) else 0
+    return (rsi is not None and rsi == rsi and rsi >= HOT_RSI) or gap50 >= HOT_GAP50
+
+
+def tranche_targets(price, ma20, ma50, ma200, hot: bool) -> list:
+    """분할매수 트랜치 [(비중%, 목표가, 근거)] — 1차는 현재가. buy_plan(라이브 표시)과
+    backtest_exec의 entry_live가 같은 함수를 쓴다(2026-09-24 전략 검토 E — 예전 백테스트는
+    20일선×0.97/50일선×0.92·200일선 하한 없음으로 라이브와 달랐다).
+
+    하위 가격 규칙: 기준선(base)이 유효하고 현재가 아래면 그 값, 아니면 현재가 대비 고정
+    비율 지점. 200일선이 현재가보다 아래에 있을 때만(=진짜 하방 지지선일 때만) 그 아래로는
+    안 내리는 floor로 쓴다 — 200일선이 현재가 위일 때 floor를 적용하면 2차 가격이 현재가보다
+    높아져 분할 순서가 뒤집히는 버그가 있었다(2026-07-15 발견)."""
+    def below(base, fallback_ratio, basis):
+        if _valid(base) and base < price:
+            p, b = base, basis
+        else:
+            p, b = price * fallback_ratio, f"현재가 {int((1-fallback_ratio)*100)}% 조정 시"
+        if _valid(ma200) and ma200 < price and p < ma200:
+            p, b = ma200, "200일선(추세 하한)"
+        return p, b
+
+    p2, b2 = below(ma20, 0.97, "20일선 부근")
+    if hot:
+        p3, b3 = below(ma50, 0.92, "50일선 부근")
+        return [(30, price, "현재가(소량 시작)"), (30, p2, b2), (40, p3, b3)]
+    return [(50, price, "현재가"), (50, p2, b2)]
+
+
 def buy_plan(c: dict, krw: bool = False) -> dict:
     """매수 후보 c(export_data.build_candidates / kr_stocks 형식)의 분할매수 계획.
     반환: {"tranches":[{"label","price","pct","basis"}...], "stop":{"price","basis"}, "note"}"""
@@ -67,38 +104,13 @@ def buy_plan(c: dict, krw: bool = False) -> dict:
     if not _valid(price):
         return {}
     hot = bool(c.get("hot"))
-
-    def below(base, fallback_ratio, basis):
-        """현재가 아래의 매수 지점: 기준선(base)이 유효하고 현재가 아래면 그 값,
-        아니면 현재가 대비 고정 비율 지점. 200일선이 현재가보다 아래에 있을 때만(=진짜
-        하방 지지선일 때만) 그 아래로는 안 내리는 floor로 쓴다. 진입 필터 폐기(2026-07,
-        HISTORY.md) 이후 200일선 '위'에서 편입되지 않는 종목이 흔해졌는데, 그럴 땐
-        200일선이 현재가보다 위에 있어 floor가 오히려 2차 가격을 현재가보다 높게
-        밀어올려 분할매수 순서가 뒤집히는 버그가 있었다(2026-07-15 발견)."""
-        if _valid(base) and base < price:
-            p, b = base, basis
-        else:
-            p, b = price * fallback_ratio, f"현재가 {int((1-fallback_ratio)*100)}% 조정 시"
-        if _valid(ma200) and ma200 < price and p < ma200:
-            p, b = ma200, "200일선(추세 하한)"
-        return round(p, 0 if krw else 2), b
-
-    p2, b2 = below(ma20, 0.97, "20일선 부근")
+    tranches = [{"label": f"{i + 1}차", "price": round(px, 0 if krw else 2), "pct": pct, "basis": basis}
+                for i, (pct, px, basis) in enumerate(tranche_targets(price, ma20, ma50, ma200, hot))]
     already_held = bool(c.get("already_held"))
     if hot:
-        p3, b3 = below(ma50, 0.92, "50일선 부근")
-        tranches = [
-            {"label": "1차", "price": round(price, 0 if krw else 2), "pct": 30, "basis": "현재가(소량 시작)"},
-            {"label": "2차", "price": p2, "pct": 30, "basis": b2},
-            {"label": "3차", "price": p3, "pct": 40, "basis": b3},
-        ]
         note = ("이미 보유 중 — 아래는 추가 매수 참고 가격대(과열 구간, 조정 기다리며)"
                 if already_held else "과열 구간 — 반드시 나눠서, 조정을 기다리며 채운다")
     else:
-        tranches = [
-            {"label": "1차", "price": round(price, 0 if krw else 2), "pct": 50, "basis": "현재가"},
-            {"label": "2차", "price": p2, "pct": 50, "basis": b2},
-        ]
         note = ("이미 보유 중 — 신규 매수 아님, 아래는 추가 매수 시 참고 가격대"
                 if already_held else "2분할 — 1차 후 조정 오면 2차, 안 오면 1차분만 보유")
     # 손절선(진입 직후 참고): 2026-07-15부터 200일선 백업 기본 비활성(holdings.py와 동일 —

@@ -38,6 +38,14 @@ import pandas as pd
 import overfit_stats as OS
 
 TRADING_DAYS = 252
+CRYPTO_DAYS = 365   # 코인은 주말 포함 매일 거래 — 연환산을 252로 하면 CAGR·샤프가 과장된다
+
+
+def periods_per_year(ticker: str) -> int:
+    """일봉 1년치 개수(2026-09-24 전략 검토 5 — 예전엔 코인에도 252를 써서 달력연도 CAGR이
+    과대 산출됐다). 코인(BTC-USD·ETH-USD·KRW-*)=365, 그 외=252."""
+    t = ticker.upper()
+    return CRYPTO_DAYS if (t.startswith("KRW-") or t.split("-")[0] in {"BTC", "ETH"}) else TRADING_DAYS
 
 # ------------------------- 사전등록 그리드(Fable 5 설계) -------------------------
 GOLD_CURRENT = {"trend_ma": 200, "band": 0.01, "confirm": 3}
@@ -134,12 +142,12 @@ def _mdd(nav: np.ndarray) -> float:
     return float(((nav / cm - 1).min()) * 100)
 
 
-def _cagr(nav: np.ndarray, n_days: int) -> float:
-    yrs = n_days / TRADING_DAYS
+def _cagr(nav: np.ndarray, n_days: int, ppy: int = TRADING_DAYS) -> float:
+    yrs = n_days / ppy
     return float((nav[-1] ** (1 / yrs) - 1) * 100) if yrs > 0 and nav[-1] > 0 else float("nan")
 
 
-def simulate(closes: np.ndarray, exposure: np.ndarray, cost_bps: float) -> dict:
+def simulate(closes: np.ndarray, exposure: np.ndarray, cost_bps: float, ppy: int = TRADING_DAYS) -> dict:
     """exposure[t-1]로 t일 수익을 받는다(1봉 지연, Fable 5 §1 실행규칙). 익스포저 변경일에
     편도 비용 차감. 반환: nav 시계열 + 지표 + OFF(0) 진입 횟수(에피소드 카운트)."""
     ret = np.diff(closes) / closes[:-1]                 # ret[t] = day t+1 vs day t 수익률
@@ -153,8 +161,8 @@ def simulate(closes: np.ndarray, exposure: np.ndarray, cost_bps: float) -> dict:
     nav = np.cumprod(1 + strat_ret)
     bh_nav = closes[1:] / closes[0]
     off_episodes = int(np.sum((np.diff(np.nan_to_num(exposure, nan=1)) == -1)))
-    return {"nav": nav, "bh_nav": bh_nav, "cagr": _cagr(nav, len(nav)),
-            "bh_cagr": _cagr(bh_nav, len(bh_nav)), "ulcer": _ulcer(nav), "bh_ulcer": _ulcer(bh_nav),
+    return {"nav": nav, "bh_nav": bh_nav, "cagr": _cagr(nav, len(nav), ppy),
+            "bh_cagr": _cagr(bh_nav, len(bh_nav), ppy), "ulcer": _ulcer(nav), "bh_ulcer": _ulcer(bh_nav),
             "mdd": _mdd(nav), "bh_mdd": _mdd(bh_nav), "off_episodes": off_episodes,
             "strat_ret": strat_ret}
 
@@ -171,13 +179,14 @@ def composite_score(m: dict) -> float:
 
 
 # ------------------------- Stage 1: 추세선×밴드×확인일수 -------------------------
-def run_stage1(closes: np.ndarray, grid: dict, current: dict, cost_bps: float, asset: str) -> dict:
+def run_stage1(closes: np.ndarray, grid: dict, current: dict, cost_bps: float, asset: str,
+               ppy: int = TRADING_DAYS) -> dict:
     rows = []
     for tm in grid["trend_ma"]:
         for band in grid["band"]:
             for cf in grid["confirm"]:
                 exp = regime_series(closes, tm, band, cf)
-                m = simulate(closes, exp, cost_bps)
+                m = simulate(closes, exp, cost_bps, ppy)
                 score = composite_score(m)
                 rows.append({"trend_ma": tm, "band": band, "confirm": cf,
                             "cagr": round(m["cagr"], 2), "bh_cagr": round(m["bh_cagr"], 2),
@@ -200,7 +209,7 @@ def run_stage1(closes: np.ndarray, grid: dict, current: dict, cost_bps: float, a
                     and abs(grid["confirm"].index(r["confirm"]) - grid["confirm"].index(best["confirm"])) <= 1]
         n_beat = sum(1 for r in neighbors if r["score"] > cur_row["score"])
         plateau_ok = n_beat >= max(1, len(neighbors) // 2)
-    always_on = simulate(closes, np.ones(len(closes)), cost_bps)
+    always_on = simulate(closes, np.ones(len(closes)), cost_bps, ppy)
     _log(f"[{asset}] Stage1 완료: {len(rows)}조합(순위가능 {len(rankable)}) · "
         f"최우수 {best} · 현행 {cur_row} · 고원여부 {plateau_ok}")
     return {"rows": rows, "best": best, "current": cur_row, "plateau_ok": plateau_ok,
@@ -211,14 +220,14 @@ def run_stage1(closes: np.ndarray, grid: dict, current: dict, cost_bps: float, a
 
 # ------------------------- Stage 2: 모멘텀(1단계 동결 후 조건부 AND필터) -------------------------
 def run_stage2(closes: np.ndarray, base_params: dict, mom_grid: list, current_mom: str,
-              cost_bps: float, asset: str) -> dict:
+              cost_bps: float, asset: str, ppy: int = TRADING_DAYS) -> dict:
     regime = regime_series(closes, base_params["trend_ma"], base_params["band"], base_params["confirm"])
     rows = []
     for mom in mom_grid:
         mok = momentum_ok(closes, mom)
         exp = np.where((regime == 1.0) & (mok == 1.0), 1.0,
                       np.where(np.isnan(regime) | np.isnan(mok), np.nan, 0.0))
-        m = simulate(closes, exp, cost_bps)
+        m = simulate(closes, exp, cost_bps, ppy)
         score = composite_score(m)
         rows.append({"mom": mom, "cagr": round(m["cagr"], 2), "ulcer": round(m["ulcer"], 2),
                     "mdd": round(m["mdd"], 1), "off_episodes": m["off_episodes"],
@@ -233,7 +242,7 @@ def run_stage2(closes: np.ndarray, base_params: dict, mom_grid: list, current_mo
 
 # ------------------------- 쌍대 블록부트스트랩(후보 vs 현행) -------------------------
 def paired_block_bootstrap(closes: np.ndarray, params_a: dict, params_b: dict, cost_bps: float,
-                           block=60, n_boot=2000, seed=7) -> dict:
+                           block=60, n_boot=2000, seed=7, ppy: int = TRADING_DAYS) -> dict:
     """params_a(후보) vs params_b(현행)의 일별수익 쌍을 블록 단위로 함께 리샘플 —
     Δ(Ulcer)·Δ(CAGR)의 90%CI(Fable 5 §2.3)."""
     exp_a = regime_series(closes, params_a["trend_ma"], params_a["band"], params_a["confirm"])
@@ -251,7 +260,7 @@ def paired_block_bootstrap(closes: np.ndarray, params_a: dict, params_b: dict, c
         sel = np.concatenate([np.arange(i * block, (i + 1) * block) for i in idx])
         nav_a = np.cumprod(1 + ra[sel]); nav_b = np.cumprod(1 + rb[sel])
         d_ulcer.append(_ulcer(nav_b) - _ulcer(nav_a))     # 양수 = 후보가 Ulcer 더 낮음(개선)
-        d_cagr.append(_cagr(nav_a, n) - _cagr(nav_b, n))
+        d_cagr.append(_cagr(nav_a, n, ppy) - _cagr(nav_b, n, ppy))
     d_ulcer, d_cagr = np.array(d_ulcer), np.array(d_cagr)
     ci = lambda x: (round(float(np.percentile(x, 5)), 3), round(float(np.percentile(x, 95)), 3))
     return {"delta_ulcer_ci90": ci(d_ulcer), "delta_cagr_ci90": ci(d_cagr),
@@ -290,15 +299,17 @@ def pbo_gate(closes: np.ndarray, grid: dict, cost_bps: float, month=21, n_blocks
 def run_asset(name: str, ticker: str, current: dict, grid: dict, mom_current: str, mom_grid: list,
              cost_bps: float, do_bootstrap=True, do_eth_check=False) -> dict:
     closes = fetch(ticker).to_numpy()
-    stage1 = run_stage1(closes, grid, current, cost_bps, name)
+    ppy = periods_per_year(ticker)
+    stage1 = run_stage1(closes, grid, current, cost_bps, name, ppy)
     payload = {"asset": name, "ticker": ticker, "n_days": len(closes),
               "date_range": None, "stage1": stage1, "current_params": current}
     if stage1["best"]:
         base = {"trend_ma": stage1["best"]["trend_ma"], "band": stage1["best"]["band"],
                "confirm": stage1["best"]["confirm"]}
-        payload["stage2"] = run_stage2(closes, base, mom_grid, mom_current, cost_bps, name)
+        payload["stage2"] = run_stage2(closes, base, mom_grid, mom_current, cost_bps, name, ppy)
         if do_bootstrap:
-            payload["bootstrap_best_vs_current"] = paired_block_bootstrap(closes, base, current, cost_bps)
+            payload["bootstrap_best_vs_current"] = paired_block_bootstrap(closes, base, current, cost_bps,
+                                                                          ppy=ppy)
     try:
         payload["pbo_gate"] = pbo_gate(closes, grid, cost_bps)
     except Exception as e:
@@ -333,16 +344,17 @@ def main():
     best = btc["stage1"]["best"]
     if best:
         bp = {"trend_ma": best["trend_ma"], "band": best["band"], "confirm": best["confirm"]}
-        m1 = simulate(half1, regime_series(half1, **bp), COST_BPS["btc"])
-        m2 = simulate(half2, regime_series(half2, **bp), COST_BPS["btc"])
+        m1 = simulate(half1, regime_series(half1, **bp), COST_BPS["btc"], CRYPTO_DAYS)
+        m2 = simulate(half2, regime_series(half2, **bp), COST_BPS["btc"], CRYPTO_DAYS)
         btc["half_split_check"] = {
             "2014_2019": {"score": composite_score(m1), "ulcer": round(m1["ulcer"], 2), "cagr": round(m1["cagr"], 2)},
             "2020_now":  {"score": composite_score(m2), "ulcer": round(m2["ulcer"], 2), "cagr": round(m2["cagr"], 2)}}
         # ETH-USD 확인용(전용 튜닝 없이 BTC 최우수 파라미터 그대로 적용)
         try:
             eth_closes = fetch("ETH-USD").to_numpy()
-            m_eth = simulate(eth_closes, regime_series(eth_closes, **bp), COST_BPS["btc"])
-            m_eth_cur = simulate(eth_closes, regime_series(eth_closes, **BTC_CURRENT), COST_BPS["btc"])
+            m_eth = simulate(eth_closes, regime_series(eth_closes, **bp), COST_BPS["btc"], CRYPTO_DAYS)
+            m_eth_cur = simulate(eth_closes, regime_series(eth_closes, **BTC_CURRENT), COST_BPS["btc"],
+                                 CRYPTO_DAYS)
             btc["eth_confirmatory_check"] = {
                 "candidate_score": composite_score(m_eth), "current_score": composite_score(m_eth_cur),
                 "directionally_consistent": composite_score(m_eth) >= composite_score(m_eth_cur)}

@@ -229,9 +229,32 @@ def _load_funds():
         return None
     try:
         with open(p, encoding="utf-8") as f:
-            return json.load(f)
+            funds = json.load(f)
     except Exception:
         return None
+    try:
+        import fundamentals_edgar as _F
+        _F.warn_split_coverage(funds, "export")
+    except Exception:
+        pass
+    return funds
+
+
+LIVE_Z_CLIP = {"shareholder_yield": 5.0}   # 나머지 팩터는 ±3
+SCORE_FLOOR = 3.25   # 종합점수 하한(us_smoothed_floor.py) — 라이브·풀스택 검증 공용
+
+
+def live_z(col, name: str):
+    """라이브 선정의 팩터 z-score — 단면 표준화 후 클립, 결측은 0(중립). shareholder_yield는
+    ±3 대신 ±5(2026-07-18 클립 완화 검증: 극단치 종목단위 재검정 t=2.83 유의, topn8+cap2
+    라이브조건 재테스트 +0.68%p 개선 — 지호 님 반영 결정). 백테스트(research/us/
+    us_full_stack_exec_validation.py)도 이 함수를 그대로 쓴다(2026-09-24 전략 검토 E —
+    예전 검증은 ±3을 써서 라이브와 달랐다)."""
+    import numpy as _np
+    sd = col.std()
+    zz = (col - col.mean()) / sd if sd and not _np.isnan(sd) else col * 0.0
+    c = LIVE_Z_CLIP.get(name, 3.0)
+    return zz.clip(-c, c).fillna(0.0)
 
 
 def select_by_weights(weights: dict, ind_map: dict, n: int, funds: dict | None = None,
@@ -267,7 +290,7 @@ def select_by_weights(weights: dict, ind_map: dict, n: int, funds: dict | None =
        채움 2.9%) — 실용성 없어 기각. 지호 님 결정으로 무제한(sector_cap=None) 전환.
     stats(선택): dict를 넘기면 제외 건수를 채워 넣는다({"floor_excluded":N,
        "ma100_excluded":N, "pool_before":N}) — 라이브 리포트에 요약 표시용."""
-    import numpy as _np, pandas as _pd, datetime as _dt
+    import pandas as _pd, datetime as _dt
     today = _dt.date.today().isoformat()
     try:
         import fundamentals_edgar as _F
@@ -283,16 +306,9 @@ def select_by_weights(weights: dict, ind_map: dict, n: int, funds: dict | None =
             r.update({k: v for k, v in cross[s].items() if v is not None})
         rows[s] = r
     df = _pd.DataFrame(rows).T.astype(float)
-
-    def z(col):
-        sd = df[col].std()
-        zz = (df[col] - df[col].mean()) / sd if sd and not _np.isnan(sd) else df[col] * 0.0
-        # shareholder_yield는 ±3 대신 ±5(2026-07-18 클립 완화 검증: 극단치 종목단위 재검정
-        # t=2.83 유의, topn8+cap2 라이브조건 재테스트 +0.68%p 개선 — 지호 님 반영 결정)
-        clip = (-5, 5) if col == "shareholder_yield" else (-3, 3)
-        return zz.clip(*clip).fillna(0.0)
     active = [f for f in weights if weights.get(f) and f in df.columns]
-    comp = sum(float(weights[f]) * z(f) for f in active) if active else _pd.Series(0.0, index=df.index)
+    comp = (sum(float(weights[f]) * live_z(df[f], f) for f in active) if active
+            else _pd.Series(0.0, index=df.index))
     valid = df["mom6"].notna() | df["mom12_1"].notna()   # 모멘텀 결측 종목 제외
     comp = comp[valid].sort_values(ascending=False)
     if stats is not None:
@@ -304,15 +320,20 @@ def select_by_weights(weights: dict, ind_map: dict, n: int, funds: dict | None =
         if stats is not None:
             stats["floor_excluded"] = n_excluded
         comp = comp[comp >= floor]
+    if require_above_ma100 and "ma100_gap" not in df.columns:
+        print("[export] 경고: 100일선 데이터(ma100_gap) 자체가 없음 — 필터 미적용(기술지표 계산 실패)",
+              file=sys.stderr)
     if require_above_ma100 and "ma100_gap" in df.columns:
+        # 2026-09-24(전략 검토 E): 100일선 값이 없는 종목은 '위'로 확인된 게 아니므로 제외
+        # (예전엔 NaN이 필터를 통과했다) — 백테스트(us_full_stack_exec_validation)와 같은 규칙.
         gap = df["ma100_gap"].reindex(comp.index)
-        below = gap <= 0
+        below = ~(gap > 0)
         n_excluded = int(below.sum())
         if n_excluded:
-            print(f"[export] 100일선 아래로 {n_excluded}종목 제외", file=sys.stderr)
+            print(f"[export] 100일선 아래(또는 값 없음)로 {n_excluded}종목 제외", file=sys.stderr)
         if stats is not None:
             stats["ma100_excluded"] = n_excluded
-        comp = comp[~below.fillna(False)]
+        comp = comp[~below]
     if stats is not None:
         stats["pool_after"] = int(len(comp))
     lbl = "가중합성(" + "·".join(f"{k}{v}" for k, v in weights.items() if v) + ")"
@@ -331,10 +352,9 @@ def split_by_entry(candidates: list, k: int = 5, sector_cap: int | None = 2):
     sector_cap=None)으로 바꿔 AI가 볼 재료를 넉넉히 남기고, 최종 매수 k종목을 여기서
     뽑을 때만 섹터당 cap개로 제한 — 지호 님 지적("후보풀이 왜 이렇게 적나") 반영, 원래
     섹터캡 취지(최종 추천 쏠림 방지)를 후보풀 단계가 아니라 여기로 이동."""
-    def hot(c):   # 과열(지금 사되 분할 권고 대상)
-        rsi = c.get("rsi"); price = c.get("price"); ma50 = c.get("ma50")
-        gap50 = ((price / ma50 - 1) * 100) if (price and ma50) else 0
-        return (rsi is not None and rsi >= 72) or (gap50 >= 15) or (c.get("entry_label") == "C")
+    def hot(c):   # 과열(지금 사되 분할 권고 대상) — 판정식은 entry_plan.is_hot(백테스트와 공유)
+        import entry_plan as _EP
+        return _EP.is_hot(c.get("rsi"), c.get("price"), c.get("ma50")) or (c.get("entry_label") == "C")
 
     def entry_ok(c):   # 진입 필터: 200일선 위 + 52주 고점 근접(-25% 이내, George-Hwang)
         if not c.get("above_ma200"):
@@ -396,14 +416,20 @@ def select_pool(data: dict, n: int):
         # 자체를 22개로 눌러버려 AI가 볼 재료가 부족해지던 문제).
         scored = select_by_weights(w, data["ind_map"], n, funds=funds, cross=cross,
                                    sector_map=data.get("sector_map"), sector_cap=None,
-                                   floor=3.25, require_above_ma100=True, stats=stats)
+                                   floor=SCORE_FLOOR, require_above_ma100=True, stats=stats)
         label = ("weights " + "·".join(f"{k}{v}" for k, v in w.items() if v)
                  + ("" if funds else " [펀더멘탈캐시 없음:모멘텀만]"))
     else:
         model = load_best_model()
         scored = select_by_model(model, data["ind_map"], n)
         label = f"model {model}"
-    if not scored:                       # 최후 폴백: 퀄리티+모멘텀 하이브리드
+    if not scored and stats.get("pool_before"):
+        # 2026-09-24(전략 검토 E): 점수하한·100일선 필터가 전 종목을 걸렀다면 그게 이 전략의
+        # 답(=신규매수 없이 현금 대기)이다. 예전엔 여기서 하이브리드 점수로 자동 전환돼, 위험
+        # 관리 필터가 가장 필요한 순간에 백테스트한 적 없는 다른 전략이 후보를 냈다.
+        print("[export] 필터 통과 0종목 → 신규 매수 없음(현금 대기)", file=sys.stderr)
+        return [], {}, label + " [필터 통과 0 — 현금 대기]", stats
+    if not scored:                       # 최후 폴백(데이터 자체 없음): 퀄리티+모멘텀 하이브리드
         scored, info = _score_pool(data)
         return scored, info, "hybrid(score_reco)", stats
     info = R.get_info_for([s for s, _, _ in scored])
