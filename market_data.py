@@ -120,8 +120,11 @@ def _save_cache(symbol: str, series: pd.Series):
 
 
 def _basis_changed(cached: pd.Series, new: pd.Series, tol: float = BASIS_TOL) -> bool:
-    """캐시와 새로 받은 꼬리가 겹치는 날짜의 가격이 tol 넘게 다르면 수정주가 기준이 바뀐 것."""
+    """캐시와 새로 받은 꼬리가 겹치는 날짜의 가격이 tol 넘게 다르면 수정주가 기준이 바뀐 것.
+    캐시의 마지막 날짜는 비교에서 뺀다 — 장중 실행(미장 메일은 개장 30~90분 후)이면 그 봉은
+    확정 종가가 아닌 장중 가격이라, 넣으면 매 실행마다 '기준 변경'으로 오판해 전체 재수집한다."""
     common = cached.index.intersection(new.index)
+    common = common[common < cached.index.max()]
     if not len(common):
         return False
     ratio = (new.reindex(common) / cached.reindex(common)).dropna()
@@ -190,6 +193,11 @@ def fetch_batch(symbols: list[str], period: str, yf_batch_fn) -> dict[str, pd.Se
                 if ser is not None and len(ser):
                     out[s] = ser
                     _save_cache(s, ser)
+                else:
+                    # 재수집 실패는 일시 장애일 수 있다 — 영구실패 목록에 올리지 말고 옛 캐시를
+                    # 반환(기준은 한 번 어긋나 있지만 완전 누락보다 낫고, 다음 실행에 재시도된다).
+                    _log(f"{s}: 기준 변경 후 재수집 실패 → 옛 캐시 사용(다음 실행 때 재시도)")
+                    out[s] = tail_cache[s]
 
     recovered = [s for s in todo if s in out and s in bad]
     if recovered:
