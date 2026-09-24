@@ -352,7 +352,7 @@ def split_by_entry(candidates: list, k: int = 5, sector_cap: int | None = 2):
     sector_cap=None)으로 바꿔 AI가 볼 재료를 넉넉히 남기고, 최종 매수 k종목을 여기서
     뽑을 때만 섹터당 cap개로 제한 — 지호 님 지적("후보풀이 왜 이렇게 적나") 반영, 원래
     섹터캡 취지(최종 추천 쏠림 방지)를 후보풀 단계가 아니라 여기로 이동."""
-    def hot(c):   # 과열(지금 사되 분할 권고 대상) — 판정식은 entry_plan.is_hot(백테스트와 공유)
+    def hot(c):   # 과열(카드 표시용 — §17부터 분할 안 함) — 판정식은 entry_plan.is_hot(백테스트와 공유)
         import entry_plan as _EP
         return _EP.is_hot(c.get("rsi"), c.get("price"), c.get("ma50")) or (c.get("entry_label") == "C")
 
@@ -377,7 +377,7 @@ def split_by_entry(candidates: list, k: int = 5, sector_cap: int | None = 2):
     # 기술 게이트 후보 6종 전부가 검증된 팩터 바스켓의 성과를 깎는 것으로 확인
     # (현행 게이트 6M -3.85%p t=-2.1 유의, 스윕 6종 전부 diff<0) → 게이트 폐지.
     # 매수 = 팩터 순위 상위 k(섹터캡 적용), 관찰 = 그 다음 k(점수순, 캡 없음).
-    # hot(과열)은 분할매수 계획 표기용으로만 유지. entry_ok/pulling_back은 정보 표시용으로
+    # hot(과열)은 카드 표시용으로만 유지(§17부터 매수는 전량 1회). entry_ok/pulling_back은 정보 표시용으로
     # 남긴다(카드에 근거 표기 가능).
     if sector_cap is None:
         return candidates[:k], candidates[k:2 * k]

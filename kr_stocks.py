@@ -226,7 +226,7 @@ def select(yf) -> dict:
     pool = [c for c in cands.values() if c["score"] <= SCORE_CAP]
     ranked = sorted(pool, key=lambda x: x["score"], reverse=True)
     # 관찰 폐지(2026-07-13): 눌림/상승지속 구분 없이 팩터 순위 그대로 매수 후보
-    # (미국 backtest_entry_gate와 동일 취지 — 기술 게이트가 성과를 깎음. hot 태그는 분할계획용 유지)
+    # (미국 backtest_entry_gate와 동일 취지 — 기술 게이트가 성과를 깎음. hot 태그는 카드 표시용 유지)
     buy = ranked[:N_BUY]
     watch = ranked[N_BUY:N_BUY + N_WATCH]
     _log(f"AI 검증 풀 {len(buy)}(최종 채택은 AI 검증 후 상위 {MAX_HOLD}명) · "

@@ -61,6 +61,11 @@ GitHub Actions(주 3~4회+워치독), 로컬 PC 작업 스케줄러(pregen), 그
 4. compileall + import 재검증 (구조를 옮긴 리베이스라면 특히).
 5. `git stash pop`으로 사용자 WIP 복원.
 6. push.
+- **브랜치 작업은 워크트리에서**: `scripts/run_pregen.ps1`은 시작할 때 현재 브랜치가 main이 아니면
+  `git checkout main`한다(KR 16:00·US 06:00 트리거). 메인 체크아웃에서 다른 브랜치로 작업 중이면 그
+  시각에 코드가 main으로 바뀐다 — **실제 사례(2026-09-24)**: 16:01 pregen이 `claude/*` 브랜치를 main으로
+  전환해, 실행 중이던 연구 스크립트가 main에 없는 함수(`_live_ranked`)를 import하다 실패했다. 긴
+  브랜치 작업은 `.worktrees/`에서 하거나, 끝난 뒤 `git branch --show-current`로 브랜치를 확인할 것.
 - **실제 사례**: KOSPI200 캐시 merge driver 작업과 리포 정리가 같은 파일을 건드려 리베이스
   10개 커밋이 자동 충돌 해소됐다(merge driver를 로컬에 등록해뒀기 때문) — driver를 등록 안
   했으면 전부 수동 충돌이었을 것.
@@ -116,6 +121,12 @@ GitHub Actions(주 3~4회+워치독), 로컬 PC 작업 스케줄러(pregen), 그
   국장 메일 중복발송 가드(`last_sent.json` 갱신)가 무력화돼 있었다(`ee6f63f`).
 - **적용**: 매 실행마다 바뀌고 계속 추적해야 하는 새 파일은 `state/`에 두거나, `report.yml`의
   persist 단계에 명시적으로 추가해라. 둘 다 안 하면 조용히 쌓이다가 터진다.
+
+## 8.5 `--self-test`가 실제 결과 파일을 덮어쓰는 스크립트가 있다
+
+- **실제 사례(2026-09-24)**: `python backtest_exec.py --self-test`가 합성 데이터로 `output/backtest_topn_compare.json`·
+  `trial_returns_topn.json`·`pbo_report_topn.json`(추적 대상 실제 결과)을 덮어썼다. `git checkout --`으로 복구.
+- **적용**: self-test 실행 후 `git status output/`를 확인하고, 의도하지 않은 변경은 되돌려라.
 
 ## 9. 라이브 함수를 백테스트에 재사용할 때 — 숨은 '현재 기준' 동작을 확인해라
 

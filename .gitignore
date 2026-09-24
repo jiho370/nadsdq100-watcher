@@ -37,6 +37,7 @@ output/*.jsonl
 
 # 네트워크/연산 캐시 (재생성 가능, 용량 큼)
 output/price_cache/
+output/ff_cache/
 output/kr_bt_cache.json
 output/kr_sector_cache.json
 output/kr_regime_cache.json

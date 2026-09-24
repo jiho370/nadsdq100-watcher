@@ -53,8 +53,8 @@ SR_CANDIDATES = ["sr_support_dist", "sr_resist_dist", "hi52_prox", "lo52_prox",
 #   exit_time6m      = 검증된 백테스트의 원형(고정 6개월) — 현행 트레일링과의 핵심 대조군
 #   exit_trail15/25  = 현행 -20%의 파라미터 민감도 스윕
 ENTRY_RULES = ["entry1_full", "entry2_pullback2", "entry3_pullback3"]
-# 2026-09-24(전략 검토 E): 라이브 규칙 그대로의 진입·청산 — entry_live(과열이면 3분할·아니면
-# 2분할, entry_plan.tranche_targets 가격) / exit_live(180달력일 경과 AND 후보풀 이탈 시 매도,
+# 2026-09-24(전략 검토 E): 라이브 규칙 그대로의 진입·청산 — entry_live(entry_plan.tranche_targets —
+# §17 이후 현재가 전량 1회) / exit_live(180달력일 경과 AND 후보풀 이탈 시 매도,
 # pool_fn 필요). 기본 21조합에는 안 넣고 research/us/us_full_stack_exec_validation.py가 추가한다.
 LIVE_ENTRY, LIVE_EXIT = "entry_live", "exit_live"
 EXIT_RULES = ["exit_trail15", "exit_trail20", "exit_trail25", "exit_ma200only",
@@ -277,16 +277,6 @@ def _last_valid(vals, day, lo):
     return day
 
 
-def _rsi_at(vals, t):
-    """t일 종가까지의 RSI(14) — 라이브 미국 지표 함수(sp500_daily_report._rsi)를 그대로 호출."""
-    import sp500_daily_report as R
-    s = pd.Series(vals[:t + 1]).dropna()
-    if len(s) < 15:
-        return None
-    v = R._rsi(s).iloc[-1]
-    return float(v) if np.isfinite(v) else None
-
-
 def _planned_fills(vals, ma20, ma50, ma200, sym, entry_day, entry_rule, n):
     """진입 규칙별 '체결 후보' [(비중, 체결가, 체결일)] — 날짜순 정리(청산 이후 체결 제거)는
     _simulate_trade가 청산일을 정한 뒤에 한다. 1차 트랜치는 항상 entry_day 종가."""
@@ -305,22 +295,10 @@ def _planned_fills(vals, ma20, ma50, ma200, sym, entry_day, entry_rule, n):
     if entry_rule == "entry1_full":
         return [(1.0, p1, entry_day)]
     if entry_rule == "entry_live":
-        # 라이브 규칙 그대로(2026-09-24 전략 검토 E): 신호일(entry_day-1) 지표로 과열 판정
-        # (entry_plan.is_hot) → 2분할 50/50 또는 3분할 30/30/40, 가격은 entry_plan.tranche_targets
-        # (20일선/50일선 부근·200일선 하한). 대기기간은 라이브에 명시가 없어 기존 스윕과 같은
-        # 가정(2차 10거래일·3차 20거래일)을 쓴다.
+        # 라이브 규칙 그대로(entry_plan.tranche_targets). 2026-09-24(HISTORY.md §17)부터 라이브가
+        # 현재가 전량 1회라 entry1_full과 같다 — 그 전엔 과열 3분할·평시 2분할(대기 10/20거래일).
         import entry_plan as EP
-        sd = entry_day - 1
-        ps = vals[sd] if np.isfinite(vals[sd]) else p1
-        ma20s, ma50s, ma200s = _col(ma20, sd), _col(ma50, sd), _col(ma200, sd)
-        hot = EP.is_hot(_rsi_at(vals, sd), ps, ma50s)
-        plan = EP.tranche_targets(ps, ma20s, ma50s, ma200s, hot)
-        fills = [(plan[0][0] / 100.0, p1, entry_day)]
-        for k, (pct, target, _) in enumerate(plan[1:], start=1):
-            f, d = _wait_fill(target, PULLBACK_WINDOW * k)
-            if f is not None:
-                fills.append((pct / 100.0, f, d))
-        return fills
+        return [(pct / 100.0, p1, entry_day) for pct, _, _ in EP.tranche_targets(p1)]
     if entry_rule == "entry2_pullback2" or entry_rule in ENTRY_RATIO_2:
         w1, w2 = ENTRY_RATIO_2.get(entry_rule, (0.5, 0.5))
         m20 = _col(ma20, entry_day)
@@ -887,10 +865,10 @@ def self_test():
     assert abs(ev["basket_mdd"] + 0.25) < 1e-9, f"고점대비 낙폭이 아님: {ev}"
     ev = _eval_event(p3, ind3, [], 210, "entry1_full", "exit_time6m", cost, None, 10)
     assert ev["net"] == 0.0 and ev["unfilled"] == 1.0, f"후보 0개 이벤트는 전액 현금이어야: {ev}"
-    # 라이브 규칙: 횡보(과열 아님)면 2분할 1차 50%만 / exit_live는 180일 경과 후 후보풀 이탈 시
+    # 라이브 규칙(§17): 현재가 전량 1회 / exit_live는 180일 경과 후 후보풀 이탈 시
     lv = _simulate_trade(p2, ma20, ma50, ma200, atr, "FLAT", 210, "entry_live", "exit_live",
                          pool_fn=lambda d: set())
-    assert abs(lv["filled_frac"] - 0.5) < 1e-9, lv
+    assert abs(lv["filled_frac"] - 1.0) < 1e-9, lv
     held = (p2.index[lv["exit_day"]] - p2.index[210]).days
     assert 180 <= held < 190 and not lv["stop"], f"exit_live 재평가 시점 오류: {held}일 {lv}"
     lv2 = _simulate_trade(p2, ma20, ma50, ma200, atr, "FLAT", 210, "entry_live", "exit_live",
