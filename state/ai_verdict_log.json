@@ -2243,6 +2243,106 @@
       "severity": "",
       "reason": "",
       "price": 193.09
+    },
+    {
+      "date": "2026-09-24",
+      "market": "us",
+      "symbol": "GM",
+      "name": "General Motors Company",
+      "verdict": "매수유지",
+      "severity": "",
+      "reason": "",
+      "price": 81.98
+    },
+    {
+      "date": "2026-09-24",
+      "market": "us",
+      "symbol": "SWKS",
+      "name": "Skyworks Solutions, Inc.",
+      "verdict": "매수유지",
+      "severity": "",
+      "reason": "",
+      "price": 88.82
+    },
+    {
+      "date": "2026-09-24",
+      "market": "us",
+      "symbol": "BMY",
+      "name": "Bristol-Myers Squibb Company",
+      "verdict": "매수유지",
+      "severity": "",
+      "reason": "",
+      "price": 61.16
+    },
+    {
+      "date": "2026-09-24",
+      "market": "us",
+      "symbol": "XYZ",
+      "name": "Block, Inc.",
+      "verdict": "매수유지",
+      "severity": "",
+      "reason": "",
+      "price": 75.84
+    },
+    {
+      "date": "2026-09-24",
+      "market": "us",
+      "symbol": "INCY",
+      "name": "Incyte Corporation",
+      "verdict": "매수유지",
+      "severity": "",
+      "reason": "",
+      "price": 124.1
+    },
+    {
+      "date": "2026-09-24",
+      "market": "us",
+      "symbol": "REGN",
+      "name": "Regeneron Pharmaceuticals, Inc.",
+      "verdict": "제외",
+      "severity": "일시적",
+      "reason": "흑색종 3상에서 Keytruda 대비 통계적 유의성 미달(2026-07-13, p=0.0627)로 급락·목표가 하향 — 단일 임상 미스, 핵심사업 전체 상실 아님",
+      "price": 799.16
+    },
+    {
+      "date": "2026-09-24",
+      "market": "us",
+      "symbol": "HPQ",
+      "name": "HP Inc.",
+      "verdict": "매수유지",
+      "severity": "",
+      "reason": "",
+      "price": 31.67
+    },
+    {
+      "date": "2026-09-24",
+      "market": "us",
+      "symbol": "QCOM",
+      "name": "QUALCOMM Incorporated",
+      "verdict": "매수유지",
+      "severity": "",
+      "reason": "",
+      "price": 192.34
+    },
+    {
+      "date": "2026-09-24",
+      "market": "us",
+      "symbol": "WDAY",
+      "name": "Workday, Inc.",
+      "verdict": "매수유지",
+      "severity": "",
+      "reason": "",
+      "price": 192.61
+    },
+    {
+      "date": "2026-09-24",
+      "market": "us",
+      "symbol": "PYPL",
+      "name": "PayPal Holdings, Inc.",
+      "verdict": "매수유지",
+      "severity": "",
+      "reason": "",
+      "price": 52.27
     }
   ]
 }
