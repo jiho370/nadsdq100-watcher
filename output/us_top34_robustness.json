@@ -1,0 +1,605 @@
+{
+  "as_of": "2026-09-23",
+  "spy": {
+    "cagr_pct": 15.14,
+    "vol_pct": 18.8,
+    "sharpe": 0.714,
+    "mdd_pct": -33.7,
+    "start": "2017-09-25",
+    "end": "2026-09-23"
+  },
+  "results": {
+    "top3": {
+      "base": {
+        "cagr_pct": 24.39,
+        "vol_pct": 23.2,
+        "sharpe": 0.951,
+        "mdd_pct": -29.7,
+        "start": "2017-09-25",
+        "end": "2026-09-23"
+      },
+      "n_symbols_held": 27,
+      "leave_one_out_cagr_contrib_top10": [
+        [
+          "BIIB",
+          11.08
+        ],
+        [
+          "MRK",
+          9.54
+        ],
+        [
+          "BKNG",
+          8.78
+        ],
+        [
+          "SRE",
+          8.7
+        ],
+        [
+          "GLW",
+          4.63
+        ],
+        [
+          "OXY",
+          4.23
+        ],
+        [
+          "ABBV",
+          4.21
+        ],
+        [
+          "GE",
+          3.44
+        ],
+        [
+          "QCOM",
+          3.21
+        ],
+        [
+          "CMI",
+          2.18
+        ]
+      ],
+      "leave_one_out_cagr_contrib_bottom5": [
+        [
+          "DD",
+          -0.41
+        ],
+        [
+          "INCY",
+          -1.03
+        ],
+        [
+          "WDC",
+          -1.26
+        ],
+        [
+          "HPE",
+          -2.68
+        ],
+        [
+          "BMY",
+          -6.53
+        ]
+      ],
+      "drop_top_contributors": {
+        "without_top1": {
+          "banned": [
+            "BIIB"
+          ],
+          "cagr_pct": 13.31,
+          "vol_pct": 24.2,
+          "sharpe": 0.535,
+          "mdd_pct": -32.1,
+          "start": "2017-09-25",
+          "end": "2026-09-23"
+        },
+        "without_top2": {
+          "banned": [
+            "BIIB",
+            "MRK"
+          ],
+          "cagr_pct": 13.16,
+          "vol_pct": 25.3,
+          "sharpe": 0.518,
+          "mdd_pct": -40.2,
+          "start": "2017-09-25",
+          "end": "2026-09-23"
+        },
+        "without_top3": {
+          "banned": [
+            "BIIB",
+            "BKNG",
+            "MRK"
+          ],
+          "cagr_pct": 20.92,
+          "vol_pct": 35.6,
+          "sharpe": 0.62,
+          "mdd_pct": -37.0,
+          "start": "2017-09-25",
+          "end": "2026-09-23"
+        },
+        "without_top5": {
+          "banned": [
+            "BIIB",
+            "BKNG",
+            "GLW",
+            "MRK",
+            "SRE"
+          ],
+          "cagr_pct": 26.72,
+          "vol_pct": 35.7,
+          "sharpe": 0.75,
+          "mdd_pct": -33.6,
+          "start": "2017-09-25",
+          "end": "2026-09-23"
+        }
+      },
+      "random_order": {
+        "n": 300,
+        "cagr_mean": 15.44,
+        "cagr_p5_p95": [
+          5.45,
+          27.22
+        ],
+        "sharpe_mean": 0.557,
+        "actual_cagr_pctile": 89.0,
+        "actual_sharpe_pctile": 97.3
+      },
+      "offsets": {
+        "0": {
+          "cagr_pct": 24.39,
+          "sharpe": 0.951,
+          "mdd_pct": -29.7
+        },
+        "2": {
+          "cagr_pct": 17.95,
+          "sharpe": 0.709,
+          "mdd_pct": -30.0
+        },
+        "4": {
+          "cagr_pct": 9.89,
+          "sharpe": 0.412,
+          "mdd_pct": -31.0
+        },
+        "6": {
+          "cagr_pct": 17.27,
+          "sharpe": 0.661,
+          "mdd_pct": -40.7
+        },
+        "8": {
+          "cagr_pct": 21.87,
+          "sharpe": 0.847,
+          "mdd_pct": -34.6
+        }
+      },
+      "calendar_excess_vs_spy_pct": {
+        "2017": -0.4,
+        "2018": -3.6,
+        "2019": 7.1,
+        "2020": 8.5,
+        "2021": 0.3,
+        "2022": 84.2,
+        "2023": 2.1,
+        "2024": 0.5,
+        "2025": 2.0,
+        "2026": -14.1
+      },
+      "rolling12m_beat_spy_pct": 69.4,
+      "halves": {
+        "first": {
+          "cagr_pct": 28.4,
+          "vol_pct": 25.6,
+          "sharpe": 1.068,
+          "mdd_pct": -29.7,
+          "start": "2017-09-25",
+          "end": "2022-03-22"
+        },
+        "second": {
+          "cagr_pct": 20.51,
+          "vol_pct": 20.5,
+          "sharpe": 0.818,
+          "mdd_pct": -22.7,
+          "start": "2022-03-22",
+          "end": "2026-09-23"
+        }
+      }
+    },
+    "top4": {
+      "base": {
+        "cagr_pct": 23.84,
+        "vol_pct": 22.9,
+        "sharpe": 0.941,
+        "mdd_pct": -27.5,
+        "start": "2017-09-25",
+        "end": "2026-09-23"
+      },
+      "n_symbols_held": 35,
+      "leave_one_out_cagr_contrib_top10": [
+        [
+          "BKNG",
+          7.01
+        ],
+        [
+          "OXY",
+          6.48
+        ],
+        [
+          "SRE",
+          6.12
+        ],
+        [
+          "MRK",
+          6.05
+        ],
+        [
+          "WDC",
+          4.98
+        ],
+        [
+          "BIIB",
+          4.39
+        ],
+        [
+          "NTAP",
+          3.97
+        ],
+        [
+          "GILD",
+          2.85
+        ],
+        [
+          "GM",
+          2.8
+        ],
+        [
+          "TPR",
+          2.56
+        ]
+      ],
+      "leave_one_out_cagr_contrib_bottom5": [
+        [
+          "XYZ",
+          -2.48
+        ],
+        [
+          "MTCH",
+          -2.63
+        ],
+        [
+          "DD",
+          -2.66
+        ],
+        [
+          "F",
+          -4.4
+        ],
+        [
+          "BMY",
+          -5.0
+        ]
+      ],
+      "drop_top_contributors": {
+        "without_top1": {
+          "banned": [
+            "BKNG"
+          ],
+          "cagr_pct": 16.83,
+          "vol_pct": 23.4,
+          "sharpe": 0.677,
+          "mdd_pct": -29.4,
+          "start": "2017-09-25",
+          "end": "2026-09-23"
+        },
+        "without_top2": {
+          "banned": [
+            "BKNG",
+            "OXY"
+          ],
+          "cagr_pct": 13.9,
+          "vol_pct": 23.3,
+          "sharpe": 0.569,
+          "mdd_pct": -29.4,
+          "start": "2017-09-25",
+          "end": "2026-09-23"
+        },
+        "without_top3": {
+          "banned": [
+            "BKNG",
+            "OXY",
+            "SRE"
+          ],
+          "cagr_pct": 17.91,
+          "vol_pct": 23.7,
+          "sharpe": 0.709,
+          "mdd_pct": -33.2,
+          "start": "2017-09-25",
+          "end": "2026-09-23"
+        },
+        "without_top5": {
+          "banned": [
+            "BKNG",
+            "MRK",
+            "OXY",
+            "SRE",
+            "WDC"
+          ],
+          "cagr_pct": 20.64,
+          "vol_pct": 30.6,
+          "sharpe": 0.673,
+          "mdd_pct": -32.2,
+          "start": "2017-09-25",
+          "end": "2026-09-23"
+        }
+      },
+      "random_order": {
+        "n": 300,
+        "cagr_mean": 17.0,
+        "cagr_p5_p95": [
+          8.33,
+          25.88
+        ],
+        "sharpe_mean": 0.63,
+        "actual_cagr_pctile": 89.0,
+        "actual_sharpe_pctile": 97.7
+      },
+      "offsets": {
+        "0": {
+          "cagr_pct": 23.84,
+          "sharpe": 0.941,
+          "mdd_pct": -27.5
+        },
+        "2": {
+          "cagr_pct": 12.46,
+          "sharpe": 0.528,
+          "mdd_pct": -42.0
+        },
+        "4": {
+          "cagr_pct": 16.5,
+          "sharpe": 0.68,
+          "mdd_pct": -32.8
+        },
+        "6": {
+          "cagr_pct": 12.98,
+          "sharpe": 0.53,
+          "mdd_pct": -39.6
+        },
+        "8": {
+          "cagr_pct": 17.99,
+          "sharpe": 0.751,
+          "mdd_pct": -30.9
+        }
+      },
+      "calendar_excess_vs_spy_pct": {
+        "2017": 3.9,
+        "2018": 1.9,
+        "2019": -2.2,
+        "2020": 9.8,
+        "2021": -5.7,
+        "2022": 57.1,
+        "2023": 0.4,
+        "2024": 4.6,
+        "2025": 7.1,
+        "2026": -5.2
+      },
+      "rolling12m_beat_spy_pct": 70.0,
+      "halves": {
+        "first": {
+          "cagr_pct": 25.82,
+          "vol_pct": 24.6,
+          "sharpe": 1.018,
+          "mdd_pct": -27.5,
+          "start": "2017-09-25",
+          "end": "2022-03-22"
+        },
+        "second": {
+          "cagr_pct": 21.88,
+          "vol_pct": 21.0,
+          "sharpe": 0.856,
+          "mdd_pct": -24.2,
+          "start": "2022-03-22",
+          "end": "2026-09-23"
+        }
+      }
+    },
+    "top10": {
+      "base": {
+        "cagr_pct": 19.11,
+        "vol_pct": 22.9,
+        "sharpe": 0.769,
+        "mdd_pct": -33.8,
+        "start": "2017-09-25",
+        "end": "2026-09-23"
+      },
+      "n_symbols_held": 58,
+      "leave_one_out_cagr_contrib_top10": [
+        [
+          "APTV",
+          4.23
+        ],
+        [
+          "QCOM",
+          3.89
+        ],
+        [
+          "CMI",
+          3.5
+        ],
+        [
+          "INCY",
+          2.92
+        ],
+        [
+          "BALL",
+          2.69
+        ],
+        [
+          "CAT",
+          2.31
+        ],
+        [
+          "HPQ",
+          1.83
+        ],
+        [
+          "MRNA",
+          1.81
+        ],
+        [
+          "GE",
+          1.76
+        ],
+        [
+          "NTAP",
+          1.72
+        ]
+      ],
+      "leave_one_out_cagr_contrib_bottom5": [
+        [
+          "WHR",
+          -0.8
+        ],
+        [
+          "TXT",
+          -0.89
+        ],
+        [
+          "CSCO",
+          -1.08
+        ],
+        [
+          "GM",
+          -1.09
+        ],
+        [
+          "VTR",
+          -1.21
+        ]
+      ],
+      "drop_top_contributors": {
+        "without_top1": {
+          "banned": [
+            "APTV"
+          ],
+          "cagr_pct": 14.88,
+          "vol_pct": 21.4,
+          "sharpe": 0.64,
+          "mdd_pct": -33.8,
+          "start": "2017-09-25",
+          "end": "2026-09-23"
+        },
+        "without_top2": {
+          "banned": [
+            "APTV",
+            "QCOM"
+          ],
+          "cagr_pct": 16.19,
+          "vol_pct": 21.0,
+          "sharpe": 0.703,
+          "mdd_pct": -32.2,
+          "start": "2017-09-25",
+          "end": "2026-09-23"
+        },
+        "without_top3": {
+          "banned": [
+            "APTV",
+            "CMI",
+            "QCOM"
+          ],
+          "cagr_pct": 13.95,
+          "vol_pct": 21.1,
+          "sharpe": 0.607,
+          "mdd_pct": -35.9,
+          "start": "2017-09-25",
+          "end": "2026-09-23"
+        },
+        "without_top5": {
+          "banned": [
+            "APTV",
+            "BALL",
+            "CMI",
+            "INCY",
+            "QCOM"
+          ],
+          "cagr_pct": 14.08,
+          "vol_pct": 21.0,
+          "sharpe": 0.615,
+          "mdd_pct": -35.9,
+          "start": "2017-09-25",
+          "end": "2026-09-23"
+        }
+      },
+      "random_order": {
+        "n": 300,
+        "cagr_mean": 16.88,
+        "cagr_p5_p95": [
+          12.25,
+          21.1
+        ],
+        "sharpe_mean": 0.7,
+        "actual_cagr_pctile": 78.3,
+        "actual_sharpe_pctile": 74.7
+      },
+      "offsets": {
+        "0": {
+          "cagr_pct": 19.11,
+          "sharpe": 0.769,
+          "mdd_pct": -33.8
+        },
+        "2": {
+          "cagr_pct": 19.43,
+          "sharpe": 0.824,
+          "mdd_pct": -30.9
+        },
+        "4": {
+          "cagr_pct": 22.33,
+          "sharpe": 0.873,
+          "mdd_pct": -36.2
+        },
+        "6": {
+          "cagr_pct": 20.74,
+          "sharpe": 0.818,
+          "mdd_pct": -34.8
+        },
+        "8": {
+          "cagr_pct": 18.64,
+          "sharpe": 0.733,
+          "mdd_pct": -39.8
+        }
+      },
+      "calendar_excess_vs_spy_pct": {
+        "2017": -6.3,
+        "2018": -3.6,
+        "2019": -1.3,
+        "2020": -5.8,
+        "2021": -4.0,
+        "2022": 33.2,
+        "2023": -7.0,
+        "2024": -25.4,
+        "2025": 16.3,
+        "2026": 41.3
+      },
+      "rolling12m_beat_spy_pct": 45.6,
+      "halves": {
+        "first": {
+          "cagr_pct": 14.32,
+          "vol_pct": 21.9,
+          "sharpe": 0.677,
+          "mdd_pct": -33.8,
+          "start": "2017-09-25",
+          "end": "2022-03-22"
+        },
+        "second": {
+          "cagr_pct": 24.1,
+          "vol_pct": 23.9,
+          "sharpe": 0.854,
+          "mdd_pct": -32.7,
+          "start": "2022-03-22",
+          "end": "2026-09-23"
+        }
+      }
+    }
+  },
+  "note": "무작위 순서 대조군은 같은 필터(floor·100일선) 통과 풀 안에서 순위만 섞은 것 — 순위(1:2:2 점수)의 가치를 잰다. 필터 자체의 가치는 포함하지 않는다."
+}
