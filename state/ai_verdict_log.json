@@ -2343,6 +2343,106 @@
       "severity": "",
       "reason": "",
       "price": 52.27
+    },
+    {
+      "date": "2026-09-25",
+      "market": "us",
+      "symbol": "GM",
+      "name": "General Motors Company",
+      "verdict": "매수유지",
+      "severity": "",
+      "reason": "",
+      "price": 82.34
+    },
+    {
+      "date": "2026-09-25",
+      "market": "us",
+      "symbol": "SWKS",
+      "name": "Skyworks Solutions, Inc.",
+      "verdict": "매수유지",
+      "severity": "",
+      "reason": "",
+      "price": 89.62
+    },
+    {
+      "date": "2026-09-25",
+      "market": "us",
+      "symbol": "BMY",
+      "name": "Bristol-Myers Squibb Company",
+      "verdict": "매수유지",
+      "severity": "",
+      "reason": "",
+      "price": 62.15
+    },
+    {
+      "date": "2026-09-25",
+      "market": "us",
+      "symbol": "INCY",
+      "name": "Incyte Corporation",
+      "verdict": "매수유지",
+      "severity": "",
+      "reason": "",
+      "price": 124.1
+    },
+    {
+      "date": "2026-09-25",
+      "market": "us",
+      "symbol": "REGN",
+      "name": "Regeneron Pharmaceuticals, Inc.",
+      "verdict": "제외",
+      "severity": "일시적",
+      "reason": "흑색종 1차치료 3상(fianlimab+cemiplimab)이 pembrolizumab 대비 PFS 통계적 유의성 미달(5/15 공식 발표), NSCLC 병용 2상도 3상 미진행 결정 - 파이프라인 리스크 지속, 해소 근거 아직 미확인",
+      "price": 787.69
+    },
+    {
+      "date": "2026-09-25",
+      "market": "us",
+      "symbol": "HPQ",
+      "name": "HP Inc.",
+      "verdict": "매수유지",
+      "severity": "",
+      "reason": "",
+      "price": 31.55
+    },
+    {
+      "date": "2026-09-25",
+      "market": "us",
+      "symbol": "WDAY",
+      "name": "Workday, Inc.",
+      "verdict": "매수유지",
+      "severity": "",
+      "reason": "",
+      "price": 190.95
+    },
+    {
+      "date": "2026-09-25",
+      "market": "us",
+      "symbol": "QCOM",
+      "name": "QUALCOMM Incorporated",
+      "verdict": "매수유지",
+      "severity": "",
+      "reason": "",
+      "price": 203.49
+    },
+    {
+      "date": "2026-09-25",
+      "market": "us",
+      "symbol": "TRMB",
+      "name": "Trimble Inc.",
+      "verdict": "매수유지",
+      "severity": "",
+      "reason": "",
+      "price": 57.98
+    },
+    {
+      "date": "2026-09-25",
+      "market": "us",
+      "symbol": "IT",
+      "name": "Gartner, Inc.",
+      "verdict": "제외",
+      "severity": "일시적",
+      "reason": "2026년 매출 가이던스가 시장 기대치를 크게 하회(연초 실적발표), 연방정부 고객 지출 축소(DOGE)·관세 불확실성으로 판매 사이클 장기화 - 최근 12개월 주가 -47%, 최근 1주 -6.4%도 동일 추세의 연장",
+      "price": 186.71
     }
   ]
 }
