@@ -2523,6 +2523,106 @@
       "severity": "",
       "reason": "",
       "price": 15980.0
+    },
+    {
+      "date": "2026-09-28",
+      "market": "us",
+      "symbol": "SWKS",
+      "name": "Skyworks Solutions, Inc.",
+      "verdict": "매수유지",
+      "severity": "",
+      "reason": "",
+      "price": 87.53
+    },
+    {
+      "date": "2026-09-28",
+      "market": "us",
+      "symbol": "BMY",
+      "name": "Bristol-Myers Squibb Company",
+      "verdict": "매수유지",
+      "severity": "",
+      "reason": "",
+      "price": 63.38
+    },
+    {
+      "date": "2026-09-28",
+      "market": "us",
+      "symbol": "INCY",
+      "name": "Incyte Corporation",
+      "verdict": "매수유지",
+      "severity": "",
+      "reason": "",
+      "price": 124.35
+    },
+    {
+      "date": "2026-09-28",
+      "market": "us",
+      "symbol": "REGN",
+      "name": "Regeneron Pharmaceuticals, Inc.",
+      "verdict": "제외",
+      "severity": "일시적",
+      "reason": "흑색종 3상에서 Keytruda 대비 통계적 유의성 미달(2026-07-13)로 급락한 사안 유지 — 이후 증권 집단소송(리드플레인티프 마감 9/14)은 동일 사안의 연장선, 신규 악재 아님",
+      "price": 766.97
+    },
+    {
+      "date": "2026-09-28",
+      "market": "us",
+      "symbol": "HPQ",
+      "name": "HP Inc.",
+      "verdict": "제외",
+      "severity": "일시적",
+      "reason": "9월 중순 FY2027 매출 가이던스를 보류하고 PC 시장 감소 전망(메모리 반도체 원가 상승에 따른 마진 압박) 발표로 주가 급락(1주 -9.0%) — 회사 고유의 수요·마진 악화 신호",
+      "price": 31.12
+    },
+    {
+      "date": "2026-09-28",
+      "market": "us",
+      "symbol": "QCOM",
+      "name": "QUALCOMM Incorporated",
+      "verdict": "매수유지",
+      "severity": "",
+      "reason": "",
+      "price": 189.59
+    },
+    {
+      "date": "2026-09-28",
+      "market": "us",
+      "symbol": "WDAY",
+      "name": "Workday, Inc.",
+      "verdict": "매수유지",
+      "severity": "",
+      "reason": "",
+      "price": 190.14
+    },
+    {
+      "date": "2026-09-28",
+      "market": "us",
+      "symbol": "TRMB",
+      "name": "Trimble Inc.",
+      "verdict": "매수유지",
+      "severity": "",
+      "reason": "",
+      "price": 56.92
+    },
+    {
+      "date": "2026-09-28",
+      "market": "us",
+      "symbol": "IT",
+      "name": "Gartner, Inc.",
+      "verdict": "제외",
+      "severity": "일시적",
+      "reason": "2026년 매출 가이던스가 시장 기대치를 크게 하회(연초 실적발표), 연방정부 고객 지출 축소(DOGE)·관세 불확실성으로 판매 사이클 장기화 - 최근 12개월 주가 -47%, 최근 1주 -6.4%도 동일 추세의 연장",
+      "price": 184.68
+    },
+    {
+      "date": "2026-09-28",
+      "market": "us",
+      "symbol": "PYPL",
+      "name": "PayPal Holdings, Inc.",
+      "verdict": "매수유지",
+      "severity": "",
+      "reason": "",
+      "price": 54.09
     }
   ]
 }
