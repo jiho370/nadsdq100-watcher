@@ -2703,6 +2703,106 @@
       "severity": "",
       "reason": "",
       "price": 115100.0
+    },
+    {
+      "date": "2026-09-29",
+      "market": "us",
+      "symbol": "SWKS",
+      "name": "Skyworks Solutions, Inc.",
+      "verdict": "매수유지",
+      "severity": "",
+      "reason": "",
+      "price": 89.0
+    },
+    {
+      "date": "2026-09-29",
+      "market": "us",
+      "symbol": "BMY",
+      "name": "Bristol-Myers Squibb Company",
+      "verdict": "매수유지",
+      "severity": "",
+      "reason": "",
+      "price": 63.13
+    },
+    {
+      "date": "2026-09-29",
+      "market": "us",
+      "symbol": "INCY",
+      "name": "Incyte Corporation",
+      "verdict": "매수유지",
+      "severity": "",
+      "reason": "",
+      "price": 122.28
+    },
+    {
+      "date": "2026-09-29",
+      "market": "us",
+      "symbol": "REGN",
+      "name": "Regeneron Pharmaceuticals, Inc.",
+      "verdict": "제외",
+      "severity": "일시적",
+      "reason": "흑색male 1차치료 3상(fianlimab+cemiplimab)이 pembrolizumab 대비 PFS 통계적 유의성 미달(5/15 공식 발표), NSCLC 병용 2상도 3상 미진행 결정 - 해당 파이프라인 리스크 해소 근거 오늘 검색에서도 미확인, 전일 판정 유지",
+      "price": 744.95
+    },
+    {
+      "date": "2026-09-29",
+      "market": "us",
+      "symbol": "HPQ",
+      "name": "HP Inc.",
+      "verdict": "제외",
+      "severity": "일시적",
+      "reason": "9월 중순 FY2027 매출 가이던스를 보류하고 PC 시장 감소 전망(메모리 반도체 원가 상승에 따른 마진 압박) 발표로 주가 급락(1주 -9.0%) — 회사 고유의 수요·마진 악화 신호",
+      "price": 30.82
+    },
+    {
+      "date": "2026-09-29",
+      "market": "us",
+      "symbol": "WDAY",
+      "name": "Workday, Inc.",
+      "verdict": "매수유지",
+      "severity": "",
+      "reason": "",
+      "price": 185.69
+    },
+    {
+      "date": "2026-09-29",
+      "market": "us",
+      "symbol": "TRMB",
+      "name": "Trimble Inc.",
+      "verdict": "매수유지",
+      "severity": "",
+      "reason": "",
+      "price": 56.8
+    },
+    {
+      "date": "2026-09-29",
+      "market": "us",
+      "symbol": "PYPL",
+      "name": "PayPal Holdings, Inc.",
+      "verdict": "매수유지",
+      "severity": "",
+      "reason": "",
+      "price": 53.73
+    },
+    {
+      "date": "2026-09-29",
+      "market": "us",
+      "symbol": "IT",
+      "name": "Gartner, Inc.",
+      "verdict": "제외",
+      "severity": "일시적",
+      "reason": "연초 실적발표에서 2026년 매출 가이던스가 시장 기대치를 크게 하회, 연방정부 고객 지출 축소(DOGE)·관세 불확실성으로 판매 사이클 장기화 - 오늘 검색에서 반전 근거 미확인, 전일 판정 유지",
+      "price": 184.57
+    },
+    {
+      "date": "2026-09-29",
+      "market": "us",
+      "symbol": "HAS",
+      "name": "Hasbro, Inc.",
+      "verdict": "매수유지",
+      "severity": "",
+      "reason": "",
+      "price": 88.9
     }
   ]
 }
