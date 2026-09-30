@@ -2883,6 +2883,106 @@
       "severity": "",
       "reason": "",
       "price": 15600.0
+    },
+    {
+      "date": "2026-09-30",
+      "market": "us",
+      "symbol": "SWKS",
+      "name": "Skyworks Solutions, Inc.",
+      "verdict": "매수유지",
+      "severity": "",
+      "reason": "",
+      "price": 87.0
+    },
+    {
+      "date": "2026-09-30",
+      "market": "us",
+      "symbol": "BMY",
+      "name": "Bristol-Myers Squibb Company",
+      "verdict": "매수유지",
+      "severity": "",
+      "reason": "",
+      "price": 63.81
+    },
+    {
+      "date": "2026-09-30",
+      "market": "us",
+      "symbol": "INCY",
+      "name": "Incyte Corporation",
+      "verdict": "매수유지",
+      "severity": "",
+      "reason": "",
+      "price": 123.46
+    },
+    {
+      "date": "2026-09-30",
+      "market": "us",
+      "symbol": "REGN",
+      "name": "Regeneron Pharmaceuticals, Inc.",
+      "verdict": "제외",
+      "severity": "일시적",
+      "reason": "흑색종 3상(Fianlimab+Libtayo)에서 1차 평가변수 통계적 유의성 미달(2026-05-15 공개)로 촉발된 증권 집단소송 - 리드플레인티프 마감(9/14) 경과, 신규 사실 없어 기존 판정 유지",
+      "price": 750.93
+    },
+    {
+      "date": "2026-09-30",
+      "market": "us",
+      "symbol": "HPQ",
+      "name": "HP Inc.",
+      "verdict": "제외",
+      "severity": "일시적",
+      "reason": "8/26 실적발표에서 FY2027 가이던스 보류 및 2027년 PC 출하량 한자릿수 중반 감소 전망 제시(원가·수요 압박) - 신규 사실 없어 기존 판정 유지",
+      "price": 31.26
+    },
+    {
+      "date": "2026-09-30",
+      "market": "us",
+      "symbol": "WDAY",
+      "name": "Workday, Inc.",
+      "verdict": "매수유지",
+      "severity": "",
+      "reason": "",
+      "price": 189.52
+    },
+    {
+      "date": "2026-09-30",
+      "market": "us",
+      "symbol": "TRMB",
+      "name": "Trimble Inc.",
+      "verdict": "매수유지",
+      "severity": "",
+      "reason": "",
+      "price": 57.96
+    },
+    {
+      "date": "2026-09-30",
+      "market": "us",
+      "symbol": "PYPL",
+      "name": "PayPal Holdings, Inc.",
+      "verdict": "매수유지",
+      "severity": "",
+      "reason": "",
+      "price": 53.14
+    },
+    {
+      "date": "2026-09-30",
+      "market": "us",
+      "symbol": "IT",
+      "name": "Gartner, Inc.",
+      "verdict": "매수유지",
+      "severity": "",
+      "reason": "",
+      "price": 186.87
+    },
+    {
+      "date": "2026-09-30",
+      "market": "us",
+      "symbol": "VRSN",
+      "name": "VeriSign, Inc.",
+      "verdict": "매수유지",
+      "severity": "",
+      "reason": "",
+      "price": 284.84
     }
   ]
 }
