@@ -2983,6 +2983,86 @@
       "severity": "",
       "reason": "",
       "price": 284.84
+    },
+    {
+      "date": "2026-10-01",
+      "market": "kr",
+      "symbol": "015760",
+      "name": "한국전력",
+      "verdict": "제외",
+      "severity": "일시적",
+      "reason": "4분기 연료비조정단가도 3분기와 동일하게 kWh당 +5원 상한으로 동결(9/21 발표, 18분기 연속)되어 원가 회수 지연이 계속됨.",
+      "price": 30000.0
+    },
+    {
+      "date": "2026-10-01",
+      "market": "kr",
+      "symbol": "002380",
+      "name": "KCC",
+      "verdict": "매수유지",
+      "severity": "",
+      "reason": "",
+      "price": 469500.0
+    },
+    {
+      "date": "2026-10-01",
+      "market": "kr",
+      "symbol": "006040",
+      "name": "동원산업",
+      "verdict": "매수유지",
+      "severity": "",
+      "reason": "",
+      "price": 35350.0
+    },
+    {
+      "date": "2026-10-01",
+      "market": "kr",
+      "symbol": "029780",
+      "name": "삼성카드",
+      "verdict": "제외",
+      "severity": "일시적",
+      "reason": "8/14 주총서 배당성향 46% 현금배당만 확정, 자사주 소각 등 구체적 주주환원 확대 방안·시점 미제시(중장기 환원율 50% 목표는 방향성 제시에 그침).",
+      "price": 41650.0
+    },
+    {
+      "date": "2026-10-01",
+      "market": "kr",
+      "symbol": "024110",
+      "name": "기업은행",
+      "verdict": "매수유지",
+      "severity": "",
+      "reason": "",
+      "price": 20100.0
+    },
+    {
+      "date": "2026-10-01",
+      "market": "kr",
+      "symbol": "003030",
+      "name": "세아제강지주",
+      "verdict": "매수유지",
+      "severity": "",
+      "reason": "",
+      "price": 110900.0
+    },
+    {
+      "date": "2026-10-01",
+      "market": "kr",
+      "symbol": "139480",
+      "name": "이마트",
+      "verdict": "제외",
+      "severity": "일시적",
+      "reason": "신세계건설 부실 여파로 연결 영업이익 훼손 지속(2분기 전년比 23%↓), 하나증권 투자의견 중립 유지(8/14).",
+      "price": 70900.0
+    },
+    {
+      "date": "2026-10-01",
+      "market": "kr",
+      "symbol": "138930",
+      "name": "BNK금융지주",
+      "verdict": "매수유지",
+      "severity": "",
+      "reason": "",
+      "price": 15810.0
     }
   ]
 }
