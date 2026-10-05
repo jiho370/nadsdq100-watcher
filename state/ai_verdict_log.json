@@ -3143,6 +3143,106 @@
       "severity": "",
       "reason": "",
       "price": 112000.0
+    },
+    {
+      "date": "2026-10-05",
+      "market": "us",
+      "symbol": "SWKS",
+      "name": "Skyworks Solutions, Inc.",
+      "verdict": "매수유지",
+      "severity": "",
+      "reason": "",
+      "price": 82.17
+    },
+    {
+      "date": "2026-10-05",
+      "market": "us",
+      "symbol": "REGN",
+      "name": "Regeneron Pharmaceuticals, Inc.",
+      "verdict": "제외",
+      "severity": "일시적",
+      "reason": "흑색종 3상(Fianlimab+Libtayo) 1차 평가변수 통계적 유의성 미달(2026-05-15 공개)에 따른 증권 집단소송. 신규 사실 없어 기존 판정 유지.",
+      "price": 729.49
+    },
+    {
+      "date": "2026-10-05",
+      "market": "us",
+      "symbol": "HPQ",
+      "name": "HP Inc.",
+      "verdict": "제외",
+      "severity": "일시적",
+      "reason": "8/26 실적발표에서 FY2027 가이던스 보류 및 2027년 PC 출하량 한자릿수 중반 감소 전망 제시(원가·수요 압박). 신규 사실 없어 기존 판정 유지.",
+      "price": 31.25
+    },
+    {
+      "date": "2026-10-05",
+      "market": "us",
+      "symbol": "WDAY",
+      "name": "Workday, Inc.",
+      "verdict": "매수유지",
+      "severity": "",
+      "reason": "",
+      "price": 185.95
+    },
+    {
+      "date": "2026-10-05",
+      "market": "us",
+      "symbol": "IT",
+      "name": "Gartner, Inc.",
+      "verdict": "매수유지",
+      "severity": "",
+      "reason": "",
+      "price": 186.0
+    },
+    {
+      "date": "2026-10-05",
+      "market": "us",
+      "symbol": "PYPL",
+      "name": "PayPal Holdings, Inc.",
+      "verdict": "매수유지",
+      "severity": "",
+      "reason": "",
+      "price": 53.72
+    },
+    {
+      "date": "2026-10-05",
+      "market": "us",
+      "symbol": "TRMB",
+      "name": "Trimble Inc.",
+      "verdict": "매수유지",
+      "severity": "",
+      "reason": "",
+      "price": 58.44
+    },
+    {
+      "date": "2026-10-05",
+      "market": "us",
+      "symbol": "VRSN",
+      "name": "VeriSign, Inc.",
+      "verdict": "매수유지",
+      "severity": "",
+      "reason": "",
+      "price": 290.16
+    },
+    {
+      "date": "2026-10-05",
+      "market": "us",
+      "symbol": "MRK",
+      "name": "Merck & Co., Inc.",
+      "verdict": "매수유지",
+      "severity": "",
+      "reason": "",
+      "price": 139.35
+    },
+    {
+      "date": "2026-10-05",
+      "market": "us",
+      "symbol": "SOLV",
+      "name": "Solventum Corporation",
+      "verdict": "매수유지",
+      "severity": "",
+      "reason": "",
+      "price": 87.04
     }
   ]
 }
