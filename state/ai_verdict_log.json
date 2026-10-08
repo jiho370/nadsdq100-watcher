@@ -3403,6 +3403,106 @@
       "severity": "일시적",
       "reason": "신세계건설이 포괄적 주식교환으로 이마트 비상장 100% 자회사화되며 PF 부실 자회사의 재무 부담을 이마트가 계속 떠안는 구조. 금번 검색에서 반전 사실 확인 안 됨.",
       "price": 70500.0
+    },
+    {
+      "date": "2026-10-08",
+      "market": "us",
+      "symbol": "SWKS",
+      "name": "Skyworks Solutions, Inc.",
+      "verdict": "매수유지",
+      "severity": "",
+      "reason": "",
+      "price": 79.32
+    },
+    {
+      "date": "2026-10-08",
+      "market": "us",
+      "symbol": "REGN",
+      "name": "Regeneron Pharmaceuticals, Inc.",
+      "verdict": "제외",
+      "severity": "일시적",
+      "reason": "2026-05-15 Fianlimab+Libtayo 3상 1차 평가변수 통계적 유의성 미달 공개에 따른 증권 집단소송(현재 리드 플레인티프 선정 단계, 신규 확정 사실 없음)",
+      "price": 728.43
+    },
+    {
+      "date": "2026-10-08",
+      "market": "us",
+      "symbol": "WDAY",
+      "name": "Workday, Inc.",
+      "verdict": "매수유지",
+      "severity": "",
+      "reason": "",
+      "price": 185.13
+    },
+    {
+      "date": "2026-10-08",
+      "market": "us",
+      "symbol": "HPQ",
+      "name": "HP Inc.",
+      "verdict": "제외",
+      "severity": "일시적",
+      "reason": "8/26 실적발표에서 FY2027 가이던스 보류 및 PC 출하량 한자릿수 중반 감소 전망(원가·수요 압박), 신규 사실 없음",
+      "price": 32.17
+    },
+    {
+      "date": "2026-10-08",
+      "market": "us",
+      "symbol": "TRMB",
+      "name": "Trimble Inc.",
+      "verdict": "매수유지",
+      "severity": "",
+      "reason": "",
+      "price": 58.93
+    },
+    {
+      "date": "2026-10-08",
+      "market": "us",
+      "symbol": "PYPL",
+      "name": "PayPal Holdings, Inc.",
+      "verdict": "매수유지",
+      "severity": "",
+      "reason": "",
+      "price": 54.38
+    },
+    {
+      "date": "2026-10-08",
+      "market": "us",
+      "symbol": "IT",
+      "name": "Gartner, Inc.",
+      "verdict": "매수유지",
+      "severity": "",
+      "reason": "",
+      "price": 190.75
+    },
+    {
+      "date": "2026-10-08",
+      "market": "us",
+      "symbol": "MRK",
+      "name": "Merck & Co., Inc.",
+      "verdict": "매수유지",
+      "severity": "",
+      "reason": "",
+      "price": 139.64
+    },
+    {
+      "date": "2026-10-08",
+      "market": "us",
+      "symbol": "VRSN",
+      "name": "VeriSign, Inc.",
+      "verdict": "매수유지",
+      "severity": "",
+      "reason": "",
+      "price": 298.04
+    },
+    {
+      "date": "2026-10-08",
+      "market": "us",
+      "symbol": "SOLV",
+      "name": "Solventum Corporation",
+      "verdict": "매수유지",
+      "severity": "",
+      "reason": "",
+      "price": 85.66
     }
   ]
 }
