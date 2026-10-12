@@ -3603,6 +3603,86 @@
       "severity": "",
       "reason": "",
       "price": 145.19
+    },
+    {
+      "date": "2026-10-12",
+      "market": "kr",
+      "symbol": "015760",
+      "name": "한국전력",
+      "verdict": "제외",
+      "severity": "일시적",
+      "reason": "4분기 연료비조정단가도 3분기와 동일하게 kWh당 +5원 상한으로 동결(9/21 발표, 18분기 연속)되어 원가 회수 지연이 계속됨.",
+      "price": 28400.0
+    },
+    {
+      "date": "2026-10-12",
+      "market": "kr",
+      "symbol": "002380",
+      "name": "KCC",
+      "verdict": "매수유지",
+      "severity": "",
+      "reason": "",
+      "price": 468500.0
+    },
+    {
+      "date": "2026-10-12",
+      "market": "kr",
+      "symbol": "006040",
+      "name": "동원산업",
+      "verdict": "매수유지",
+      "severity": "",
+      "reason": "",
+      "price": 35400.0
+    },
+    {
+      "date": "2026-10-12",
+      "market": "kr",
+      "symbol": "029780",
+      "name": "삼성카드",
+      "verdict": "제외",
+      "severity": "일시적",
+      "reason": "8/14 주총서 배당성향 46% 현금배당만 확정, 자사주 소각 등 구체적 주주환원 확대 방안·시점 미제시(중장기 환원율 50% 목표는 방향성 제시에 그침).",
+      "price": 41850.0
+    },
+    {
+      "date": "2026-10-12",
+      "market": "kr",
+      "symbol": "003030",
+      "name": "세아제강지주",
+      "verdict": "매수유지",
+      "severity": "",
+      "reason": "",
+      "price": 103100.0
+    },
+    {
+      "date": "2026-10-12",
+      "market": "kr",
+      "symbol": "024110",
+      "name": "기업은행",
+      "verdict": "매수유지",
+      "severity": "",
+      "reason": "",
+      "price": 20000.0
+    },
+    {
+      "date": "2026-10-12",
+      "market": "kr",
+      "symbol": "000270",
+      "name": "기아",
+      "verdict": "매수유지",
+      "severity": "",
+      "reason": "",
+      "price": 110100.0
+    },
+    {
+      "date": "2026-10-12",
+      "market": "kr",
+      "symbol": "139480",
+      "name": "이마트",
+      "verdict": "제외",
+      "severity": "일시적",
+      "reason": "신세계건설 부실 지원 부담 지속 — 5,000억원 유상증자(현금 2,400억+현물 2,600억, 명일점 부동산)가 진행 중이며 현물출자 완료 시점 미확정.",
+      "price": 72500.0
     }
   ]
 }
