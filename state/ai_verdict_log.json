@@ -3863,6 +3863,106 @@
       "severity": "일시적",
       "reason": "신세계건설을 포괄적 주식교환으로 비상장 100% 자회사화한 구조가 유지되어 PF 부실 자회사의 재무 부담을 이마트가 계속 떠안는 상태.",
       "price": 72400.0
+    },
+    {
+      "date": "2026-10-13",
+      "market": "us",
+      "symbol": "SWKS",
+      "name": "Skyworks Solutions, Inc.",
+      "verdict": "매수유지",
+      "severity": "",
+      "reason": "",
+      "price": 75.71
+    },
+    {
+      "date": "2026-10-13",
+      "market": "us",
+      "symbol": "GM",
+      "name": "General Motors Company",
+      "verdict": "매수유지",
+      "severity": "",
+      "reason": "",
+      "price": 83.71
+    },
+    {
+      "date": "2026-10-13",
+      "market": "us",
+      "symbol": "REGN",
+      "name": "Regeneron Pharmaceuticals, Inc.",
+      "verdict": "제외",
+      "severity": "일시적",
+      "reason": "흑색종 3상(Fianlimab+Libtayo) 1차 평가변수 미달(2026-05-15) 관련 증권 집단소송 계속 진행 중(리드플레인티프 마감 9/14 경과, 소송 자체는 미해결)",
+      "price": 755.56
+    },
+    {
+      "date": "2026-10-13",
+      "market": "us",
+      "symbol": "HPQ",
+      "name": "HP Inc.",
+      "verdict": "제외",
+      "severity": "일시적",
+      "reason": "8/26 실적발표에서 FY2027 PC 출하 둔화 전망·가이던스 보류, 이후 4000~6000명 감원 계획 발표 및 Morgan Stanley Underweight 하향(마진 압박 우려)",
+      "price": 30.73
+    },
+    {
+      "date": "2026-10-13",
+      "market": "us",
+      "symbol": "WDAY",
+      "name": "Workday, Inc.",
+      "verdict": "매수유지",
+      "severity": "",
+      "reason": "",
+      "price": 188.01
+    },
+    {
+      "date": "2026-10-13",
+      "market": "us",
+      "symbol": "TRMB",
+      "name": "Trimble Inc.",
+      "verdict": "매수유지",
+      "severity": "",
+      "reason": "",
+      "price": 59.56
+    },
+    {
+      "date": "2026-10-13",
+      "market": "us",
+      "symbol": "PYPL",
+      "name": "PayPal Holdings, Inc.",
+      "verdict": "매수유지",
+      "severity": "",
+      "reason": "",
+      "price": 56.0
+    },
+    {
+      "date": "2026-10-13",
+      "market": "us",
+      "symbol": "VRSN",
+      "name": "VeriSign, Inc.",
+      "verdict": "매수유지",
+      "severity": "",
+      "reason": "",
+      "price": 305.24
+    },
+    {
+      "date": "2026-10-13",
+      "market": "us",
+      "symbol": "IT",
+      "name": "Gartner, Inc.",
+      "verdict": "매수유지",
+      "severity": "",
+      "reason": "",
+      "price": 197.76
+    },
+    {
+      "date": "2026-10-13",
+      "market": "us",
+      "symbol": "SOLV",
+      "name": "Solventum Corporation",
+      "verdict": "매수유지",
+      "severity": "",
+      "reason": "",
+      "price": 85.46
     }
   ]
 }
