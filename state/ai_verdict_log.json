@@ -4243,6 +4243,106 @@
       "severity": "일시적",
       "reason": "자회사 신세계건설 부채비율 재상승(444.7%)과 재무부실로 이마트의 추가 자금 지원(5월 5천억 유상증자 참여)이 반복되는 구조, 2분기 연결 영업손실 430억 적자전환 겹치며 하나증권이 투자의견을 매수→중립, 목표가 11만→8.2만원으로 하향(2026.8월).",
       "price": 74500.0
+    },
+    {
+      "date": "2026-10-19",
+      "market": "us",
+      "symbol": "GM",
+      "name": "General Motors Company",
+      "verdict": "매수유지",
+      "severity": "",
+      "reason": "",
+      "price": 83.12
+    },
+    {
+      "date": "2026-10-19",
+      "market": "us",
+      "symbol": "SWKS",
+      "name": "Skyworks Solutions, Inc.",
+      "verdict": "매수유지",
+      "severity": "",
+      "reason": "",
+      "price": 80.76
+    },
+    {
+      "date": "2026-10-19",
+      "market": "us",
+      "symbol": "HPQ",
+      "name": "HP Inc.",
+      "verdict": "제외",
+      "severity": "일시적",
+      "reason": "8/26 실적발표에서 FY2027 PC 출하 둔화 전망·가이던스 보류, 4000~6000명 감원 계획 및 Morgan Stanley Underweight 하향 — 오늘 추가 확인된 신규 사실 없어 전일 판정 유지",
+      "price": 30.11
+    },
+    {
+      "date": "2026-10-19",
+      "market": "us",
+      "symbol": "REGN",
+      "name": "Regeneron Pharmaceuticals, Inc.",
+      "verdict": "제외",
+      "severity": "일시적",
+      "reason": "흑색종 3상(Fianlimab+Libtayo) 1차 평가변수 미달(5/15) 관련 증권 집단소송 미해결(리드플레인티프 마감 9/14 경과) — 오늘 소송 해소 근거 없어 전일 판정 유지",
+      "price": 783.86
+    },
+    {
+      "date": "2026-10-19",
+      "market": "us",
+      "symbol": "XYZ",
+      "name": "Block, Inc.",
+      "verdict": "매수유지",
+      "severity": "",
+      "reason": "",
+      "price": 77.92
+    },
+    {
+      "date": "2026-10-19",
+      "market": "us",
+      "symbol": "WDAY",
+      "name": "Workday, Inc.",
+      "verdict": "매수유지",
+      "severity": "",
+      "reason": "",
+      "price": 192.36
+    },
+    {
+      "date": "2026-10-19",
+      "market": "us",
+      "symbol": "BALL",
+      "name": "Ball Corporation",
+      "verdict": "매수유지",
+      "severity": "",
+      "reason": "",
+      "price": 63.56
+    },
+    {
+      "date": "2026-10-19",
+      "market": "us",
+      "symbol": "TRMB",
+      "name": "Trimble Inc.",
+      "verdict": "매수유지",
+      "severity": "",
+      "reason": "",
+      "price": 59.6
+    },
+    {
+      "date": "2026-10-19",
+      "market": "us",
+      "symbol": "PYPL",
+      "name": "PayPal Holdings, Inc.",
+      "verdict": "매수유지",
+      "severity": "",
+      "reason": "",
+      "price": 56.39
+    },
+    {
+      "date": "2026-10-19",
+      "market": "us",
+      "symbol": "VRSN",
+      "name": "VeriSign, Inc.",
+      "verdict": "매수유지",
+      "severity": "",
+      "reason": "",
+      "price": 304.57
     }
   ]
 }
