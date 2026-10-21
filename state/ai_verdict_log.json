@@ -4343,6 +4343,106 @@
       "severity": "",
       "reason": "",
       "price": 304.57
+    },
+    {
+      "date": "2026-10-21",
+      "market": "us",
+      "symbol": "SWKS",
+      "name": "Skyworks Solutions, Inc.",
+      "verdict": "매수유지",
+      "severity": "",
+      "reason": "",
+      "price": 81.43
+    },
+    {
+      "date": "2026-10-21",
+      "market": "us",
+      "symbol": "BMY",
+      "name": "Bristol-Myers Squibb Company",
+      "verdict": "매수유지",
+      "severity": "",
+      "reason": "",
+      "price": 61.01
+    },
+    {
+      "date": "2026-10-21",
+      "market": "us",
+      "symbol": "REGN",
+      "name": "Regeneron Pharmaceuticals, Inc.",
+      "verdict": "제외",
+      "severity": "일시적",
+      "reason": "흑색종 3상(Fianlimab+Libtayo) 1차 평가변수 미달(5/15) 관련 증권사기 소송(Cheathem v. Regeneron, SDNY 26-cv-6026) 리드플레인티프 마감(9/14) 경과했으나 판결·기각 등 해소 근거 없음",
+      "price": 801.34
+    },
+    {
+      "date": "2026-10-21",
+      "market": "us",
+      "symbol": "HPQ",
+      "name": "HP Inc.",
+      "verdict": "제외",
+      "severity": "일시적",
+      "reason": "FY2027 PC 출하 둔화 전망·가이던스 보류, 4000~6000명 감원 계획, Morgan Stanley Underweight 하향 — 해소 근거 없음",
+      "price": 31.35
+    },
+    {
+      "date": "2026-10-21",
+      "market": "us",
+      "symbol": "XYZ",
+      "name": "Block, Inc.",
+      "verdict": "매수유지",
+      "severity": "",
+      "reason": "",
+      "price": 78.7
+    },
+    {
+      "date": "2026-10-21",
+      "market": "us",
+      "symbol": "BALL",
+      "name": "Ball Corporation",
+      "verdict": "매수유지",
+      "severity": "",
+      "reason": "",
+      "price": 64.1
+    },
+    {
+      "date": "2026-10-21",
+      "market": "us",
+      "symbol": "WDAY",
+      "name": "Workday, Inc.",
+      "verdict": "매수유지",
+      "severity": "",
+      "reason": "",
+      "price": 203.4
+    },
+    {
+      "date": "2026-10-21",
+      "market": "us",
+      "symbol": "TRMB",
+      "name": "Trimble Inc.",
+      "verdict": "매수유지",
+      "severity": "",
+      "reason": "",
+      "price": 62.48
+    },
+    {
+      "date": "2026-10-21",
+      "market": "us",
+      "symbol": "PYPL",
+      "name": "PayPal Holdings, Inc.",
+      "verdict": "매수유지",
+      "severity": "",
+      "reason": "",
+      "price": 57.51
+    },
+    {
+      "date": "2026-10-21",
+      "market": "us",
+      "symbol": "VRSN",
+      "name": "VeriSign, Inc.",
+      "verdict": "매수유지",
+      "severity": "",
+      "reason": "",
+      "price": 308.64
     }
   ]
 }
